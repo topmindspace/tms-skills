@@ -17,14 +17,14 @@
     README.md                      人类视角的简介 / 安装 / 开发 / 打包
     package.json                   Node 依赖声明（pptxgenjs）与常用命令
     assets/templates/              三份模式模板 + engine.css / ui.js（公共片段注入源）
-    assets/examples/               9 份示例 HTML + 9 份 REPORT_MODEL（复制起点 · 覆盖全部 9 风格）
+    assets/examples/               3 份黄金样张 HTML + model（每模式 1；风格见 style-gallery）
     assets/pptx-export.js          PPTX 预览运行时（注入源）
     assets/style-gallery.html      风格 × 模式 × 亮暗主题交互画廊
     assets/theme-overview*.png     3 张主题参考图（整体 + research + architecture；演示态与整体图相同）
-    references/*.md                规范全文（当前 ≥24 篇；playbook.md = 唯一常读入口 L1；其余 L2 按需）
+    references/*.md                规范全文（Batch3 起 ≥20 篇；playbook.md = L1；其余 L2 按需）
     scripts/                         生成 / 校验 / 回归 / 维护工具（py + js + json 单源）
     scripts/extract_snippet.py       L2 节级片段抽取（减少整读大规范）
-    scripts/layout_slots.json        页型布局 IR（高频页型语义槽位）
+    # layoutSlots 已并入 layout-constants.json（Batch 3）
 
 ────────────────────────────────────────────────────────────────────────
 不进包（构建产物 / 本地状态 / 缓存，与 .gitignore 口径一致）
@@ -42,7 +42,7 @@
 ────────────────────────────────────────────────────────────────────────
     · SKILL.md frontmatter 含 name / description；name 与分发包目录名一致；
       description 为单行双引号字符串且 ≤ 1024 字符（平台截断阈值）
-    · references（含 layout-grammar）、3 份模式模板 + engine.css / ui.js、9 组示例、3 张参考图齐全
+    · references（含 layout-grammar）、3 份模式模板 + engine.css / ui.js、3 组黄金样张、3 张参考图齐全
     · 关键脚本齐全（单源注入 / 审计 / 示例重建 / 回归 / 双校验器 / 精导 / 打包）
 """
 import fnmatch
@@ -123,23 +123,23 @@ REQUIRED = [
     'references/charts.md',
     'references/infographics.md', 'references/icons.md', 'references/pptx-export.md',
     'references/high-fidelity.md', 'references/failure-modes.md',
-    'references/tech-design.md', 'references/industry-benchmark.md',
+    'references/tech-design.md',
     'scripts/env_probe.py', 'scripts/audit_docs.py', 'scripts/audit_skill.py',
     'scripts/scaffold_report.py',
     'scripts/render_from_model.py',
+    'scripts/recommend_layout.py',
     'scripts/sync_runtime.py', 'scripts/audit_styles.py', 'scripts/build_examples.py',
     'scripts/regression.py', 'scripts/validate_report.py', 'scripts/validate_pptx.py',
     'scripts/extract_model.py', 'scripts/build_pptx.js', 'scripts/gen_channel_a.js',
     'scripts/cross_verify.py', 'scripts/prepare_images.py', 'scripts/probe_image_export.py',
     'scripts/render_compare.py', 'scripts/capture_theme_overview.js', 'scripts/package_skill.py',
-    'scripts/layout-constants.json', 'scripts/model-schema.json', 'scripts/layout_slots.json',
+    'scripts/layout-constants.json', 'scripts/model-schema.json',
     'scripts/lib_layout_regions.js', 'scripts/extract_snippet.py', 'scripts/quality_gate.py',
     'scripts/checks_html.py', 'scripts/section-file-map.json',
     'scripts/measure_height.py', 'scripts/audit_css.py', 'scripts/negative_tests.py',
     'references/components-atoms.md', 'references/layouts-research.md',
     'references/layouts-architecture.md', 'references/layouts-combo.md',
     'references/charts-basic.md', 'references/charts-extended.md', 'references/charts-discipline.md',
-    'references/design-system-engine.md',
     'references/infographics-stats.md', 'references/infographics-structure.md',
     'evals/prompts.csv', 'evals/run_evals.py', 'evals/rubric.schema.json',
     'evals/trace.example.json',
@@ -147,9 +147,9 @@ REQUIRED = [
 
 # 必须达到最小数量的集合（名称含日期，故按数量校验）
 MIN_COUNTS = {
-    'assets/examples/*.html': 9,
-    'assets/examples/*.model.json': 9,
-    'references/*.md': 24,  # 实有 ~26（归档 reform-plan 后）；≥24 防误删核心 L2
+    'assets/examples/*.html': 3,  # Batch3 每模式 1 份黄金样张
+    'assets/examples/*.model.json': 3,
+    'references/*.md': 20,  # Batch3 归档后实有 24；≥20 防误删核心 L2
 }
 
 

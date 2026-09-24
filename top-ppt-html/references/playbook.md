@@ -151,6 +151,11 @@ Gate 0 参考图 → 六项问询（1 轮）→ 证据表 → 故事线脑暴 �
 
 ## 五、图表选型决策树（先问"要回答什么"，再选图）
 
+> **默认面（8 核心图）**：`bar` · `hbar` · `line` · `donut` · `progress` · `area` · `stack` · `dualline`
+> （= `layoutSystem.defaultCharts`）。完整登记与代码 → `extract_snippet.py --chart <类型>`；误用纪律 → `charts.md`。
+> 下表仍保留决策提示；**生成默认只从 8 核心里选**，扩展图仅在意图明确命中时用。
+
+
 > 穷举代码见 `charts.md` §16–§31、§35、§52–§70；误用反例与多样性纪律见 `charts.md` §66。
 > **默认生成面（P1 收敛）**：优先 `bar / hbar / line / donut / progress / area / stack / dualline`。
 > **高级图型**（waterfall/gantt/funnel/slope/… 与 6 类信息图）按需选用，不进默认轮换。
@@ -255,6 +260,7 @@ python scripts/validate_pptx.py 2026-09-15-主题.pptx --strict --model=….mode
 
 ## 十、L2 节级路由（按任务只读这些，读完即停）
 
+> 默认生成面速查：`default-surface.md`（12 页型 + 8 图 + V1–V4）。
 > **不要整读** `components.md` / `charts.md` 背后的物理拆分大文件。需要代码时优先：
 > `python scripts/extract_snippet.py --list` · `--task <名>` · `--chart <类型>` · `--page-type <页型>` · `--file components.md --section 46`（逻辑名自动路由）
 
@@ -272,5 +278,5 @@ python scripts/validate_pptx.py 2026-09-15-主题.pptx --strict --model=….mode
 | 图标 / 语义速查 | `icons.md` · `--task icons` |
 | 起骨架用节奏包 | `scaffold_report.py --list-types` → `--preset consulting` 等 |
 
-**纪律**：L0+L1 是默认全部所需；上表命中才开 L2；**读完即执行，不预读下一份**。页型语义槽位见 `scripts/layout_slots.json`（双通道同源 IR）。
+**纪律**：L0+L1 是默认全部所需；上表命中才开 L2；**读完即执行，不预读下一份**。页型语义槽位见 `layout-constants.json` → `layoutSlots`（双通道同源 IR）。
 **维护者**：改常量/schema/引擎后必跑 `sync_runtime.py` → `audit_styles.py` → `audit_docs.py` → `audit_skill.py` → `build_examples.py` → `regression.py`。

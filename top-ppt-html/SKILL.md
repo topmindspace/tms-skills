@@ -85,10 +85,10 @@ description: "TopPPT HTML：报告 / 演示 / 信息架构图生成器。单文�
 **L2 一览**（命中条件与逐任务只读清单的**详表以 playbook §十为准**，此处仅索引）：
 
 - 模式契约与锁定版式 → `references/modes.md` · 完整路径七步 → `references/outline-design.md`
-- **布局骨架/元素/组合/留白 → `references/layout-grammar.md`（P1–P12 · 每页动手前）**
+- **默认面 → `references/default-surface.md`** · **布局骨架 → `references/layout-grammar.md`（P1–P12）**
 - 组件/版式**代码**与 §46 选型表 → `references/components.md` · 图表**代码** → `references/charts.md` · 信息图页型 → `references/infographics.md`（→ stats / structure 两分册）
-- 配色/主题/字阶 → `references/styles.md` + `references/design-system.md`（`design-system-engine.md` 为实现镜像，生成场景不读）· 写作纪律 → `references/content-rules.md` · 图标语义表 → `references/icons.md`
-- PPTX 精导 → `references/pptx-export.md` · 深度高保真 → `references/high-fidelity.md` · 修复顺序 → `references/failure-modes.md` · 技能维护 → `references/tech-design.md` + `references/industry-benchmark.md`
+- 配色/主题/字阶 → `references/styles.md` + `references/design-system.md`（引擎 CSS 为实现真相；历史引擎说明已归档）· 写作纪律 → `references/content-rules.md` · 图标语义表 → `references/icons.md`
+- PPTX 精导 → `references/pptx-export.md` · 深度高保真 → `references/high-fidelity.md` · 修复顺序 → `references/failure-modes.md` · 技能维护 → `references/tech-design.md`
 
 **操作方式**：定模式/页型/组合/图 → 只读 `playbook.md`；取代码 → `extract_snippet.py`；**禁止整读** `layouts-combo.md` / `charts-basic.md` 等大文件；**同一阶段不重复读同一文件**。
 

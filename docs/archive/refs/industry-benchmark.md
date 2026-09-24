@@ -1,3 +1,5 @@
+> **归档说明（Batch 3 · 2026-09-24）**：已从 `top-ppt-html/references/` 迁出；生成路径不读。现行入口：`playbook.md` / `design-system.md` / `tech-design.md` + `assets/templates/engine.css`。
+
 # 业界对标与设计决策
 
 四大主流 PPT/报告技能的调研结论 → TopPPT HTML 的采纳/改造/不采用决策。生成报告前不必读本文档；**改动导出机制、版式体系或校验体系前必读**（防止无依据地破坏既有决策）。
