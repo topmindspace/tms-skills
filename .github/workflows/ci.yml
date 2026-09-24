@@ -82,6 +82,10 @@ jobs:
             python3 scripts/audit_skill.py
             python3 scripts/audit_css.py
             python3 scripts/negative_tests.py
+            # Batch 2: one-example PPTX smoke (extract → build → validate --strict)
+            if [ -f scripts/smoke_pptx.sh ]; then
+              bash scripts/smoke_pptx.sh
+            fi
             # regression.py needs pptxgenjs (installed) but may need playwright
             # for measure_height; that step self-SKIPs. Full regression is heavy
             # and optional here — keep CI green; run locally before release.

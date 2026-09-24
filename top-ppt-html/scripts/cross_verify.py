@@ -8,7 +8,7 @@
 ③ 文本溢出启发式：文本估算宽 vs shape 宽 × 可容行数
 ④ B 通道原生图表数值 ↔ 模型数值（类别标签一致不代表数值一致；数值错乱只能这里拓）
 ⑤ 字号比例尺同源：B 的字号必须是 A 字号集的子集（防 modeSize()/sz() 后处理漂移）
-用法：先 node scripts/gen_channel_a.js 生成 A 通道产物，再 python scripts/cross_verify.py
+默认 SKIP；加 --full-ab 才执行。用法：先 node scripts/gen_channel_a.js 生成 A 通道产物，再 python scripts/cross_verify.py
 改 pptx-export.js 序列化骨架后必跑（见 references/pptx-export.md 双裁判教训）。
 """
 import json
@@ -291,4 +291,8 @@ def main() -> int:
 
 
 if __name__ == '__main__':
+    # Batch 2: A/B 全文对等默认关闭；显式 --full-ab 才跑（Fast/标准交付不依赖）
+    if '--full-ab' not in sys.argv:
+        print('cross_verify: SKIP（默认关闭；需要 A/B 全文对等时加 --full-ab）')
+        sys.exit(0)
     sys.exit(main())

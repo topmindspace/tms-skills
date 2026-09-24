@@ -240,7 +240,7 @@ def main() -> int:
         fails.append('dark-theme')
 
     # ⑥ 双通道交叉裁判（python-pptx）：放在探针之后，A/B 产物齐全时才逐页比对
-    r4 = run([PY, str(ROOT / 'scripts' / 'cross_verify.py')])
+    r4 = run([PY, str(ROOT / 'scripts' / 'cross_verify.py')] + (['--full-ab'] if '--full-ab' in sys.argv else []))
     if r4.returncode == 2:
         print('  [cross_verify] SKIP（python-pptx 未安装，可选第三方裁判）')
         skipped.append('cross-verify')

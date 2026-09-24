@@ -1,3 +1,13 @@
+## Unreleased
+
+### top-ppt-html · Batch 2（布局选型 + layout-qa + PPTX 对齐）
+
+- **recommend_layout.py**：`--mode A|B|C` + `--intent` / `--from-model` / `--stdin` → `{pageType,skel,chart,rationale,v?}`（V1–V4 / 极偏禁 donut / sizeByComplexity）。
+- **validate_report.py --layout-qa**：缺 data-skel、连续同骨架、极偏 donut、演示简单全幅、V 契约；negative_tests 增 L1–L3。
+- **cross_verify.py** 默认 SKIP，`--full-ab` 才跑；regression 同口径。
+- **build_pptx.js** 尊重 `layoutPreset`（缺省由 pageToPreset 回填，写入备注）。
+- **smoke_pptx.sh** + CI skill-gates 冒烟：extract_model → build_pptx → validate_pptx --strict。
+
 # Changelog
 
 ## Unreleased
