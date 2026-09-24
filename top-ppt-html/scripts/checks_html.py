@@ -83,6 +83,45 @@ def variety_floor(mode: str, n_chart_pages: int, variety: dict | None = None) ->
     return min(floor, max(1, int(-(-n_chart_pages * ratio // 1))))
 
 
+
+def core_charts(lc: dict | None = None) -> list[str]:
+    lc = lc or load_lc()
+    ls = lc.get('layoutSystem') or {}
+    return list(ls.get('defaultCharts') or
+                ['bar', 'hbar', 'line', 'donut', 'progress', 'area', 'stack', 'dualline'])
+
+
+def advanced_charts(lc: dict | None = None) -> set[str]:
+    lc = lc or load_lc()
+    ls = lc.get('layoutSystem') or {}
+    return set(ls.get('advancedCharts') or [])
+
+
+def variety_core_preference(used: list[str], variety: dict | None = None,
+                            lc: dict | None = None) -> str | None:
+    """preferCoreFirst：advanced 已用但核图多样性不足 → WARN 文案。
+
+    advanced 仍计入 minTypes（不罚）；仅提示勿用冷门图凑下限。
+    """
+    v = variety if variety is not None else chart_variety(lc)
+    if not v.get('preferCoreFirst'):
+        return None
+    core = set(core_charts(lc))
+    adv = advanced_charts(lc)
+    distinct = set(used)
+    core_used = distinct & core
+    adv_used = distinct & adv if adv else (distinct - core)
+    if not adv_used:
+        return None
+    floor_hint = int(v.get('corePreferMin') or 3)
+    if len(core_used) >= min(floor_hint, len(core)):
+        return None
+    return (
+        f"核图仅 {sorted(core_used) or '∅'}（建议先 ≥{floor_hint} 种核图拉开多样性）；"
+        f"已用 advanced {sorted(adv_used)}——允许计入 minTypes，但勿为凑下限而选用；"
+        f"仅内容意图命中时用 advanced"
+    )
+
 def adjacent_same_type(pages: list[list[str]]) -> list[str]:
     """相邻图表页同型告警文案列表。"""
     adj, prev, prev_i = [], None, 0

@@ -820,7 +820,7 @@
       }
     },
     "variety": {
-      "$comment": "图表多样性预算（validate_report.py 与 evals/run_evals.py 消费）——治「图表定义 36 种、实际只用 bar/line/donut」。类型数下限 = min(minTypes[模式], max(1, ⌈图表页数 × minTypesRatio⌉))；noRepeatAdjacent = 相邻图表页不得同 data-chart；compositeMinRatio/compositeModes 只对 research 生效（A 演示一屏一主张，C 架构一页一图）。多样性仍是特性：按内容选型拉开图种；8 核图优先、advanced 在意图命中时用。禁反模式：为过门禁硬上冷门图、简单图全幅、极偏 donut/pie（见 layout-qa / sizeByComplexity）。判据与选型见 references/playbook.md §五。",
+      "$comment": "图表多样性预算（validate_report.py 与 evals/run_evals.py 消费）——治「图表定义 36 种、实际只用 bar/line/donut」。类型数下限 = min(minTypes[模式], max(1, ⌈图表页数 × minTypesRatio⌉))；noRepeatAdjacent = 相邻图表页不得同 data-chart；compositeMinRatio/compositeModes 只对 research 生效（A 演示一屏一主张，C 架构一页一图）。preferCoreFirst：多样性宜先拉开 layoutSystem.defaultCharts（核图 8）；advanced 图种在使用时同样计入 minTypes（不因用 advanced 受罚），但仅当内容意图命中时选用，禁为凑下限硬上冷门图。禁反模式：简单图全幅、极偏 donut/pie（见 layout-qa / sizeByComplexity）。判据与选型见 references/playbook.md §五。",
       "minTypes": {
         "presentation": 4,
         "research": 6,
@@ -831,7 +831,9 @@
       "compositeMinRatio": 0.3,
       "compositeModes": [
         "research"
-      ]
+      ],
+      "preferCoreFirst": true,
+      "corePreferMin": 3
     },
     "registry": {
       "$comment": "图表登记四元组：pptx=native 走 addChart（真 chart part + 内嵌 Excel，双击可编辑数据）；pptx=shape 走 OOXML 原生形状/SVG path 高保真还原，且**必须**按 dataTable 策略附数据表保证数据可追溯；nativeTrick = 用原生图表技巧实现的类型；path = 形状还原的几何约束（采样点下限 / 双边界追踪 / 禁预设形状）。build_pptx.js 与 pptx-export.js 双引擎按本表分派，validate_pptx.py 按本表断言。",
@@ -1845,7 +1847,66 @@
       "$comment": "混排须显式对齐类；layout-qa 另检列节奏（多列网格共享顶边/左缘意图）。",
       "requireColumnRhythm": true
     },
-    "fillTargetComment": "填充率目标带。Mode A 大气留白：cover/section/quote/closing 等休止页为 intentional whitespace，不按 underfill/FILL_LOW 惩罚（见 qualityGates.underfill.exemptIds + validate LAYOUT_FILL 轻量页豁免）。内容页半空仍属 underfill。硬规则守舞台；自适应留给内容。"
+    "fillTargetComment": "填充率目标带。Mode A 大气留白：cover/section/quote/closing 等休止页为 intentional whitespace，不按 underfill/FILL_LOW 惩罚（见 qualityGates.underfill.exemptIds + validate LAYOUT_FILL 轻量页豁免）。内容页半空仍属 underfill。硬规则守舞台；自适应留给内容。",
+    "modeSkels": {
+      "$comment": "Mode A 主力骨架 = P1–P4 + P6/P10；P7–P9、P11–P12 为 A 次级（research/architecture 场景下可升主力）。P5 三卡为 A 常用扩展（非默认轮换）。次级仍合法、文档与画廊可引用，禁止删除。",
+      "presentation": {
+        "primary": [
+          "P1",
+          "P2",
+          "P3",
+          "P4",
+          "P6",
+          "P10"
+        ],
+        "secondary": [
+          "P7",
+          "P8",
+          "P9",
+          "P11",
+          "P12"
+        ],
+        "extended": [
+          "P5"
+        ]
+      },
+      "research": {
+        "primary": [
+          "P5",
+          "P7",
+          "P8",
+          "P4",
+          "P6"
+        ],
+        "secondary": [
+          "P1",
+          "P2",
+          "P3",
+          "P9",
+          "P10",
+          "P11",
+          "P12"
+        ]
+      },
+      "architecture": {
+        "primary": [
+          "P9",
+          "P10",
+          "P11"
+        ],
+        "secondary": [
+          "P1",
+          "P2",
+          "P3",
+          "P4",
+          "P5",
+          "P6",
+          "P7",
+          "P8",
+          "P12"
+        ]
+      }
+    }
   },
   "qualityGates": {
     "$comment": "v9+ 硬门禁。tagLeakPatterns / titleOnly / underfill / roundtripMin / chartSkew / chartOversize 同前。antiTruncation：截断迹象与溢出未拆页；chromeDriftIn：跨页 chrome y 容差（英寸）。",

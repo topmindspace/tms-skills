@@ -222,8 +222,9 @@ CARRIERS = checks_html.CARRIERS  # 单源 scripts/checks_html.py
 def _check_chart_variety(txt, chk, mode):
     """图表与版式多样性（阈值单源 charts.variety；判定逻辑 checks_html）。
 
-    多样性仍是特性：全部 data-chart 类型计入下限。禁反模式由 layout-qa /
-    sizeByComplexity / CHART_SKEW 等另检（简单全幅、极偏 donut、内容不匹配的冷门图）。
+    多样性仍是特性：全部 data-chart（含 advanced）计入下限——用 advanced 不罚。
+    preferCoreFirst：核图多样性不足却靠 advanced 撑场时 WARN（勿凑下限）。
+    禁反模式由 layout-qa / sizeByComplexity / CHART_SKEW 另检。
     """
     v = CHART_VARIETY
     if not v:
@@ -236,8 +237,14 @@ def _check_chart_variety(txt, chk, mode):
     n_chart_pages = len([1 for ts in per_page if ts])
 
     floor = checks_html.variety_floor(mode, n_chart_pages, v)
+    # advanced 与核图一并计入 distinct（不因用 advanced 受罚）
     chk("图表多样性（全篇不同 data-chart 类型数）", len(distinct) >= floor,
         f"{len(distinct)} 种 / 下限 {floor}（{n_chart_pages} 个图表页）: {distinct}")
+    # preferCoreFirst WARN 仅 A/B：C 架构以结构/甘特等 advanced 为主属正常，不噪音
+    if mode in ('presentation', 'research'):
+        pref = checks_html.variety_core_preference(used, v)
+        if pref:
+            chk("图表多样性·核图优先（preferCoreFirst）", False, pref, level="WARN")
 
     if v.get('noRepeatAdjacent'):
         adj = checks_html.adjacent_same_type(per_page)

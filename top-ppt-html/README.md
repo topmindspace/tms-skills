@@ -101,7 +101,7 @@ top-ppt-html/
 │  ├─ layouts-combo.md          #   §32–§34/§39–§50 组合与选型表 §46              │
 │  ├─ charts.md                 #   逻辑索引（图表 § 路由）                       │
 │  ├─ charts-basic.md           #   §16–§35 基础图表代码                          │
-│  ├─ charts-extended.md        #   §52–§70 扩展图表代码                          │
+│  ├─ charts-extended.md        #   §52–§70 advanced（意图命中才读，禁预读）        │
 │  ├─ charts-discipline.md      #   §64/§66 误用与多样性纪律                      │
 │  ├─ infographics.md           #   铁律与边界（逻辑入口）；代码已拆分见下两行          │
 │  ├─ infographics-stats.md     #   统计图形族 §1–§6 / §71–§77                        │
@@ -153,7 +153,7 @@ python scripts/negative_tests.py
 |------|------|
 | `SKILL.md` | L0 路由（≤13KB） |
 | `references/playbook.md` | L1 决策层 |
-| `references/default-surface.md` | 默认 12 页型 + 8 图 + V1–V4 |
+| `references/default-surface.md` | Mode A 主读：12 页型 + 核图 8 + V1–V4；主力骨架 P1–P4+P6/P10 |
 | `assets/examples/` | 3 份黄金样张（每模式 1） |
 | `assets/style-gallery.html` | 9 风格 × 模式 × 亮暗 |
 | `docs/archive/` | 历史规范 / 旧示例 / 全量 build_examples |

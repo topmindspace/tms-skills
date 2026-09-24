@@ -45,7 +45,9 @@
 | 同页放两张同型图 | 两个视觉重心互相打架 | 改 `split` / `halftable` 并让两图**编码不同维度** |
 | 多系列图用单色明度阶梯 | 三条线分不清谁是谁 | `f-c1~c5` / `s-c1~c5` 编码色板（见 `design-system.md` §9b） |
 
-### 66-2 多样性纪律（校验器硬拦 · 阈值单源 `layout-constants.json` `charts.variety`）
+### 66-2 多样性纪律（校验器硬拦 · 参数单源 `layout-constants.json` `charts.variety`）
+
+> **preferCoreFirst**：优先用核图 8 拉开多样性；`charts-extended` / advanced **意图命中才加载**。advanced 一旦使用即计入类型数下限（不罚）；**禁止**为过 `minTypes` 硬上冷门图。
 
 1. **类型数下限**：全篇不同 `data-chart` 类型数 ≥ `min(minTypes[mode], ⌈图表页数 × 0.6⌉)`（research 上限 6 / presentation 4 / architecture 3）。
 2. **不连续同型**：相邻图表页不得使用同一 `data-chart` 类型——读者视角就是"又一张一样的图"。
