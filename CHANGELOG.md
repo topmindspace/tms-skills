@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.1.1 — 2026-09-24
+
 ### Fixes (P0 / P1)
 
 - **Release 顺序与稳健性**：Privacy → 技能门禁 → Package → Collect → GitHub Release → **npm publish（已发布则跳过，避免 E409）** → 再 Prune。
