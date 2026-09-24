@@ -1909,8 +1909,8 @@
       "overflowNoSplitFail": true
     },
     "chromeDriftIn": {
-      "$comment": "PPTX 页脚/页码 y 相对中位数漂移超过此值（英寸）→ WARN CHROME_DRIFT。",
-      "maxAbsDeltaIn": 0.12
+      "$comment": "PPTX 内容页页脚/页码 y 相对中位数漂移超过此值（英寸）→ WARN CHROME_DRIFT。封面/收尾豁免。默认 0.2in，抓明显漂移、不挡正常页型微差。",
+      "maxAbsDeltaIn": 0.2
     },
     "halfEmpty": {
       "$comment": "半空卡：同页多卡时，正文过短的卡占比过高 → layout-qa WARN/FAIL。",
