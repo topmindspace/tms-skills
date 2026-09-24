@@ -1,0 +1,5 @@
+# Codex / ChatGPT Skills UI metadata (optional)
+display_name: "TopPPT HTML"
+short_description: "Reports, decks, and architecture diagrams as single-file HTML + editable 16:9 PPTX."
+default_prompt: "Generate a professional presentation or research report as HTML (and optional PPTX)."
+allow_implicit_invocation: true

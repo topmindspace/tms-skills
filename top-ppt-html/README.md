@@ -48,6 +48,16 @@ node tms-skills/bin/tms-skills.js install top-ppt-html
 
 > **GitHub 更新不会自动进 npm。** 日常可钉 npm 版本；要最新技能用 GitHub 直装，或等 maintainer 打 tag 发版。
 >
+
+### 触发词回归（维护者）
+
+```bash
+python3 scripts/check_triggers.py          # keyword/heuristic vs SKILL description
+# 扩展：编辑 evals/trigger-queries.json（how_to_extend）
+```
+
+`package_skill.py --check` 会自动跑 trigger coverage。
+
 > 「找不到这个包」→ 换 GitHub 直装，或 `--registry https://registry.npmjs.org/`（镜像索引可能滞后）。不要 `npm install top-ppt-html`（技能 id 不是独立 npm 包）。
 
 也可将本目录（或 GitHub Release 附件 `top-ppt-html.zip` 解压结果）复制到智能体技能目录，目录名保持 `top-ppt-html`。技能识别面为 `SKILL.md`（frontmatter 的 `name` / `description` 即触发描述）。

@@ -48,6 +48,16 @@ node tms-skills/bin/tms-skills.js install top-ppt-html
 
 安装器把根目录下的技能目录 `<id>/`（含 `SKILL.md`）复制到目标目录；智能体通过 frontmatter（`name` + `description`）发现技能。
 
+默认探测顺序（`resolveDefaultTarget`）：项目级 `./.agents` → `./.claude` → `./.cursor` → `./.codex` → `./.mimocode`；再用户级 `~/.claude` → `~/.agents` → `~/.cursor` → `~/.codex`；都没有则落 `./.agents/skills`。也可用 `--to` 显式指定。
+
+| 宿主 | 项目级 | 用户级 |
+|------|--------|--------|
+| 通用 / Codex | `.agents/skills` | `~/.agents/skills` |
+| Claude Code | `.claude/skills` | `~/.claude/skills` |
+| Cursor | `.cursor/skills`（兼读 `.agents`） | `~/.cursor/skills` |
+| Codex 兼容 | `.codex/skills` | `~/.codex/skills` |
+| 本仓库另含 | `.mimocode/skills` | — |
+
 > **排错**：不要 `npm install <skill-id>`（技能 id 不是独立 npm 包）。「找不到包」→ 换 GitHub 直装，或 `--registry https://registry.npmjs.org/`。
 
 ### 可选依赖（仅 PPTX 精导）

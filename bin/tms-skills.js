@@ -70,12 +70,17 @@ function readSkillMeta(skillId) {
 }
 
 function resolveDefaultTarget() {
+  const home = process.env.HOME || process.env.USERPROFILE || '';
   const candidates = [
     path.join(process.cwd(), '.agents', 'skills'),
     path.join(process.cwd(), '.claude', 'skills'),
+    path.join(process.cwd(), '.cursor', 'skills'),
+    path.join(process.cwd(), '.codex', 'skills'),
     path.join(process.cwd(), '.mimocode', 'skills'),
-    path.join(process.env.HOME || process.env.USERPROFILE || '', '.claude', 'skills'),
-    path.join(process.env.HOME || process.env.USERPROFILE || '', '.agents', 'skills'),
+    path.join(home, '.claude', 'skills'),
+    path.join(home, '.agents', 'skills'),
+    path.join(home, '.cursor', 'skills'),
+    path.join(home, '.codex', 'skills'),
   ];
   for (const dir of candidates) {
     if (dir && fs.existsSync(path.dirname(dir))) {

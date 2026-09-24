@@ -139,7 +139,7 @@ def main() -> int:
     # ⑤ 篇数与必需文件
     n_ref = len(list(REF.glob('*.md')))
     sk = (ROOT / 'SKILL.md').read_text(encoding='utf-8')
-    d = re.search(r'^description:\s*"(.*)"\s*$', sk, re.M | re.S)
+    d = re.search(r'^description:\s*"(.*)"\s*$', sk, re.M)
     dlen = len(d.group(1)) if d else -1
     nm = re.search(r'^name:\s*(\S+)\s*$', sk, re.M)
     missing = [r for r in REQUIRED if not (ROOT / r).exists()]

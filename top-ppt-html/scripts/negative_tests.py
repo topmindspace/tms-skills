@@ -23,6 +23,7 @@
   L4  截断迹象（列表项省略号砍义）
   L5  溢出未拆页
   L6  混排缺对齐（ALIGN_RHYTHM）
+  N18 配图页缺 caption/图注（IMAGE_CAPTION）
 
 用法: python scripts/negative_tests.py
 """
@@ -175,6 +176,15 @@ def main() -> int:
             '"footnote":',
             '"footnote": "<strong>x</strong> ', 1)
     cases.append(('N17 模型夹带标签', t17, 'HTML_TAG_IN_TEXT'))
+
+    # N18 配图页缺 caption（有 <img>/media 无图注类）
+    t18 = txt.replace(
+        '</body>',
+        '<section class="band" data-page-type="image">'
+        '<div class="media media--full">'
+        '<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="注入无图注">'
+        '</div></section></body>', 1)
+    cases.append(('N18 配图缺 caption', t18, 'IMAGE_CAPTION'))
 
     ok = True
     for name, content, keyword in cases:

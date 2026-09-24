@@ -24,7 +24,8 @@
     "regression": "python3 scripts/regression.py",
     "negative": "python3 scripts/negative_tests.py",
     "package": "python3 scripts/package_skill.py",
-    "check": "python3 scripts/package_skill.py --check"
+    "check": "python3 scripts/package_skill.py --check",
+    "triggers": "python3 scripts/check_triggers.py"
   },
   "dependencies": {
     "pptxgenjs": "^4.0.0"
