@@ -7,6 +7,8 @@ TopPPT HTML· HTML 报告质量校验（交付闭环）
 
 输出每项 PASS/FAIL，结尾给汇总与结论；任一 FAIL 时退出码为 1（--strict 时 WARN 也计失败）。
 --json 以 JSON 输出全部检查结果（供脚本/流水线读取）。
+Mode A / presentation + --strict：自动启用 --layout-qa（V 契约/简单全幅/骨架连用）；
+research / architecture 仍须显式传 --layout-qa（不强制）。
 生成流程：生成 → 跑本脚本 → 修复 FAIL → 再跑，直至全部 PASS 才交付。
 
 阈值全部来自单源 scripts/layout-constants.json（checkBudgets / charts / styleAccents / aiFlavor），
@@ -218,7 +220,11 @@ CARRIERS = checks_html.CARRIERS  # 单源 scripts/checks_html.py
 
 
 def _check_chart_variety(txt, chk, mode):
-    """图表与版式多样性（阈值单源 charts.variety；判定逻辑 checks_html）。"""
+    """图表与版式多样性（阈值单源 charts.variety；判定逻辑 checks_html）。
+
+    多样性仍是特性：全部 data-chart 类型计入下限。禁反模式由 layout-qa /
+    sizeByComplexity / CHART_SKEW 等另检（简单全幅、极偏 donut、内容不匹配的冷门图）。
+    """
     v = CHART_VARIETY
     if not v:
         return
@@ -920,7 +926,10 @@ def _check_layout_grammar(txt, chk, mode):
 
     for i, b in enumerate(_bands(txt), 1):
         head = b[:240]
-        if any(f'id="{x}' in head for x in ('refs', 'appendix', 'cover', 'agenda', 'quote')):
+        # intentional whitespace：封面/章节幕/金句/收尾等休止页不参与 FILL 门禁
+        if any(f'id="{x}' in head for x in (
+                'refs', 'appendix', 'cover', 'agenda', 'quote',
+                'closing', 'section', 'chapter', 'next')):
             continue
         if 'band--flow' in head:
             continue
@@ -1379,6 +1388,8 @@ def main():
     strict = '--strict' in sys.argv
     as_json = '--json' in sys.argv
     layout_qa = '--layout-qa' in sys.argv
+    # Mode A / presentation：--strict 隐含 --layout-qa（正式演示交付不漏 V 契约）
+    # research/architecture 不自动开启，避免污染密排/架构路径
     if not path.exists():
         print(f"文件不存在: {path}")
         return 2
@@ -1412,6 +1423,8 @@ def main():
         f"读到 {mode!r}（未声明按 presentation 处理）" if mode not in MODE_BUDGETS else "",
         level="WARN" if mode is None else "FAIL")
     mode = mode if mode in MODE_BUDGETS else 'presentation'
+    if strict and mode == 'presentation' and not layout_qa:
+        layout_qa = True  # presentation + --strict → 自动 layout-qa
 
     # ── 宽屏与页面高度模型 ──
     B0 = MODE_BUDGETS[mode]
@@ -1533,6 +1546,28 @@ def main():
         short = [h for h in short if 0 < len(h) < 12 and not h.lower().startswith(STRUCT)]
         chk("research 行动标题（章节主标题 ≥12 字，标题即结论）", not short,
             f"过短: {short[:3]}" if short else "", level="WARN")
+
+    if mode == 'presentation':
+        # Mode A：主张/行动句标题（action title）；纯话题标签 WARN（硬 FAIL 过脆）
+        STRUCT_A = ('报告大纲', '大纲', '议程', 'Agenda', '参考资料', '下一步', '结论',
+                    '封面', '目录', '附录', '谢谢', 'Thank', 'Q&A', '问答')
+        TOPIC_ONLY = (
+            '现状分析', '市场格局', '风险与挑战', '背景介绍', '项目概述', '总结',
+            '概览', '概述', '简介', '背景', '方案', '规划', '进展', '回顾',
+            '分析', '对比', '数据', '附录', '下一步计划', '内容', '主题',
+        )
+        h1s_a = re.findall(r'<h2 class="t-h1 shead__title"[^>]*>(.*?)</h2>', txt)
+        titles_a = [re.sub(r'<[^>]+>', '', h).strip() for h in h1s_a]
+        topic_hits = []
+        for h in titles_a:
+            if not h or any(h.startswith(s) or h == s for s in STRUCT_A):
+                continue
+            # 纯话题：命中话题词表，或极短且无判断/数字/动词痕迹
+            if h in TOPIC_ONLY or (len(h) <= 6 and not re.search(
+                    r'\d|是|应|须|将|已|要|可|能|达|超|降|升|破|卡|成|未|无|有', h)):
+                topic_hits.append(h)
+        chk("presentation 主张/行动标题（禁纯话题标签）", not topic_hits,
+            f"话题式: {topic_hits[:4]}" if topic_hits else "", level="WARN")
 
     _check_content_quality(txt, chk, mode, model)
     _check_v9_hard_gates(txt, chk, model)

@@ -4,6 +4,7 @@
 
 用法:
     python scripts/quality_gate.py report.html
+    # Mode A / presentation 自动对 validate_report 附加 --layout-qa
     python scripts/quality_gate.py report.html --pptx report.pptx --model report.model.json
     python scripts/quality_gate.py report.html --trace trace.json --json
     python scripts/quality_gate.py report.html --require-rubric 60
@@ -241,10 +242,17 @@ def main() -> int:
     print(f'交付质量门禁 · {html.name}')
     print('-' * 60)
 
-    # ① HTML strict
-    rc, out, el = run([sys.executable, str(ROOT / 'scripts' / 'validate_report.py'), str(html), '--strict'])
+    # ① HTML strict（Mode A / presentation 自动附带 --layout-qa）
+    head_snip = html.read_text(encoding='utf-8')[:2500]
+    mode_m = re.search(r'data-mode="([^"]+)"', head_snip)
+    mode = mode_m.group(1) if mode_m else 'presentation'
+    vcmd = [sys.executable, str(ROOT / 'scripts' / 'validate_report.py'), str(html), '--strict']
+    if mode == 'presentation':
+        vcmd.append('--layout-qa')
+    rc, out, el = run(vcmd)
+    gate_name = 'validate_report --strict' + (' --layout-qa' if mode == 'presentation' else '')
     tail = [ln for ln in out.splitlines() if ln.startswith('PASS ') or ln.startswith('结论')]
-    gate('validate_report --strict', rc == 0, tail[-1] if tail else f'exit {rc}', el)
+    gate(gate_name, rc == 0, tail[-1] if tail else f'exit {rc}', el)
 
     # ② PPTX strict（可选）
     if args.pptx:

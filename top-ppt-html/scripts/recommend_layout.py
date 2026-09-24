@@ -41,8 +41,9 @@ MODE_ALIAS = {
 
 # 模式默认节奏（页型序列）；cover/closing 由调用方决定是否保留
 DEFAULT_SEQ = {
+    # Mode A：偏 V1–V4 / claim 页（kpi/points/quote）；降低 donut 默认权重（构成意图命中再用）
     'presentation': [
-        'cover', 'agenda', 'kpi', 'points', 'bar', 'points', 'donut', 'quote', 'closing',
+        'cover', 'agenda', 'kpi', 'points', 'bar', 'points', 'comparison', 'quote', 'closing',
     ],
     'research': [
         'cover', 'agenda', 'metrics', 'exhibit', 'twocol', 'halftable',
@@ -59,8 +60,8 @@ INTENT_RULES: list[tuple[tuple[str, ...], dict]] = [
         'rationale': '极偏占比禁 donut/pie → V3 大数+佐证',
     }),
     (('占比', '构成', '份额', '结构'), {
-        'pageType': 'donut', 'chart': 'donut', 'v': 'V1',
-        'rationale': '构成类默认 donut（非极偏）；演示配 V1 右注解',
+        'pageType': 'points', 'chart': 'stack', 'v': 'V1',
+        'rationale': '构成类优先 stack/hbar+V1；donut 仅非极偏且需环形直觉时用（降默认权重）',
     }),
     (('趋势', '爬坡', '时间序列', '同比', '环比'), {
         'pageType': 'bar', 'chart': 'line', 'v': 'V2',
@@ -74,9 +75,9 @@ INTENT_RULES: list[tuple[tuple[str, ...], dict]] = [
         'pageType': 'diagram', 'chart': 'network', 'v': None,
         'rationale': '结构图为王；skel P10/P11',
     }),
-    (('路演', '融资', 'pitch', '发布'), {
+    (('路演', '融资', 'pitch', '发布', '汇报', '演讲', 'demo', '演示'), {
         'pageType': 'points', 'chart': None, 'v': 'V1',
-        'rationale': '演示节奏；简单图禁全幅',
+        'rationale': '演示节奏偏 V1–V4 + claim；简单图禁全幅；motion=none',
     }),
     (('经营', '复盘', '分析', '调研'), {
         'pageType': 'exhibit', 'chart': 'bar', 'v': None,
@@ -217,7 +218,13 @@ def recommend(
             ch = 'donut'
         if pt == 'exhibit':
             ch = 'bar'
-        v = 'V1' if mode == 'presentation' and pt not in ('cover', 'agenda', 'closing', 'quote') else None
+        if pt == 'comparison':
+            ch = 'hbar'  # 对比默认 hbar，避免 donut 占默认序列
+        # Mode A：内容页默认 V1；kpi→V3；复杂序列由 intent/from-model 升 V2
+        if mode == 'presentation' and pt not in ('cover', 'agenda', 'closing', 'quote'):
+            v = 'V3' if pt == 'kpi' else 'V1'
+        else:
+            v = None
         rationale = f'default {mode} rhythm'
         skel = _skel(pt, v)
         row = {'page': i, 'pageType': pt, 'skel': skel, 'chart': ch, 'rationale': rationale}

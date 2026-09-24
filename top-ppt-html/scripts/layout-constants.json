@@ -820,7 +820,7 @@
       }
     },
     "variety": {
-      "$comment": "图表多样性预算（validate_report.py 与 evals/run_evals.py 消费）——治「图表定义 36 种、实际只用 bar/line/donut」。类型数下限 = min(minTypes[模式], max(1, ⌈图表页数 × minTypesRatio⌉))；noRepeatAdjacent = 相邻图表页不得同 data-chart；compositeMinRatio/compositeModes = 组合版式（内容页含 ≥2 种承载类型）比例下限与适用模式（治「单件页当默认」，只对 research 生效：A 演示按契约每屏一主张，C 架构恒为一页一图）。判据与选型见 references/playbook.md §四/§五。",
+      "$comment": "图表多样性预算（validate_report.py 与 evals/run_evals.py 消费）——治「图表定义 36 种、实际只用 bar/line/donut」。类型数下限 = min(minTypes[模式], max(1, ⌈图表页数 × minTypesRatio⌉))；noRepeatAdjacent = 相邻图表页不得同 data-chart；compositeMinRatio/compositeModes 只对 research 生效（A 演示一屏一主张，C 架构一页一图）。多样性仍是特性：按内容选型拉开图种；8 核图优先、advanced 在意图命中时用。禁反模式：为过门禁硬上冷门图、简单图全幅、极偏 donut/pie（见 layout-qa / sizeByComplexity）。判据与选型见 references/playbook.md §五。",
       "minTypes": {
         "presentation": 4,
         "research": 6,
@@ -1732,8 +1732,8 @@
     ],
     "fillTarget": {
       "presentation": [
-        62,
-        78
+        58,
+        75
       ],
       "research": [
         70,
@@ -1838,7 +1838,8 @@
         "align-items"
       ],
       "requireOnMixed": true
-    }
+    },
+    "fillTargetComment": "填充率目标带。Mode A 大气留白：cover/section/quote/closing 等休止页为 intentional whitespace，不按 underfill/FILL_LOW 惩罚（见 qualityGates.underfill.exemptIds + validate LAYOUT_FILL 轻量页豁免）。内容页半空仍属 underfill。硬规则守舞台；自适应留给内容。"
   },
   "qualityGates": {
     "$comment": "v9 硬门禁阈值（validate_report / validate_pptx / quality_gate 消费）。tagLeakPatterns = 可见文本中禁止出现的 HTML 源码片段；titleOnly = 去页头后正文字符上限（低于即 TITLE_ONLY_PAGE）；underfillCarriers = 承载组件数下限；roundtripMin = 模型代表性文本落页覆盖率下限（原 0.50 过松，放行截断）；chartSkew = 极偏占比禁 donut/pie；chartOversize = 简单图占内容区面积上限。",
@@ -1866,8 +1867,11 @@
         "refs",
         "appendix",
         "next",
-        "closing"
-      ]
+        "closing",
+        "section",
+        "chapter"
+      ],
+      "$comment": "intentional whitespace 豁免：封面/章节幕/金句/收尾/参考资料等休止页不要求承载数下限；其余内容页半空 = underfill FAIL。"
     },
     "roundtripMin": 0.8,
     "chartSkew": {

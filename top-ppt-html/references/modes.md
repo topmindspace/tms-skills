@@ -74,14 +74,18 @@
 
 ## 模式 A · 演示汇报 `presentation`（assets/templates/presentation.html）
 
-台上讲给人听，3 秒抓住主张。要点回顾：
+台上讲给人听，3 秒抓住主张。工艺清单 → `presentation-craft.md`；默认面 → `default-surface.md`。
 
-- 字号大（正文 17–18px）、版心 1400px、band--fit 居中节奏、大留白
+要点回顾：
+
+- **标题 = 主张/行动句**（action title），禁纯话题标签（「现状分析」等）；可短于 research，仍须是判断
+- 字号大（正文 17–18px）、版心 1400px、band--fit 居中节奏、大气留白（休止页合法空 ≠ 内容页 underfill）
 - 高度预算 1080p ≈ 830px；单页文字 ≤1500、并列单元 ≤8、表格 ≤8 行
-- 图表大（环形≥140px、柱/折线≥200px 高）；动效克制
-- 节奏休止：连续数据页之间可插 1–2 处「大引言/金句页」（`components.md` §39，**主题一致强调带** `band--accent`/`band--accent--solid`，一句话主张）；**全文 1–2 处即可，多了廉价**
-- **收尾页统一用 `band--accent`**（accent-soft 底）——不再用 `band--deep`：后者在浅色主题下会渲染成深色页（"浅色模式末尾出现深色页"的根因）。`band--deep` 仅作显式反相页，全文 ≤1 处且不得作末页（校验器检查）。
-- 版式从 `components.md` 混排版式 A–C（左图右文 / 表图并排 / 2×2 四象限）挑
+- 图表：8 核图优先；大而克制；简单图禁全幅；极偏禁 donut→V3；**motion = none**
+- 主力版式 **V1–V4 / P1–P4**；P5–P12 / advanced 按需
+- 节奏休止：连续数据页之间可插 1–2 处金句页（`components.md` §39，`band--accent`/`band--accent--solid`）；全文 1–2 处即可
+- **收尾页用 `band--accent`**；`band--deep` 仅显式反相且不作末页（校验器检查）
+- 交付：`--strict` 隐含 `--layout-qa`
 
 ---
 

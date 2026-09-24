@@ -26,7 +26,7 @@ description: "TopPPT HTML：报告 / 演示 / 信息架构图生成器。单文�
 
 | 参数 | 默认 | 推断 |
 |------|------|------|
-| mode | **B** | 路演/融资→A；架构/拓扑→C |
+| mode | **B** | **路演/汇报/发布/演讲/demo/融资→A**；架构/拓扑→C；未点明→B |
 | style | B→mckinsey · A→business-blue · C→graphite-dark | |
 | theme | light（graphite→dark） | |
 | 篇幅 | A=10 / B=12 / C=6 | |
@@ -85,7 +85,7 @@ description: "TopPPT HTML：报告 / 演示 / 信息架构图生成器。单文�
 **L2 一览**（命中条件与逐任务只读清单的**详表以 playbook §十为准**，此处仅索引）：
 
 - 模式契约与锁定版式 → `references/modes.md` · 完整路径七步 → `references/outline-design.md`
-- **默认面 → `references/default-surface.md`** · **布局骨架 → `references/layout-grammar.md`（P1–P12）**
+- **A/Fast 主读 → `references/default-surface.md`** + **`presentation-craft.md`** · 骨架 → `layout-grammar.md`（A 主力 P1–P4）
 - 组件/版式**代码**与 §46 选型表 → `references/components.md` · 图表**代码** → `references/charts.md` · 信息图页型 → `references/infographics.md`（→ stats / structure 两分册）
 - 配色/主题/字阶 → `references/styles.md` + `references/design-system.md`（引擎 CSS 为实现真相；历史引擎说明已归档）· 写作纪律 → `references/content-rules.md` · 图标语义表 → `references/icons.md`
 - PPTX 精导 → `references/pptx-export.md` · 深度高保真 → `references/high-fidelity.md` · 修复顺序 → `references/failure-modes.md` · 技能维护 → `references/tech-design.md`
@@ -94,14 +94,14 @@ description: "TopPPT HTML：报告 / 演示 / 信息架构图生成器。单文�
 
 ## 铁律（12 条 · 交付硬门禁）
 
-> 本节是**门禁语义**；阈值与细则见 playbook（常量在 scripts 下的 layout 常量 JSON）。排版只读 `layout-grammar.md`。
+> 门禁语义；阈值见 playbook / layout 常量 JSON。排版读 `layout-grammar.md`。**motion=none**（无炫技转场；见 `presentation-craft.md`）。
 
 1. **单文件零外链**——无 CDN/外部字体/外部图片，图形一律内联 SVG；`<img src>` 仅 `data:` 或相对路径且必带 `alt`（单图 ≤1.5MB、全篇 ≤8MB）；无素材图不留空不省略，用配图占位（`components.md` §11c-3）。
 2. **模式先定后写**——从对应模式模板起步；`data-mode` = `REPORT_MODEL.mode`，页面无模式切换；MD3 映射；PPTX 字号走三模式独立比例尺。
 3. **亮暗双主题一致**——CSS 变量整块换肤 + header 切换 + 文件级记忆；`REPORT_MODEL.theme` 与页面一致，PPTX 同主题导出；强调带只用 accent 家族，**末页禁 `band--deep`**。
 4. **每页一屏 + 高度稳定**——`section.band` ≥ 一屏高且垂直居中；六七成屏用 `.band--top`，长结构页 `.band--flow`。放不下按「优化内容 → 升级承载 → 扩组合 → 分区 → 拆页 → 最后才有限缩字号」（下限 `containers.fontShrink`）；禁止砍决策必需信息，拆页保持信息完整。
 5. **PPT 式翻页 + 骨架固定**——`section.band` 即一页；方向键翻页、页码可点；Agenda 第二页（arch 内容页 ≤4 可省）；页头只留 eyebrow + 标题 + 可选导语，页脚全文一个；页头页脚之外不加装饰。
-6. **标题与字号**——主标题粗体（`--fw-title/--fw-display`）；research 主标题必须是**结论句**（≥12 字含数字/判断词）；字号随模式（playbook §一），全部 `clamp()`，图表不缩水。
+6. **标题与字号**——主标题粗体；research=结论句（≥12 字）；**presentation=主张/行动句**（禁话题标签）；字号随模式，`clamp()`，图表不缩水。
 7. **组合版式 + 细节保全**——默认一页 = 主件 + 从件 + 注释层（矩阵 playbook §四）；先判定决策必需信息再定形态，**禁砍口径列/时间列/维度**；密度 L/M/H 禁连续 3 页同档；同一版式不连用超 2 页（扩展签名可 3 页）。
 8. **列表优先 + 去 AI 味 + 图标克制**——大段文字转列表（research 双/三栏正文除外）；`aiFlavor` 词表零命中；图标每屏 3–8 个（架构图为王可无）。
 9. **图表够大 + 够多样 + 双通道**——尺寸 ≥ `charts.minSize`；`data-chart` 须在 `charts.registry`（36 种）登记；多样性下限与相邻不同型按 `charts.variety`（playbook §五）；原生通道 `addChart` 双击可编辑数据，形状通道须按登记策略附数据表（口径注解见 tech-design §二）。
@@ -120,7 +120,7 @@ description: "TopPPT HTML：报告 / 演示 / 信息架构图生成器。单文�
 
 - **零依赖可用**：HTML 生成与全部 Python 脚本只用 **Python 标准库**。
 - **PPTX 精导**：另需 Node + pptxgenjs（安装与 `TOP_PPT_NODE_EXE`/`TOP_PPT_NODE_PATH` 探测细节见 `pptx-export.md` 环境备注，探测失败会打印指引）。
-- **硬门禁**：标签泄漏/空页/极偏图/简单大图等见 `layout-constants.qualityGates` 与 `references/failure-modes.md`。
+- **硬门禁**：标签泄漏/空页/极偏图/简单大图 → `scripts/layout-constants.json`（qualityGates）+ `failure-modes.md`。
 - **可选**：浏览器页高/裁切真值、参考图重生成需 playwright（`regression.py` 自动探测，缺失即跳过）。
 - **一键回归**：`scripts/regression.py`——模板/常量/schema/运行时/示例改动后必跑。
 - **技能自检**：`audit_skill.py`（体积/披露/Gate 0/内容重复）· `audit_docs.py`（§ 引用 + 任务路由可解析）· `audit_styles.py`（9 风格 × 亮暗 token 与对比度）· `audit_css.py`（CSS 类覆盖率 · 报告制）。

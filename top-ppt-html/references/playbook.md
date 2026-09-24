@@ -58,7 +58,7 @@ Gate 0 参考图 → 六项问询（1 轮）→ 证据表 → 故事线脑暴 �
 
 ## 三、页型选型（意图 → 页型 → 关键约束）
 
-> 自动选型：`python scripts/recommend_layout.py --mode B --intent "经营分析" --pages 10 --json`（或 `--from-model report.model.json`）→ `{pageType,skel,chart,rationale}`；交付前可加 `validate_report.py --layout-qa`。
+> 自动选型：`python scripts/recommend_layout.py --mode A --intent "路演" --pages 10 --json`（或 `--from-model report.model.json`）→ `{pageType,skel,chart,rationale}`；Mode A 交付 `--strict` 已含 layout-qa。
 
 > 穷举表（内容形态 → 版式 → PPTX 页型）见 `components.md` §46；密度档适配见 `components.md` §46b；组合见下节 §四。
 
@@ -159,7 +159,7 @@ Gate 0 参考图 → 六项问询（1 轮）→ 证据表 → 故事线脑暴 �
 > 穷举代码见 `charts.md` §16–§31、§35、§52–§70；误用反例与多样性纪律见 `charts.md` §66。
 > **默认生成面（P1 收敛）**：优先 `bar / hbar / line / donut / progress / area / stack / dualline`。
 > **高级图型**（waterfall/gantt/funnel/slope/… 与 6 类信息图）按需选用，不进默认轮换。
-> **纪律**：全篇不同 `data-chart` 类型 ≥ `min(模式上限, ⌈图表页数 × 0.6⌉)`（上限：research 6 / presentation 4 / architecture 3）；**相邻图表页不得同型**。
+> **纪律**：全篇不同 `data-chart` 类型 ≥ `min(模式上限, ⌈图表页数 × 0.6⌉)`（上限：research 6 / presentation 4 / architecture 3）；**相邻图表页不得同型**。多样性按内容选型拉开图种（核图优先，advanced 意图命中再用）；**禁**为过门禁硬上冷门图、简单图全幅、极偏 donut/pie。
 
 | 分析意图（读者要得出的结论） | 首选 | 次选 | 禁用 / 改判条件 |
 |---------------------------|------|------|----------------|
@@ -243,15 +243,15 @@ python scripts/scaffold_report.py --mode research --style mckinsey --theme light
 # 或用黄金节奏包：--preset consulting|diagnostic|pitch|ops-review|layered-arch|flow-arch
 # 只填 window.REPORT_MODEL（禁止手改 HTML 正文），然后回填：
 python scripts/render_from_model.py 2026-09-15-主题.html --inplace
-python scripts/validate_report.py 2026-09-15-主题.html --strict --layout-qa  # HTML 硬门禁 + 布局 QA
+python scripts/validate_report.py 2026-09-15-主题.html --strict  # presentation 自动 --layout-qa；B/C 可显式加
 # 可选：python scripts/recommend_layout.py --from-model 报告.model.json
 python scripts/extract_model.py   2026-09-15-主题.html              # → .model.json
 node  scripts/build_pptx.js 2026-09-15-主题.pptx --model=….model.json
 python scripts/validate_pptx.py 2026-09-15-主题.pptx --strict --model=….model.json   # 0/0
 ```
 
-**交付前必过**：`validate_report.py --strict` 0/0；含 PPTX 时 `validate_pptx.py --strict --model=` 0/0（`pictures` 数 = 声明数）。
-**推荐一键门禁**：`python scripts/quality_gate.py 报告.html [--pptx x.pptx --model x.model.json]`（strict + evals + rubric 启发式五维；交付时加 `--deliver` 开关自动产出七要素说明，不要手拼）。
+**交付前必过**：`validate_report.py --strict` 0/0（**Mode A / presentation 隐含 `--layout-qa`**；research/architecture 不强制）；含 PPTX 时 `validate_pptx.py --strict --model=` 0/0。
+**推荐一键门禁**：`python scripts/quality_gate.py 报告.html [--pptx x.pptx --model x.model.json]`（presentation 同口径附带 layout-qa；交付加 `--deliver` 出七要素，不要手拼）。
 **A/B 全文对等**：`cross_verify.py` 默认 SKIP，仅 `python scripts/cross_verify.py --full-ab` 或 `regression.py --full-ab` 时启用。
 **PPTX 冒烟**：`bash scripts/smoke_pptx.sh`（extract_model → build_pptx → validate_pptx --strict）。
 **失败自修复**：按输出逐条修 → 重跑，直到 0/0；修复顺序见 `failure-modes.md`。
@@ -260,13 +260,14 @@ python scripts/validate_pptx.py 2026-09-15-主题.pptx --strict --model=….mode
 
 ## 十、L2 节级路由（按任务只读这些，读完即停）
 
-> 默认生成面速查：`default-surface.md`（12 页型 + 8 图 + V1–V4）。
+> 默认生成面：`default-surface.md`（12 页型 + 8 图 + V1–V4）。Mode A 工艺清单：`presentation-craft.md`。
 > **不要整读** `components.md` / `charts.md` 背后的物理拆分大文件。需要代码时优先：
 > `python scripts/extract_snippet.py --list` · `--task <名>` · `--chart <类型>` · `--page-type <页型>` · `--file components.md --section 46`（逻辑名自动路由）
 
 | 任务 | 只读 |
 |------|------|
 | research 证据页 / Exhibit / 密表 | `components.md` §36d/§46/§46c · 本文件 §三/§四 · `extract_snippet.py --task research-evidence` |
+| 正式演示 / Mode A 工艺 | `default-surface.md` · `presentation-craft.md` · 本文件 §三-b/§五 |
 | 演示组合版式 | `components.md` §39–§42/§46/§46b/§46c · `--task presentation-combo` |
 | 架构 / 泳道 / 分层 | `components.md` §37–§38b · `infographics.md` §78–§80 · `--task architecture-diagram` |
 | 选图 / 取图表代码 | 本文件 §五 · `--chart <类型>` · 误用见 `charts.md` §66 |
