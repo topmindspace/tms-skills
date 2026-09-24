@@ -9,24 +9,26 @@
 2. **8 核心图**（核图池；advanced 按需）  
 3. **V1–V4** 演讲构图（≈ P1–P4）
 
-**按需（非 A 默认）**：P5–P12 扩展骨架 · advanced 图（waterfall/sankey/…）· Mode B Exhibit/密表 · Mode C 全幅架构——意图命中再用。
+**骨架分层（A）**：**主力** P1–P4 + P6/P10；**扩展** P5；**次级** P7–P9、P11–P12（意图命中再用，勿默认轮换）。  
+**图表**：**核图 8** 为默认池；`charts-extended.md` / advanced **仅意图命中才读/才用**（禁为凑多样性硬上）。  
+**按需**：Mode B Exhibit/密表 · Mode C 全幅架构——意图命中再读 modes / layouts-*。
 
 ## 12 默认页型
 
-| 意图 | pageType | skel |
-|------|----------|------|
-| 封面 | cover | P1 |
-| 议程 | agenda | P2 |
-| 大数/KPI | kpi | P3 |
-| 要点 | points | P4 |
-| 卡片 | cards | P5 |
-| 指标带 | metrics | P2 |
-| 对比 | comparison | P4 |
-| 表 | table / halftable | P8 |
-| 图证 | exhibit / bar | P8 |
-| 双栏论述 | twocol | P6 |
-| 结构/泳道 | diagram / lane | P10/P11 |
-| 收尾 | closing | P1 |
+| 意图 | pageType | A 主力 skel | 备注 |
+|------|----------|-------------|------|
+| 封面 | cover | **P1** | |
+| 议程 | agenda | **P2** | |
+| 大数/KPI | kpi | **P3** | V3 |
+| 要点 | points | **P4** | |
+| 卡片 | cards | P5 | 扩展（非默认轮换） |
+| 指标带 | metrics | **P2** | |
+| 对比 | comparison | **P4** | V4 |
+| 表 | table / halftable | **P4** / P1 | A 少用次级 P8；密表意图才 P8 |
+| 图证 | exhibit / bar | **P1** / P2 | A 演讲图文；P8 为 B 证据次级 |
+| 双栏论述 | twocol | **P6** | 主力 |
+| 结构/泳道 | diagram / lane | **P10** | 全幅结构次级 P9；一主两从次级 P11 |
+| 收尾 | closing | **P1** | |
 
 选型：`recommend_layout.py --mode A|B|C`；矩阵见 playbook §三/§四。演示优先 V1–V4 对应页。
 
@@ -34,7 +36,8 @@
 
 `bar` · `hbar` · `line` · `donut` · `progress` · `area` · `stack` · `dualline`
 
-极偏占比 → **禁 donut/pie**，改 KPI/进度/对比条（V3）。简单图禁全幅。多样性按内容拉开图种（核图优先；advanced 意图命中再用）；禁为过门禁硬上冷门图。
+极偏占比 → **禁 donut/pie**，改 KPI/进度/对比条（V3）。简单图禁全幅。  
+**多样性**：先拉开核图 8；advanced 用了也计入 `minTypes`（不罚），但**只在内容需要时选**，绝不为凑下限垫冷门图。默认**不**预读 `charts-extended.md`。
 
 ## V1–V4（演示默认）
 

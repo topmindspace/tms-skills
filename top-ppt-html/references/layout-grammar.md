@@ -296,9 +296,18 @@ fill = Body 区被内容覆盖的估算面积 / Body 区面积
 | V3 大数+佐证 | **P3** |
 | V4 双图对照 | **P4** |
 
-- A presentation：默认 P1–P4、P6、P10。
-- B research：P5、P7、P8 + 密表；仍禁双大件。
-- C architecture：P9 为主；结构必须真边（见 infographics-structure）。
+### Mode A（presentation）骨架分层
+
+| 层级 | 骨架 | 说明 |
+|------|------|------|
+| **主力 primary** | **P1–P4**、**P6**、**P10** | 默认轮换；与 V1–V4 对齐；画廊/示例优先展示 |
+| **常用扩展** | P5 | 三卡并列；非默认轮换，意图命中可用 |
+| **次级 secondary** | **P7–P9、P11–P12** | 仍合法且文档保留；A 下仅当 research 密表 / 全幅结构 / 一主两从等意图命中再用——**勿作 A 默认轮换** |
+
+- B research：主力 P5、P7、P8 + 密表；仍禁双大件。
+- C architecture：主力 P9（及 P10/P11）；结构必须真边（见 infographics-structure）。
+
+> 机器可读：`layoutSystem.modeSkels`（`scripts/layout-constants.json`）。
 
 ---
 

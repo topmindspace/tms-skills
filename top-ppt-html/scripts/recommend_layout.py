@@ -9,7 +9,7 @@
   echo '{"mode":"research","intents":["架构"]}' | python scripts/recommend_layout.py --stdin
 
 输出 JSON 页序列：{pageType, skel, chart?, rationale, v?}
-启发式：playbook V1–V4 / sizeByComplexity / 极偏禁 donut / 高容量多页序列 / layoutSystem.defaultCharts。
+启发式：playbook V1–V4 / sizeByComplexity / 极偏禁 donut / 高容量多页序列 / layoutSystem.defaultCharts（核图 8）；advanced 仅意图命中；Mode A 主力骨架 P1–P4+P6/P10，次级 P7–P9/P11–P12 不默认。
 不列入 package REQUIRED（可选工具；Batch 3 再定是否纳入）。
 """
 from __future__ import annotations
@@ -30,6 +30,23 @@ LS = LC.get('layoutSystem') or {}
 PAGE_TO_PRESET = dict(LS.get('pageToPreset') or {})
 DEFAULT_CHARTS = list(LS.get('defaultCharts') or
                       ['bar', 'hbar', 'line', 'donut', 'progress', 'area', 'stack', 'dualline'])
+ADVANCED_CHARTS = set(LS.get('advancedCharts') or [])
+_MODE_SKELS = LS.get('modeSkels') or {}
+PRIMARY_SKELS = {
+    'presentation': list((_MODE_SKELS.get('presentation') or {}).get('primary') or
+                         ['P1', 'P2', 'P3', 'P4', 'P6', 'P10']),
+    'research': list((_MODE_SKELS.get('research') or {}).get('primary') or
+                     ['P5', 'P7', 'P8', 'P4', 'P6']),
+    'architecture': list((_MODE_SKELS.get('architecture') or {}).get('primary') or
+                         ['P9', 'P10', 'P11']),
+}
+SECONDARY_SKELS = {
+    'presentation': list((_MODE_SKELS.get('presentation') or {}).get('secondary') or
+                         ['P7', 'P8', 'P9', 'P11', 'P12']),
+    'research': list((_MODE_SKELS.get('research') or {}).get('secondary') or []),
+    'architecture': list((_MODE_SKELS.get('architecture') or {}).get('secondary') or []),
+}
+
 SIZE_BANDS = list(((LC.get('charts') or {}).get('sizeByComplexity') or {}).get('bands') or [])
 V_MAP = dict(LS.get('vMap') or {'V1': 'P1', 'V2': 'P2', 'V3': 'P3', 'V4': 'P4'})
 
@@ -83,6 +100,22 @@ INTENT_RULES: list[tuple[tuple[str, ...], dict]] = [
         'pageType': 'exhibit', 'chart': 'bar', 'v': None,
         'rationale': '研究证据页 exhibit + bar',
     }),
+    (('瀑布', 'waterfall', '增减拆解', '桥图'), {
+        'pageType': 'bar', 'chart': 'waterfall', 'v': 'V1',
+        'rationale': 'advanced:waterfall 意图命中（非默认池）',
+    }),
+    (('漏斗', 'funnel', '转化率'), {
+        'pageType': 'bar', 'chart': 'funnel', 'v': 'V1',
+        'rationale': 'advanced:funnel 意图命中',
+    }),
+    (('甘特', 'gantt', '排期', '里程碑计划'), {
+        'pageType': 'bar', 'chart': 'gantt', 'v': None,
+        'rationale': 'advanced:gantt 意图命中',
+    }),
+    (('桑基', 'sankey', '流向', '分流'), {
+        'pageType': 'diagram', 'chart': 'sankey', 'v': None,
+        'rationale': 'advanced/信息图：流向意图',
+    }),
     (('长文', '密集', '材料多', '证据多', '详细', 'deep dive', '白皮书', '高容量'), {
         'pageType': 'points', 'chart': None, 'v': 'V1',
         'rationale': '高容量→多页序列（勿塞一页）',
@@ -117,14 +150,22 @@ def _norm_mode(m: str) -> str:
     return MODE_ALIAS.get((m or 'b').lower().strip(), 'research')
 
 
-def _skel(page_type: str, v: str | None = None) -> str:
+def _skel(page_type: str, v: str | None = None, mode: str | None = None,
+          allow_secondary: bool = False) -> str:
     if page_type in ('cover', 'closing'):
         return 'P1'
     if page_type in ('agenda',):
         return 'P2'
     if v and v in V_MAP:
         return V_MAP[v]
-    return PAGE_TO_PRESET.get(page_type, 'P4')
+    sk = PAGE_TO_PRESET.get(page_type, 'P4')
+    # Mode A: remap secondary skels to primary unless intent explicitly allows
+    if mode == 'presentation' and not allow_secondary and sk in set(SECONDARY_SKELS.get('presentation') or []):
+        remap = {
+            'P7': 'P4', 'P8': 'P1', 'P9': 'P10', 'P11': 'P6', 'P12': 'P6',
+        }
+        sk = remap.get(sk, 'P4')
+    return sk
 
 
 def _chart_ok(chart: str | None, n_cats: int, n_pts: int) -> str | None:
@@ -216,7 +257,8 @@ def recommend(
                     ch = hit.get('chart', ch)
                     v = hit.get('v', v)
                     rationale = hit.get('rationale', rationale)
-            skel = sec.get('layoutPreset') or _skel(pt, v)
+            allow_sec = bool(ch and ch in ADVANCED_CHARTS) or pt in ('diagram', 'lane', 'matrix', 'heatmap')
+            skel = sec.get('layoutPreset') or _skel(pt, v, mode, allow_secondary=allow_sec)
             row = {'page': i, 'pageType': pt, 'skel': skel, 'chart': ch,
                    'rationale': rationale}
             if v:
@@ -244,8 +286,11 @@ def recommend(
 
     out = []
     for i, pt in enumerate(seq, 1):
+        # 默认只从核图 8 轮换；advanced 不进默认节奏
         ch = pt if pt in DEFAULT_CHARTS else (DEFAULT_CHARTS[(i - 1) % len(DEFAULT_CHARTS)]
                                              if pt in ('bar', 'exhibit', 'donut') else None)
+        if ch in ADVANCED_CHARTS:
+            ch = DEFAULT_CHARTS[(i - 1) % len(DEFAULT_CHARTS)]
         if pt == 'bar':
             ch = 'bar'
         if pt == 'donut':
@@ -260,7 +305,8 @@ def recommend(
         else:
             v = None
         rationale = f'default {mode} rhythm'
-        skel = _skel(pt, v)
+        allow_sec = bool(ch and ch in ADVANCED_CHARTS) or pt in ('diagram', 'lane', 'matrix', 'heatmap')
+        skel = _skel(pt, v, mode, allow_secondary=allow_sec)
         row = {'page': i, 'pageType': pt, 'skel': skel, 'chart': ch, 'rationale': rationale}
         if v:
             row['v'] = v
@@ -274,7 +320,9 @@ def recommend(
         out[idx]['chart'] = intent_hit.get('chart')
         if intent_hit.get('v'):
             out[idx]['v'] = intent_hit['v']
-        out[idx]['skel'] = _skel(out[idx]['pageType'], out[idx].get('v'))
+        ch_i = out[idx].get('chart')
+        allow_sec = bool(ch_i and ch_i in ADVANCED_CHARTS) or out[idx]['pageType'] in ('diagram', 'lane', 'matrix', 'heatmap')
+        out[idx]['skel'] = _skel(out[idx]['pageType'], out[idx].get('v'), mode, allow_secondary=allow_sec)
         out[idx]['rationale'] = intent_hit.get('rationale', '')
     if high_vol:
         for r in out:
