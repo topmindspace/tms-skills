@@ -22,20 +22,51 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Privacy scan
-        run: python scripts/ci_privacy_scan.py
+        run: python3 scripts/ci_privacy_scan.py
 
-      - name: Package top-ppt-html
-        working-directory: top-ppt-html
+      # Same skill gates as CI — tag-only releases must not skip audits.
+      - name: Skill gates (all discovered skills)
         run: |
-          npm install --omit=dev
-          python scripts/package_skill.py
+          set -euo pipefail
+          mapfile -t SKILLS < <(node scripts/discover_skills.js)
+          echo "discovered: ${SKILLS[*]}"
+          for skill in "${SKILLS[@]}"; do
+            echo "=== gates: ${skill} ==="
+            pushd "$skill" >/dev/null
+            if [ -f package-lock.json ]; then
+              npm ci --omit=dev
+            else
+              npm install --omit=dev
+            fi
+            python3 scripts/package_skill.py --check
+            python3 scripts/audit_styles.py
+            python3 scripts/audit_docs.py
+            python3 scripts/audit_skill.py
+            python3 scripts/audit_css.py
+            python3 scripts/negative_tests.py
+            popd >/dev/null
+          done
+
+      - name: Package all skills
+        run: |
+          set -euo pipefail
+          mapfile -t SKILLS < <(node scripts/discover_skills.js)
+          for skill in "${SKILLS[@]}"; do
+            echo "=== package: ${skill} ==="
+            (cd "$skill" && python3 scripts/package_skill.py)
+          done
 
       - name: Collect artifacts
         run: |
+          set -euo pipefail
           mkdir -p release-assets
-          cp top-ppt-html/dist/top-ppt-html.zip release-assets/
-          cp top-ppt-html/dist/top-ppt-html.manifest.json release-assets/
+          mapfile -t SKILLS < <(node scripts/discover_skills.js)
+          for skill in "${SKILLS[@]}"; do
+            cp "$skill/dist/${skill}.zip" release-assets/
+            cp "$skill/dist/${skill}.manifest.json" release-assets/
+          done
           node bin/tms-skills.js list > release-assets/skills-list.txt
+          ls -la release-assets/
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -43,16 +74,40 @@ jobs:
           files: release-assets/*
           generate_release_notes: true
 
-      # Keep only the 2 most recent GitHub Releases (and their tags).
-      # Policy: 定期清理历史 releases，最多保留 2 个最近版本.
-      - name: Prune old releases (keep 2)
+      # Publish installer package to npm (keeps npm in sync with the tag).
+      # Requires repository secret NPM_TOKEN (granular token, write on @topmindspace).
+      # Skip quietly when the secret is not configured.
+      # If this version is already on the registry, exit 0 (avoid E409 after Release exists).
+      - name: Publish to npm (with precheck)
+        run: |
+          set -euo pipefail
+          if [ -z "${NODE_AUTH_TOKEN:-}" ]; then
+            echo "NPM_TOKEN not configured — skip npm publish (GitHub Release still published)."
+            exit 0
+          fi
+          VERSION="$(node -p "require('./package.json').version")"
+          PKG="@topmindspace/tms-skills"
+          echo "Checking whether ${PKG}@${VERSION} is already published..."
+          if npm view "${PKG}@${VERSION}" version >/dev/null 2>&1; then
+            echo "${PKG}@${VERSION} already on npm — skip publish (exit 0)."
+            exit 0
+          fi
+          echo "Publishing ${PKG}@${VERSION} ..."
+          npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # Keep only the 2 most recent GitHub Releases (API delete only).
+      # Policy: 定期清理历史 Releases，最多保留 2 个最近版本；git tags 保留不删。
+      # Do NOT run `git push origin :refs/tags/...` — tags stay for history / npm pin.
+      - name: Prune old releases (keep 2; tags retained)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           KEEP=2
           mapfile -t ids < <(gh api "repos/${GITHUB_REPOSITORY}/releases" --jq 'sort_by(.published_at // .created_at) | reverse | .[] | "\(.id)\t\(.tag_name)"')
-          echo "found ${#ids[@]} release(s); keeping newest ${KEEP}"
+          echo "found ${#ids[@]} release(s); keeping newest ${KEEP}; tags retained"
           i=0
           for row in "${ids[@]}"; do
             i=$((i + 1))
@@ -62,20 +117,6 @@ jobs:
             fi
             id="${row%%$'\t'*}"
             tag="${row#*$'\t'}"
-            echo "prune $row"
+            echo "prune release id=${id} tag=${tag} (tag retained)"
             gh api -X DELETE "repos/${GITHUB_REPOSITORY}/releases/${id}"
-            git push origin ":refs/tags/${tag}" || true
           done
-
-      # Publish installer package to npm (keeps npm in sync with the tag).
-      # Requires repository secret NPM_TOKEN (granular token, write on @topmindspace).
-      # Skip quietly when the secret is not configured.
-      - name: Publish to npm
-        run: |
-          if [ -z "$NODE_AUTH_TOKEN" ]; then
-            echo "NPM_TOKEN not configured — skip npm publish (GitHub Release still published)."
-            exit 0
-          fi
-          npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

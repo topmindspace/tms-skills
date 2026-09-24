@@ -20,7 +20,7 @@
     assets/examples/               9 份示例 HTML + 9 份 REPORT_MODEL（复制起点 · 覆盖全部 9 风格）
     assets/pptx-export.js          PPTX 预览运行时（注入源）
     assets/style-gallery.html      风格 × 模式 × 亮暗主题交互画廊
-    assets/theme-overview*.png     4 张主题参考图（六项问询辅助）
+    assets/theme-overview*.png     3 张主题参考图（整体 + research + architecture；演示态与整体图相同）
     references/*.md                15 篇规范（playbook.md = 唯一常读入口 L1；其余 L2 按需加载）
     scripts/                         生成 / 校验 / 回归 / 维护工具（py + js + json 单源）
     scripts/extract_snippet.py       L2 节级片段抽取（减少整读大规范）
@@ -42,7 +42,7 @@
 ────────────────────────────────────────────────────────────────────────
     · SKILL.md frontmatter 含 name / description；name 与分发包目录名一致；
       description 为单行双引号字符串且 ≤ 1024 字符（平台截断阈值）
-    · 15 篇 references、3 份模式模板 + engine.css / ui.js、9 组示例、4 张参考图齐全
+    · references（含 layout-grammar）、3 份模式模板 + engine.css / ui.js、9 组示例、3 张参考图齐全
     · 关键脚本齐全（单源注入 / 审计 / 示例重建 / 回归 / 双校验器 / 精导 / 打包）
 """
 import fnmatch
@@ -80,7 +80,6 @@ INCLUDE = [
     'assets/pptx-export.js',
     'assets/style-gallery.html',
     'assets/theme-overview.png',
-    'assets/theme-overview-presentation.png',
     'assets/theme-overview-research.png',
     'assets/theme-overview-architecture.png',
     'assets/templates/*',
@@ -112,12 +111,13 @@ EXCLUDE = [
 REQUIRED = [
     'SKILL.md', 'README.md', 'package.json',
     'assets/pptx-export.js', 'assets/style-gallery.html',
-    'assets/theme-overview.png', 'assets/theme-overview-presentation.png',
+    'assets/theme-overview.png',
     'assets/theme-overview-research.png', 'assets/theme-overview-architecture.png',
     'assets/templates/presentation.html', 'assets/templates/research.html',
     'assets/templates/architecture.html', 'assets/templates/engine.css',
     'assets/templates/ui.js',
     'references/playbook.md',
+    'references/layout-grammar.md',
     'references/modes.md', 'references/outline-design.md', 'references/design-system.md',
     'references/styles.md', 'references/content-rules.md', 'references/components.md',
     'references/charts.md',

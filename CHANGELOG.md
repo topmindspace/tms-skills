@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+### Fixes (P0 / P1)
+
+- **Release 顺序与稳健性**：Privacy → 技能门禁 → Package → Collect → GitHub Release → **npm publish（已发布则跳过，避免 E409）** → 再 Prune。
+- **Prune 策略**：只删旧 GitHub Release（保留 2 个）；**不再删除 git tags**。
+- **多技能发现**：`scripts/discover_skills.js` + CI/Release 动态打包/门禁；`npm run sync:files` 同步 `package.json` `files`。
+- **CLI**：校验 skill id；目标目录已存在时须 `--force`；文档口径与 README 对齐（npm 推荐 / GitHub 跟 HEAD）。
+- **python3**：根与技能 `package.json`、workflows 统一 `python3`。
+- **打包门禁**：`references/layout-grammar.md` 纳入 REQUIRED；去掉与 `theme-overview.png` 完全重复的 `theme-overview-presentation.png`。
+- **Lockfile**：提交 `top-ppt-html/package-lock.json`；CI 优先 `npm ci --omit=dev`。
+- **npm 2.x**：文档警告勿装 `^2`；提供 `scripts/deprecate-npm-2x.sh`（须维护者本地 npm 登录后执行）。
+
 ## 0.1.0 — 2026-09-24
 
 首个公开版本。

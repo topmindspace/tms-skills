@@ -14,7 +14,7 @@ description: "TopPPT HTML：报告 / 演示 / 信息架构图生成器。单文�
 | 给什么 | 路径 | 何时 |
 |--------|------|------|
 | 整体图（默认先给这张） | `assets/theme-overview.png` | 每次开场 |
-| 按模式拆分的参考图 | `assets/theme-overview-presentation.png` / `-research.png` / `-architecture.png` | 模式已明确时给对应那张 |
+| 按模式拆分的参考图 | 演示 → `assets/theme-overview.png`；研究 → `-research.png`；架构 → `-architecture.png` | 模式已明确时给对应那张（演示态与整体图相同，不再单独存 presentation 副本） |
 | 交互画廊（实时切风格×模式×亮暗） | `assets/style-gallery.html` | 用户想边看边挑 |
 
 **理由**：风格与主题是用户最需要"看见"才能决策的形式参数。**跳过参考图直接问询 = 不合格**（`audit_skill.py` 校验 Gate 0 位于六项问询之前）。

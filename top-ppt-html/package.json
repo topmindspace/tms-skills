@@ -14,17 +14,17 @@
     "node": ">=18"
   },
   "scripts": {
-    "scaffold": "python scripts/scaffold_report.py",
-    "sync": "python scripts/sync_runtime.py",
-    "audit": "python scripts/audit_styles.py && python scripts/audit_docs.py && python scripts/audit_skill.py && python scripts/audit_css.py",
+    "scaffold": "python3 scripts/scaffold_report.py",
+    "sync": "python3 scripts/sync_runtime.py",
+    "audit": "python3 scripts/audit_styles.py && python3 scripts/audit_docs.py && python3 scripts/audit_skill.py && python3 scripts/audit_css.py",
     "capture-themes": "node scripts/capture_theme_overview.js",
-    "measure": "python scripts/measure_height.py",
-    "eval": "python evals/run_evals.py",
-    "build-examples": "python scripts/build_examples.py",
-    "regression": "python scripts/regression.py",
-    "negative": "python scripts/negative_tests.py",
-    "package": "python scripts/package_skill.py",
-    "check": "python scripts/package_skill.py --check"
+    "measure": "python3 scripts/measure_height.py",
+    "eval": "python3 evals/run_evals.py",
+    "build-examples": "python3 scripts/build_examples.py",
+    "regression": "python3 scripts/regression.py",
+    "negative": "python3 scripts/negative_tests.py",
+    "package": "python3 scripts/package_skill.py",
+    "check": "python3 scripts/package_skill.py --check"
   },
   "dependencies": {
     "pptxgenjs": "^4.0.0"

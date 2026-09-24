@@ -15,7 +15,9 @@ jobs:
         with:
           python-version: '3.12'
       - name: Scan for private/local/deprecated identifiers
-        run: python scripts/ci_privacy_scan.py
+        run: python3 scripts/ci_privacy_scan.py
+      - name: package.json files sync check
+        run: node scripts/sync_npm_files.js --check
 
   installer:
     name: npx installer smoke
@@ -27,17 +29,26 @@ jobs:
           node-version: '20'
       - name: CLI list
         run: node bin/tms-skills.js list
-      - name: CLI install to temp dir
+      - name: CLI install each discovered skill
         run: |
-          node bin/tms-skills.js install top-ppt-html --to "$RUNNER_TEMP/skills-out"
-          test -f "$RUNNER_TEMP/skills-out/top-ppt-html/SKILL.md"
+          set -euo pipefail
+          mapfile -t SKILLS < <(node scripts/discover_skills.js)
+          OUT="$RUNNER_TEMP/skills-out"
+          for skill in "${SKILLS[@]}"; do
+            node bin/tms-skills.js install "$skill" --to "$OUT"
+            test -f "$OUT/$skill/SKILL.md"
+          done
+          # Refuse overwrite without --force
+          if node bin/tms-skills.js install "${SKILLS[0]}" --to "$OUT"; then
+            echo "expected install onto existing dir to fail without --force" >&2
+            exit 1
+          fi
+          node bin/tms-skills.js install "${SKILLS[0]}" --to "$OUT" --force
+          test -f "$OUT/${SKILLS[0]}/SKILL.md"
 
-  skill-top-ppt-html:
-    name: top-ppt-html package gate
+  skill-gates:
+    name: Skill package gates
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: top-ppt-html
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -46,15 +57,34 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Install PPTX dependency
-        run: npm install --omit=dev
-      - name: Package check
-        run: python scripts/package_skill.py --check
-      - name: Style / docs / skill / css audits
+      - name: Discover skills
+        id: discover
         run: |
-          python scripts/audit_styles.py
-          python scripts/audit_docs.py
-          python scripts/audit_skill.py
-          python scripts/audit_css.py
-      - name: Negative tests (gate self-check)
-        run: python scripts/negative_tests.py
+          mapfile -t SKILLS < <(node scripts/discover_skills.js)
+          echo "skills=${SKILLS[*]}" >> "$GITHUB_OUTPUT"
+          printf '%s\n' "${SKILLS[@]}" > /tmp/skills.txt
+          cat /tmp/skills.txt
+      - name: Install + package check + audits + negative
+        run: |
+          set -euo pipefail
+          while IFS= read -r skill; do
+            [ -z "$skill" ] && continue
+            echo "=== ${skill} ==="
+            pushd "$skill" >/dev/null
+            if [ -f package-lock.json ]; then
+              npm ci --omit=dev
+            else
+              npm install --omit=dev
+            fi
+            python3 scripts/package_skill.py --check
+            python3 scripts/audit_styles.py
+            python3 scripts/audit_docs.py
+            python3 scripts/audit_skill.py
+            python3 scripts/audit_css.py
+            python3 scripts/negative_tests.py
+            # regression.py needs pptxgenjs (installed) but may need playwright
+            # for measure_height; that step self-SKIPs. Full regression is heavy
+            # and optional here — keep CI green; run locally before release.
+            # python3 scripts/regression.py
+            popd >/dev/null
+          done < /tmp/skills.txt

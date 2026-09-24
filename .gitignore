@@ -5,8 +5,9 @@
 # ── Dependencies ────────────────────────────────────────────────────────
 node_modules/
 **/node_modules/
-package-lock.json
-**/package-lock.json
+# Root installer has no lockfile requirement; skill lockfiles ARE committed
+# so CI can `npm ci --omit=dev`. Do not blanket-ignore **/package-lock.json.
+/package-lock.json
 
 # ── Build / regression artifacts ────────────────────────────────────────
 dist/

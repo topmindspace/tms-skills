@@ -49,7 +49,6 @@ def main() -> int:
     picks = [Path(a) for a in sys.argv[1:]]
     if not picks:
         picks = [assets / 'theme-overview.png',
-                 assets / 'theme-overview-presentation.png',
                  assets / 'theme-overview-research.png',
                  assets / 'theme-overview-architecture.png']
     missing = [str(p) for p in picks if not p.exists()]
