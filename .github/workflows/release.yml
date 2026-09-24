@@ -1,0 +1,81 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Privacy scan
+        run: python scripts/ci_privacy_scan.py
+
+      - name: Package top-ppt-html
+        working-directory: top-ppt-html
+        run: |
+          npm install --omit=dev
+          python scripts/package_skill.py
+
+      - name: Collect artifacts
+        run: |
+          mkdir -p release-assets
+          cp top-ppt-html/dist/top-ppt-html.zip release-assets/
+          cp top-ppt-html/dist/top-ppt-html.manifest.json release-assets/
+          node bin/tms-skills.js list > release-assets/skills-list.txt
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release-assets/*
+          generate_release_notes: true
+
+      # Keep only the 2 most recent GitHub Releases (and their tags).
+      # Policy: 定期清理历史 releases，最多保留 2 个最近版本.
+      - name: Prune old releases (keep 2)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          KEEP=2
+          mapfile -t ids < <(gh api "repos/${GITHUB_REPOSITORY}/releases" --jq 'sort_by(.published_at // .created_at) | reverse | .[] | "\(.id)\t\(.tag_name)"')
+          echo "found ${#ids[@]} release(s); keeping newest ${KEEP}"
+          i=0
+          for row in "${ids[@]}"; do
+            i=$((i + 1))
+            if [ "$i" -le "$KEEP" ]; then
+              echo "keep  $row"
+              continue
+            fi
+            id="${row%%$'\t'*}"
+            tag="${row#*$'\t'}"
+            echo "prune $row"
+            gh api -X DELETE "repos/${GITHUB_REPOSITORY}/releases/${id}"
+            git push origin ":refs/tags/${tag}" || true
+          done
+
+      # Publish installer package to npm (keeps npm in sync with the tag).
+      # Requires repository secret NPM_TOKEN (granular token, write on @topmindspace).
+      # Skip quietly when the secret is not configured.
+      - name: Publish to npm
+        run: |
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "NPM_TOKEN not configured — skip npm publish (GitHub Release still published)."
+            exit 0
+          fi
+          npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

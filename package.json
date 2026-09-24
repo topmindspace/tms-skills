@@ -1,0 +1,48 @@
+{
+  "name": "@topmindspace/tms-skills",
+  "version": "0.1.0",
+  "description": "TopMindspace 智能体技能 monorepo — 通过 GitHub npx 安装技能（top-ppt-html 等）。",
+  "license": "MIT",
+  "author": "TopMindspace",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/topmindspace/tms-skills.git"
+  },
+  "homepage": "https://github.com/topmindspace/tms-skills#readme",
+  "bugs": {
+    "url": "https://github.com/topmindspace/tms-skills/issues"
+  },
+  "keywords": [
+    "agent-skills",
+    "ai-skills",
+    "slides",
+    "pptx",
+    "report",
+    "top-ppt-html"
+  ],
+  "type": "commonjs",
+  "bin": {
+    "tms-skills": "bin/tms-skills.js"
+  },
+  "files": [
+    "bin",
+    "top-ppt-html",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "list": "node bin/tms-skills.js list",
+    "install:skills": "node bin/tms-skills.js install top-ppt-html",
+    "check": "python top-ppt-html/scripts/package_skill.py --check",
+    "privacy": "python scripts/ci_privacy_scan.py",
+    "audit": "python top-ppt-html/scripts/audit_styles.py && python top-ppt-html/scripts/audit_docs.py && python top-ppt-html/scripts/audit_skill.py && python top-ppt-html/scripts/audit_css.py",
+    "package:skill": "python top-ppt-html/scripts/package_skill.py"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

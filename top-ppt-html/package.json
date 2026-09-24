@@ -1,0 +1,35 @@
+{
+  "name": "top-ppt-html",
+  "version": "0.1.0",
+  "private": true,
+  "description": "TopPPT HTML：报告 / 演示 / 信息架构图技能。单文件 HTML + 版式保真的可编辑 PPTX；布局骨架 P1–P12；模型单写；strict 0/0 交付。",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/topmindspace/tms-skills.git",
+    "directory": "top-ppt-html"
+  },
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "scaffold": "python scripts/scaffold_report.py",
+    "sync": "python scripts/sync_runtime.py",
+    "audit": "python scripts/audit_styles.py && python scripts/audit_docs.py && python scripts/audit_skill.py && python scripts/audit_css.py",
+    "capture-themes": "node scripts/capture_theme_overview.js",
+    "measure": "python scripts/measure_height.py",
+    "eval": "python evals/run_evals.py",
+    "build-examples": "python scripts/build_examples.py",
+    "regression": "python scripts/regression.py",
+    "negative": "python scripts/negative_tests.py",
+    "package": "python scripts/package_skill.py",
+    "check": "python scripts/package_skill.py --check"
+  },
+  "dependencies": {
+    "pptxgenjs": "^4.0.0"
+  },
+  "devDependencies": {
+    "playwright": "^1.63.0"
+  }
+}

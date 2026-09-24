@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  privacy:
+    name: Privacy & deprecation scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Scan for private/local/deprecated identifiers
+        run: python scripts/ci_privacy_scan.py
+
+  installer:
+    name: npx installer smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: CLI list
+        run: node bin/tms-skills.js list
+      - name: CLI install to temp dir
+        run: |
+          node bin/tms-skills.js install top-ppt-html --to "$RUNNER_TEMP/skills-out"
+          test -f "$RUNNER_TEMP/skills-out/top-ppt-html/SKILL.md"
+
+  skill-top-ppt-html:
+    name: top-ppt-html package gate
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: top-ppt-html
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install PPTX dependency
+        run: npm install --omit=dev
+      - name: Package check
+        run: python scripts/package_skill.py --check
+      - name: Style / docs / skill / css audits
+        run: |
+          python scripts/audit_styles.py
+          python scripts/audit_docs.py
+          python scripts/audit_skill.py
+          python scripts/audit_css.py
+      - name: Negative tests (gate self-check)
+        run: python scripts/negative_tests.py

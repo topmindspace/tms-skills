@@ -1,0 +1,59 @@
+# tms-skills monorepo · version control ignore rules
+
+# Principle: regenerateable artifacts, machine-local state, and secrets never enter the repo.
+
+# ── Dependencies ────────────────────────────────────────────────────────
+node_modules/
+**/node_modules/
+package-lock.json
+**/package-lock.json
+
+# ── Build / regression artifacts ────────────────────────────────────────
+dist/
+**/dist/
+report-assets/
+**/report-assets/
+render-compare/
+**/render-compare/
+
+# ── Python cache / venv ─────────────────────────────────────────────────
+__pycache__/
+**/__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# ── IDE / agent local state (never publish) ─────────────────────────────
+.codebuddy/
+.h3caiwork/
+.playwright-mcp/
+.claude/
+.agents/
+.mimocode/
+.idea/
+.vscode/
+
+# ── Temp / logs / OS ────────────────────────────────────────────────────
+scripts/_*
+**/scripts/_*
+*.tmp
+*.log
+*.bak
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Internal planning notes (not for release) ───────────────────────────
+OPTIMIZATION-PLAN.md
+**/OPTIMIZATION-PLAN.md
+
+# ── Secrets ─────────────────────────────────────────────────────────────
+.env
+.env.*
+*.pem
+*.key
+credentials.json
+
+# Machine-local privacy denylist (usernames/hostnames). Never commit.
+scripts/.privacy-deny.local
+**/.privacy-deny.local
