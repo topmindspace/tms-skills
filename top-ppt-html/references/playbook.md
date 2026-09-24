@@ -35,6 +35,7 @@
 **密度选错的症状**：A 出现双栏小字墙（投影看不清）→ 拆页/换形态；A 为「疏朗」删证据/so-what → **反模式**，按 content-rules §四-c 恢复；B 大面积留白 → 合页或补证据；C 成段正文 → 转图注。
 **节奏**：禁止连续 3 页同密度档；同一版式不连用超过 2 页；research 每 3–4 页插一个低密度页（指标带/金句/大数）。
 **反截断**：溢出顺序 = 重构承载 → 拆页/分章 → 换布局 → 有限 fontShrink；禁静默截断（见 `presentation-craft.md`）。
+**插画页**：情绪/产品/占位图 ≠ 数据图；安全边距、图文不叠、icon+chart 共存、Mode A full-bleed+主张叠字规则见 `illustration-layout.md`。
 
 ---
 
@@ -42,10 +43,10 @@
 
 **轻量路径**（默认）——同时满足：≤12 页 · 材料单一完整 · 无未敲定关键判断 · 用户没要求看框架。
 ```
-Gate 0 参考图 → 六项问询（1 轮）→ 1 张规划卡 → scaffold_report.py
+Gate 0 参考图 → 六项问询（1 轮）→ 最小大纲（outline-design「轻量最小集」）→ 1 张规划卡 → scaffold_report.py
   → **只填 REPORT_MODEL** → render_from_model.py --inplace → validate_report.py --strict → 交付
 ```
-（Fast Mode 跳过 Gate 0/六项，其余同链；**禁止**手改 HTML 正文与模型双写。）
+（Fast Mode 跳过 Gate 0/六项，仍须最小大纲；其余同链；**禁止**手改 HTML 正文与模型双写。）
 
 **完整路径**（任一命中）——研究 ≥20 页 / 演示 ≥12 页 / 材料量大且杂 / 含未敲定关键判断 / 用户要看框架。
 ```
@@ -53,7 +54,7 @@ Gate 0 参考图 → 六项问询（1 轮）→ 证据表 → 故事线脑暴 �
   → scaffold_report.py → **只填 REPORT_MODEL** → render_from_model.py --inplace → validate_report.py --strict → 交付
 ```
 
-**预算（硬）**：交互轮次 ≤3；必读文件 = `SKILL.md` + 本文件（≤2 份）；L2 深度文件按需且单份读完即停。
+**预算（硬）**：交互轮次 ≤3；常读面仅入口两份（`SKILL.md` + 本手册）。正式演示 / Fast 演示路径额外允许工艺双件为 L1.5（`default-surface` 与 `presentation-craft`），不记作超读。深度 L2 命中再开、读完即停。
 
 ---
 
@@ -261,9 +262,11 @@ python scripts/validate_pptx.py 2026-09-15-主题.pptx --strict --model=….mode
 
 ## 十、L2 节级路由（按任务只读这些，读完即停）
 
-> 默认生成面：`default-surface.md`（12 页型 + 8 图 + V1–V4）。Mode A 工艺清单：`presentation-craft.md`。
-> **不要整读** `components.md` / `charts.md` 背后的物理拆分大文件。需要代码时优先：
-> `python scripts/extract_snippet.py --list` · `--task <名>` · `--chart <类型>` · `--page-type <页型>` · `--file components.md --section 46`（逻辑名自动路由）
+> 常读仍为入口两份；演示路径可加 **L1.5 工艺双件**：`default-surface.md` + `presentation-craft.md`。
+> 默认生成面：`default-surface.md`（12 页型 + 8 图 + V1–V4）。Mode A 工艺：`presentation-craft.md`。插画：`illustration-layout.md`。
+>
+> **禁止整读（强制走 `extract_snippet.py`）**：`layouts-combo.md` · `components-atoms.md` · `charts-basic.md` · `charts-extended.md` · `content-rules.md` 全文 · `pptx-export.md` · 模式模板 HTML（`assets/templates/*.html`，走 `scaffold_report.py`）。
+> 取码：`python scripts/extract_snippet.py --list` · `--task <名>` · `--chart <类型>` · `--page-type <页型>` · `--file components.md --section 46`（逻辑名自动路由）
 
 | 任务 | 只读 |
 |------|------|
@@ -273,12 +276,12 @@ python scripts/validate_pptx.py 2026-09-15-主题.pptx --strict --model=….mode
 | 架构 / 泳道 / 分层 | `components.md` §37–§38b · `infographics.md` §78–§80 · `--task architecture-diagram` |
 | 选图 / 取图表代码 | 本文件 §五 · `--chart <类型>` · 误用见 `charts.md` §66 |
 | 密度 / 字数 / 去 AI 味 | `content-rules.md` §一/§四 · 本文件 §六 · `--task content-rules` |
-| 素材图片 / 占位 | `components.md` §11c · `--task image-layout` |
+| 素材图片 / 占位 / 插画页 | `illustration-layout.md` · `components.md` §11c · `--task image-layout` |
 | PPTX 精导字段 | `pptx-export.md` · 本文件 §九 · `--task pptx-export` |
 | 高保真 / 锚点 | `high-fidelity.md` · `--task high-fidelity` |
 | 配色 / 风格 | `styles.md` · `design-system.md` §1a–§1b/§9 · `--task style-theme` |
 | 图标 / 语义速查 | `icons.md` · `--task icons` |
 | 起骨架用节奏包 | `scaffold_report.py --list-types` → `--preset consulting` 等 |
 
-**纪律**：L0+L1 是默认全部所需；上表命中才开 L2；**读完即执行，不预读下一份**。页型语义槽位见 `layout-constants.json` → `layoutSlots`（双通道同源 IR）。
+**纪律**：L0+L1 是默认全部所需（Mode A/Fast 可加 L1.5）；上表命中才开 L2；**读完即执行，不预读下一份**；大文件**禁止整读**，一律 `extract_snippet.py`。页型语义槽位见 `layout-constants.json` → `layoutSlots`（双通道同源 IR）。
 **维护者**：改常量/schema/引擎后必跑 `sync_runtime.py` → `audit_styles.py` → `audit_docs.py` → `audit_skill.py` → `build_examples.py` → `regression.py`。

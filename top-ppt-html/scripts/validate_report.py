@@ -1215,6 +1215,22 @@ def _check_media(txt, chk, model):
         chk("模型配图占位 ↔ 正文 .media--ph 对应", False,
             f"{n_ph} 页模型声明 image.placeholder 但正文无 .media--ph", level="WARN")
 
+    # 配图页 caption / so-what（廉价 WARN）
+    bands = re.split(r'(?=<section\b)', txt)
+    miss_cap = []
+    for i, b in enumerate(bands):
+        if not re.search(r'class="[^"]*\bmedia\b|<img\b|class="[^"]*media--', b):
+            continue
+        if len(b) < 80:
+            continue
+        has_cap = bool(re.search(
+            r'class="[^"]*(?:fig__cap|media__cap|media__ph|caption|exhibit__src|footnote)', b))
+        if not has_cap:
+            miss_cap.append(f'band[{i}]')
+    chk("配图页含 caption/图注（IMAGE_CAPTION）", not miss_cap,
+        f"{len(miss_cap)} 处配图区缺 .fig__cap/.media__cap/.footnote 等图注" if miss_cap else "",
+        level="WARN")
+
 
 # 失败检查项 → 失败模式 / 处置动作 / 精确取码命令。
 # 目的：校验失败时直接给出「改什么、按什么顺序改、去哪取代码」，

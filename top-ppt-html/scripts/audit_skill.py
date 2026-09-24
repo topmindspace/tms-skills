@@ -13,7 +13,7 @@
 
 审计项（任一不过 → 退出码 1）:
   ① 体积预算   —— SKILL.md / 常读入口 playbook.md / 单份 reference / 模式模板 的上限
-  ② 元数据     —— frontmatter name 与技能名一致；description ≤ DESC_HARD，且 ≤ DESC_SOFT（触发精度）
+  ② 元数据     —— frontmatter name 与技能名一致；description ≤ DESC_HARD/SOFT；可选 license/compatibility/metadata（开放标准）
   ③ 披露分层   —— SKILL.md 必须声明 L0/L1/L2 三档，且 L1（常读入口）恰好 1 份
   ④ 交互门禁   —— SKILL.md 必须含「Gate 0 参考图先行」，且其出现位置在「六项问询」之前；若声明 Fast Mode，须同时有豁免句且标准路径仍为硬门禁
   ⑤ 效率预算   —— SKILL.md 必须显式声明交互轮次上限与必读文件数上限
@@ -139,7 +139,7 @@ def main() -> int:
         f'最大 {kb(max((p.stat().st_size for p in TPL.glob("*.html")), default=0))} / 上限 {kb(BUDGET["template"])}')
 
     # ② 元数据
-    d = re.search(r'^description:\s*"(.*)"\s*$', sk, re.M | re.S)
+    d = re.search(r'^description:\s*"(.*)"\s*$', sk, re.M)
     dlen = len(d.group(1)) if d else -1
     nm = re.search(r'^name:\s*(\S+)\s*$', sk, re.M)
     chk('② name 一致', bool(nm) and nm.group(1) == NAME,
@@ -149,9 +149,37 @@ def main() -> int:
     chk('② description 软上限（触发精度）', 0 < dlen <= BUDGET['desc_soft'],
         f'{dlen} / 建议 ≤ {BUDGET["desc_soft"]}')
 
+    # ②b 开放标准可选 frontmatter（允许额外键；校验存在与粗约束）
+    lic = re.search(r'^license:\s*(.+)$', sk, re.M)
+    chk('② license', bool(lic) and 'MIT' in (lic.group(1) if lic else ''),
+        '缺 license: MIT（开放标准可选，本技能应对齐 package.json）',
+        'license=MIT')
+    compat = re.search(r'^compatibility:\s*"(.*)"\s*$', sk, re.M | re.S)
+    clen = len(compat.group(1)) if compat else -1
+    chk('② compatibility', 0 < clen <= 500,
+        f'compatibility 缺失或超 500 字符（{clen}）',
+        f'{clen} 字符')
+    meta_ver = re.search(r'^\s+version:\s*"?([\w.\-]+)"?\s*$', sk, re.M)
+    meta_author = re.search(r'^\s+author:\s*(\S+)\s*$', sk, re.M)
+    pkg_ver = ''
+    try:
+        import json as _json
+        pkg_ver = str(_json.loads((ROOT / 'package.json').read_text(encoding='utf-8')).get('version') or '')
+    except Exception:
+        pass
+    chk('② metadata.version', bool(meta_ver) and (not pkg_ver or meta_ver.group(1) == pkg_ver),
+        f'metadata.version 缺失或与 package.json 不一致（fm={meta_ver.group(1) if meta_ver else None} pkg={pkg_ver})',
+        f'{meta_ver.group(1) if meta_ver else "?"}')
+    chk('② metadata.author', bool(meta_author),
+        '缺 metadata.author',
+        meta_author.group(1) if meta_author else '')
+
     # ③ 渐进式披露分层（机器可读标记：L0=… · L1=… · L2=…）
-    m_l1 = re.search(r'L1\s*=\s*`?([^`\s·|]+)`?', sk)
-    has_l0 = bool(re.search(r'L0\s*=', sk))
+    # Prefer machine-readable disclosure marker `L1=references/...`（忽略正文「L0+L1 共 2」等）
+    m_l1 = re.search(r'L1\s*=\s*`?(references/[a-z0-9\-./]+\.md)`?', sk)
+    if not m_l1:
+        m_l1 = re.search(r'L1\s*=\s*`?([^`\s·|]+)`?', sk)
+    has_l0 = bool(re.search(r'L0\s*=\s*`?SKILL', sk)) or bool(re.search(r'`L0=SKILL', sk))
     has_l2 = bool(re.search(r'L2\s*=', sk))
     l1_files = [f.strip() for f in re.split(r'[,、]', m_l1.group(1)) if f.strip()] if m_l1 else []
     chk('③ 披露分层 L0/L1/L2', has_l0 and has_l2 and len(l1_files) == BUDGET['l1_files'],

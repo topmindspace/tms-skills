@@ -46,6 +46,14 @@ quality_gate.py … --deliver   # 同口径
 - [ ] `motion = none`；翻页靠内容节奏  
 
 
+## 插画页（非数据配图）
+
+- 情绪/产品/占位图与数据图**勿同页抢主位**；规则见 `illustration-layout.md`。
+- **安全边距** ≥24px；文字不压照片焦点；标签/图例不重叠。
+- **icon + chart**：icon 在注释列，不进绘图区。
+- **full-bleed + 主张叠字**（Mode A）：仅封面/章节幕/金句/收尾；遮罩保对比度；必有 caption/来源；证据另页。
+- 配图页写 **caption + so-what**（氛围休止页可免 so-what）；校验对缺项 WARN。
+
 ## 长文与信息承载（anti-truncation）
 
 > **硬原则**：大量文字**不得**为了「看起来像稀疏 demo 甲板」而被故意压缩或删除。留白是设计；**删掉证据 / so-what / 口径不是设计**。

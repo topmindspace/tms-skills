@@ -87,6 +87,7 @@ INCLUDE = [
     'references/*',
     'scripts/*',
     'evals/*',
+    'agents/*',
 ]
 
 # 出包规则（命中即跳过；与 .gitignore 口径一致）
@@ -120,6 +121,7 @@ REQUIRED = [
     'references/layout-grammar.md',
     'references/default-surface.md',
     'references/presentation-craft.md',
+    'references/illustration-layout.md',
     'references/modes.md', 'references/outline-design.md', 'references/design-system.md',
     'references/styles.md', 'references/content-rules.md', 'references/components.md',
     'references/charts.md',
@@ -145,13 +147,15 @@ REQUIRED = [
     'references/infographics-stats.md', 'references/infographics-structure.md',
     'evals/prompts.csv', 'evals/run_evals.py', 'evals/rubric.schema.json',
     'evals/trace.example.json',
+    'evals/trigger-queries.json',
+    'scripts/check_triggers.py',
 ]
 
 # 必须达到最小数量的集合（名称含日期，故按数量校验）
 MIN_COUNTS = {
     'assets/examples/*.html': 3,  # Batch3 每模式 1 份黄金样张
     'assets/examples/*.model.json': 3,
-    'references/*.md': 22,  # craft 轮后含 default-surface + presentation-craft；≥22 防误删
+    'references/*.md': 23,  # + illustration-layout；≥23 防误删
 }
 
 
@@ -254,6 +258,16 @@ def main():
             print(f'    ✗ {e}')
         return 1
     print('  校验通过：必需文件齐全 · frontmatter 合规 · 无临时/缓存路径')
+
+    # P0-1 trigger heuristic gate（廉价、无 LLM）
+    trig = ROOT / 'scripts' / 'check_triggers.py'
+    if trig.exists():
+        import subprocess
+        r = subprocess.run([sys.executable, str(trig)], cwd=str(ROOT))
+        if r.returncode != 0:
+            print('  ✗ trigger coverage 失败（evals/trigger-queries.json）')
+            return 1
+        print('  ✓ trigger coverage 通过')
 
     if check_only:
         print('\n(--check 模式：仅校验，不打包)')

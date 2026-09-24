@@ -1,5 +1,18 @@
 ## Unreleased
 
+### top-ppt-html · Agent Skills 兼容 + 全链路质量（agent-compat）
+
+- **P0-1 Trigger eval**：`evals/trigger-queries.json`（22 正 / 11 负）+ `scripts/check_triggers.py`（keyword/heuristic，无 LLM）；`package_skill.py --check` 门禁。
+- **P0-2 Mode A 读预算诚实**：统一 L0+L1=2；Mode A/Fast 可加 L1.5（`default-surface` + `presentation-craft`）——SKILL + playbook 同口径。
+- **P0-3 反过读**：SKILL 阶段路由 + playbook §十 明确禁止整读清单；强制 `extract_snippet.py`。
+- **P1-1/2 Frontmatter**：`license: MIT` · `compatibility` · `metadata.version/author`；description 祈使 Use when…（去实现jargon）；`audit_skill` 校验可选键。
+- **P1-3 安装路径**：`bin/tms-skills.js` 增加 `.cursor` / `.codex`（项目+用户级）；根 README 安装表。
+- **P1-4 Fast 最小大纲**：`outline-design.md`「轻量最小集」；SKILL Fast/轻量路径链接。
+- **P1-5 插画 brief**：新建 `references/illustration-layout.md`；接入 L2 / default-surface / presentation-craft / playbook。
+- **配图质量**：presentation-craft / playbook 插画页规则；`validate_report` WARN `IMAGE_CAPTION` + 负例 N18。
+- **P2**：`agents/openai.yaml`（Codex UI 元数据）。
+- **红线保持**：`minTypes.presentation≥4`；反截断溢出序；Mode A 大气正式演示。**本轮不发版 / 不打 tag / 不 npm publish。**
+
 ## 0.1.2 — 2026-09-24
 
 ### top-ppt-html · P2 cleanup（advanced 按需 · Mode A 次级骨架 · icons 压缩）

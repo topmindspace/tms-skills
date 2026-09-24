@@ -1,8 +1,12 @@
 ---
 name: top-ppt-html
-description: "TopPPT HTML：报告 / 演示 / 信息架构图生成器。单文件零外链 HTML（可翻页、亮暗双主题）+ 版式保真的原生可编辑 16:9 PPTX。三模式（A 演示·每屏一主张 / B 研究·咨询密排 / C 架构·图为王）× 9 风格；布局骨架 P1–P12；内容只填 REPORT_MODEL，render_from_model 回填正文；strict 0/0 才交付。Use when 用户要做报告、演示、汇报、PPT、slides、deck、路演，或写研究报告、分析报告、咨询报告、白皮书、调研、评测、对标、经营分析、复盘、项目汇报、商务/HTML/网页报告，或做架构图、拓扑图、流程图、泳道图、方案图，或把材料/数据做成可视化报告，或导出 HTML/PPT/PPTX（保真、可编辑、高保真、1:1），或优化排版、版式、配色、密度、图文布局，或要快速模式/fast/直接生成/一键出稿/少问一句。Do NOT use for 纯代码工程、非报告类网页或应用开发、视频/图片生成、直接改写已有 Word/PPT 源文件本身。"
+description: "Use when 用户要做报告、演示、汇报、PPT、slides、deck、路演，或写研究报告、分析报告、咨询报告、白皮书、调研、评测、对标、经营分析、复盘、项目汇报、商务/HTML/网页报告，或做架构图、拓扑图、流程图、泳道图、方案图，或把材料做成可视化报告并导出 HTML/PPT/PPTX，或优化排版/版式/配色/图文布局，或要快速模式/fast/直接生成/一键出稿/少问一句。TopPPT HTML：零外链可翻页 HTML（亮暗双主题）+ 版式保真可编辑 16:9 PPTX；三模式（A 演示·每屏一主张 / B 研究·咨询密排 / C 架构·图为王）× 9 风格。Do NOT use for 纯代码工程、非报告类网页或应用开发、视频/图片生成、直接改写已有 Word/PPT 源文件本身。"
+license: MIT
+compatibility: "Python 3 stdlib for HTML generation; Node >=18 + pptxgenjs for PPTX; optional playwright for browser regression / theme captures."
+metadata:
+  version: "0.1.2"
+  author: TopMindspace
 ---
-
 # TopPPT HTML
 
 **让 idea 飞，好想法被看见。** 一套技能、三种模式、两种交付：**单文件 HTML 报告**（可翻页、可演示、header 自带工具栏）+ **版式保真的原生可编辑 PPTX**（智能体精导唯一交付通道）。两者同源于一个内容模型 `REPORT_MODEL`。设计对齐 Material Design 3，执行克制（Google/Apple 风）；研究模式对齐咨询机构（McKinsey/BCG）的密度与论证结构，但**克制优先**——不加多余的页头标签、页脚信息与装饰。
@@ -32,7 +36,7 @@ description: "TopPPT HTML：报告 / 演示 / 信息架构图生成器。单文�
 | 篇幅 | A=10 / B=12 / C=6 | |
 | format | html only（用户要 PPT→html+pptx） | |
 
-流程：一行宣布「Fast 选用：…」→ 走 playbook §二轻量命令链（骨架→模型单写→回填→strict→`quality_gate --deliver`；可选 pptx）。路径永远轻量；回复末可附 `assets/style-gallery.html`。开场须声明「已跳过参考图」。**标准模式**仍强制 Gate 0 + 六项。
+流程：一行宣布「Fast 选用：…」→ **最小大纲**（`outline-design.md`「轻量最小集」）→ playbook §二轻量链（骨架→模型单写→回填→strict→`quality_gate --deliver`；可选 pptx）。路径轻量；末可附 `assets/style-gallery.html`。开场声明「已跳过参考图」。**标准模式**仍强制 Gate 0 + 六项。
 
 ## 唯一入口流程
 
@@ -42,7 +46,7 @@ description: "TopPPT HTML：报告 / 演示 / 信息架构图生成器。单文�
       （命令链见 playbook §二/§九；PPTX 见 pptx-export）
 ```
 
-**预算（硬）**：交互轮次 **≤3**；默认必读仅 2 份——本文件 + L1 决策层 `references/playbook.md`；L2 深度文件命中才读、读一份用一份、不预读。
+**预算（硬）**：交互轮次 **≤3**；**L0+L1 共 2 份**（本文件 + `playbook.md`）。**Mode A/Fast**可加 L1.5：`default-surface.md`+`presentation-craft.md`（非违约）。其余 L2 命中才读、不预读。
 
 ## 六项问询（标准模式 · 一次问完 · 唯一一次形式参数确认）
 
@@ -61,7 +65,7 @@ description: "TopPPT HTML：报告 / 演示 / 信息架构图生成器。单文�
 
 | 路径 | 何时 | 多做什么 |
 |------|------|---------|
-| **轻量**（默认） | 页数不多、材料单一完整、关键判断已敲定 | 仅 1 张规划卡，直接生成 |
+| **轻量**（默认） | 页数不多、材料单一完整、关键判断已敲定 | 最小大纲→1 张规划卡（`outline-design.md`「轻量最小集」） |
 | **完整** | 长篇、材料量大且杂、含未敲定关键判断、用户要看框架 | 证据盘点 → 故事线 → 主张树 → 逐页规划卡 → 大纲确认（1 轮） |
 
 两条路径的**精确判定条件与完整步骤以 `references/playbook.md` §二为准**。完整路径确认只做一次，用户说"调整"只改指定处；确认后不再有内容层面的反复确认。
@@ -85,12 +89,12 @@ description: "TopPPT HTML：报告 / 演示 / 信息架构图生成器。单文�
 **L2 一览**（命中条件与逐任务只读清单的**详表以 playbook §十为准**，此处仅索引）：
 
 - 模式契约与锁定版式 → `references/modes.md` · 完整路径七步 → `references/outline-design.md`
-- **A/Fast 主读 → `references/default-surface.md`** + **`presentation-craft.md`** · 骨架分层见 `layout-grammar.md` §七
+- **A/Fast L1.5 → `default-surface.md` + `presentation-craft.md`** · 骨架 `layout-grammar.md` §七 · 插画 `illustration-layout.md`
 - 组件/版式**代码** → `components.md` · 图表门面 `charts.md`（纪律+核图；extended 按需取节）· 信息图 → `infographics.md`
 - 配色/主题/字阶 → `styles.md` + `design-system.md` · 写作 → `content-rules.md` · 图标语义 → `icons.md`
 - PPTX 精导 → `references/pptx-export.md` · 深度高保真 → `references/high-fidelity.md` · 修复顺序 → `references/failure-modes.md` · 技能维护 → `references/tech-design.md`
 
-**操作方式**：定模式/页型/组合/图 → 只读 `playbook.md`；取代码 → `extract_snippet.py`；**禁止整读** `layouts-combo.md` / `charts-basic.md` 等大文件；**同一阶段不重复读同一文件**。
+**操作方式**：定模式/页型/组合/图 → 只读 `playbook.md`；取代码 → **必须** `extract_snippet.py`。**禁止整读**：`layouts-combo` / `components-atoms` / `charts-basic` / `charts-extended` / `content-rules` 全文 / `pptx-export` / 模式模板 HTML（走 scaffold）。详表 playbook §十。同阶段不重读。
 
 ## 铁律（12 条 · 交付硬门禁）
 
