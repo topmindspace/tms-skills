@@ -212,3 +212,16 @@
    - so-what 连续 3 页空缺或套话（→ F15）；引用 0 条且内容含外部数字（→ §五 引用纪律，补 `[n]` 或标 `.tbd`）。
 
 > 自查后重跑 `quality_gate.py`；rubric 启发式只覆盖可静态判定的部分，最终以 LLM 按 `evals/rubric.schema.json` 复评或人眼对照为准。
+
+## F18 · 长文截断 / 溢出未拆页 / 半空卡（v9.1）
+
+| 信号 | 错误码 | 修复 |
+|------|--------|------|
+| 列表/卡/结论以「…」砍义 | `LAYOUT_QA_TRUNCATION` | 恢复完整表述；改列表化/拆卡/拆页，禁止省略号充数 |
+| 页高溢出且无续页/换形态信号 | `LAYOUT_QA_OVERFLOW_NO_SPLIT` | 按 overflowRule：重构→拆页→换形态→fontShrink |
+| 同页多卡过半正文过短 | `LAYOUT_QA_HALF_EMPTY` | 减卡高/改列数，或合并卡；勿留凑数半空卡 |
+| 图卡混排无对齐类 | `LAYOUT_QA_ALIGN_RHYTHM` | 加 `a-start` / `a-c`；共享左缘顶边 |
+| PPTX 页脚 y 跨页漂移 | `CHROME_DRIFT` | 锁死 chrome 槽位几何（pageTypes） |
+
+反模式：为稀疏 demo 感删证据 / so-what。原则见 `presentation-craft.md`「长文与信息承载」。
+

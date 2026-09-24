@@ -9,7 +9,7 @@
   echo '{"mode":"research","intents":["架构"]}' | python scripts/recommend_layout.py --stdin
 
 输出 JSON 页序列：{pageType, skel, chart?, rationale, v?}
-启发式：playbook V1–V4 / sizeByComplexity / 极偏禁 donut / layoutSystem.defaultCharts。
+启发式：playbook V1–V4 / sizeByComplexity / 极偏禁 donut / 高容量多页序列 / layoutSystem.defaultCharts。
 不列入 package REQUIRED（可选工具；Batch 3 再定是否纳入）。
 """
 from __future__ import annotations
@@ -83,7 +83,34 @@ INTENT_RULES: list[tuple[tuple[str, ...], dict]] = [
         'pageType': 'exhibit', 'chart': 'bar', 'v': None,
         'rationale': '研究证据页 exhibit + bar',
     }),
+    (('长文', '密集', '材料多', '证据多', '详细', 'deep dive', '白皮书', '高容量'), {
+        'pageType': 'points', 'chart': None, 'v': 'V1',
+        'rationale': '高容量→多页序列（勿塞一页）',
+        'sequence': 'high_volume',
+    }),
 ]
+
+# 高容量内容：推荐多页分解，而非一页塞爆
+HIGH_VOLUME_SEQ = {
+    'presentation': [
+        'cover', 'agenda',
+        'kpi',          # claim
+        'points',       # evidence cards
+        'cards',        # secondary evidence
+        'bar',          # chart evidence
+        'points',       # detail list
+        'table',        # detail table if needed
+        'quote',        # breath
+        'closing',
+    ],
+    'research': [
+        'cover', 'agenda', 'metrics', 'exhibit', 'twocol',
+        'halftable', 'exhibit', 'threecol', 'table', 'flags', 'closing',
+    ],
+    'architecture': [
+        'cover', 'diagram', 'lane', 'diagram', 'points', 'points', 'closing',
+    ],
+}
 
 
 def _norm_mode(m: str) -> str:
@@ -197,7 +224,15 @@ def recommend(
             out.append(row)
         return out
 
-    seq = list(DEFAULT_SEQ.get(mode, DEFAULT_SEQ['research']))
+    intent_hit = _match_intent(blob) if blob else None
+    high_vol = bool(intent_hit and intent_hit.get('sequence') == 'high_volume')
+    # 页数偏多或意图含高容量 → 多页序列（议程→主张→证据卡→明细），禁一页塞爆
+    if high_vol or (pages and pages >= 10) or any(
+            k in blob for k in ('长文', '密集', '材料多', '证据多', '详细', '白皮书')):
+        seq = list(HIGH_VOLUME_SEQ.get(mode, HIGH_VOLUME_SEQ['presentation']))
+        high_vol = True
+    else:
+        seq = list(DEFAULT_SEQ.get(mode, DEFAULT_SEQ['research']))
     if pages and pages > 0:
         mid = seq[1:-1] if len(seq) > 2 else seq
         if pages <= 2:
@@ -208,7 +243,6 @@ def recommend(
             seq = [seq[0]] + body + [seq[-1]]
 
     out = []
-    intent_hit = _match_intent(blob) if blob else None
     for i, pt in enumerate(seq, 1):
         ch = pt if pt in DEFAULT_CHARTS else (DEFAULT_CHARTS[(i - 1) % len(DEFAULT_CHARTS)]
                                              if pt in ('bar', 'exhibit', 'donut') else None)
@@ -232,7 +266,7 @@ def recommend(
             row['v'] = v
         out.append(row)
 
-    if intent_hit and out:
+    if intent_hit and out and intent_hit.get('sequence') != 'high_volume':
         idx = 2 if len(out) > 2 else 0
         if out[idx]['pageType'] in ('cover', 'agenda'):
             idx = min(idx + 1, len(out) - 1)
@@ -242,6 +276,12 @@ def recommend(
             out[idx]['v'] = intent_hit['v']
         out[idx]['skel'] = _skel(out[idx]['pageType'], out[idx].get('v'))
         out[idx]['rationale'] = intent_hit.get('rationale', '')
+    if high_vol:
+        for r in out:
+            if r['pageType'] in ('cover', 'closing', 'agenda'):
+                continue
+            r['rationale'] = (r.get('rationale') or '') + (
+                ' · 高容量多页分解（禁一页塞爆/截断）' if '高容量' not in (r.get('rationale') or '') else '')
     return out
 
 

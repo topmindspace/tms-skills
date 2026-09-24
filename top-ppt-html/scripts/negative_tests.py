@@ -20,6 +20,9 @@
   N12 模型 theme 与 data-theme 矛盾
   N13 模型 mode 与 data-mode 矛盾
   N14 内部锚点断裂（链接目标 id 不存在）
+  L4  截断迹象（列表项省略号砍义）
+  L5  溢出未拆页
+  L6  混排缺对齐（ALIGN_RHYTHM）
 
 用法: python scripts/negative_tests.py
 """
@@ -233,6 +236,56 @@ def main() -> int:
             p_l3 = OUT / 'L3-skew-donut.html'
             p_l3.write_text(t_l3, encoding='utf-8')
             ok = expect_layout_qa_fail('L3 极偏 donut', p_l3, 'LAYOUT_QA_SKEW_DONUT') and ok
+
+        # L4 截断迹象：列表项以省略号砍义
+        t_l4 = t_l1
+        inj4 = '<div class="card"><ul><li class="card__li">这项证据其实很长但被故意截断了…</li></ul></div>'
+        t_l4 = re.sub(r'(id="s1"[^>]*>)', lambda m: m.group(1) + inj4, t_l4, count=1)
+        p_l4 = OUT / 'L4-truncation.html'
+        p_l4.write_text(t_l4, encoding='utf-8')
+        ok = expect_layout_qa_fail('L4 截断迹象', p_l4, 'LAYOUT_QA_TRUNCATION') and ok
+
+        # L5 溢出未拆页：塞入超长正文使页高估算爆掉且无续页信号
+        t_l5 = t_l1
+        wall = '论证要点' + ('详细证据与口径说明，必须完整保留不得删减。' * 40)
+        t_l5 = re.sub(
+            r'(id="s1"[^>]*>)',
+            lambda m: m.group(1) + '<div class="card"><p>' + wall + '</p></div>'
+                 + '<div class="card"><p>' + wall + '</p></div>'
+                 + '<div class="card"><p>' + wall + '</p></div>',
+            t_l5, count=1)
+        p_l5 = OUT / 'L5-overflow-nosplit.html'
+        p_l5.write_text(t_l5, encoding='utf-8')
+        ok = expect_layout_qa_fail('L5 溢出未拆页', p_l5, 'LAYOUT_QA_OVERFLOW_NO_SPLIT') and ok
+
+        # L6 混排缺对齐：图+卡同页但无对齐类
+        t_l6 = t_l1
+        inj6 = (
+            '<div class="grid g-2">'
+            '<div class="fig"><svg class="chart" data-chart="bar" style="height:200px"></svg></div>'
+            '<div class="card"><ul><li>证据甲</li><li>证据乙</li></ul></div>'
+            '</div>'
+        )
+        t_l6 = re.sub(r'(id="s1"[^>]*>)', lambda m: m.group(1) + inj6, t_l6, count=1)
+        # 撕掉 s1 段内对齐类，确保 ALIGN_RHYTHM 能抓住
+        def _strip_align_s1(src: str) -> str:
+            m = re.search(r'(<section[^>]*id="s1"[^>]*>)([\s\S]*?)(</section>)', src)
+            if not m:
+                # attribute order may be data-skel before id
+                m = re.search(r'(<section[^>]*id="s1"[^>]*>)([\s\S]*?)(</section>)', src)
+            if not m:
+                return src
+            body = m.group(2)
+            body = re.sub(r'\ba-start\b', '', body)
+            body = re.sub(r'\ba-c\b', '', body)
+            body = re.sub(r'\ba-end\b', '', body)
+            body = body.replace('align-items:start', '').replace('align-items: center', '')
+            return src[:m.start()] + m.group(1) + body + m.group(3) + src[m.end():]
+        t_l6 = _strip_align_s1(t_l6)
+        p_l6 = OUT / 'L6-align-rhythm.html'
+        p_l6.write_text(t_l6, encoding='utf-8')
+        ok = expect_layout_qa_fail('L6 混排缺对齐', p_l6, 'LAYOUT_QA_ALIGN_RHYTHM') and ok
+
     else:
         print('  [SKIP] layout-qa 负例（scaffold 未产出 data-skel）')
 

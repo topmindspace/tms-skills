@@ -24,6 +24,19 @@
 - **智能体精导**：正式 PPTX 的唯一交付路径——从报告抽模型 → 生成 → **过 strict 质检** → 交付。生成时用户选了「HTML+PPTX」交付格式的，交付时一并生成；交付后用户随时可通过页面提示词回来补生成。
 - **双单源**：页面几何/三模式独立比例尺（`typeScale` 基准 + `modeTypeScale` 模式取值）/页型几何/9 风格 token 全在 `scripts/layout-constants.json`；**页型 DSL schema（字段/必填/适用模式）在 `scripts/model-schema.json`**。通道 B 直接 `require`；页面运行时由 `sync_runtime.py` 注入（同时注入三模板的引擎/UI/运行时内联副本）。**改常量只改 JSON，改 schema 只改 schema JSON，然后跑 `python scripts/sync_runtime.py`**。
 
+### 会场与字号（venue · P1-4）
+
+PPTX `modeTypeScale` 以**中型会议室投影**为默认（presentation 正文 13pt）。按会场微调，**不要**用无限缩字号塞字：
+
+| 会场 | 建议 | 做法 |
+|------|------|------|
+| 小会议室 / 桌面投屏 | 默认可略紧 | 保持 mode 比例尺；密卡页走拆页而非降到 floor 下 |
+| 中型会议室（默认） | presentation body 13pt / research 10.5pt | `modeTypeScale` 原值 |
+| 礼堂 / 大报告厅 | 提高可读性 | 演示稿优先更大标题档与更少每页单元；必要时整体上移一档角色映射，**仍禁**为塞字破 fontShrink floor |
+
+HTML 侧仍用 MD3 clamp；双端都以「最后一排可读」为准（`presentation-craft` back-of-room）。
+
+
 ## 内容模型（只填模型 · render_from_model 回填正文）
 
 三份模式模板（`assets/templates/{presentation|research|architecture}.html`）尾部已带对应模式的占位。字段：
@@ -207,3 +220,8 @@ python scripts/validate_pptx.py "报告.pptx" --strict --model="报告.model.jso
 - **Node + pptxgenjs**：仅精导通道与回归双裁判需要。在技能目录执行 `npm install pptxgenjs`，或把 `NODE_PATH` 指向任意已含 pptxgenjs 的 node_modules；`regression.py` 会自动探测（`TOP_PPT_NODE_PATH` / `NODE_PATH` / 仓库内 node_modules / 全局 npm root）。
 - **Python（标准库）**：跑 `validate_report.py` / `validate_pptx.py` / `extract_model.py`（读 `model-schema.json` 单源）/ `sync_runtime.py` / `audit_styles.py`，无第三方依赖；`cross_verify.py` 可选依赖 python-pptx（未装则自动跳过该第三方裁判，不影响交付判定）。
 - 页面预览运行时零依赖（浏览器纯序列化，无 ZIP 打包）。
+
+### Chrome 一致性（P1-6）
+
+跨页页眉/页脚/页码（chrome）应**锁死同一几何**：同 y、同字号角色、同边距（`layoutSystem.zones.chromePct`）。禁止逐页漂移页码位置或交替有无页脚。HTML 用模板页脚；PPTX 由 `pageTypes` chrome 槽位同源落位。便宜门禁：`validate_pptx` 对页脚/页码 y 漂移做 WARN（见 `qualityGates.chromeDriftIn`）。
+

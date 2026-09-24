@@ -35,7 +35,7 @@ validate_report.py --strict   # presentation 自动隐含 --layout-qa
 quality_gate.py … --deliver   # 同口径
 ```
 
-检查：V 契约 · 简单全幅 · 骨架连用 · 主张标题 WARN · 核图多样性 · WCAG（audit_styles）。
+检查：V 契约 · 简单全幅 · 骨架连用 · 截断/溢出未拆页 · 半空卡 · 对齐节奏 · 主张标题 WARN · 核图多样性 · WCAG。
 
 ## 自检（上台前 30 秒）
 
@@ -44,5 +44,26 @@ quality_gate.py … --deliver   # 同口径
 - [ ] 休止页有意留白；内容页不无故半空  
 - [ ] 无多强调色、无动画墙、无冷门图硬凑  
 - [ ] `motion = none`；翻页靠内容节奏  
+
+
+## 长文与信息承载（anti-truncation）
+
+> **硬原则**：大量文字**不得**为了「看起来像稀疏 demo 甲板」而被故意压缩或删除。留白是设计；**删掉证据 / so-what / 口径不是设计**。
+
+**Mode A 仍主张一屏一主张**——但「一主张」可以带充分证据：次要卡、列表、表、跟进页。内容密时优先**加结构**，不砍实质。
+
+### 溢出处置顺序（铁律 · 与 `containers.overflowRule` 同源）
+
+1. **重构承载**：段落 → 列表 / 卡片 / 表 / 图 / 组合版式  
+2. **拆页 / 分章**：议程→主张→证据卡→明细列表等多页序列；01a/01b；多部分章节  
+3. **换布局形态**：V1–V4 · 多列 · 卡栅格 · `g-side` / `g-bento`  
+4. **有限 `fontShrink`**（阶梯内、模式 floor 以上，最多 4 档）  
+5. **禁止**静默截断、砍 so-what、砍证据、为审美稀疏而删决策必需信息
+
+### 密度许可
+
+- 卡片/列表页在主张清楚时可**偏密**（多卡、多条），仍须可读、对齐、一重心。  
+- 单页字数预算是**溢出预警**，不是「字数太多就删」的许可证；超预算先走 1–3 步。  
+- 校验：`overflow-without-split` / 截断迹象 → FAIL 或 WARN；**不为「字多」单独 FAIL**。
 
 > *Hard rules protect the stage; adaptive choices serve the content.*

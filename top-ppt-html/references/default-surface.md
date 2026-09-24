@@ -52,3 +52,7 @@ scaffold_report → 只填 REPORT_MODEL → render_from_model --inplace
 → validate_report --strict   # presentation 自动 --layout-qa
 → quality_gate --deliver →（可选）pptx
 ```
+
+## 长文与密度（Mode A）
+
+一屏一主张；证据用卡/列表或跟进页。**禁止**为稀疏 demo 感删实质。溢出顺序：重构 → 拆页 → 换 V/栅格 → 有限 fontShrink。详见 `presentation-craft.md`「长文与信息承载」。
