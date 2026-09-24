@@ -530,6 +530,35 @@ def title_anchor_info(shapes: list[ET.Element]) -> dict[str, Any] | None:
     }
 
 
+
+def chrome_footer_y_in(shapes: list[ET.Element], height: int) -> float | None:
+    """页码 chrome y（英寸）：只认页码形文本（如 3 / 14），避免把 so-what/图注当页脚。"""
+    zones = ((json.loads(Path(__file__).with_name("layout-constants.json").read_text(encoding="utf-8"))
+              .get("layoutSystem") or {}).get("zones") or {})
+    chrome = zones.get("chromePct") or [18, 24]
+    bottom_frac = float(chrome[1] if isinstance(chrome, list) and len(chrome) > 1 else 24) / 100.0
+    threshold = int(height * (1.0 - bottom_frac))
+    ys: list[float] = []
+    pager = re.compile(r"^\s*\d+\s*/\s*\d+\s*$|^\s*\d+\s*$")
+    for shape in shapes:
+        text = (text_content(shape) or "").strip()
+        box = shape_bounds(shape)
+        if not text or box is None:
+            continue
+        _x, y, _cx, _cy = box
+        if y < threshold:
+            continue
+        if not pager.match(text):
+            continue
+        sizes = font_sizes_pt(shape)
+        if sizes and max(sizes) > 14:
+            continue
+        ys.append(y / 914400.0)
+    if not ys:
+        return None
+    return round(sum(ys) / len(ys), 4)
+
+
 def anchor_check(shapes: list[ET.Element], slide_no: int, width: int) -> list[dict[str, Any]]:
     """空间锚点注册（深度模式）：标题/页头块的左边距必须对齐版心左边界。
 
@@ -728,6 +757,7 @@ def inspect_slide(
         "font_sizes_pt": sorted({round(v, 2) for v in _all_run_sizes(root)}),
         "text_characters": len(combined_text),
         "anchor": title_anchor_info(shapes),
+        "chrome_footer_y_in": chrome_footer_y_in(shapes, height),
     }
     return metrics, warnings
 
@@ -1105,6 +1135,42 @@ def promote_strict_failures(report: dict[str, Any], deep: bool = False) -> None:
         existing.add(key)
 
 
+
+def validate_chrome_drift(slides: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """跨页 chrome（页脚/页码）y 一致性：相对中位数漂移超过 chromeDriftIn → WARN。
+
+    封面/收尾页版式不同（常无页脚或 y 不同）豁免；仅比内容页。严格交付下任意 WARN 会挡
+    smoke，故容差偏宽、只抓明显漂移。
+    """
+    out: list[dict[str, Any]] = []
+    if len(slides) < 4:
+        return out
+    first_n = slides[0].get("slide")
+    last_n = slides[-1].get("slide")
+    ys = [(s.get("slide"), s.get("chrome_footer_y_in"))
+          for s in slides
+          if s.get("chrome_footer_y_in") is not None
+          and s.get("slide") not in (first_n, last_n)]
+    if len(ys) < 3:
+        return out
+    vals = sorted(y for _, y in ys)
+    mid = vals[len(vals) // 2]
+    try:
+        lc = json.loads(Path(__file__).with_name("layout-constants.json").read_text(encoding="utf-8"))
+        max_delta = float(((lc.get("qualityGates") or {}).get("chromeDriftIn") or {}).get("maxAbsDeltaIn") or 0.2)
+    except (OSError, json.JSONDecodeError, TypeError, ValueError):
+        max_delta = 0.2
+    drifted = [(n, y) for n, y in ys if abs(float(y) - mid) > max_delta]
+    for n, y in drifted[:4]:
+        out.append(issue(
+            "CHROME_DRIFT",
+            f"第{n}页页脚/页码 y={y:.3f}in 相对中位 {mid:.3f}in 漂移 {abs(y-mid):+.3f}in "
+            f"（容差 {max_delta}in）；跨页 chrome 应锁死几何。",
+            slide=n,
+        ))
+    return out
+
+
 def validate_pptx(
     path: str | Path,
     model_path: str | Path | None = None,
@@ -1208,6 +1274,9 @@ def validate_pptx(
             report["summary"]["slide_count"] = len(slide_names)
             for field in ("native_text_shapes", "native_graphic_shapes", "pictures", "charts", "tables"):
                 report["summary"][field] = sum(slide[field] for slide in report["slides"])
+
+            # P1-6 chrome 一致性：页脚/页码 y 相对中位数漂移
+            report["warnings"].extend(validate_chrome_drift(report["slides"]))
 
             # 图片门禁：默认零图片（pictures=0 全原生可编辑）；
             # 仅当模型显式声明 section.image / split.right.image 时才允许对应数量的图片落地。

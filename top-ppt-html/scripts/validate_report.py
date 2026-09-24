@@ -7,6 +7,8 @@ TopPPT HTML· HTML 报告质量校验（交付闭环）
 
 输出每项 PASS/FAIL，结尾给汇总与结论；任一 FAIL 时退出码为 1（--strict 时 WARN 也计失败）。
 --json 以 JSON 输出全部检查结果（供脚本/流水线读取）。
+Mode A / presentation + --strict：自动启用 --layout-qa（V 契约/截断/溢出未拆页/半空卡/对齐）；
+research / architecture 仍须显式传 --layout-qa（不强制）。
 生成流程：生成 → 跑本脚本 → 修复 FAIL → 再跑，直至全部 PASS 才交付。
 
 阈值全部来自单源 scripts/layout-constants.json（checkBudgets / charts / styleAccents / aiFlavor），
@@ -218,7 +220,11 @@ CARRIERS = checks_html.CARRIERS  # 单源 scripts/checks_html.py
 
 
 def _check_chart_variety(txt, chk, mode):
-    """图表与版式多样性（阈值单源 charts.variety；判定逻辑 checks_html）。"""
+    """图表与版式多样性（阈值单源 charts.variety；判定逻辑 checks_html）。
+
+    多样性仍是特性：全部 data-chart 类型计入下限。禁反模式由 layout-qa /
+    sizeByComplexity / CHART_SKEW 等另检（简单全幅、极偏 donut、内容不匹配的冷门图）。
+    """
     v = CHART_VARIETY
     if not v:
         return
@@ -323,7 +329,7 @@ def _check_bands(txt, chk, mode="presentation"):
         if est_h > SCREEN_BUDGET_PX * 1.08:
             est_over.append(f"第{i}页≈{est_h:.0f}px")
     chk(f"页高溢出估算（字×行高+组件 ≤ ~{SCREEN_BUDGET_PX}px/屏 · {mode}）", not est_over,
-        ("; ".join(est_over) + "（按「列表化/精炼→压缩→多列→拆页」处理，或给长结构页加 band--flow）")
+        ("; ".join(est_over) + "（按「重构承载→拆页/分章→换形态→有限 fontShrink」；禁静默截断；或长结构页加 band--flow）")
         if est_over else "")
 
     bad_grids = 0
@@ -888,6 +894,45 @@ def _check_v9_hard_gates(txt, chk, model):
         not oversize, "; ".join(oversize[:4]) if oversize else "")
 
 
+
+def _class_tokens(tag_or_html: str) -> set[str]:
+    """Extract HTML class tokens from class="..." attributes."""
+    out: set[str] = set()
+    for m in re.finditer(r'class="([^"]*)"', tag_or_html):
+        out.update(m.group(1).split())
+    return out
+
+
+def _mixed_grid_needs_align(band: str) -> bool:
+    """True when a grid/g-* region pairs media with cards/lists (token-exact; no t-metric / data-chart false hits)."""
+    def has_media(classes: set[str], chunk: str) -> bool:
+        if classes & {'fig', 'media', 'chart'}:
+            return True
+        if any(c.startswith('media') or c.startswith('fig') for c in classes):
+            return True
+        return 'data-chart=' in chunk
+
+    def has_cards(classes: set[str]) -> bool:
+        if classes & {'card', 'ul', 'metric'}:
+            return True
+        return any(
+            c.startswith('ul--') or c.startswith('card') or c.startswith('metric__')
+            for c in classes)
+
+    # Find each grid opening and inspect following chunk
+    for m in re.finditer(r'<div class="([^"]*)"', band):
+        classes_on_grid = set(m.group(1).split())
+        if not (classes_on_grid & {'grid'} or any(re.fullmatch(r'g-\d+', c) or c.startswith('g-') for c in classes_on_grid)):
+            # allow g-hero / g-side / g-2 etc
+            if not any(c == 'grid' or c.startswith('g-') for c in classes_on_grid):
+                continue
+        chunk = band[m.start(): m.start() + 4500]
+        classes = _class_tokens(chunk)
+        if has_media(classes, chunk) and has_cards(classes):
+            return True
+    return False
+
+
 def _check_layout_grammar(txt, chk, mode):
     """布局语法门禁：骨架类 / 单一重心 / 混排对齐 / 间距 token / 图标尺寸 / 标签防换行。"""
     LS = LC.get('layoutSystem') or {}
@@ -920,7 +965,10 @@ def _check_layout_grammar(txt, chk, mode):
 
     for i, b in enumerate(_bands(txt), 1):
         head = b[:240]
-        if any(f'id="{x}' in head for x in ('refs', 'appendix', 'cover', 'agenda', 'quote')):
+        # intentional whitespace：封面/章节幕/金句/收尾等休止页不参与 FILL 门禁
+        if any(f'id="{x}' in head for x in (
+                'refs', 'appendix', 'cover', 'agenda', 'quote',
+                'closing', 'section', 'chapter', 'next')):
             continue
         if 'band--flow' in head:
             continue
@@ -956,11 +1004,10 @@ def _check_layout_grammar(txt, chk, mode):
         if n_big >= 2:
             multi_focus.append(f"第{i}页大件×{n_big}")
 
-        # ③ 混排对齐（同时有图/媒体与卡/列表）
-        mixed = (re.search(r'class="[^"]*(?:fig|media|chart)', b) and
-                 re.search(r'class="[^"]*(?:card|ul|metric)', b))
+        # ③ 混排对齐（grid 内同时有图/媒体与卡/列表；token 精确）
+        mixed = _mixed_grid_needs_align(b)
         if mixed and mixed_need:
-            if not any(t in b for t in align_tokens):
+            if not any(re.search(r'\b' + re.escape(tok) + r'\b', b) for tok in align_tokens):
                 align_miss.append(f"第{i}页图卡混排缺 a-start/a-c")
 
         # ④ 间距写死（margin/padding/gap 非 token / 非 clamp；≤8px 微调白名单）
@@ -1233,17 +1280,16 @@ def _print_fix_guide(results, strict, width):
             print(f"     取码: python scripts/extract_snippet.py {cmd}")
     else:
         print("  未匹配到已登记的失败模式，按通用顺序处置：")
-        print("  ① 补内容 ② 优化形态（列表化/精炼）③ 换承载形态 "
-              "④ 调容器/网格 ⑤ 有限缩字号 ⑥ 最后拆页")
+        print("  ① 重构承载（列表/卡/表/图）② 拆页/分章 ③ 换布局形态 "
+              "④ 有限缩字号 ⑤ 禁止静默截断/砍 so-what")
     print("  完整失败模式库与错误解释纠正表: references/failure-modes.md")
 
 
 
 def _check_layout_qa(txt, chk, mode, model):
-    """Batch 2 · 布局 QA（仅 --layout-qa）：V 契约 / 极偏环图 / 连续同骨架 / 缺 data-skel / 简单全幅图。
-
-    与日常 strict 互补：strict 已含 CHART_SKEW / CHART_OVERSIZE / LAYOUT_* 基础项；
-    本函数把「内容→版式」契约升为 FAIL，供 Fast/交付前加跑。
+    """布局 QA（--layout-qa；presentation+--strict 自动开）：
+    V 契约 / 极偏环图 / 骨架连用 / 缺 data-skel / 简单全幅 /
+    截断迹象 / 溢出未拆页 / 半空卡 / 列对齐节奏。
     """
     bands = _bands(txt)
     skip_ids = {'cover', 'agenda', 'refs', 'appendix', 'next', 'quote'}
@@ -1370,6 +1416,90 @@ def _check_layout_qa(txt, chk, mode, model):
     chk("LAYOUT_QA_V_CONTRACT 演示 V1–V4 与复杂度匹配",
         not v_hits, "; ".join(v_hits[:3]) if v_hits else "")
 
+    # ⑥ 截断迹象：正文/列表项以省略号截断充数（antiTruncation）
+    at = (LC.get('qualityGates') or {}).get('antiTruncation') or {}
+    trunc_hits = []
+    if at.get('forbidEllipsisTruncate', True):
+        patterns = list(at.get('ellipsisPatterns') or ['…', '...', '……'])
+        for i, b, head in content:
+            plain_parts = re.findall(r'<(?:li|p)[^>]*>([\s\S]*?)</(?:li|p)>', b)
+            plain_parts += re.findall(
+                r'class="[^"]*(?:card__b|sowhat__v|point)[^"]*"[^>]*>([\s\S]*?)</',
+                b)
+            for raw in plain_parts:
+                plain = _plain(raw).strip()
+                if len(plain) < 8:
+                    continue
+                for pat in patterns:
+                    if plain.endswith(pat) or plain.endswith(pat + '。'):
+                        # 排除「等…」短收口
+                        if re.search(r'等[…\.]{1,3}$', plain) and len(plain) <= 16:
+                            continue
+                        trunc_hits.append(f"第{i}页「{plain[:18]}」")
+                        break
+    chk("LAYOUT_QA_TRUNCATION 禁静默截断（列表/卡/结论勿以省略号砍义）",
+        not trunc_hits, "; ".join(trunc_hits[:4]) if trunc_hits else "")
+
+    # ⑦ 溢出却无拆页策略：页高估算超预算，且无 band--flow / 续页标记 / 多部分 title
+    overflow_hits = []
+    if at.get('overflowNoSplitFail', True):
+        B = MODE_BUDGETS.get(mode, MODE_BUDGETS['presentation'])
+        fs_px = int(B.get('bodyPx') or 17)
+        wrap_px = int(B.get('wrap') or 1400) - WRAP_INSET_PX
+        cpl = max(10, int(wrap_px / fs_px))
+        for i, b, head in content:
+            if 'band--flow' in head:
+                continue
+            # 已有拆页/续页信号则豁免
+            if re.search(r'(续|续表|01[ab]|02[ab]|part\s*[12]|跟进|详见下页)', b, re.I):
+                continue
+            b_clean = re.sub(r'<script\b[\s\S]*?</script>', ' ', b)
+            b_clean = re.sub(r'<style\b[\s\S]*?</style>', ' ', b_clean)
+            plen = len(_plain(b_clean).strip())
+            u = _band_heavy_units(b)
+            est_h = plen / cpl * fs_px * LINE_FACTOR + u * UNIT_PX + SHEAD_PX
+            if est_h > SCREEN_BUDGET_PX * 1.08:
+                overflow_hits.append(f"第{i}页≈{est_h:.0f}px 无拆页/换形态信号")
+    chk("LAYOUT_QA_OVERFLOW_NO_SPLIT 溢出须拆页/换形态（禁硬塞）",
+        not overflow_hits, "; ".join(overflow_hits[:3]) if overflow_hits else "")
+
+    # ⑧ 半空卡 vs 塞爆：同页多卡时过半卡正文过短
+    he = (LC.get('qualityGates') or {}).get('halfEmpty') or {}
+    half_hits = []
+    min_cards = int(he.get('minCards') or 3)
+    short_n = int(he.get('shortPlainChars') or 12)
+    max_ratio = float(he.get('maxShortRatio') or 0.5)
+    for i, b, head in content:
+        cards = re.findall(r'class="[^"]*\bcard\b[^"]*"[^>]*>([\s\S]*?)(?=<div class="[^"]*\bcard\b|</section>|$)', b)
+        if len(cards) < min_cards:
+            # also count .card blocks via simpler split
+            cards = re.split(r'class="[^"]*\bcard\b', b)[1:]
+        if len(cards) < min_cards:
+            continue
+        shorts = 0
+        for c in cards:
+            plen = len(_plain(c[:800]).strip())
+            if plen < short_n:
+                shorts += 1
+        if shorts / max(len(cards), 1) > max_ratio and shorts >= 2:
+            half_hits.append(f"第{i}页半空卡 {shorts}/{len(cards)}")
+    chk("LAYOUT_QA_HALF_EMPTY 半空卡过多（与塞爆同样不合格）",
+        not half_hits, "; ".join(half_hits[:3]) if half_hits else "",
+        level="WARN")
+
+    # ⑨ 列对齐节奏：同页多个 grid 混排却完全无对齐 token（加强 LAYOUT_ALIGN）
+    align_cfg = (LC.get('layoutSystem') or {}).get('align') or {}
+    rhythm_hits = []
+    if align_cfg.get('requireColumnRhythm', True):
+        tokens = set(align_cfg.get('mixedGridClasses') or ['a-start', 'a-c', 'a-end'])
+        for i, b, head in content:
+            mixed = _mixed_grid_needs_align(b)
+            has_align = any(re.search(r'\b' + re.escape(tok) + r'\b', b) for tok in tokens)
+            if mixed and not has_align:
+                rhythm_hits.append(f"第{i}页混排缺对齐类")
+    chk("LAYOUT_QA_ALIGN_RHYTHM 混排列节奏/共享对齐类",
+        not rhythm_hits, "; ".join(rhythm_hits[:3]) if rhythm_hits else "")
+
 
 def main():
     if len(sys.argv) < 2:
@@ -1379,6 +1509,8 @@ def main():
     strict = '--strict' in sys.argv
     as_json = '--json' in sys.argv
     layout_qa = '--layout-qa' in sys.argv
+    # Mode A / presentation：--strict 隐含 --layout-qa（正式演示交付不漏 V 契约）
+    # research/architecture 不自动开启，避免污染密排/架构路径
     if not path.exists():
         print(f"文件不存在: {path}")
         return 2
@@ -1412,6 +1544,8 @@ def main():
         f"读到 {mode!r}（未声明按 presentation 处理）" if mode not in MODE_BUDGETS else "",
         level="WARN" if mode is None else "FAIL")
     mode = mode if mode in MODE_BUDGETS else 'presentation'
+    if strict and mode == 'presentation' and not layout_qa:
+        layout_qa = True  # presentation + --strict → 自动 layout-qa
 
     # ── 宽屏与页面高度模型 ──
     B0 = MODE_BUDGETS[mode]
@@ -1533,6 +1667,28 @@ def main():
         short = [h for h in short if 0 < len(h) < 12 and not h.lower().startswith(STRUCT)]
         chk("research 行动标题（章节主标题 ≥12 字，标题即结论）", not short,
             f"过短: {short[:3]}" if short else "", level="WARN")
+
+    if mode == 'presentation':
+        # Mode A：主张/行动句标题（action title）；纯话题标签 WARN（硬 FAIL 过脆）
+        STRUCT_A = ('报告大纲', '大纲', '议程', 'Agenda', '参考资料', '下一步', '结论',
+                    '封面', '目录', '附录', '谢谢', 'Thank', 'Q&A', '问答')
+        TOPIC_ONLY = (
+            '现状分析', '市场格局', '风险与挑战', '背景介绍', '项目概述', '总结',
+            '概览', '概述', '简介', '背景', '方案', '规划', '进展', '回顾',
+            '分析', '对比', '数据', '附录', '下一步计划', '内容', '主题',
+        )
+        h1s_a = re.findall(r'<h2 class="t-h1 shead__title"[^>]*>(.*?)</h2>', txt)
+        titles_a = [re.sub(r'<[^>]+>', '', h).strip() for h in h1s_a]
+        topic_hits = []
+        for h in titles_a:
+            if not h or any(h.startswith(s) or h == s for s in STRUCT_A):
+                continue
+            # 纯话题：命中话题词表，或极短且无判断/数字/动词痕迹
+            if h in TOPIC_ONLY or (len(h) <= 6 and not re.search(
+                    r'\d|是|应|须|将|已|要|可|能|达|超|降|升|破|卡|成|未|无|有', h)):
+                topic_hits.append(h)
+        chk("presentation 主张/行动标题（禁纯话题标签）", not topic_hits,
+            f"话题式: {topic_hits[:4]}" if topic_hits else "", level="WARN")
 
     _check_content_quality(txt, chk, mode, model)
     _check_v9_hard_gates(txt, chk, model)

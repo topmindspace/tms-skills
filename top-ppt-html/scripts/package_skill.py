@@ -118,6 +118,8 @@ REQUIRED = [
     'assets/templates/ui.js',
     'references/playbook.md',
     'references/layout-grammar.md',
+    'references/default-surface.md',
+    'references/presentation-craft.md',
     'references/modes.md', 'references/outline-design.md', 'references/design-system.md',
     'references/styles.md', 'references/content-rules.md', 'references/components.md',
     'references/charts.md',
@@ -149,7 +151,7 @@ REQUIRED = [
 MIN_COUNTS = {
     'assets/examples/*.html': 3,  # Batch3 每模式 1 份黄金样张
     'assets/examples/*.model.json': 3,
-    'references/*.md': 20,  # Batch3 归档后实有 24；≥20 防误删核心 L2
+    'references/*.md': 22,  # craft 轮后含 default-surface + presentation-craft；≥22 防误删
 }
 
 

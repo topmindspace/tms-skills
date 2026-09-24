@@ -54,7 +54,7 @@
     "micro": 10
   },
   "modeTypeScale": {
-    "$comment": "三模式独立排版比例尺（pt）。research=咨询密排（正文 10.5pt、标题 22pt）；architecture 与 presentation 同基。序列化器按「调用点基准 pt → 最接近 typeScale 角色」映射到当前模式取值。",
+    "$comment": "三模式独立排版比例尺（pt）。默认按中型会议室投影。小会议室可保持原值；礼堂/大报告厅宜更大标题档、更少每页单元（见 pptx-export 会场节）。research=咨询密排（正文 10.5pt、标题 22pt）；architecture 与 presentation 同基。",
     "presentation": {
       "coverTitle": 44,
       "coverSub": 18,
@@ -820,7 +820,7 @@
       }
     },
     "variety": {
-      "$comment": "图表多样性预算（validate_report.py 与 evals/run_evals.py 消费）——治「图表定义 36 种、实际只用 bar/line/donut」。类型数下限 = min(minTypes[模式], max(1, ⌈图表页数 × minTypesRatio⌉))；noRepeatAdjacent = 相邻图表页不得同 data-chart；compositeMinRatio/compositeModes = 组合版式（内容页含 ≥2 种承载类型）比例下限与适用模式（治「单件页当默认」，只对 research 生效：A 演示按契约每屏一主张，C 架构恒为一页一图）。判据与选型见 references/playbook.md §四/§五。",
+      "$comment": "图表多样性预算（validate_report.py 与 evals/run_evals.py 消费）——治「图表定义 36 种、实际只用 bar/line/donut」。类型数下限 = min(minTypes[模式], max(1, ⌈图表页数 × minTypesRatio⌉))；noRepeatAdjacent = 相邻图表页不得同 data-chart；compositeMinRatio/compositeModes 只对 research 生效（A 演示一屏一主张，C 架构一页一图）。多样性仍是特性：按内容选型拉开图种；8 核图优先、advanced 在意图命中时用。禁反模式：为过门禁硬上冷门图、简单图全幅、极偏 donut/pie（见 layout-qa / sizeByComplexity）。判据与选型见 references/playbook.md §五。",
       "minTypes": {
         "presentation": 4,
         "research": 6,
@@ -1218,15 +1218,16 @@
     }
   },
   "checkBudgets": {
-    "$comment": "单页预算（validate_report.py 消费）：char 单页纯文字上限 / unit 并列单元上限 / empty 过空页阈值 / fit 满屏页文字上限 / wrap 版心宽度断言 / trow 表格行数上限。bodyPx 供页高溢出静态估算（HTML 正文基准 px，与 modes 契约一致）。",
+    "$comment": "单页预算（validate_report 消费）：char=文字量预警（WARN，非「字多就删」）；unit=并列单元预警；empty=过空页 FAIL；fit=满屏页文字；wrap=版心；trow=表行。Mode A 密卡/列表页允许偏密；超 char 先走 overflowRule，不对字数单独 FAIL。",
     "presentation": {
-      "char": 1500,
+      "char": 1800,
       "unit": 8,
       "empty": 80,
       "fit": 1000,
       "wrap": 1400,
       "trow": 8,
-      "bodyPx": 17
+      "bodyPx": 17,
+      "$comment": "预警阈值；结构合理的密页可接近此值；溢出无拆页→ layout-qa FAIL"
     },
     "research": {
       "char": 3200,
@@ -1323,9 +1324,9 @@
       "lineFactor": 1.45,
       "emAsciiRatio": 0.52
     },
-    "overflowRule": "溢出处置优先级：① 优化内容（列表化/精炼/合并/拆页/换组合版式）→ ② 调整容器尺寸与行宽 → ③ 有限度缩小字号（见 fontShrink）→ ④ 仍装不下则拆页。禁止无限缩字号硬塞，也禁止把「精简」当第一手段砍掉决策必需信息。",
+    "overflowRule": "溢出处置优先级（禁静默截断）：① 重构承载（列表/卡片/表/图/组合版式）→ ② 拆页/分章（议程→主张→证据卡→明细；01a/01b；信息须完整）→ ③ 换布局形态（V1–V4/多列/卡栅格）→ ④ 有限 fontShrink（阶梯内、模式 floor 以上、最多 4 档）→ ⑤ 禁止：静默截断、砍 so-what/证据/口径、为审美稀疏删决策必需信息。单页字数预算是预警不是删字许可证。",
     "fontShrink": {
-      "$comment": "有限缩字号策略（v8.2 放松）。内容确实偏多、优化格式与措辞后仍装不下时，允许在阶梯内下探；绝对下限按模式。优先顺序永远是：列表化/精炼 → 换组合/拆页 → 最后才缩字号。",
+      "$comment": "有限缩字号（最后手段）。优先：重构承载 → 拆页/分章 → 换布局 → 最后才缩字号。最多 4 档；绝对下限按模式 floor。禁止无限缩字号，禁止用缩字号代替拆页。",
       "ladder": [
         15,
         14,
@@ -1732,8 +1733,8 @@
     ],
     "fillTarget": {
       "presentation": [
-        62,
-        78
+        58,
+        75
       ],
       "research": [
         70,
@@ -1774,15 +1775,18 @@
         ]
       },
       "list": {
-        "maxItemLines": 2,
-        "maxItemChars": 45,
+        "maxItemLines": 3,
+        "maxItemChars": 72,
         "itemGap": "sp-3",
-        "maxPerCard": 4
+        "maxPerCard": 5,
+        "$comment": "结构引导（非硬砍刀）：条目宜可读完整；超长→加行/拆项/拆页，禁省略号截断充数。maxItemChars/maxItemLines 为投影可读建议，校验不因「字多」单独 FAIL。",
+        "preferItemChars": 45
       },
       "card": {
         "padToken": "sp-5",
         "equalHeight": true,
-        "maxBullets": 4
+        "maxBullets": 5,
+        "$comment": "maxBullets 为建议；更多→拆卡/跟进页，勿截断条目。"
       },
       "metric": {
         "perRow": [
@@ -1837,11 +1841,14 @@
         "a-end",
         "align-items"
       ],
-      "requireOnMixed": true
-    }
+      "requireOnMixed": true,
+      "$comment": "混排须显式对齐类；layout-qa 另检列节奏（多列网格共享顶边/左缘意图）。",
+      "requireColumnRhythm": true
+    },
+    "fillTargetComment": "填充率目标带。Mode A 大气留白：cover/section/quote/closing 等休止页为 intentional whitespace，不按 underfill/FILL_LOW 惩罚（见 qualityGates.underfill.exemptIds + validate LAYOUT_FILL 轻量页豁免）。内容页半空仍属 underfill。硬规则守舞台；自适应留给内容。"
   },
   "qualityGates": {
-    "$comment": "v9 硬门禁阈值（validate_report / validate_pptx / quality_gate 消费）。tagLeakPatterns = 可见文本中禁止出现的 HTML 源码片段；titleOnly = 去页头后正文字符上限（低于即 TITLE_ONLY_PAGE）；underfillCarriers = 承载组件数下限；roundtripMin = 模型代表性文本落页覆盖率下限（原 0.50 过松，放行截断）；chartSkew = 极偏占比禁 donut/pie；chartOversize = 简单图占内容区面积上限。",
+    "$comment": "v9+ 硬门禁。tagLeakPatterns / titleOnly / underfill / roundtripMin / chartSkew / chartOversize 同前。antiTruncation：截断迹象与溢出未拆页；chromeDriftIn：跨页 chrome y 容差（英寸）。",
     "tagLeakPatterns": [
       "<a ",
       "</a>",
@@ -1866,8 +1873,11 @@
         "refs",
         "appendix",
         "next",
-        "closing"
-      ]
+        "closing",
+        "section",
+        "chapter"
+      ],
+      "$comment": "intentional whitespace 豁免：封面/章节幕/金句/收尾/参考资料等休止页不要求承载数下限；其余内容页半空 = underfill FAIL。"
     },
     "roundtripMin": 0.8,
     "chartSkew": {
@@ -1885,6 +1895,28 @@
       "simpleMaxCats": 2,
       "simpleMaxPts": 3,
       "maxContentAreaPct": 55
+    },
+    "antiTruncation": {
+      "$comment": "截断/内容损失启发式。ellipsisInContent=正文/列表中的截断省略号；overflowNoSplit 与 layout-qa 同源。",
+      "ellipsisPatterns": [
+        "…",
+        "...",
+        "……",
+        "…。",
+        "...。"
+      ],
+      "forbidEllipsisTruncate": true,
+      "overflowNoSplitFail": true
+    },
+    "chromeDriftIn": {
+      "$comment": "PPTX 内容页页脚/页码 y 相对中位数漂移超过此值（英寸）→ WARN CHROME_DRIFT。封面/收尾豁免。默认 0.2in，抓明显漂移、不挡正常页型微差。",
+      "maxAbsDeltaIn": 0.2
+    },
+    "halfEmpty": {
+      "$comment": "半空卡：同页多卡时，正文过短的卡占比过高 → layout-qa WARN/FAIL。",
+      "minCards": 3,
+      "shortPlainChars": 12,
+      "maxShortRatio": 0.5
     }
   },
   "imageAdmission": {
