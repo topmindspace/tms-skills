@@ -1215,20 +1215,31 @@ def _check_media(txt, chk, model):
         chk("模型配图占位 ↔ 正文 .media--ph 对应", False,
             f"{n_ph} 页模型声明 image.placeholder 但正文无 .media--ph", level="WARN")
 
-    # 配图页 caption / so-what（廉价 WARN）
+    # 配图页 caption / so-what（廉价 WARN）；近邻主张/导语亦可
     bands = re.split(r'(?=<section\b)', txt)
     miss_cap = []
+    near_empty = []
     for i, b in enumerate(bands):
         if not re.search(r'class="[^"]*\bmedia\b|<img\b|class="[^"]*media--', b):
             continue
         if len(b) < 80:
             continue
         has_cap = bool(re.search(
-            r'class="[^"]*(?:fig__cap|media__cap|media__ph|caption|exhibit__src|footnote)', b))
+            r'class="[^"]*(?:fig__cap|media__cap|media__ph|caption|exhibit__src|footnote|so-what|lead)', b)
+            or re.search(r'<figcaption\b|class="[^"]*\bsoWhat\b', b))
         if not has_cap:
             miss_cap.append(f'band[{i}]')
+        # 近图过空：有 media 但正文文本极少且无要点/指标（WARN）
+        textish = re.sub(r'<script[\s\S]*?</script>|<style[\s\S]*?</style>|<[^>]+>', ' ', b)
+        textish = re.sub(r'\s+', ' ', textish).strip()
+        has_points = bool(re.search(r'class="[^"]*(?:points|bullets|kpi|metrics|card)', b))
+        if len(textish) < 40 and not has_points and not re.search(r'media--ph', b):
+            near_empty.append(f'band[{i}]')
     chk("配图页含 caption/图注（IMAGE_CAPTION）", not miss_cap,
-        f"{len(miss_cap)} 处配图区缺 .fig__cap/.media__cap/.footnote 等图注" if miss_cap else "",
+        f"{len(miss_cap)} 处配图区缺 .fig__cap/.media__cap/.footnote/so-what 等图注" if miss_cap else "",
+        level="WARN")
+    chk("配图页近邻过空（IMAGE_NEAR_EMPTY）", not near_empty,
+        f"{len(near_empty)} 处配图页几乎无注解/要点（补 caption 或要点条）" if near_empty else "",
         level="WARN")
 
 

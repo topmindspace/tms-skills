@@ -8,9 +8,9 @@
 
 | 技能 | 版本 | 做什么 |
 |------|------|--------|
-| [`top-ppt-html`](./top-ppt-html/) | 0.1.0 | 报告 / 演示 / 信息架构图：单文件 HTML + 版式保真的可编辑 16:9 PPTX |
+| [`top-ppt-html`](./top-ppt-html/) | 0.1.3 | 报告 / 演示 / 信息架构图：单文件 HTML + 版式保真的可编辑 16:9 PPTX |
 
-安装器包 [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) 亦为 **0.1.0**（与技能版本各自独立演进）。
+安装器包 [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) 亦为 **0.1.3**（整仓发版：安装器与当前技能同 tag；未来多技能仍可各自演进，默认随仓库 release）。
 
 更多技能以仓库根目录下的技能目录加入（每个目录含 `SKILL.md`）。
 
@@ -30,7 +30,7 @@
 npx @topmindspace/tms-skills list
 npx @topmindspace/tms-skills install top-ppt-html
 npx @topmindspace/tms-skills install top-ppt-html --to ./.claude/skills
-npx @topmindspace/tms-skills@0.1.0 install top-ppt-html   # 钉版本
+npx @topmindspace/tms-skills@0.1.3 install top-ppt-html   # 钉版本
 ```
 
 ### GitHub 直装

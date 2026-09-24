@@ -3,26 +3,21 @@
 **让 idea 飞，好想法被看见。** 一套面向 AI 智能体的商务报告生成技能：把想法、调研、分析、架构方案，变成**专业级的 HTML 报告 + 版式保真的可编辑 PPTX**。
 
 - 技能标识：`top-ppt-html`（安装/打包目录名与此一致）；品牌名：**TopPPT HTML**
-- 版本：**v0.1.0** · 完整规范见 `SKILL.md`（智能体入口）+ `references/playbook.md`（唯一常读入口）+ `references/layout-grammar.md`（排版）+ 其余按需 L2
+- 版本：**v0.1.3**（与 `@topmindspace/tms-skills@0.1.3` 同 tag）
+- **智能体入口**：`SKILL.md` → `references/playbook.md`（L1）→ L2 按需
+- **人类维护者**：本 README（安装 / 命令 / 目录）；勿把本文件当生成规范
 
-## 一、技能简介
+## 一、技能简介（人类速览）
 
 | 维度 | 能力 |
 |------|------|
-| 产出物 ① | **单文件 HTML 报告**：零外链、可翻页（方向键整屏翻页）、**每页一屏的稳定页高**、亮暗双主题（记忆按文件隔离）、header 自带工具栏（主题/9 风格实时切换/PPTX WYSIWYG 预览/可复制 AI 提示词/全屏 F/收起工具栏 B） |
-| 产出物 ② | **16:9 可编辑 PPTX**：全原生形状/文本框/表格（默认 `pictures=0`；模型显式声明 `section.image` 时按声明数导出素材图片，六版式 full/half/bleed/grid/compare/wall 与 HTML 同比例；无素材时出**原生配图占位框**——可编辑、`pictures` 不增），三模式独立排版比例尺 + **29 种页型**，带数据的图表为**原生数据图表**（双击"编辑数据"），非原生图表**附数据表**（备注/页内表格），口径自动写入演讲者备注，按所选主题导出亮色版或深色版 |
-| 三种模式 | A 演示汇报（大字每屏一主张，8–15 页）/ B 研究报告（咨询密排：行动标题 + Exhibit 编号 + 双三栏 + 密表 + 矩阵，12–25 页）/ C 信息架构图（图为王：全幅分层带/泳道/管线，1–3 张图成篇） |
-| 9 套风格 | 商务蓝（默认）/ 优雅黑白 / 麦肯锡 / 品牌红 / 暖沙金 / 墨绿 / 石墨深灰（深色优先）/ 靛紫 / 光谱彩色——与模式、主题正交组合；**每套风格各有自己的编码色板 c1–c5**（`styleDataColors` 单源，双引擎消费），多系列图表在任何风格下都可辨。**刻意不再扩张**：新增门槛（新色族 + 新语汇 + 场景缺口）见 `references/styles.md` §10 |
-| 复杂信息图 | 桑基 / 树图 / 箱线 / 关系网络 / 马赛克 / 流带 六类专属页型：曲线采样点 ≥16（流带 ≥24）、双边界分别追踪、禁预设形状替代；每页一图，数据表可追溯 |
-| 强调带 | 收尾/CTA 用 `band--accent`（软强调）、金句用 `band--accent--solid`（实底）——**浅色模式不再出现深色收尾页**；`band--deep` 仅显式反相页（≤1 处、不作末页） |
-| 待核实标注 | `.tbd` 内联标色 + `.tbd-legend`/`.flagbar` 说明——无法核实的数字/判断用**强调色**标出，提示用户二次修改（PPTX 同源 + 演讲者备注） |
-| 素材图片 | **六版式**：full 版心全宽 3:1 / half 左图右注 4:3 / bleed 通栏出血 21:9 / grid 多图网格 4:3（2·3·4·6 张）/ compare 双图 A/B / wall Logo 墙；比例由 `imageSpec` 单源锁定（HTML 用 `.media--r*` 类、PPTX 用同一比例算高度并居中）——**两通道比例一致**；`src` 仅 data: 内联或相对路径；PPTX 声明式放行 |
-| 配图占位 | 无素材时不省略图也不塞无关图：`.media--ph`（虚线框 + 斜纹 + 图标 + 尺寸提示）+ 模型 `image.placeholder` → PPTX 出**原生圆角矩形占位框**（可编辑、`pictures` 不增），交付前替换 `src` 即可；预览模态会把图位替换成真实图片 |
-| 用户图片准备 | `scripts/prepare_images.py <图片\|目录> --layout full\|half\|grid…`：读尺寸/格式/体积 → 按版式建议尺寸缩放压缩（有 Pillow 时）→ 自动选 data: 内联或相对路径 → 产出可粘贴的 `.media` HTML 片段与 `image` 模型对象 |
-| 36 种图表 | 环形 / 多段环形 / 饼图 / 柱状 / 堆叠 / 100% 堆叠条 / 折线 / 双折线 / 面积 / 横向条形 / 双向条形 / 雷达 / 仪表盘 / 玫瑰 / 瀑布 / 漏斗 / 甘特 / 散点 / 气泡 / 矩形树图 / 马赛克 / 进度条组 / 迷你趋势线 / 桑基 / 斜率 / 哑铃 / 棒棒糖 / 点图 / 子弹图 / 华夫 / 箱线 / 帕累托 / 径向条 / 流图 / K 线 / 关系网络（全内联 SVG，随主题与风格变色；**16 类走 PPTX 原生图表，其余形状还原 + 数据表**） |
-| 按需深度模式 | 命中「高保真/1:1/精确还原/正式交付」或含复杂信息图时自动升级：`--deep` 把连续文本流与空间锚点纳入 strict，`--emit-manifest` 产出锚点/容器/数据表/图表通道/图片资产登记，`render_compare.py` 准备渲染对照材料（缺依赖自动跳过） |
-| 质量闭环 | `validate_report.py`（HTML strict 全 PASS，含强调带约束/待核实标注/素材图片与配图占位/图表数据表策略）+ `validate_pptx.py --strict`（0 错误 0 警告，含容器级溢出/表格语义字号与密度/未声明图片硬拦/图片版式·裁切·多图数量·相对路径文件存在性）+ WCAG 对比度与单源完整性审计 + 双通道回归双裁判 + 素材图片导出探针 |
-| 设计标准 | Material Design 3 对齐（克制执行）；研究模式对齐咨询机构实践 |
+| 产出 | 单文件 HTML（可翻页、亮暗双主题、header 工具栏）+ 16:9 可编辑 PPTX（精导通道） |
+| 三模式 | A 演示 · B 研究 · C 架构（页型/字号/密度契约见 `playbook.md` §一） |
+| 风格 | 9 套（`styles.md`）；编码色板 c1–c5 随风格 |
+| 图表 | 核图 8 默认 + registry 全量；多样性 / 反截断 / Mode A 工艺见 playbook + `presentation-craft.md` |
+| 质量 | `validate_report --strict`（A 隐含 layout-qa）· `validate_pptx --strict` · `quality_gate --deliver` |
+
+生成规范、页型/图表穷举、铁律 **不在本文件**——智能体读 `SKILL.md` / playbook；选型大表见 `page-type-matrix.md` / `chart-decision-tree.md`。
 
 **核心架构**：HTML 与 PPTX 出自同一内容模型 `window.REPORT_MODEL`（唯一事实源）；页面只预览不导出，PPTX 由智能体走「精导通道」生成（extract → build → strict 校验）。阈值与几何全部单源化：`scripts/layout-constants.json`（常量）+ `scripts/model-schema.json`（页型 DSL）。
 
@@ -116,9 +111,12 @@ top-ppt-html/
 │  ├─ infographics.md           #   铁律与边界（逻辑入口）；代码已拆分见下两行          │
 │  ├─ infographics-stats.md     #   统计图形族 §1–§6 / §71–§77                        │
 │  ├─ infographics-structure.md #   结构图形族 §78–§82                                │
+│  ├─ page-type-matrix.md     #   L2 意图→页型穷举（playbook §三 速记）                 │
+│  ├─ chart-decision-tree.md  #   L2 图表决策表+误用（playbook §五 摘要）               │
+│  ├─ illustration-layout.md  #   L2 插画/配图 brief                                   │
 │  └─ …（modes / styles / design-system / content-rules / icons / default-surface /     │
-│        outline-design / pptx-export / high-fidelity /                               │
-│        failure-modes / tech-design；归档见 docs/archive/refs/）                         │
+│        outline-design / pptx-export / high-fidelity / failure-modes / tech-design；  │
+│        归档见 docs/archive/refs/）                                                   │
 ├─ evals/                       # Eval 框架（结果/过程/风格/效率四类目标）    │
 │  ├─ prompts.csv               #   14 条 prompt（显式/隐式/上下文/负对照）   │
 │  ├─ rubric.schema.json        #   风格目标结构化评分契约                    │
@@ -155,18 +153,23 @@ python scripts/package_skill.py --check
 python scripts/audit_skill.py && python scripts/audit_docs.py
 python scripts/audit_styles.py && python scripts/audit_css.py
 python scripts/negative_tests.py
+python scripts/check_triggers.py
+# 可选第三方：npx --yes skills-ref@0.1.5 validate .
 ```
 
 ## 目录要点
 
 | 路径 | 用途 |
 |------|------|
-| `SKILL.md` | L0 路由（≤13KB） |
-| `references/playbook.md` | L1 决策层 |
-| `references/default-surface.md` | Mode A 主读：12 页型 + 核图 8 + V1–V4；主力骨架 P1–P4+P6/P10 |
+| `SKILL.md` | L0 路由（≤13KB）；智能体唯一入口 |
+| `references/playbook.md` | L1 决策层（Mode / 路径 / V1–V4 / 组合 / 多样性摘要 / 命令 / 路由） |
+| `references/page-type-matrix.md` | L2 页型穷举表 |
+| `references/chart-decision-tree.md` | L2 图表决策树 + 七种误用 |
+| `references/default-surface.md` | Mode A L1.5：12 页型 + 核图 8 + V1–V4 |
+| `references/presentation-craft.md` | Mode A L1.5 工艺（反截断 / 大气正式） |
 | `assets/examples/` | 3 份黄金样张（每模式 1） |
-| `assets/style-gallery.html` | 9 风格 × 模式 × 亮暗 |
-| `docs/archive/` | 历史规范 / 旧示例 / 全量 build_examples |
+| `evals/trigger-queries.json` | description 触发正/负例；`check_triggers.py` |
+| `docs/archive/` | 历史规范 / 旧示例 |
 
 风格画廊与主题参考图：`assets/theme-overview*.png`（Gate 0）。完整规范索引见 playbook §十。
 

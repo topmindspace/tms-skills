@@ -1,17 +1,25 @@
-## Unreleased
+## 0.1.3 — 2026-09-24
 
-### top-ppt-html · Agent Skills 兼容 + 全链路质量（agent-compat）
+### top-ppt-html · QA close-out + docs
 
-- **P0-1 Trigger eval**：`evals/trigger-queries.json`（22 正 / 11 负）+ `scripts/check_triggers.py`（keyword/heuristic，无 LLM）；`package_skill.py --check` 门禁。
-- **P0-2 Mode A 读预算诚实**：统一 L0+L1=2；Mode A/Fast 可加 L1.5（`default-surface` + `presentation-craft`）——SKILL + playbook 同口径。
-- **P0-3 反过读**：SKILL 阶段路由 + playbook §十 明确禁止整读清单；强制 `extract_snippet.py`。
-- **P1-1/2 Frontmatter**：`license: MIT` · `compatibility` · `metadata.version/author`；description 祈使 Use when…（去实现jargon）；`audit_skill` 校验可选键。
-- **P1-3 安装路径**：`bin/tms-skills.js` 增加 `.cursor` / `.codex`（项目+用户级）；根 README 安装表。
-- **P1-4 Fast 最小大纲**：`outline-design.md`「轻量最小集」；SKILL Fast/轻量路径链接。
-- **P1-5 插画 brief**：新建 `references/illustration-layout.md`；接入 L2 / default-surface / presentation-craft / playbook。
-- **配图质量**：presentation-craft / playbook 插画页规则；`validate_report` WARN `IMAGE_CAPTION` + 负例 N18。
-- **P2**：`agents/openai.yaml`（Codex UI 元数据）。
-- **红线保持**：`minTypes.presentation≥4`；反截断溢出序；Mode A 大气正式演示。**本轮不发版 / 不打 tag / 不 npm publish。**
+- **P2-4 playbook 拆表**：意图→页型穷举 → `references/page-type-matrix.md`；图表决策表+七种误用 → `references/chart-decision-tree.md`。playbook 保留 Mode 契约 / V1–V4 / 组合 / **图表多样性摘要** / **反截断** / 路径·命令·L2 路由（体积 22KB→~17KB）。
+- **版本对齐**：根 README / 技能 README / PUBLISHING / `metadata.version` / 双 `package.json` → **0.1.3**（消除残留 0.1.0 横幅）。
+- **IMAGE_CAPTION**：配图页亦认 so-what/lead/figcaption；新增 WARN `IMAGE_NEAR_EMPTY`（近图过空）。
+- **P2-2/P2-3**：不引入 Claude-only `when_to_use`、不写跨端风险 `allowed-tools`（`skills-ref validate` 已通过开放标准字段；扩展字段留给宿主实验）。
+- **P2-5**：可选 `npx skills-ref@0.1.5 validate ./top-ppt-html`（不作为发布硬依赖；主门禁仍 `audit_skill`）。
+- **docs**：根 README 安装表/钉版本/`@0.1.3`；技能 README 改为人类维护指南并指向 SKILL；package REQUIRED + MIN refs ≥25。
+
+### Installer
+
+- `@topmindspace/tms-skills` → **0.1.3**（整仓同 tag）。
+
+### 此前 Unreleased（agent-compat，随 0.1.3 一并发布）
+
+- **P0-1 Trigger eval**：`evals/trigger-queries.json` + `scripts/check_triggers.py`；`package_skill.py --check` 门禁。
+- **P0-2 Mode A 读预算诚实**：L0+L1=2；Mode A/Fast 可加 L1.5（`default-surface` + `presentation-craft`）。
+- **P0-3 反过读**：禁止整读清单 + 强制 `extract_snippet.py`。
+- **P1 Frontmatter / 安装路径 / Fast 最小大纲 / 插画 brief**：license·compatibility·metadata；Cursor/Codex 路径；`illustration-layout.md`；`agents/openai.yaml`。
+
 
 ## 0.1.2 — 2026-09-24
 
