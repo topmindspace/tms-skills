@@ -115,13 +115,15 @@ def build_const_block(lc: dict) -> str:
     img_js = 'var IMG = ' + json.dumps(_strip_comments(lc.get('imageSpec') or {}), ensure_ascii=False,
                                        separators=(',', ':')) + ';'
     # 页型布局区域 IR（与 scripts/lib_layout_regions.js 同源公式；浏览器端 A 通道消费）
-    slots_path = ROOT / 'scripts' / 'layout_slots.json'
-    slots = {}
-    if slots_path.exists():
-        try:
-            slots = json.loads(slots_path.read_text(encoding='utf-8'))
-        except json.JSONDecodeError:
-            slots = {}
+    # Batch 3: layoutSlots 单源 = layout-constants.json（不再读独立 layout_slots.json）
+    slots = lc.get('layoutSlots') or {}
+    if not slots:
+        slots_path = ROOT / 'scripts' / 'layout_slots.json'  # 兼容过渡
+        if slots_path.exists():
+            try:
+                slots = json.loads(slots_path.read_text(encoding='utf-8'))
+            except json.JSONDecodeError:
+                slots = {}
     slots_js = 'var LAYOUT_SLOTS = ' + json.dumps(_strip_comments(slots), ensure_ascii=False,
                                                   separators=(',', ':')) + ';'
     region_fn = r'''
@@ -528,28 +530,27 @@ def main() -> int:
             print(f'警告: {eng_name} 未见图片版式 {eng_missing_lay}（imageSpec 已登记但引擎未提及）')
             ok = False
 
-    # ⑩ 页型布局 IR（layout_slots.json）：高频页型槽位完整性
-    slots_path = ROOT / 'scripts' / 'layout_slots.json'
+    # ⑩ 页型布局 IR（LC.layoutSlots）：高频页型槽位完整性
     n_slots = 0
-    if not slots_path.exists():
-        print('警告: 缺 scripts/layout_slots.json（页型布局 IR 单源）')
+    slots_doc = lc.get('layoutSlots') or {}
+    if not slots_doc.get('pageTypes'):
+        print('警告: layout-constants.json 缺 layoutSlots.pageTypes（页型布局 IR 单源）')
         ok = False
     else:
         try:
-            slots_doc = json.loads(slots_path.read_text(encoding='utf-8'))
             slots_pages = slots_doc.get('pageTypes') or {}
             for pt_name, pt_def in slots_pages.items():
                 if pt_name not in schema_types:
-                    print(f'警告: layout_slots 页型 {pt_name!r} 不在 schema.pageTypes')
+                    print(f'警告: layoutSlots 页型 {pt_name!r} 不在 schema.pageTypes')
                     ok = False
                 slot_list = pt_def.get('slots') or []
                 if not slot_list:
-                    print(f'警告: layout_slots 页型 {pt_name!r} 无槽位定义')
+                    print(f'警告: layoutSlots 页型 {pt_name!r} 无槽位定义')
                     ok = False
                     continue
                 ids = [s.get('id') for s in slot_list]
                 if 'head' not in ids or not any(s.get('role') == 'primary' for s in slot_list):
-                    print(f'警告: layout_slots 页型 {pt_name!r} 缺 head 或 primary 槽位')
+                    print(f'警告: layoutSlots 页型 {pt_name!r} 缺 head 或 primary 槽位')
                     ok = False
             n_slots = len(slots_pages)
             # 布局 IR 模块存在性（B 通道 require）
@@ -559,7 +560,7 @@ def main() -> int:
                 ok = False
             else:
                 ir_txt = ir_mod.read_text(encoding='utf-8')
-                for key in ('regionOf', 'layout_slots.json', 'layout-constants.json'):
+                for key in ('regionOf', 'layoutSlots', 'layout-constants.json'):
                     if key not in ir_txt:
                         print(f'警告: lib_layout_regions.js 缺少 {key!r} 引用')
                         ok = False
@@ -603,7 +604,7 @@ process.exit(bad ? 1 : 0);
                 except Exception as exc:
                     print(f'警告: 布局 IR 烟测未执行: {exc}')
         except json.JSONDecodeError as exc:
-            print(f'警告: layout_slots.json 解析失败: {exc}')
+            print(f'警告: layoutSlots 解析失败: {exc}')
             ok = False
             n_slots = 0
 
@@ -618,14 +619,10 @@ process.exit(bad ? 1 : 0);
         if ms.get('version') != ver:
             print(f'警告: model-schema.json version={ms.get("version")!r} ≠ layout-constants.json {ver!r}')
             ok = False
-        try:
-            slots_ver = (json.loads((ROOT / 'scripts' / 'layout_slots.json').read_text(encoding='utf-8'))
-                         .get('version'))
-            if slots_ver != ver:
-                print(f'警告: layout_slots.json version={slots_ver!r} ≠ {ver!r}')
-                ok = False
-        except (OSError, json.JSONDecodeError):
-            pass  # ⑩ 已告警
+        slots_ver = (lc.get('layoutSlots') or {}).get('version')
+        if slots_ver and slots_ver != ver:
+            print(f'警告: layoutSlots.version={slots_ver!r} ≠ layout-constants {ver!r}')
+            ok = False
         try:
             pj_ver = json.loads((ROOT / 'package.json').read_text(encoding='utf-8')).get('version')
             if not str(pj_ver or '').startswith(f'{ver}.'):

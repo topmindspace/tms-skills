@@ -1,12 +1,11 @@
 /**
  * TopPPT HTML · 页型布局区域 IR（双通道几何收敛起点）
  *
- * 从 layout-constants.json + layout_slots.json 派生「语义槽位 → 英寸矩形」。
- * B 通道（build_pptx.js）直接 require；A 通道消费同一 LC 常量（数字同源），
- * 本模块是把「槽位语义」从散落坐标收拢成可测接口的第一步。
+ * 从 layout-constants.json（含 layoutSlots）派生「语义槽位 → 英寸矩形」。
+ * B 通道（build_pptx.js）直接 require；A 通道消费同一 LC 常量（数字同源）。
  *
- * 纪律：改几何只改 layout-constants.json；改槽位只改 layout_slots.json。
- * 新增页型先扩 layout_slots.json，再在此补 regionOf 分支，最后写双引擎。
+ * 纪律：改几何与槽位只改 layout-constants.json（layoutSlots 已并入）。
+ * 新增页型先扩 LC.layoutSlots，再在此补 regionOf 分支，最后写双引擎。
  */
 'use strict';
 
@@ -15,10 +14,9 @@ const path = require('path');
 
 const ROOT = path.join(__dirname, '..');
 const LC = JSON.parse(fs.readFileSync(path.join(__dirname, 'layout-constants.json'), 'utf8'));
-// 布局 IR：优先 layout-constants.layoutSlots（v9 单源合并）；否则回落 layout_slots.json
-let SLOTS = LC.layoutSlots;
+const SLOTS = LC.layoutSlots;
 if (!SLOTS || !SLOTS.pageTypes) {
-  SLOTS = JSON.parse(fs.readFileSync(path.join(__dirname, 'layout_slots.json'), 'utf8'));
+  throw new Error('layout-constants.json 缺 layoutSlots.pageTypes（Batch 3 单源）');
 }
 
 const INFO_TYPES = {
@@ -387,7 +385,7 @@ function regionOf(pageType, slotId, opts) {
   return null;
 }
 
-/** 槽位是否在 layout_slots.json 中声明为 required */
+/** 槽位是否在 LC.layoutSlots 中声明为 required */
 function slotRequired(pageType, slotId) {
   const def = (SLOTS.pageTypes || {})[pageType];
   if (!def) return false;

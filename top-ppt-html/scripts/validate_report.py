@@ -3,7 +3,7 @@
 """
 TopPPT HTML· HTML 报告质量校验（交付闭环）
 用法:
-    python validate_report.py <报告.html> [--strict] [--json]
+    python validate_report.py <报告.html> [--strict] [--layout-qa] [--json]
 
 输出每项 PASS/FAIL，结尾给汇总与结论；任一 FAIL 时退出码为 1（--strict 时 WARN 也计失败）。
 --json 以 JSON 输出全部检查结果（供脚本/流水线读取）。
@@ -1238,6 +1238,139 @@ def _print_fix_guide(results, strict, width):
     print("  完整失败模式库与错误解释纠正表: references/failure-modes.md")
 
 
+
+def _check_layout_qa(txt, chk, mode, model):
+    """Batch 2 · 布局 QA（仅 --layout-qa）：V 契约 / 极偏环图 / 连续同骨架 / 缺 data-skel / 简单全幅图。
+
+    与日常 strict 互补：strict 已含 CHART_SKEW / CHART_OVERSIZE / LAYOUT_* 基础项；
+    本函数把「内容→版式」契约升为 FAIL，供 Fast/交付前加跑。
+    """
+    bands = _bands(txt)
+    skip_ids = {'cover', 'agenda', 'refs', 'appendix', 'next', 'quote'}
+    content = []
+    for i, b in enumerate(bands, 1):
+        head = b[:240]
+        if any(f'id="{sid}"' in head for sid in skip_ids):
+            continue
+        if 'band--deep' in head or 'band--accent' in head:
+            # 金句/强调带允许无骨架
+            if 'data-skel=' not in b and not re.search(r'class="[^"]*\bP\d+\b', b):
+                continue
+        content.append((i, b, head))
+
+    # ① 缺 data-skel：若全文已出现 data-skel（scaffold/render 管线），则内容页必须都有
+    has_any_skel = 'data-skel="' in txt
+    missing = []
+    if has_any_skel:
+        for i, b, head in content:
+            if 'data-skel="' not in b and not re.search(r'class="[^"]*\bP\d+\b', b):
+                missing.append(f"第{i}页")
+    chk("LAYOUT_QA_MISSING_SKEL 内容页须带 data-skel（管线产物）",
+        not missing,
+        ("缺骨架: " + "; ".join(missing[:5])) if missing else
+        ("（全文无 data-skel，跳过——手写示例豁免；scaffold/render 会写入）" if not has_any_skel else ""))
+
+    # ② 连续 ≥3 页同一 data-skel（或同一 layout 签名）
+    skels = []
+    for i, b, head in content:
+        m = re.search(r'data-skel="(P\d+)"', b)
+        if m:
+            skels.append((i, m.group(1)))
+        else:
+            sig = _layout_sig(b)
+            if sig:
+                skels.append((i, f"sig:{sig}"))
+    streak_hits = []
+    run_v, run_s, run_n = None, 0, 0
+    for i, v in skels:
+        if v == run_v:
+            run_n += 1
+        else:
+            if run_v and run_n >= 3:
+                streak_hits.append(f"{run_v}×{run_n}（起第{run_s}页）")
+            run_v, run_s, run_n = v, i, 1
+    if run_v and run_n >= 3:
+        streak_hits.append(f"{run_v}×{run_n}（起第{run_s}页）")
+    chk("LAYOUT_QA_SKEL_STREAK 同一 data-skel/版式签名连续 <3 页",
+        not streak_hits, "; ".join(streak_hits[:3]) if streak_hits else "")
+
+    # ③ 极偏仍用 donut/pie（模型侧；与 CHART_SKEW 互补，专打 layout-qa 关键字）
+    skew_hits = []
+    sections = (model or {}).get('sections') or []
+    for si, sec in enumerate(sections, 1):
+        if not isinstance(sec, dict):
+            continue
+        ch = sec.get('chart') if isinstance(sec.get('chart'), dict) else {}
+        ctype = str(ch.get('type') or (sec.get('type') if sec.get('type') in
+                                         ('donut', 'pie', 'multidonut') else '') or '').lower()
+        if sec.get('type') == 'donut':
+            ctype = 'donut'
+        if ctype not in ('donut', 'pie', 'multidonut'):
+            continue
+        vals = [float(v) for v in (ch.get('values') or []) if isinstance(v, (int, float))]
+        vals = [v for v in vals if v >= 0]
+        if len(vals) < 2:
+            continue
+        total = sum(vals) or 1.0
+        pcts = [v / total * 100 for v in vals]
+        mn, mx = min(pcts), max(pcts)
+        ratio = (mx / mn) if mn > 0 else 999
+        if mn < 5.0 or ratio > 20:
+            skew_hits.append(f"sections[{si}] {ctype} 最小{mn:.1f}% 比{ratio:.0f}:1 → 改 V3/KPI")
+    chk("LAYOUT_QA_SKEW_DONUT 极偏占比禁用 donut/pie（改 V3 KPI）",
+        not skew_hits, "; ".join(skew_hits[:3]) if skew_hits else "")
+
+    # ④ 演示模式：简单图（≤2 类）却近全幅（svg height≥320 或 width:100% 无注解带）
+    bleed_hits = []
+    if mode == 'presentation':
+        for i, b, head in content:
+            for m in re.finditer(
+                    r'<svg\b[^>]*data-chart="([^"]+)"[^>]*style="([^"]*)"[^>]*>', b):
+                ctype, style = m.group(1), m.group(2)
+                svg_end = b.find('</svg>', m.end())
+                block = b[m.start():svg_end if svg_end > 0 else m.end() + 600]
+                n_lab = len(re.findall(r'<text\b', block))
+                n_pts = max(n_lab, len(re.findall(r'<rect\b', block)),
+                            len(re.findall(r'<circle\b', block)))
+                hm = re.search(r'height:\s*(\d+(?:\.\d+)?)px', style)
+                h_px = float(hm.group(1)) if hm else 0
+                simple = n_lab <= 2 or n_pts <= 3
+                full = h_px >= 320 or ('width:100%' in style and h_px >= 240)
+                has_anno = bool(re.search(r'class="[^"]*(?:sowhat|anno|points|callout)', b))
+                if simple and full and not has_anno:
+                    bleed_hits.append(f"第{i}页 {ctype} 简单全幅无注解")
+    chk("LAYOUT_QA_SIMPLE_FULLBLEED 演示页简单图禁全幅无注解（用 V1–V4）",
+        not bleed_hits, "; ".join(bleed_hits[:3]) if bleed_hits else "")
+
+    # ⑤ V 契约：演示页 data-v / data-skel 与内容复杂度粗检
+    v_hits = []
+    if mode == 'presentation' and sections:
+        for si, sec in enumerate(sections, 1):
+            if not isinstance(sec, dict):
+                continue
+            pt = str(sec.get('type') or '')
+            if pt in ('cover', 'agenda', 'closing', 'quote'):
+                continue
+            ch = sec.get('chart') if isinstance(sec.get('chart'), dict) else {}
+            vals = ch.get('values') or []
+            n = len(vals) if vals else len(sec.get('points') or sec.get('items') or [])
+            skel = str(sec.get('layoutPreset') or '')
+            # 极偏却仍 donut
+            if pt == 'donut' or ch.get('type') in ('donut', 'pie'):
+                if vals:
+                    nums = [float(v) for v in vals if isinstance(v, (int, float)) and v >= 0]
+                    if len(nums) >= 2:
+                        total = sum(nums) or 1
+                        pcts = [v / total * 100 for v in nums]
+                        if min(pcts) < 5:
+                            v_hits.append(f"sections[{si}] 极偏仍 {pt or ch.get('type')}（应 V3/kpi）")
+            # 简单 1–2 点却声明 V1 全幅主视觉（layoutPreset P1 + 简单）
+            if skel == 'P1' and n <= 2 and (pt in ('bar', 'donut') or ch.get('type')):
+                v_hits.append(f"sections[{si}] P1+简单{n}点（应 V3/P3 或加注解）")
+    chk("LAYOUT_QA_V_CONTRACT 演示 V1–V4 与复杂度匹配",
+        not v_hits, "; ".join(v_hits[:3]) if v_hits else "")
+
+
 def main():
     if len(sys.argv) < 2:
         print(__doc__)
@@ -1245,6 +1378,7 @@ def main():
     path = Path(sys.argv[1])
     strict = '--strict' in sys.argv
     as_json = '--json' in sys.argv
+    layout_qa = '--layout-qa' in sys.argv
     if not path.exists():
         print(f"文件不存在: {path}")
         return 2
@@ -1403,6 +1537,8 @@ def main():
     _check_content_quality(txt, chk, mode, model)
     _check_v9_hard_gates(txt, chk, model)
     _check_layout_grammar(txt, chk, mode)
+    if layout_qa:
+        _check_layout_qa(txt, chk, mode, model)
 
     # ── 去AI味（词表来自单源） ──
     body_plain = _plain(body_txt)

@@ -30,7 +30,7 @@
 |------|------|--------|
 | `scripts/layout-constants.json` | 页面几何 `page` / **12 列网格 `grid`** / **语义字阶 `typography` C0–T14** / 三模式比例尺 `typeScale`+`modeTypeScale` / 页型几何 `pageTypes`+`pageTypeGeometry` / **9 风格 token `styles`+`stylesDark`+`styleAccents`** / **编码色板 `styleDataColors`+`styleDataColorsDark`（9 套 × 亮暗 × c1–c5）** / **图表登记四元组 `charts.registry`** / 图表最小尺寸 `charts.minSize` / **图表多样性预算 `charts.variety`** / **容器内边距 `containers`** / **锚点容差 `anchorTolerance`** / **图片准入门 `imageAdmission`** / **图片规格 `imageSpec`**（版式 `layouts` / 比例 `ratioDefault`+`ratioCssClass` / 建议尺寸 / 占位标签 / 体积上限） / **深度模式 `deepMode`** / 校验预算 `checkBudgets` / 强调带 `emphasis` / 待核实 `annotations` / 去AI味词 `aiFlavor` / **内容级质量 `contentQuality`**（版式节奏 / so-what 实质 / research 标题判断） | `build_pptx.js`（require）、`pptx-export.js`（注入常量块）、三模板、`style-gallery.html`、`validate_report.py`、`validate_pptx.py`、`audit_styles.py`、`audit_skill.py`、`prepare_images.py`、`evals/run_evals.py` |
 | `scripts/model-schema.json` | 29 种页型的字段与必填约束 / **图表类型白名单 `chartTypes`（30 类：16 原生 + 14 形状）** / **数据表策略 `chartDataTable`** / 通用可选字段 `commonSectionFields` | `extract_model.py`（本地校验）、`pptx-export.js`（浏览器端 `validateModel`） |
-| `scripts/layout_slots.json` | **页型布局 IR（29 页型全量）**：语义槽位（head/primary/secondary/annotation + required）——双通道按同一槽位语义落位 | `sync_runtime.py`（完整性校验）；`lib_layout_regions.js`（槽位→英寸矩形）；`extract_snippet.py --page-type` |
+| `layout-constants.json` → `layoutSlots` | **页型布局 IR（29 页型全量）**：语义槽位（head/primary/secondary/annotation + required）——双通道按同一槽位语义落位 | `sync_runtime.py`（完整性校验）；`lib_layout_regions.js`（槽位→英寸矩形）；`extract_snippet.py --page-type` |
 | 交付一键 | `quality_gate.py` | `validate_report --strict` + 可选 `validate_pptx` + `evals --score` + **rubric 启发式五维**（content/layout/chart/infographic/tone） |
 
 **纪律**：改常量只改 JSON，改 schema 只改 schema JSON，然后跑 `python scripts/sync_runtime.py`（注入 + 完整性校验 + 哈希摘要）。**禁止手改** `pptx-export.js` / 三模板 / `style-gallery.html` 的标记块。
@@ -43,7 +43,7 @@
 5. **页型实现可达性（冒烟）**：schema 每个页型都应出现在 `build_pptx.js` 与 `pptx-export.js` 源码中（子串级，拦「schema 加了页型、引擎没实现」）
 6. **骨架尺寸单源不变量**：`charts.scaffold`（scaffold_report.py 骨架尺寸唯一事实源）键 ⊆ registry，且默认值 ≥ `charts.minSize` 同口径阈值——拦「脚本硬编码第二源漂移」
 7. **语义字阶**：每个 level 的 `role` 在 `modeTypeScale` 中存在
-8. **页型布局 IR**：`layout_slots.json` 每个页型在 schema 中存在，且含 head + primary 槽位
+8. **页型布局 IR**：`layoutSlots（LC）` 每个页型在 schema 中存在，且含 head + primary 槽位
 
 > **图表计数的两种口径**（同一事实的两种切法，勿混用）：`registry` 视角 **36 = 16 原生 + 20 形状**（SKILL.md 铁律 9 用此口径）；`chartTypes` 视角 **30 = 16 原生 + 14 形状**（可作 `chart.type` 的形状类，`pptx-export.md` 页型表用此口径）——差额 6 类是信息图专属页型（sankey/treemap/boxplot/network/marimekko/streamgraph），它们只作 `sections[].type`，不作 `chart.type`。
 
@@ -110,7 +110,7 @@
 
 - **发布版**：**v0.1**（布局语法 + 模型单写 + 硬门禁 + 风格语汇层）。**版本唯一事实源 = `layout-constants.json` `version`**；`model-schema.json` / `layoutSlots` 同步该值、技能 `package.json` 为 `0.1.x`；`sync_runtime.py` 校验一致。变更流水见仓库根 `CHANGELOG.md`。
 - **兼容回落**：排版比例尺只有 `modeTypeScale` 一套；未知模式回落 `presentation` 档。环境变量 `TOP_PPT_NODE_EXE` / `TOP_PPT_NODE_PATH`（旧名已移除）。
-- **文档分工**：本文件管架构与机制；日常规范见 `references/*`，业界对标依据见 `industry-benchmark.md`。
+- **文档分工**：本文件管架构与机制；日常规范见 `references/*`，业界对标依据见 `docs/archive/refs/industry-benchmark.md`。
 
 ## 八、目录职责
 
@@ -121,7 +121,7 @@
 | `references/modes.md` | 三模式密度契约与锁定版式（L2：定模式细节时读） |
 | `references/outline-design.md` | 内容架构七步法 + 跨页叙事节奏 + 细节保全 |
 | `references/design-system.md` | MD3 对齐、设计原理（CRAP/7:2:1/字体矩阵）、页高模型、12 列网格、语义字阶、SVG 语义类（生成时主读） |
-| `references/design-system-engine.md` | 顶栏/卡片/列表/表格/页脚/动效等 CSS 类实现目录（维护者；生成时勿读） |
+| `docs/archive/refs/design-system-engine.md` | 顶栏/卡片/列表/表格/页脚/动效等 CSS 类实现目录（维护者；生成时勿读） |
 | `references/styles.md` | 9 套风格定义与选型 |
 | `references/content-rules.md` | 页内写作规则、密度三档、表格语义字号、容器内边距、连续文本流 |
 | `references/components.md` | 结构组件与锁定版式（`components.md` §1–§15c、§32–§50）+ 版式选型表 + **组合版式矩阵（§46c）** |
@@ -131,7 +131,7 @@
 | `references/pptx-export.md` | PPTX 导出通道、模型字段、双单源、29 页型、图表双通道 |
 | `references/high-fidelity.md` | 按需深度模式规范（触发、容差、manifest、渲染对照） |
 | `references/failure-modes.md` | 十四类失败模式 + 修复顺序铁律 + 错误解释纠正表 |
-| `references/industry-benchmark.md` | 业界对标与采纳/不采纳决策依据 |
+| `docs/archive/refs/industry-benchmark.md` | 业界对标与采纳/不采纳决策依据 |
 | `scripts/*` | 校验器、**骨架生成器 `scaffold_report.py`**、注入器、回归、**三项审计（styles / docs / skill）**、打包（全部标准库；PPTX 精导需 Node + pptxgenjs） |
 | `evals/*` | Eval 框架：`prompts.csv`（14 条，含负对照）+ `rubric.schema.json`（风格目标评分契约）+ `run_evals.py`（结果/过程/风格/效率四类目标） |
 | `assets/templates/*` | 三模式模板 + 公共引擎/UI（标记块由 `sync_runtime.py` 注入） |

@@ -41,12 +41,15 @@
 
 **轻量路径**（默认）——同时满足：≤12 页 · 材料单一完整 · 无未敲定关键判断 · 用户没要求看框架。
 ```
-Gate 0 参考图 → 六项问询（1 轮）→ 1 张规划卡 → scaffold_report.py → 填内容+模型 → 校验 → 交付
+Gate 0 参考图 → 六项问询（1 轮）→ 1 张规划卡 → scaffold_report.py
+  → **只填 REPORT_MODEL** → render_from_model.py --inplace → validate_report.py --strict → 交付
 ```
+（Fast Mode 跳过 Gate 0/六项，其余同链；**禁止**手改 HTML 正文与模型双写。）
 
 **完整路径**（任一命中）——研究 ≥20 页 / 演示 ≥12 页 / 材料量大且杂 / 含未敲定关键判断 / 用户要看框架。
 ```
-Gate 0 参考图 → 六项问询（1 轮）→ 证据表 → 故事线脑暴 → SCR+主张树 → 逐页规划卡 → 大纲确认（1 轮）→ 生成 → 校验 → 交付
+Gate 0 参考图 → 六项问询（1 轮）→ 证据表 → 故事线脑暴 → SCR+主张树 → 逐页规划卡 → 大纲确认（1 轮）
+  → scaffold_report.py → **只填 REPORT_MODEL** → render_from_model.py --inplace → validate_report.py --strict → 交付
 ```
 
 **预算（硬）**：交互轮次 ≤3；必读文件 = `SKILL.md` + 本文件（≤2 份）；L2 深度文件按需且单份读完即停。
@@ -54,6 +57,8 @@ Gate 0 参考图 → 六项问询（1 轮）→ 证据表 → 故事线脑暴 �
 ---
 
 ## 三、页型选型（意图 → 页型 → 关键约束）
+
+> 自动选型：`python scripts/recommend_layout.py --mode B --intent "经营分析" --pages 10 --json`（或 `--from-model report.model.json`）→ `{pageType,skel,chart,rationale}`；交付前可加 `validate_report.py --layout-qa`。
 
 > 穷举表（内容形态 → 版式 → PPTX 页型）见 `components.md` §46；密度档适配见 `components.md` §46b；组合见下节 §四。
 
@@ -146,6 +151,11 @@ Gate 0 参考图 → 六项问询（1 轮）→ 证据表 → 故事线脑暴 �
 
 ## 五、图表选型决策树（先问"要回答什么"，再选图）
 
+> **默认面（8 核心图）**：`bar` · `hbar` · `line` · `donut` · `progress` · `area` · `stack` · `dualline`
+> （= `layoutSystem.defaultCharts`）。完整登记与代码 → `extract_snippet.py --chart <类型>`；误用纪律 → `charts.md`。
+> 下表仍保留决策提示；**生成默认只从 8 核心里选**，扩展图仅在意图明确命中时用。
+
+
 > 穷举代码见 `charts.md` §16–§31、§35、§52–§70；误用反例与多样性纪律见 `charts.md` §66。
 > **默认生成面（P1 收敛）**：优先 `bar / hbar / line / donut / progress / area / stack / dualline`。
 > **高级图型**（waterfall/gantt/funnel/slope/… 与 6 类信息图）按需选用，不进默认轮换。
@@ -231,7 +241,10 @@ Gate 0 参考图 → 六项问询（1 轮）→ 证据表 → 故事线脑暴 �
 python scripts/scaffold_report.py --mode research --style mckinsey --theme light \
        --title "报告标题" --sections 8 --out 2026-09-15-主题.html   # 起点（不要手抄模板）
 # 或用黄金节奏包：--preset consulting|diagnostic|pitch|ops-review|layered-arch|flow-arch
-python scripts/validate_report.py 2026-09-15-主题.html --strict     # HTML 硬门禁（0 FAIL / 0 WARN）
+# 只填 window.REPORT_MODEL（禁止手改 HTML 正文），然后回填：
+python scripts/render_from_model.py 2026-09-15-主题.html --inplace
+python scripts/validate_report.py 2026-09-15-主题.html --strict --layout-qa  # HTML 硬门禁 + 布局 QA
+# 可选：python scripts/recommend_layout.py --from-model 报告.model.json
 python scripts/extract_model.py   2026-09-15-主题.html              # → .model.json
 node  scripts/build_pptx.js 2026-09-15-主题.pptx --model=….model.json
 python scripts/validate_pptx.py 2026-09-15-主题.pptx --strict --model=….model.json   # 0/0
@@ -239,12 +252,15 @@ python scripts/validate_pptx.py 2026-09-15-主题.pptx --strict --model=….mode
 
 **交付前必过**：`validate_report.py --strict` 0/0；含 PPTX 时 `validate_pptx.py --strict --model=` 0/0（`pictures` 数 = 声明数）。
 **推荐一键门禁**：`python scripts/quality_gate.py 报告.html [--pptx x.pptx --model x.model.json]`（strict + evals + rubric 启发式五维；交付时加 `--deliver` 开关自动产出七要素说明，不要手拼）。
+**A/B 全文对等**：`cross_verify.py` 默认 SKIP，仅 `python scripts/cross_verify.py --full-ab` 或 `regression.py --full-ab` 时启用。
+**PPTX 冒烟**：`bash scripts/smoke_pptx.sh`（extract_model → build_pptx → validate_pptx --strict）。
 **失败自修复**：按输出逐条修 → 重跑，直到 0/0；修复顺序见 `failure-modes.md`。
 
 ---
 
 ## 十、L2 节级路由（按任务只读这些，读完即停）
 
+> 默认生成面速查：`default-surface.md`（12 页型 + 8 图 + V1–V4）。
 > **不要整读** `components.md` / `charts.md` 背后的物理拆分大文件。需要代码时优先：
 > `python scripts/extract_snippet.py --list` · `--task <名>` · `--chart <类型>` · `--page-type <页型>` · `--file components.md --section 46`（逻辑名自动路由）
 
@@ -262,5 +278,5 @@ python scripts/validate_pptx.py 2026-09-15-主题.pptx --strict --model=….mode
 | 图标 / 语义速查 | `icons.md` · `--task icons` |
 | 起骨架用节奏包 | `scaffold_report.py --list-types` → `--preset consulting` 等 |
 
-**纪律**：L0+L1 是默认全部所需；上表命中才开 L2；**读完即执行，不预读下一份**。页型语义槽位见 `scripts/layout_slots.json`（双通道同源 IR）。
+**纪律**：L0+L1 是默认全部所需；上表命中才开 L2；**读完即执行，不预读下一份**。页型语义槽位见 `layout-constants.json` → `layoutSlots`（双通道同源 IR）。
 **维护者**：改常量/schema/引擎后必跑 `sync_runtime.py` → `audit_styles.py` → `audit_docs.py` → `audit_skill.py` → `build_examples.py` → `regression.py`。

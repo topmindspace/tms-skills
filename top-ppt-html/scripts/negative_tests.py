@@ -62,6 +62,25 @@ def expect_fail(name: str, path: Path, keyword: str) -> bool:
     return ok
 
 
+
+def expect_layout_qa_fail(name: str, path: Path, keyword: str) -> bool:
+    """Run validate_report --strict --layout-qa and require FAIL containing keyword."""
+    r = subprocess.run(
+        [PY, str(ROOT / 'scripts' / 'validate_report.py'), str(path),
+         '--strict', '--layout-qa'],
+        capture_output=True, text=True, encoding='utf-8', errors='replace')
+    out = (r.stdout or '') + (r.stderr or '')
+    hit = [ln for ln in out.splitlines()
+           if keyword in ln and ('[FAIL]' in ln or 'FAIL' in ln)]
+    ok = r.returncode != 0 and bool(hit)
+    print(f'  [{"OK" if ok else "FAIL"}] {name}')
+    if hit:
+        print(f'        抓到: {hit[0].strip()[:120]}')
+    elif not ok:
+        print(f'        layout-qa 未触发（期望含「{keyword}」）')
+    return ok
+
+
 def main() -> int:
     base = ROOT / 'assets' / 'examples' / '2026-09-09-research-mckinsey.html'
     if not base.exists():
@@ -163,7 +182,61 @@ def main() -> int:
         p.write_text(content, encoding='utf-8')
         ok = expect_fail(name, p, keyword) and ok
 
-    ok = _pptx_notes_case() and ok
+
+    # ── Batch 2 · layout-qa 专用负例 ─────────────────────────────────────
+    # L1 管线产物缺 data-skel：先造带 skel 的页，再撕掉其中一页的标记
+    import tempfile
+    scaf = OUT / 'L1-scaffold.html'
+    subprocess.run(
+        [PY, str(ROOT / 'scripts' / 'scaffold_report.py'),
+         '--mode', 'presentation', '--style', 'business-blue', '--theme', 'light',
+         '--title', 'LayoutQA Neg', '--sections', '5', '--out', str(scaf)],
+        capture_output=True, text=True)
+    if scaf.exists() and 'data-skel="' in scaf.read_text(encoding='utf-8'):
+        t_l1 = scaf.read_text(encoding='utf-8')
+        # 撕掉第一个内容页的 data-skel
+        t_l1b = re.sub(r'(id="s1") data-skel="P\d+"', r'\1', t_l1, count=1)
+        p_l1 = OUT / 'L1-missing-skel.html'
+        p_l1.write_text(t_l1b, encoding='utf-8')
+        ok = expect_layout_qa_fail('L1 缺 data-skel', p_l1, 'LAYOUT_QA_MISSING_SKEL') and ok
+        # L2 连续 3 页同一 skel
+        t_l2 = t_l1
+        # force s1,s2,s3 all P4
+        t_l2 = re.sub(r'(id="s1"[^>]*data-skel=")P\d+"', r'\1P4"', t_l2, count=1)
+        t_l2 = re.sub(r'(id="s2"[^>]*data-skel=")P\d+"', r'\1P4"', t_l2, count=1)
+        t_l2 = re.sub(r'(id="s3"[^>]*data-skel=")P\d+"', r'\1P4"', t_l2, count=1)
+        # also rewrite if attribute order is data-skel before id
+        t_l2 = re.sub(r'(data-skel=")P\d+(" data-page-type="[^"]+" id="s1")', r'\1P4\2', t_l2)
+        t_l2 = re.sub(r'(data-skel=")P\d+("([^>]*) id="s1")', r'\1P4\2', t_l2)
+        # simpler: replace first three data-skel values
+        def _force_p4(src, n=3):
+            out, c = [], 0
+            for part in re.split(r'(data-skel="P\d+")', src):
+                if part.startswith('data-skel="') and c < n:
+                    out.append('data-skel="P4"'); c += 1
+                else:
+                    out.append(part)
+            return ''.join(out)
+        t_l2 = _force_p4(t_l1, 3)
+        p_l2 = OUT / 'L2-skel-streak.html'
+        p_l2.write_text(t_l2, encoding='utf-8')
+        ok = expect_layout_qa_fail('L2 连续同 skel', p_l2, 'LAYOUT_QA_SKEL_STREAK') and ok
+        # L3 极偏 donut in REPORT_MODEL
+        t_l3 = t_l1
+        if 'window.REPORT_MODEL' in t_l3:
+            # inject a skewed donut section into model JSON
+            inj = (
+                '{"type":"donut","title":"极偏环",'
+                '"chart":{"type":"donut","labels":["A","B"],"values":[0.5,99.5]}},'
+            )
+            t_l3 = re.sub(r'("sections"\s*:\s*\[)', r'\1' + inj, t_l3, count=1)
+            p_l3 = OUT / 'L3-skew-donut.html'
+            p_l3.write_text(t_l3, encoding='utf-8')
+            ok = expect_layout_qa_fail('L3 极偏 donut', p_l3, 'LAYOUT_QA_SKEW_DONUT') and ok
+    else:
+        print('  [SKIP] layout-qa 负例（scaffold 未产出 data-skel）')
+
+        ok = _pptx_notes_case() and ok
     ok = _chart_data_case() and ok
     ok = _title_pattern_case() and ok
     ok = _font_scale_case() and ok

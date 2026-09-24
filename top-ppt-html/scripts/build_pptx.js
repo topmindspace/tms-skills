@@ -1588,6 +1588,11 @@ function addTable(s, tbl, x, y, w, availH, opts) {
 /* 章节页 · 按页型分发 */
 CONTENT.sections.forEach((sec) => {
   const type = sec.type || 'points';
+  // Batch 2: honor layoutPreset (scaffold/recommend_layout → PPTX IR alignment)
+  if (!sec.layoutPreset) {
+    const _p2p = (LC.layoutSystem && LC.layoutSystem.pageToPreset) || {};
+    if (_p2p[type]) sec.layoutPreset = _p2p[type];
+  }
   const s = base();
   if (type !== 'quote') head(s, sec.eyebrow, sec.title, sec.lead);
 
@@ -2319,6 +2324,7 @@ CONTENT.sections.forEach((sec) => {
   if (sec.items) _notes.push('达成对比：' + sec.items.map(it => it[0] + ' ' + it[1] + (it[2] != null ? '/' + it[2] : '')).join('；'));
   if (sec.levels) _notes.push('层级：' + sec.levels.map(l => (isRec(l) ? l.t : l[0]) || '').join(' → '));
   if (sec.soWhat) _notes.push('So what：' + sec.soWhat);
+  if (sec.layoutPreset) _notes.push('布局骨架：' + sec.layoutPreset);
   if (flagItems.length) _notes.push('待核实（需二次确认）：' + flagItems.join('；'));
   if (sec.note) _notes.push('注：' + sec.note);
   if (sec.footnote) _notes.push('来源：' + sec.footnote);

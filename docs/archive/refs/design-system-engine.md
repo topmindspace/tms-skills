@@ -1,3 +1,5 @@
+> **归档说明（Batch 3 · 2026-09-24）**：已从 `top-ppt-html/references/` 迁出；生成路径不读。现行入口：`playbook.md` / `design-system.md` / `tech-design.md` + `assets/templates/engine.css`。
+
 # 设计系统 · 引擎 CSS 实现目录（维护者 / 深挖时读）
 
 > 顶栏 / 卡片 / 列表 / 表格 / 章节头 / 页脚 / Agenda / 动效等**类实现细节**。

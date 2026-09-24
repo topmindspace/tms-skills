@@ -312,4 +312,4 @@ fill = Body 区被内容覆盖的估算面积 / Body 区面积
 - [ ] Annotation 只有 so-what/口径/页码
 - [ ] `LAYOUT_*` 全 PASS
 
-> 整改与实现细节见 `reform-plan.md` §四-b。间距与色 token 见 `design-system.md`。
+> 门禁与失败修复见 `layout-constants.qualityGates` 与 `failure-modes.md`。间距与色 token 见 `design-system.md`。
