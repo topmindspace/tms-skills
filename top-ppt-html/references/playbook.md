@@ -62,37 +62,9 @@ Gate 0 参考图 → 六项问询（1 轮）→ 证据表 → 故事线脑暴 �
 
 > 自动选型：`python scripts/recommend_layout.py --mode A --intent "路演" --pages 10 --json`（或 `--from-model report.model.json`）→ `{pageType,skel,chart,rationale}`；Mode A 交付 `--strict` 已含 layout-qa。
 
-> 穷举表（内容形态 → 版式 → PPTX 页型）见 `components.md` §46；密度档适配见 `components.md` §46b；组合见下节 §四。
+> **穷举意图→页型表** → L2 `page-type-matrix.md`（命中才读）。`components.md` §46 / §46b；组合见 §四。
 
-| 我要表达 | 首选页型 | 次选 | 关键约束 |
-|---------|---------|------|---------|
-| 要点式并列主张（默认页） | `points` | `cards` | 每卡宜 3–5 条；更多拆卡/跟进页，勿截断条目 |
-| 现状基线 / 指标快照 | `metrics` | `kpi` | 4–6 个；单数压场用 `kpi` |
-| 单个核心数字压场 | `kpi` | `metrics` | hero 一数一结论 |
-| 多维对标清单 | `table` | `halftable` | ≤8 行（research ≤16） |
-| 时间趋势 / 爬坡 | `bar`（chart.type=line/area/dualline） | `exhibit` | 时间点 >8 改折线 |
-| 构成占比 | `donut`（pie/multidonut/waffle） | `halftable` / **V3 KPI** | 扇区 ≤5，最小扇区 ≥8%；**极偏（min&lt;5% 或 max/min&gt;20）禁 donut→V3** |
-| 排名 / 大小对比 | `bar`（chart.type=hbar/lollipop/pareto） | `table` | 类别 >8 取 Top 7 + 附录 |
-| 现状 vs 目标 | `bullet` / `comparison` | `bar`（vsbar/bulletchart） | 目标线与实际条同量纲 |
-| 两期升降（谁升谁降） | `bar`（slope/dumbbell） | `table` | 两端都要标数值 |
-| 双维分布 / 优先级 | `bar`（scatter/bubble） | `matrix` | 气泡半径 ∝ √值 |
-| 分布 / 离散度 | `boxplot` | `bar`（dotplot） | 组数 ≤8；箱线四件齐备 |
-| 增减归因（A→B） | `bar`（waterfall） | `table` | 每段标变化量 + 合计收口 |
-| 转化 / 筛选漏斗 | `bar`（funnel） | `sankey` | 层数 ≤5 |
-| 计划排期（并行） | `bar`（gantt） | `timeline` | 里程碑叙事用 `timeline`，勿混 |
-| 里程碑 / 路线叙事 | `timeline` | `steps` | 3–5 个，每个 ≤2 行 |
-| 步骤 / 实施节奏 | `steps` | `timeline` | 3–6 步；高亮步 ≤2 处 |
-| 二维强度对标 | `heatmap` | `matrix` | 行列 ≤5×5；只用强调色明度阶梯 |
-| 定位 / 优先级 / 象限 | `matrix` | `bar`（scatter） | ≤3×3 |
-| 层级递进 / 价值阶梯 | `pyramid` | `diagram` | 3–5 层；强调层 ≤1 |
-| 关键判断 / 金句休止 | `quote` | `points` | 全文 1–2 处，多了廉价 |
-| 完整论述（发现→证据→含义） | `twocol`（research R1） | `threecol` | 段 ≤200 字；标题必须结论句 |
-| 数据证据页（主力） | `exhibit`（R2） | `split` | 全篇 Exhibit 连续编号 |
-| 三栏并列论点 | `threecol`（R6） | `cards` | 每栏 ≤150 字 |
-| 系统分层架构 | `diagram` | `bar`（chart.type=network） | 节点 ≤24；层 ≤4 |
-| 流程 / 职责协作 | `lane` | `diagram` | 每行 ≤6 步；正交折线优先 |
-| 素材图片（实拍/截图） | `image` | `split` | 六版式；无图用 `image.placeholder` |
-| 待核实项收口 | `flags` 字段 | `table` | 标色必须配说明 |
+**速记（默认面）**：要点→`points`/`cards` · 指标→`metrics`/`kpi` · 证据图→`exhibit`/`split` · 对标表→`table`/`halftable` · 趋势→`bar`+line/area · 占比→`donut`（极偏→**V3**）· 架构→`diagram`/`lane` · 图文演讲→§三-b V1–V4。
 
 ---
 
@@ -155,48 +127,11 @@ Gate 0 参考图 → 六项问询（1 轮）→ 证据表 → 故事线脑暴 �
 
 > **默认面（8 核心图）**：`bar` · `hbar` · `line` · `donut` · `progress` · `area` · `stack` · `dualline`
 > （= `layoutSystem.defaultCharts`）。完整登记与代码 → `extract_snippet.py --chart <类型>`；误用纪律 → `charts.md`（先 `charts-discipline`，核图 8，extended 按需）。
-> 下表仍保留决策提示；**生成默认只从 8 核心里选**，扩展图仅在意图明确命中时用。
+> **扩展决策表 + 七种误用** → L2 `chart-decision-tree.md`（命中才读）。**生成默认只从 8 核心里选**，扩展图仅意图明确命中。
 
+**多样性（硬摘要 · 保留）**：全篇不同 `data-chart` ≥ `min(模式上限, ⌈图表页数 × 0.6⌉)`（上限 research 6 / presentation **4** / architecture 3）；**相邻图表页不得同型**。**preferCoreFirst**：先拉开核图 8；advanced 计入 `minTypes`（不罚）但禁预读 `charts-extended.md`；**禁**为凑下限硬上冷门图、简单图全幅、极偏 donut/pie。
 
-> 穷举代码见 `charts.md` §16–§31、§35、§52–§70；误用反例与多样性纪律见 `charts.md` §66（facade：纪律→核图→extended）。
-> **默认生成面（P1 收敛）**：优先 `bar / hbar / line / donut / progress / area / stack / dualline`。
-> **高级图型**（waterfall/gantt/funnel/slope/… 与 6 类信息图）按需选用，不进默认轮换。
-> **纪律**：全篇不同 `data-chart` 类型 ≥ `min(模式上限, ⌈图表页数 × 0.6⌉)`（上限：research 6 / presentation 4 / architecture 3）；**相邻图表页不得同型**。多样性 **preferCoreFirst**：先拉开核图 8；advanced 计入 minTypes（不罚）但只在意图命中时用，**禁止预读** `charts-extended.md`；**禁**为凑下限硬上冷门图、简单图全幅、极偏 donut/pie。
-
-| 分析意图（读者要得出的结论） | 首选 | 次选 | 禁用 / 改判条件 |
-|---------------------------|------|------|----------------|
-| 谁大谁小 | `hbar` | `lollipop` / `bar` | 类别 >8 → Top7 + 附录 |
-| 随时间怎么变 | `line` | `area` / `dualline` | 时间点 >8 不标点值 |
-| 占比是多少 | `donut` | `pie` / `multidonut` | 扇区 >5 → 合并"其他"或 `treemap` |
-| 每 1% 的直觉 | `waffle` | `donut` | 类别 >3 改 `marimekko` |
-| 结构在变形 | `streamgraph` | `stackline` | 系列 >6 合并 |
-| 总量 × 构成双编码 | `marimekko` | `treemap` | 列 >6 / 段 >4 → 拆 |
-| 份额悬殊（头部集中） | `treemap` | `donut` | 叶 >16 → 合并小项 |
-| 从 A 到 B 是谁贡献的 | `waterfall` | `pareto` | 段 >6 → 合并 |
-| 主要矛盾是哪几个 | `pareto` | `waterfall` | 类别 >7 → 合并 |
-| 转化/流失在哪一环 | `funnel` | `sankey` | 层 >5 → 改 `hbar` |
-| 多对多的流向 | `sankey` | `network` | 节点 >12 / 流带 >24 → 拆页 |
-| 谁和谁相连 | `network` | `diagram` | 节点 >18 / 边 >30 → 拆页 |
-| 两期谁升谁降 | `slope` | `dumbbell` | 系列 >6 → 取 Top 6 |
-| 单指标前后对比（多对象） | `dumbbell` | `vsbar` | 行 >6 → 拆页 |
-| 实际 vs 目标（含区间） | `bulletchart` | `bullet` | 行 >6 → 拆页 |
-| 达成率（多指标同心） | `radialbar` | `gauge` | 环 >5 → 改 `bullet` |
-| 一个值够不够 | `gauge` | `radialbar` | 单值叙事，勿与图并存 |
-| 分布不是均值 | `boxplot` | `dotplot` | 组 >8 → 拆页 |
-| 双维定位 + 第三维权重 | `bubble` | `scatter` | 气泡 >8 → 标注关键项 |
-| 六维能力画像 | `radar` | `rose` | 维度 >6 → 拆两组 |
-| 区间波动（开高低收） | `candlestick` | `line` | 蜡烛 >12 → 聚合 |
-| 多项目完成度 | `progress` | `bullet` | 行 >6 → 拆页 |
-| 迷你趋势（卡内） | `sparkline` | — | 只用于指标卡，不与大图并存 |
-
-**七种最常见的误用（出现即改判）**：
-1. 用 `bar` 表达占比 → 改 `donut`/`stackline`/`waffle`。
-2. 用 `donut` 表达 8 个类别 → 合并或改 `treemap`。
-3. 用 `line` 表达类别对比（无时间轴）→ 改 `hbar`。
-4. 用 `table` 表达趋势 → 改 `line`/`area`。
-5. 用均值型图表表达分布 → 改 `boxplot`/`dotplot`。
-6. 同一页放两张同型图 → 改 `split`/`halftable` 并让两图**编码不同维度**。
-7. 多系列图用单色明度阶梯（分不清） → 用 `f-c1~c5` 编码色板（见 §八）。
+**速记**：谁大谁小→`hbar` · 时间→`line`/`area` · 占比→`donut`（扇区>5/极偏改判）· 归因→`waterfall` · 转化→`funnel` · 流向→`sankey`。
 
 ---
 
@@ -270,11 +205,11 @@ python scripts/validate_pptx.py 2026-09-15-主题.pptx --strict --model=….mode
 
 | 任务 | 只读 |
 |------|------|
-| research 证据页 / Exhibit / 密表 | `components.md` §36d/§46/§46c · 本文件 §三/§四 · `extract_snippet.py --task research-evidence` |
-| 正式演示 / Mode A 工艺 | `default-surface.md` · `presentation-craft.md` · 本文件 §三-b/§五 |
+| research 证据页 / Exhibit / 密表 | `components.md` §36d/§46/§46c · 本文件 §三/§四 · `page-type-matrix.md` · `extract_snippet.py --task research-evidence` |
+| 正式演示 / Mode A 工艺 | `default-surface.md` · `presentation-craft.md` · 本文件 §三-b/§五 · `page-type-matrix.md` |
 | 演示组合版式 | `components.md` §39–§42/§46/§46b/§46c · `--task presentation-combo` |
 | 架构 / 泳道 / 分层 | `components.md` §37–§38b · `infographics.md` §78–§80 · `--task architecture-diagram` |
-| 选图 / 取图表代码 | 本文件 §五 · `--chart <类型>` · 误用见 `charts.md` §66 |
+| 选图 / 取图表代码 | 本文件 §五 · `chart-decision-tree.md` · `--chart <类型>` · 误用见 `charts.md` §66 |
 | 密度 / 字数 / 去 AI 味 | `content-rules.md` §一/§四 · 本文件 §六 · `--task content-rules` |
 | 素材图片 / 占位 / 插画页 | `illustration-layout.md` · `components.md` §11c · `--task image-layout` |
 | PPTX 精导字段 | `pptx-export.md` · 本文件 §九 · `--task pptx-export` |

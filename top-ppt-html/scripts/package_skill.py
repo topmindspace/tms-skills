@@ -122,6 +122,8 @@ REQUIRED = [
     'references/default-surface.md',
     'references/presentation-craft.md',
     'references/illustration-layout.md',
+    'references/page-type-matrix.md',
+    'references/chart-decision-tree.md',
     'references/modes.md', 'references/outline-design.md', 'references/design-system.md',
     'references/styles.md', 'references/content-rules.md', 'references/components.md',
     'references/charts.md',
@@ -155,7 +157,7 @@ REQUIRED = [
 MIN_COUNTS = {
     'assets/examples/*.html': 3,  # Batch3 每模式 1 份黄金样张
     'assets/examples/*.model.json': 3,
-    'references/*.md': 23,  # + illustration-layout；≥23 防误删
+    'references/*.md': 25,  # + page-type-matrix + chart-decision-tree；≥25 防误删
 }
 
 

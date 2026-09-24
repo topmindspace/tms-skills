@@ -136,3 +136,9 @@
 | `evals/*` | Eval 框架：`prompts.csv`（14 条，含负对照）+ `rubric.schema.json`（风格目标评分契约）+ `run_evals.py`（结果/过程/风格/效率四类目标） |
 | `assets/templates/*` | 三模式模板 + 公共引擎/UI（标记块由 `sync_runtime.py` 注入） |
 | `assets/examples/*` | 示例矩阵（含信息图页型与原生图表技巧） |
+
+## 附：第三方校验与实验 frontmatter
+
+- **主门禁**：`audit_skill.py` / `package_skill.py --check`（体积、披露、Gate0、触发覆盖）。
+- **可选**：`npx --yes skills-ref@0.1.5 validate .`（Agent Skills 开放标准；本技能已通过）。**不**作为 CI 硬依赖。
+- **不启用**：Claude-only `when_to_use`（会破坏严格 allowlist）；跨端 `allowed-tools`（宿主语法分叉）——需要时由宿主侧实验，不进本仓库 frontmatter。

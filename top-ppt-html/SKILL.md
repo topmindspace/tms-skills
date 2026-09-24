@@ -4,7 +4,7 @@ description: "Use when 用户要做报告、演示、汇报、PPT、slides、dec
 license: MIT
 compatibility: "Python 3 stdlib for HTML generation; Node >=18 + pptxgenjs for PPTX; optional playwright for browser regression / theme captures."
 metadata:
-  version: "0.1.2"
+  version: "0.1.3"
   author: TopMindspace
 ---
 # TopPPT HTML
@@ -90,7 +90,7 @@ metadata:
 
 - 模式契约与锁定版式 → `references/modes.md` · 完整路径七步 → `references/outline-design.md`
 - **A/Fast L1.5 → `default-surface.md` + `presentation-craft.md`** · 骨架 `layout-grammar.md` §七 · 插画 `illustration-layout.md`
-- 组件/版式**代码** → `components.md` · 图表门面 `charts.md`（纪律+核图；extended 按需取节）· 信息图 → `infographics.md`
+- 组件/版式**代码** → `components.md` · 页型表 `page-type-matrix.md` · 图表门面 `charts.md` + 决策树 `chart-decision-tree.md`（extended 按需）· 信息图 → `infographics.md`
 - 配色/主题/字阶 → `styles.md` + `design-system.md` · 写作 → `content-rules.md` · 图标语义 → `icons.md`
 - PPTX 精导 → `references/pptx-export.md` · 深度高保真 → `references/high-fidelity.md` · 修复顺序 → `references/failure-modes.md` · 技能维护 → `references/tech-design.md`
 
@@ -98,7 +98,7 @@ metadata:
 
 ## 铁律（12 条 · 交付硬门禁）
 
-> 门禁语义；阈值见 playbook / layout 常量 JSON。排版读 `layout-grammar.md`。**motion=none**（无炫技转场；见 `presentation-craft.md`）。
+> 门禁语义；阈值见 playbook / layout 常量 JSON。排版读 `layout-grammar.md`。**motion=none**（无炫技转场；`presentation-craft.md`）。
 
 1. **单文件零外链**——无 CDN/外部字体/外部图片，图形一律内联 SVG；`<img src>` 仅 `data:` 或相对路径且必带 `alt`（单图 ≤1.5MB、全篇 ≤8MB）；无素材图不留空不省略，用配图占位（`components.md` §11c-3）。
 2. **模式先定后写**——从对应模式模板起步；`data-mode` = `REPORT_MODEL.mode`，页面无模式切换；MD3 映射；PPTX 字号走三模式独立比例尺。
