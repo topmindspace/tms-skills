@@ -13,11 +13,11 @@
  * 最后回落到 Playwright 自带的 chromium（无本机浏览器依赖）。
  *
  * 产物（assets/，覆盖旧图）：
- *   theme-overview.png                      —— 默认（演示 Tab）整体参考图
- *   theme-overview-presentation.png         —— 演示模式 Tab
+ *   theme-overview.png                      —— 默认（演示 Tab）整体参考图（= 演示态）
  *   theme-overview-research.png             —— 研究模式 Tab（咨询密排形态）
  *   theme-overview-architecture.png         —— 架构模式 Tab（图为王形态）
  *
+ * 演示态与整体图内容相同，不再单独写 theme-overview-presentation.png。
  * 每次截图前断言当前 Tab 文案，防止 Tab 切换未生效导致产出雷同图。 */
 const path = require('path');
 let chromium;
@@ -64,15 +64,16 @@ const CHANNEL = channelArg || process.env.TOP_PPT_BROWSER_CHANNEL
       throw new Error(`画廊卡片数 ${n} ≠ 单源风格数 ${expected}（画廊与 layout-constants.json 漂移）`);
     }
     if (n < 9) throw new Error(`卡片数异常：${n}`);
-    await page.screenshot({ path: path.join(outDir, `theme-overview-${m}.png`), fullPage: true });
-    console.log(`captured: theme-overview-${m}.png  (tab=${on}, cards=${n})`);
+    // presentation tab → theme-overview.png only (no duplicate *-presentation.png)
+    if (m === 'presentation') {
+      await page.screenshot({ path: path.join(outDir, 'theme-overview.png'), fullPage: true });
+      console.log(`captured: theme-overview.png  (tab=${on}, cards=${n}; presentation = overview)`);
+    } else {
+      await page.screenshot({ path: path.join(outDir, `theme-overview-${m}.png`), fullPage: true });
+      console.log(`captured: theme-overview-${m}.png  (tab=${on}, cards=${n})`);
+    }
   }
 
-  /* 主图回到演示 Tab（默认态） */
-  await page.evaluate(() => document.querySelectorAll('.mtab')[0].click());
-  await page.waitForTimeout(500);
-  await page.screenshot({ path: path.join(outDir, 'theme-overview.png'), fullPage: true });
-  console.log('captured: theme-overview.png (default presentation tab)');
   await browser.close();
-  console.log(`done: 4 张主题参考图已刷新（deviceScaleFactor=${SCALE}）`);
+  console.log(`done: 3 张主题参考图已刷新（deviceScaleFactor=${SCALE}）`);
 })().catch((e) => { console.error(e); process.exit(1); });

@@ -18,6 +18,12 @@
 
 两条通道，装出来同一套技能。**npm = 钉版本快照**；**GitHub = 跟仓库 HEAD**。
 
+
+> **警告 / Warning**：不要安装 `@topmindspace/tms-skills@^2`。npm 上残留的 **2.0.0–2.1.1** 是仓库重置前的过时线；当前线是 **0.1.x**（`latest` 亦指向 0.1.x）。维护者登录 npm 后可运行 `scripts/deprecate-npm-2x.sh` 标记弃用。
+>
+> Do **not** install `^2`. Versions 2.0.0–2.1.1 are obsolete after the repo reset; use **0.1.x**. Maintainers with npm auth should run `scripts/deprecate-npm-2x.sh`.
+
+
 ### npm（推荐）
 
 ```bash
@@ -74,7 +80,7 @@ tms-skills/
 | tag `vX.Y.Z` | Release + zip | **自动 publish** |
 
 - **push 不会更新 npm**；必须 bump 版本并打 tag。
-- **Release 只保留最近 2 个**（CI 自动清理）；npm 可钉任意历史版本。
+- **Release 只保留最近 2 个**（CI 只删旧 Release，**git tags 保留**）；npm 可钉任意历史版本。
 - 安装器与技能 **版本各自独立**；默认 patch/minor，major 仅破坏性变更。
 
 详见 [docs/PUBLISHING.md](./docs/PUBLISHING.md)。
@@ -84,7 +90,7 @@ tms-skills/
 | 工作流 | 触发 | 做什么 |
 |--------|------|--------|
 | `ci.yml` | push / PR | 打包门禁、审计、隐私扫描、CLI 冒烟 |
-| `release.yml` | tag `v*` | 技能 zip → Release；npm publish；Release 保留 2 个 |
+| `release.yml` | tag `v*` | 门禁 → zip → Release → npm publish（已存在则跳过）→ prune Release 留 2（tags 保留） |
 
 ```bash
 npm run check && npm run audit && npm run privacy
@@ -95,7 +101,7 @@ npm run check && npm run audit && npm run privacy
 1. 根目录建 `<skill-id>/`，`SKILL.md` 的 `name` 与目录一致。
 2. 人类说明写 `README.md`；智能体入口保持 `SKILL.md`。
 3. 发布前 `scripts/package_skill.py --check`。
-4. 登记：根 README、`package.json` 的 `files`、`ci.yml`、`CHANGELOG.md`。
+4. 登记：根 README、`npm run sync:files`、`CHANGELOG.md`（CI 按发现的技能跑门禁，无需再硬编码）。
 
 ## 许可证
 

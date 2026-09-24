@@ -14,6 +14,20 @@
 
 当前线：安装器 **0.1.0** · 技能 top-ppt-html **0.1.0**（各自独立演进，见 CHANGELOG）。
 
+
+## npm 2.x 弃用说明（仓库重置）
+
+npm 上仍可能看到 `@topmindspace/tms-skills` 的 **2.0.0–2.1.1**。那是重置前的过时线；**不要安装 `^2`**。当前线是 **0.1.x**（`latest` 指向 0.1.x）。
+
+维护者在已 `npm login` 的机器上执行：
+
+```bash
+bash scripts/deprecate-npm-2x.sh
+```
+
+（本仓库 CI / 无 npm 登录的环境无法代跑 deprecate。）
+
+
 ## 安装口径（文档与 CLI 一致）
 
 | 优先级 | 命令 | 何时用 |
@@ -44,7 +58,7 @@
 | `git push` | 更新 | **不变** |
 | `git tag vX.Y.Z && git push --tags` | Release + zip | **自动 publish** |
 
-**Release 保留策略：最多 2 个最近版本**（CI 自动删更旧 Release 与 tag）。npm 历史版本可钉。
+**Release 保留策略：最多 2 个最近版本**（CI 只通过 API 删除更旧 **Release**；**git tags 保留**，便于历史追溯与 npm 对照）。npm 历史版本可钉。
 
 ## 发布流程
 
@@ -54,13 +68,13 @@
    ```bash
    npm run check && npm run audit && npm run privacy
    ```
-4. 新技能写入根 `package.json` 的 `files`。
+4. 新技能：`npm run sync:files`（把发现的技能目录写入 `package.json` `files`）。
 5. 提交并打 tag：
    ```bash
    git tag vX.Y.Z
    git push origin main --tags
    ```
-   CI：技能 zip → GitHub Release → prune（留 2）→ `npm publish`。
+   CI：门禁 → 技能 zip → GitHub Release → `npm publish`（版本已存在则跳过）→ prune Releases（留 2，tags 保留）。
 6. 验证：`npm view @topmindspace/tms-skills version`
 
 ### 手工 publish
@@ -112,7 +126,7 @@ npm run privacy
 
 1. 根目录建 `<new-id>/SKILL.md`，`name` 与目录一致。
 2. 附 `README.md`、`package.json`；有工具则 `package_skill.py --check`。
-3. 登记 README 技能表、`package.json` `files`、`ci.yml`、CHANGELOG。
+3. 登记 README 技能表、`npm run sync:files`、CHANGELOG（CI/Release 动态发现技能）。
 4. 隐私清单全绿。
 
 ## 排错

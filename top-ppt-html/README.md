@@ -92,7 +92,7 @@ top-ppt-html/
 │  ├─ examples/                 #   9 份示例 + 9 份 REPORT_MODEL（复制起点 · 覆盖全部 9 风格）   │
 │  ├─ pptx-export.js            #   PPTX 预览运行时（含常量/schema 注入块）   │
 │  ├─ style-gallery.html        #   风格 × 模式 × 亮暗主题交互画廊            │
-│  └─ theme-overview*.png       #   4 张主题参考图（问询辅助）                │
+│  └─ theme-overview*.png       #   3 张主题参考图（整体=演示 / 研究 / 架构）  │
 ├─ references/                  # 规范（L1 常读 1 篇 + L2 按需；components/charts 已按族拆分）│  ├─ playbook.md               #   ★ L1 唯一常读入口：模式/页型/组合/图表/配色/校验 │
 │  ├─ components.md             #   逻辑索引（§ 路由到下列物理文件）              │
 │  ├─ components-atoms.md       #   §1–§15c 结构组件                              │
@@ -153,7 +153,7 @@ top-ppt-html/
 | `negative_tests.py` | **门禁反向验证**（故障注入 · 14 例）：往合格产物里埋已知缺陷（Exhibit 漏编号 / 引用错配与跳号 / 备注被剔离 / 图表数值篡改 / 标题鉴别力 / 字号越尺 / 未登记图表类型 / 多样性塌陷 / 图片外链 / tbd 无图例 / 模型主题与模式矛盾 / 锚点断裂），断言门禁必须报错——正向全绿只能证明“没误报”，这里证明“真能报” | regression 内部 / 改校验器后必跑 |
 | `regression.py` | **一键全链路回归**（9 示例 HTML strict + 双通道 PPTX 0/0 + 双裁判交叉一致 + 素材图片探针 + 深色主题探针 + 门禁反向验证 + **任务路由全量遍历** + 浏览器页高/裁切真值） | 任何模板/常量/schema/运行时/示例改动后必跑 |
 | `render_compare.py` | **深度模式渲染对照**（PPTX→PDF→位图 + HTML/PPTX 并排对照 + 偏差登记；缺 LibreOffice 自动跳过） | 深度模式交付时（可选） |
-| `capture_theme_overview.js` | playwright 截图画廊 → 4 张主题参考图（带 Tab 断言防雷同） | 改画廊后（可选，非交付依赖） |
+| `capture_theme_overview.js` | playwright 截图画廊 → 3 张主题参考图（演示态=整体图；带 Tab 断言防雷同） | 改画廊后（可选，非交付依赖） |
 | `package_skill.py` | **发布前校验 + 打包**：必需文件齐全 / frontmatter 合规（name 与包名一致、description ≤1024）/ 无临时·缓存路径 → `dist/top-ppt-html.zip` + 发布清单 `dist/top-ppt-html.manifest.json`（版本/条目/SHA-256）；`--check` 只校验 | 发布时 / 提交前自检 |
 
 ### 4.2 单源纪律（最重要的一条规矩）

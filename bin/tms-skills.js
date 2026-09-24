@@ -2,11 +2,15 @@
 /**
  * tms-skills — TopMindspace agent skills installer
  *
- * Usage (GitHub is the primary install source — npm publish is optional):
- *   npx github:topmindspace/tms-skills list
- *   npx github:topmindspace/tms-skills install top-ppt-html
- *   npx github:topmindspace/tms-skills install top-ppt-html --to ./skills-out
- *   npx @topmindspace/tms-skills install top-ppt-html   # only after npm publish
+ * Recommended channel (when published): npm @topmindspace/tms-skills
+ * GitHub npx remains available for HEAD / offline clone.
+ *
+ * Usage:
+ *   npx @topmindspace/tms-skills list
+ *   npx @topmindspace/tms-skills install top-ppt-html
+ *   npx @topmindspace/tms-skills install top-ppt-html --to ./skills-out
+ *   npx @topmindspace/tms-skills install top-ppt-html --force
+ *   npx github:topmindspace/tms-skills install top-ppt-html   # follow repo HEAD
  */
 'use strict';
 
@@ -16,6 +20,7 @@ const path = require('path');
 const ROOT = path.resolve(__dirname, '..');
 // Skills live at repo root (one directory per skill with SKILL.md).
 const INFRA_DIRS = new Set(['bin', 'docs', 'scripts', 'node_modules', 'dist', 'release-assets']);
+const SKILL_ID_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 function die(msg, code = 1) {
   console.error(msg);
@@ -24,6 +29,24 @@ function die(msg, code = 1) {
 
 function skillDir(skillId) {
   return path.join(ROOT, skillId);
+}
+
+function assertSkillId(skillId) {
+  if (!skillId || typeof skillId !== 'string') {
+    die('Missing skill id.\n\n' + usageText());
+  }
+  if (
+    skillId.includes('..') ||
+    skillId.includes('/') ||
+    skillId.includes('\\') ||
+    path.isAbsolute(skillId) ||
+    !SKILL_ID_RE.test(skillId)
+  ) {
+    die(
+      `Invalid skill id: ${JSON.stringify(skillId)}\n` +
+        'Skill ids must match ^[a-z0-9]+(?:-[a-z0-9]+)*$ (no paths, dots, or slashes).'
+    );
+  }
 }
 
 function listSkillIds() {
@@ -77,7 +100,8 @@ function copyDir(src, dest) {
   }
 }
 
-function install(skillId, targetRoot) {
+function install(skillId, targetRoot, { force = false } = {}) {
+  assertSkillId(skillId);
   const src = skillDir(skillId);
   if (!fs.existsSync(path.join(src, 'SKILL.md'))) {
     die(`Skill not found: ${skillId}\nAvailable: ${listSkillIds().join(', ') || '(none)'}`);
@@ -85,6 +109,12 @@ function install(skillId, targetRoot) {
   const dest = path.join(targetRoot, skillId);
   fs.mkdirSync(targetRoot, { recursive: true });
   if (fs.existsSync(dest)) {
+    if (!force) {
+      die(
+        `Destination already exists: ${dest}\n` +
+          'Refusing to overwrite. Pass --force (or -f) to replace.'
+      );
+    }
     fs.rmSync(dest, { recursive: true, force: true });
   }
   copyDir(src, dest);
@@ -96,22 +126,27 @@ function install(skillId, targetRoot) {
   console.log(`  cd "${dest}" && npm install`);
 }
 
-function usage() {
-  console.log(`tms-skills — install TopMindspace agent skills
+function usageText() {
+  return `tms-skills — install TopMindspace agent skills
 
 Usage:
   tms-skills list
-  tms-skills install <skill-id> [--to <dir>]
+  tms-skills install <skill-id> [--to <dir>] [--force|-f]
   tms-skills help
 
-Examples:
-  npx github:topmindspace/tms-skills list
-  npx github:topmindspace/tms-skills install top-ppt-html
-  npx github:topmindspace/tms-skills install top-ppt-html --to ./.agents/skills
-
-  # Optional npm package (only after @topmindspace/tms-skills is published):
+Examples (npm recommended when published):
+  npx @topmindspace/tms-skills list
   npx @topmindspace/tms-skills install top-ppt-html
-`);
+  npx @topmindspace/tms-skills install top-ppt-html --to ./.agents/skills
+  npx @topmindspace/tms-skills install top-ppt-html --force
+
+  # Follow repo HEAD:
+  npx github:topmindspace/tms-skills install top-ppt-html
+`;
+}
+
+function usage() {
+  console.log(usageText());
 }
 
 function main(argv) {
@@ -140,21 +175,26 @@ function main(argv) {
   if (cmd === 'install') {
     const skillId = args[1];
     if (!skillId || skillId.startsWith('-')) {
-      die('Missing skill id.\n\n' + usage());
+      die('Missing skill id.\n\n' + usageText());
     }
     let to = null;
+    let force = false;
     for (let i = 2; i < args.length; i++) {
       if (args[i] === '--to' || args[i] === '-t') {
         to = args[++i];
         if (!to) die('Option --to requires a directory path.');
+      } else if (args[i] === '--force' || args[i] === '-f') {
+        force = true;
+      } else {
+        die(`Unknown option: ${args[i]}\n\n` + usageText());
       }
     }
     const targetRoot = to ? path.resolve(to) : resolveDefaultTarget();
-    install(skillId, targetRoot);
+    install(skillId, targetRoot, { force });
     return;
   }
 
-  die(`Unknown command: ${cmd}\n\n` + usage());
+  die(`Unknown command: ${cmd}\n\n` + usageText());
 }
 
 main(process.argv);

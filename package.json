@@ -1,7 +1,7 @@
 {
   "name": "@topmindspace/tms-skills",
   "version": "0.1.0",
-  "description": "TopMindspace 智能体技能 monorepo — 通过 GitHub npx 安装技能（top-ppt-html 等）。",
+  "description": "TopMindspace 智能体技能 monorepo — 通过 npm / GitHub npx 安装技能（top-ppt-html 等）。",
   "license": "MIT",
   "author": "TopMindspace",
   "repository": {
@@ -26,21 +26,24 @@
   },
   "files": [
     "bin",
-    "top-ppt-html",
     "README.md",
     "LICENSE",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "top-ppt-html"
   ],
   "engines": {
     "node": ">=18"
   },
   "scripts": {
     "list": "node bin/tms-skills.js list",
-    "install:skills": "node bin/tms-skills.js install top-ppt-html",
-    "check": "python top-ppt-html/scripts/package_skill.py --check",
-    "privacy": "python scripts/ci_privacy_scan.py",
-    "audit": "python top-ppt-html/scripts/audit_styles.py && python top-ppt-html/scripts/audit_docs.py && python top-ppt-html/scripts/audit_skill.py && python top-ppt-html/scripts/audit_css.py",
-    "package:skill": "python top-ppt-html/scripts/package_skill.py"
+    "discover": "node scripts/discover_skills.js",
+    "sync:files": "node scripts/sync_npm_files.js",
+    "prepack": "node scripts/sync_npm_files.js",
+    "install:skills": "node -e \"const {discoverSkills}=require('./scripts/discover_skills'); const {spawnSync}=require('child_process'); for (const id of discoverSkills()) { const r=spawnSync(process.execPath,['bin/tms-skills.js','install',id],{stdio:'inherit'}); if(r.status) process.exit(r.status||1); }\"",
+    "check": "node scripts/run_skill_gates.js check",
+    "privacy": "python3 scripts/ci_privacy_scan.py",
+    "audit": "node scripts/run_skill_gates.js audit",
+    "package:skill": "node scripts/run_skill_gates.js package"
   },
   "publishConfig": {
     "access": "public"
