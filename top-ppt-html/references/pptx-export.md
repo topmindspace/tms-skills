@@ -24,7 +24,7 @@
 - **智能体精导**：正式 PPTX 的唯一交付路径——从报告抽模型 → 生成 → **过 strict 质检** → 交付。生成时用户选了「HTML+PPTX」交付格式的，交付时一并生成；交付后用户随时可通过页面提示词回来补生成。
 - **双单源**：页面几何/三模式独立比例尺（`typeScale` 基准 + `modeTypeScale` 模式取值）/页型几何/9 风格 token 全在 `scripts/layout-constants.json`；**页型 DSL schema（字段/必填/适用模式）在 `scripts/model-schema.json`**。通道 B 直接 `require`；页面运行时由 `sync_runtime.py` 注入（同时注入三模板的引擎/UI/运行时内联副本）。**改常量只改 JSON，改 schema 只改 schema JSON，然后跑 `python scripts/sync_runtime.py`**。
 
-## 内容模型（生成报告时与正文同步填写）
+## 内容模型（只填模型 · render_from_model 回填正文）
 
 三份模式模板（`assets/templates/{presentation|research|architecture}.html`）尾部已带对应模式的占位。字段：
 
@@ -122,7 +122,7 @@
 
 ## 页面预览（已内置三模板）
 
-三份模式模板均已集成：header 工具组「预览 PPTX」（快捷键 P）+「?」PPT 生成指引弹窗（快捷键 H，精导通道说明 + 可复制提示词）+ 内嵌预览运行时 + 对应模式模型占位。**生成报告时只需做一件事：把 `window.REPORT_MODEL` 填成与正文一致的内容（mode 用模板默认值，勿改）。**
+三份模式模板均已集成：header 工具组「预览 PPTX」（快捷键 P）+「?」PPT 生成指引弹窗（快捷键 H，精导通道说明 + 可复制提示词）+ 内嵌预览运行时 + 对应模式模型占位。**生成报告时只填 `window.REPORT_MODEL`，再跑 `render_from_model.py --inplace` 回填正文（mode 用模板默认值，勿改；禁止双写）。**
 
 - 预览模态读取 `slidesXml`（与精导同一序列化输出）渲染 16:9 页序列——所见即所得
 - 打开即自检（schema 单源驱动）：模型完整 → 正常预览 + 提示词；不完整 → 尽力渲染 + 缺失清单 + 提示词

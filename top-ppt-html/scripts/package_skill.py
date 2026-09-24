@@ -21,7 +21,7 @@
     assets/pptx-export.js          PPTX 预览运行时（注入源）
     assets/style-gallery.html      风格 × 模式 × 亮暗主题交互画廊
     assets/theme-overview*.png     3 张主题参考图（整体 + research + architecture；演示态与整体图相同）
-    references/*.md                15 篇规范（playbook.md = 唯一常读入口 L1；其余 L2 按需加载）
+    references/*.md                规范全文（当前 ≥24 篇；playbook.md = 唯一常读入口 L1；其余 L2 按需）
     scripts/                         生成 / 校验 / 回归 / 维护工具（py + js + json 单源）
     scripts/extract_snippet.py       L2 节级片段抽取（减少整读大规范）
     scripts/layout_slots.json        页型布局 IR（高频页型语义槽位）
@@ -126,6 +126,7 @@ REQUIRED = [
     'references/tech-design.md', 'references/industry-benchmark.md',
     'scripts/env_probe.py', 'scripts/audit_docs.py', 'scripts/audit_skill.py',
     'scripts/scaffold_report.py',
+    'scripts/render_from_model.py',
     'scripts/sync_runtime.py', 'scripts/audit_styles.py', 'scripts/build_examples.py',
     'scripts/regression.py', 'scripts/validate_report.py', 'scripts/validate_pptx.py',
     'scripts/extract_model.py', 'scripts/build_pptx.js', 'scripts/gen_channel_a.js',
@@ -148,7 +149,7 @@ REQUIRED = [
 MIN_COUNTS = {
     'assets/examples/*.html': 9,
     'assets/examples/*.model.json': 9,
-    'references/*.md': 15,
+    'references/*.md': 24,  # 实有 ~26（归档 reform-plan 后）；≥24 防误删核心 L2
 }
 
 

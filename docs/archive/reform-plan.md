@@ -1,3 +1,5 @@
+> **归档说明（Batch 1 · 2026-09-24）**：本文件已从 `top-ppt-html/references/` 迁出，不再作为生成硬门禁。现行门禁见 `layout-constants.qualityGates` 与 `references/failure-modes.md`。保留供历史对照。
+
 # 整体整改方案（质量 · 性能 · 可靠）
 
 > **何时读**：改技能架构、门禁、图表选型、图文版式、导出链路前必读。

@@ -41,12 +41,15 @@
 
 **轻量路径**（默认）——同时满足：≤12 页 · 材料单一完整 · 无未敲定关键判断 · 用户没要求看框架。
 ```
-Gate 0 参考图 → 六项问询（1 轮）→ 1 张规划卡 → scaffold_report.py → 填内容+模型 → 校验 → 交付
+Gate 0 参考图 → 六项问询（1 轮）→ 1 张规划卡 → scaffold_report.py
+  → **只填 REPORT_MODEL** → render_from_model.py --inplace → validate_report.py --strict → 交付
 ```
+（Fast Mode 跳过 Gate 0/六项，其余同链；**禁止**手改 HTML 正文与模型双写。）
 
 **完整路径**（任一命中）——研究 ≥20 页 / 演示 ≥12 页 / 材料量大且杂 / 含未敲定关键判断 / 用户要看框架。
 ```
-Gate 0 参考图 → 六项问询（1 轮）→ 证据表 → 故事线脑暴 → SCR+主张树 → 逐页规划卡 → 大纲确认（1 轮）→ 生成 → 校验 → 交付
+Gate 0 参考图 → 六项问询（1 轮）→ 证据表 → 故事线脑暴 → SCR+主张树 → 逐页规划卡 → 大纲确认（1 轮）
+  → scaffold_report.py → **只填 REPORT_MODEL** → render_from_model.py --inplace → validate_report.py --strict → 交付
 ```
 
 **预算（硬）**：交互轮次 ≤3；必读文件 = `SKILL.md` + 本文件（≤2 份）；L2 深度文件按需且单份读完即停。
@@ -231,6 +234,8 @@ Gate 0 参考图 → 六项问询（1 轮）→ 证据表 → 故事线脑暴 �
 python scripts/scaffold_report.py --mode research --style mckinsey --theme light \
        --title "报告标题" --sections 8 --out 2026-09-15-主题.html   # 起点（不要手抄模板）
 # 或用黄金节奏包：--preset consulting|diagnostic|pitch|ops-review|layered-arch|flow-arch
+# 只填 window.REPORT_MODEL（禁止手改 HTML 正文），然后回填：
+python scripts/render_from_model.py 2026-09-15-主题.html --inplace
 python scripts/validate_report.py 2026-09-15-主题.html --strict     # HTML 硬门禁（0 FAIL / 0 WARN）
 python scripts/extract_model.py   2026-09-15-主题.html              # → .model.json
 node  scripts/build_pptx.js 2026-09-15-主题.pptx --model=….model.json

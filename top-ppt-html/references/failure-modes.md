@@ -117,7 +117,7 @@
 - **识别**：正文或模型里出现 `<a class="cite">` 字面量；整页只有标题；0.5% vs 99.5% 还用 donut；简单 2 类图占满整页。
 - **错误码**：`HTML_TAG_IN_TEXT` / `TITLE_ONLY_PAGE` / `UNDERFILL_PAGE` / `CHART_SKEW_INVALID` / `CHART_OVERSIZE` / `TEXT_INCOMPLETE`
 - **根因**：双写未净化（标签进模型）；过空页只 WARN；图表面积与信息复杂度脱钩；极偏数据误用占比图。
-- **修复**：① 模型字段纯文本，引用写 `[n]`；② 空页补证据与承载或并页；③ 极偏改 V3（KPI/进度/对比条）；④ 简单图缩到 18–28% 高并配注解带（V1–V4）。详见 `reform-plan.md` 与 `playbook.md` §三-b。
+- **修复**：① 模型字段纯文本，引用写 `[n]`；② 空页补证据与承载或并页；③ 极偏改 V3（KPI/进度/对比条）；④ 简单图缩到 18–28% 高并配注解带（V1–V4）。详见 `layout-constants.qualityGates` 与 `playbook.md` §三-b。
 
 ### F16 已登记图表静默降级 `chart_fallback_forgery`
 

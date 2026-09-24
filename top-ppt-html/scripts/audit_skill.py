@@ -15,7 +15,7 @@
   ① 体积预算   —— SKILL.md / 常读入口 playbook.md / 单份 reference / 模式模板 的上限
   ② 元数据     —— frontmatter name 与技能名一致；description ≤ DESC_HARD，且 ≤ DESC_SOFT（触发精度）
   ③ 披露分层   —— SKILL.md 必须声明 L0/L1/L2 三档，且 L1（常读入口）恰好 1 份
-  ④ 交互门禁   —— SKILL.md 必须含「Gate 0 参考图先行」，且其出现位置在「六项问询」之前
+  ④ 交互门禁   —— SKILL.md 必须含「Gate 0 参考图先行」，且其出现位置在「六项问询」之前；若声明 Fast Mode，须同时有豁免句且标准路径仍为硬门禁
   ⑤ 效率预算   —— SKILL.md 必须显式声明交互轮次上限与必读文件数上限
   ⑥ 引用完整性 —— SKILL.md 与 playbook.md 提到的 references/*.md 必须存在
   ⑦ 冗余报告   —— SKILL.md ↔ 全部 references（含 playbook）的归一化共同片段
@@ -159,12 +159,23 @@ def main() -> int:
     chk('③ 常读入口存在', bool(l1_files) and all((ROOT / f).exists() for f in l1_files),
         f'L1={l1_files} 不存在', f'{l1_files} 存在')
 
-    # ④ Gate 0（参考图先行）
+    # ④ Gate 0（参考图先行）——标准路径硬门禁；Fast Mode 可声明豁免
     g0 = sk.find('Gate 0')
     ask = sk.find('六项问询')
+    has_fast = bool(re.search(r'Fast\s*Mode|快速模式', sk))
     chk('④ Gate 0 存在', g0 >= 0, '未找到「Gate 0」标记', '已就位')
     chk('④ Gate 0 在问询之前', g0 >= 0 and ask >= 0 and g0 < ask,
         f'Gate0@{g0} 未在六项问询@{ask} 之前', f'位置正确（{g0} < {ask}）')
+    if has_fast:
+        ok_exempt = bool(re.search(
+            r'(?:Fast\s*Mode|快速模式).{0,400}(?:跳过|豁免).{0,120}(?:Gate\s*0|参考图|六项)',
+            sk, re.S)) or bool(re.search(
+            r'(?:跳过|豁免).{0,60}(?:Gate\s*0|参考图|六项问询)', sk))
+        chk('④ Fast Mode 豁免声明', ok_exempt,
+            '有 Fast Mode 但未声明 Gate 0/六项豁免', '已声明豁免')
+        ok_std = bool(re.search(r'标准.{0,24}(?:硬门禁|强制)|Gate\s*0.{0,48}硬门禁', sk))
+        chk('④ 标准路径 Gate 0 仍为硬门禁', ok_std,
+            '有 Fast Mode 但标准路径未保留 Gate 0 硬门禁表述', '已保留')
 
     # ⑤ 效率预算声明
     chk('⑤ 交互轮次预算', bool(re.search(r'交互轮次|轮次上限|≤\s*3\s*轮', sk)),
