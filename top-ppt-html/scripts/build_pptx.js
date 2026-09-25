@@ -174,6 +174,17 @@ function modeFloorPt() {
   const f = FS_POLICY.floorPt[m];
   return f != null ? f : 10;
 }
+function snapFont(pt, ladder, floor) {
+  /* Snap arbitrary pt to nearest ladder step (≥ floor). fitFont + callers (fz-1) must use this. */
+  const lad = (ladder || FONT_LADDER).filter(v => v >= (floor == null ? 0 : floor));
+  if (!lad.length) return floor == null ? pt : Math.max(floor, pt);
+  let best = lad[0], bd = Math.abs(lad[0] - pt);
+  for (let i = 1; i < lad.length; i++) {
+    const d = Math.abs(lad[i] - pt);
+    if (d < bd) { bd = d; best = lad[i]; }
+  }
+  return best;
+}
 function fitFont(items, widthIn, availIn, opts) {
   opts = opts || {};
   const floor = opts.floor != null ? opts.floor : modeFloorPt();
@@ -536,7 +547,7 @@ function imageLayoutShapes(s, layout, img, items, points, isPh, fit, y0, y1) {
     const ptsI = points || [];
     const rowHI = fitRowH(ih - 0.1, ptsI.length, IM.noteRowH || 0.62, 0.3);
     const fzI = fitFont(ptsI.map(p => (p[0] || '') + (p[1] || '')), rwI - 0.3, ih, { max: 14, gapFactor: 0.6 });
-    const fz = sz(fzI), fzSm = sz(fzI - 1);
+    const fz = sz(fzI), fzSm = sz(snapFont(fzI - 1));
     ptsI.forEach((pt, i) => {
       const lyI = iy + i * rowHI;
       s.addShape('rect', { x: rxI, y: lyI + rowHI / 2 - 0.06, w: 0.12, h: 0.12,
@@ -1490,8 +1501,11 @@ function infoStreamgraph(s, sec, y0, y1) {
     totals.push(t);
   }
   const maxTot = Math.max.apply(null, totals.concat([1]));
-  const plotH = P.y1 - P.y0;
-  const cyMid = (P.y0 + P.y1) / 2;
+  /* Reserve legend INSIDE the plot box — 6 series must not crush the annotation band. */
+  const legH = Math.min(1.2, Math.max(0.28, series.length * 0.22 + 0.08));
+  const plotBottom = P.y1 - legH;
+  const plotH = Math.max(0.6, plotBottom - P.y0);
+  const cyMid = P.y0 + plotH / 2;
   const xAt = (i) => MX + (nPts > 1 ? i / (nPts - 1) : 0.5) * CW;
   const yAt = (i) => cyMid - (totals[i] / maxTot) * plotH / 2;
   const palette = [STYLE.accent, STYLE.faint, STYLE.body, STYLE.line, STYLE.soft, STYLE.surface];
@@ -1512,14 +1526,14 @@ function infoStreamgraph(s, sec, y0, y1) {
     }
     ribbonRects(s, pts, palette[si % palette.length]);
     const lx = MX;
-    s.addShape('rect', { x: lx, y: P.y1 + 0.06 + si * 0.26, w: 0.12, h: 0.12,
+    s.addShape('rect', { x: lx, y: plotBottom + 0.04 + si * 0.2, w: 0.12, h: 0.12,
       fill: { color: palette[si % palette.length] }, line: { type: 'none' } });
-    s.addText(String(se.name || ('系列' + (si + 1))), { x: lx + 0.16, y: P.y1 + si * 0.26, w: 1.5, h: 0.26,
+    s.addText(String(se.name || ('系列' + (si + 1))), { x: lx + 0.16, y: plotBottom + 0.02 + si * 0.2, w: 1.5, h: 0.2,
       fontFace: STYLE.font, fontSize: sz(10), color: STYLE.body, valign: 'middle' });
     base = upper;
   });
   labels.forEach((lb, i) => {
-    s.addText(String(lb), { x: xAt(i) - 0.4, y: P.y1 - 0.02, w: 0.8, h: 0.24, align: 'center',
+    s.addText(String(lb), { x: xAt(i) - 0.4, y: plotBottom - 0.22, w: 0.8, h: 0.2, align: 'center',
       fontFace: STYLE.font, fontSize: sz(9.5), color: STYLE.faint });
   });
 }
@@ -1745,8 +1759,8 @@ CONTENT.sections.forEach((sec) => {
     const iy = ireg.y;
     const capH = img.caption ? 0.32 : 0;
     const ih = Math.max(1.2, ireg.h);
-    imageLayoutShapes(s, layout, img, items, sec.points || [], isPh, fit, iy, iy + ih);
-    if (img.caption) s.addText(img.caption, { x: MX, y: iy + ih + 0.04, w: CW, h: capH,
+    const capYImg = imageLayoutShapes(s, layout, img, items, sec.points || [], isPh, fit, iy, iy + ih);
+    if (img.caption) s.addText(img.caption, { x: MX, y: capYImg + 0.04, w: CW, h: capH,
       fontFace: STYLE.font, fontSize: sz(10.5), color: STYLE.faint });
   } else if (type === 'donut') {
     const dcn = sec.chart || {};
@@ -2133,7 +2147,7 @@ CONTENT.sections.forEach((sec) => {
       const ly0 = bodyY, availP = bodyBottom - ly0;
       const rowH = fitRowH(availP, pts.length, SP.rowH, 0.3);
       const fzB = fitFont(pts.map(p => (p[0] || '') + (p[1] || '')), w - 0.4, availP, { max: 14, gapFactor: 0.6 });
-      const fz = sz(fzB), fzSm = sz(fzB - 1);
+      const fz = sz(fzB), fzSm = sz(snapFont(fzB - 1));
       pts.forEach((pt, i) => {
         const ly = ly0 + i * rowH;
         s.addShape('rect', { x, y: ly + rowH / 2 - 0.06, w: 0.12, h: 0.12, fill: { color: STYLE.accent }, line: { type: 'none' } });
@@ -2277,7 +2291,7 @@ CONTENT.sections.forEach((sec) => {
     const rowH = fitRowH(avail, pts.length, P.rowH, 0.3);
     const fzB = fitFont(pts.map(p => (p[0] || '') + (p[1] || '')), textW - 0.32, avail,
       { max: 15, gapFactor: 0.55 });
-    const fz = sz(fzB), fzSm = sz(fzB - 1);
+    const fz = sz(fzB), fzSm = sz(snapFont(fzB - 1));
     pts.forEach((p, i) => {
       const y = bodyY + i * rowH;
       s.addShape('rect', { x: MX, y: y + rowH / 2 - P.markSize / 2, w: P.markSize, h: P.markSize,
