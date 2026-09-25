@@ -16,7 +16,7 @@
     ② 无 LLM 的 rubric 启发式（content/layout/chart/infographic/tone 五维）
     ③ --deliver：按 SKILL.md「交付说明」七要素（路径/字节数/模式/风格/篇幅/格式/校验+引用）
        生成结构化交付说明——七要素缺一即 gate FAIL，杜绝手拼遗漏
-    交付时一键跑完，避免「只过了结构、内容质量靠自觉」。
+    交付时一键跑完；互不依赖的子进程门禁（HTML / PPTX / evals）并行执行以缩短墙钟。
 """
 from __future__ import annotations
 
@@ -26,6 +26,7 @@ import re
 import subprocess
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 try:
@@ -242,33 +243,43 @@ def main() -> int:
     print(f'交付质量门禁 · {html.name}')
     print('-' * 60)
 
-    # ① HTML strict（Mode A / presentation 自动附带 --layout-qa）
+    # ①–③ 互不依赖子进程并行（HTML strict / PPTX strict / evals）
     head_snip = html.read_text(encoding='utf-8')[:2500]
     mode_m = re.search(r'data-mode="([^"]+)"', head_snip)
     mode = mode_m.group(1) if mode_m else 'presentation'
+    jobs: list[tuple[str, list[str], str | None]] = []
+    # (name, cmd, fixed_note) — fixed_note 非空则覆盖尾部摘要
     vcmd = [sys.executable, str(ROOT / 'scripts' / 'validate_report.py'), str(html), '--strict']
     if mode == 'presentation':
         vcmd.append('--layout-qa')
-    rc, out, el = run(vcmd)
-    gate_name = 'validate_report --strict' + (' --layout-qa' if mode == 'presentation' else '')
-    tail = [ln for ln in out.splitlines() if ln.startswith('PASS ') or ln.startswith('结论')]
-    gate(gate_name, rc == 0, tail[-1] if tail else f'exit {rc}', el)
-
-    # ② PPTX strict（可选）
+    gate_html = 'validate_report --strict' + (' --layout-qa' if mode == 'presentation' else '')
+    jobs.append((gate_html, vcmd, None))
     if args.pptx:
-        cmd = [sys.executable, str(ROOT / 'scripts' / 'validate_pptx.py'), args.pptx, '--strict']
+        pcmd = [sys.executable, str(ROOT / 'scripts' / 'validate_pptx.py'), args.pptx, '--strict']
         if args.model:
-            cmd += ['--model=' + args.model]
-        rc, out, el = run(cmd)
-        tail = [ln for ln in out.splitlines() if ln.startswith('PASS ') or ln.startswith('结论')]
-        gate('validate_pptx --strict', rc == 0, tail[-1] if tail else f'exit {rc}', el)
-
-    # ③ evals 确定性
-    cmd = [sys.executable, str(ROOT / 'evals' / 'run_evals.py'), '--score', str(html)]
+            pcmd += ['--model=' + args.model]
+        jobs.append(('validate_pptx --strict', pcmd, None))
+    ecmd = [sys.executable, str(ROOT / 'evals' / 'run_evals.py'), '--score', str(html)]
     if args.trace:
-        cmd += ['--trace', args.trace]
-    rc, out, el = run(cmd)
-    gate('evals --score', rc == 0, '确定性 + 效率检查', el)
+        ecmd += ['--trace', args.trace]
+    jobs.append(('evals --score', ecmd, '确定性 + 效率检查'))
+
+    results: dict[str, tuple[int, str, float, str | None]] = {}
+    with ThreadPoolExecutor(max_workers=max(1, len(jobs))) as pool:
+        futs = {pool.submit(run, cmd): (name, note) for name, cmd, note in jobs}
+        for fut in as_completed(futs):
+            name, note = futs[fut]
+            rc, out, el = fut.result()
+            results[name] = (rc, out, el, note)
+
+    # 按 jobs 声明顺序输出（稳定可读；墙钟已并行）
+    for name, _cmd, _note in jobs:
+        rc, out, el, note = results[name]
+        if note is not None:
+            gate(name, rc == 0, note, el)
+        else:
+            tail = [ln for ln in out.splitlines() if ln.startswith('PASS ') or ln.startswith('结论')]
+            gate(name, rc == 0, tail[-1] if tail else f'exit {rc}', el)
 
     # ④ rubric 启发式
     rubric = heuristic_rubric(html)

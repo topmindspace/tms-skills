@@ -1,9 +1,9 @@
 # TopPPT HTML
 
-**让 idea 飞，好想法被看见。** 一套面向 AI 智能体的商务报告生成技能：把想法、调研、分析、架构方案，变成**专业级的 HTML 报告 + 版式保真的可编辑 PPTX**。
+**让 idea 飞，好想法被看见。** 面向**演讲与正式场合**的高品质甲板技能：把主张、调研、分析、架构方案，生成为**优雅、美观、大气**的可翻页 HTML + **版式保真可编辑 PPTX**。核心工艺是版式、排版、色彩与内容组织——克制图标/图表配文，而非 gadget 堆砌或咨询 dump 默认。
 
 - 技能标识：`top-ppt-html`（安装/打包目录名与此一致）；品牌名：**TopPPT HTML**
-- 版本：**v0.1.3**（与 `@topmindspace/tms-skills@0.1.3` 同 tag）
+- 版本：**v0.1.4**（与 `@topmindspace/tms-skills@0.1.4` 同 tag）
 - **智能体入口**：`SKILL.md` → `references/playbook.md`（L1）→ L2 按需
 - **人类维护者**：本 README（安装 / 命令 / 目录）；勿把本文件当生成规范
 
@@ -78,11 +78,11 @@ npm install                  # 依 package.json 安装 pptxgenjs（^4）
 ```
 听意图 → Gate 0 参考图 → 六项问询 → 路径判定（轻量默认 / 完整走 outline-design.md 七步法）
 → scaffold_report.py 起骨架（勿整读/复制模板）→ **只填 window.REPORT_MODEL** → `render_from_model.py --inplace`
-→ validate_report.py --strict 全 PASS → 交付
-→（含 PPTX 时）extract_model.py → build_pptx.js --model → validate_pptx.py --strict 0/0
+→ validate_report.py --strict 全 PASS → 交付（默认 HTML）
+→（用户要 PPTX 时 · **仅 B 通道**）extract_model.py → build_pptx.js --model → validate_pptx.py --strict 0/0
 ```
 
-**渐进式披露三档**（详见 `SKILL.md` 阶段路由表）：`L0` = `SKILL.md`（路由 + 门禁 + 铁律，加载即用）；`L1` = `references/playbook.md`（**唯一常读入口**：模式契约 / 页型选型 / 组合版式矩阵 / 图表选型决策树 / 内容规则 / 配色 / 校验命令）；`L2` = 深度规范，**只在命中条件时读、读完即停**；**取码优先 `extract_snippet.py`**（`components.md`/`charts.md` 为逻辑索引，自动路由到 `components-atoms` / `layouts-*` / `charts-basic` / `charts-extended` / `charts-discipline` 等物理文件）。
+**渐进式披露三档**（详见 `SKILL.md` 阶段路由表）：`L0` = `SKILL.md`（路由 + 门禁 + 铁律，加载即用）；`L1` = `references/playbook.md`（**唯一常读入口**：模式契约 / 页型选型 / 组合版式矩阵 / 图表选型决策树 / 内容规则 / 配色 / 校验命令）；`L2` = 深度规范，**只在命中条件时读、读完即停**；**取码必须 `extract_snippet.py`**（整读大 L2 = FAIL）；`components.md`/`charts.md` 为逻辑索引，自动路由到物理拆分文件。
 
 ## 三、目录结构
 

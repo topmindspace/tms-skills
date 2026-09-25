@@ -210,6 +210,17 @@ def main() -> int:
         'SKILL.md 未声明交互轮次上限', '已声明（≤3 轮）')
     chk('⑤ 必读文件预算', bool(re.search(r'必读.{0,6}上限|必读文件数|只读当前需要的|不预读', sk)),
         'SKILL.md 未声明必读文件预算/不预读纪律', '已声明（不预读纪律）')
+    # ⑤b 反过读硬门禁文案（整读大 L2 = FAIL）+ B 通道交付口径
+    ok_snip = bool(re.search(r'extract_snippet', sk)) and bool(
+        re.search(r'整读.{0,40}(?:FAIL|不合格)|(?:FAIL|不合格).{0,40}整读', sk))
+    chk('⑤ extract_snippet 整读=FAIL', ok_snip,
+        'SKILL.md 须同时声明 extract_snippet 与「整读…FAIL/不合格」',
+        '已声明 FAIL 口径')
+    ok_b = bool(re.search(r'B\s*通道|build_pptx', sk)) and bool(
+        re.search(r'A\s*通道|pptx-export|cross_verify', sk))
+    chk('⑤ B 通道交付 / A 预览', ok_b,
+        'SKILL.md 须区分 B 通道交付与 A 通道预览/cross_verify',
+        '已区分')
 
     # ⑥ 引用完整性
     missing: list[str] = []

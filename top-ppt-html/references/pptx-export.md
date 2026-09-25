@@ -21,7 +21,7 @@
 ```
 
 - **页面预览**：收到/打开报告的人点 header「预览 PPTX」（快捷键 P）即可查看页序列，无需任何环境。预览模态与精导通道使用**同一序列化语义**（`slidesOf → slideXml`）——**版式与文本所见即所得**；带数据的原生图表在交付 PPTX 中为真 chart part（双击可编辑数据），预览侧为形状近似，**图表形态以精导产物为准**。**页面不直接导出文件**：浏览器端跑不了 strict 质检硬门禁，达不到交付质量；预览模态常显**可复制 AI 提示词**，用户想获得 PPTX 时复制给 AI，由智能体走精导通道生成（`?` 帮助弹窗 / 快捷键 H 有同样说明）。
-- **智能体精导**：正式 PPTX 的唯一交付路径——从报告抽模型 → 生成 → **过 strict 质检** → 交付。生成时用户选了「HTML+PPTX」交付格式的，交付时一并生成；交付后用户随时可通过页面提示词回来补生成。
+- **智能体精导（B 通道 · 唯一交付）**：`extract_model.py` → `build_pptx.js` → `validate_pptx.py --strict` 0/0。用户选「HTML+PPTX」或事后要 PPT 时才跑；**不要**用 A 通道（`pptx-export.js` / `gen_channel_a.js`）产物交付——A 仅页面预览与回归双裁判。
 - **双单源**：页面几何/三模式独立比例尺（`typeScale` 基准 + `modeTypeScale` 模式取值）/页型几何/9 风格 token 全在 `scripts/layout-constants.json`；**页型 DSL schema（字段/必填/适用模式）在 `scripts/model-schema.json`**。通道 B 直接 `require`；页面运行时由 `sync_runtime.py` 注入（同时注入三模板的引擎/UI/运行时内联副本）。**改常量只改 JSON，改 schema 只改 schema JSON，然后跑 `python scripts/sync_runtime.py`**。
 
 ### 会场与字号（venue · P1-4）

@@ -1,8 +1,8 @@
 # 作战手册 · Playbook（唯一常读入口 · L1）
 
 > **每次生成都读这一份，通常就够了。**
-> 本文件是**决策层**：定模式、选页型、选版式组合、选图表、定配色、跑校验。
-> **代码、几何、穷举表不在本文件**——需要时按 `SKILL.md` 的 L2 路由读深度文件，**读完即停，不预读**。
+> 决策层：定模式、选页型、选版式组合、选图表、定配色、跑校验——服务**优雅、大气、正式场合**的演讲/汇报甲板（Mode A 默认气质；B/C 按契约，勿把咨询 dump 当 A 默认）。
+> **代码、几何、穷举表不在本文件**——按 `SKILL.md` L2 路由命中再读，**读完即停**；整读大 L2 = **FAIL**。
 
 ---
 
@@ -46,7 +46,7 @@
 Gate 0 参考图 → 六项问询（1 轮）→ 最小大纲（outline-design「轻量最小集」）→ 1 张规划卡 → scaffold_report.py
   → **只填 REPORT_MODEL** → render_from_model.py --inplace → validate_report.py --strict → 交付
 ```
-（Fast Mode 跳过 Gate 0/六项，仍须最小大纲；其余同链；**禁止**手改 HTML 正文与模型双写。）
+（Fast Mode 跳过 Gate 0/六项，仍须最小大纲；默认 **HTML-only**，PPTX 显式 opt-in 走 B 通道；**禁止**手改 HTML 正文与模型双写。）
 
 **完整路径**（任一命中）——研究 ≥20 页 / 演示 ≥12 页 / 材料量大且杂 / 含未敲定关键判断 / 用户要看框架。
 ```
@@ -188,10 +188,11 @@ python scripts/validate_pptx.py 2026-09-15-主题.pptx --strict --model=….mode
 ```
 
 **交付前必过**：`validate_report.py --strict` 0/0（**Mode A / presentation 隐含 `--layout-qa`**；research/architecture 不强制）；含 PPTX 时 `validate_pptx.py --strict --model=` 0/0。
-**推荐一键门禁**：`python scripts/quality_gate.py 报告.html [--pptx x.pptx --model x.model.json]`（presentation 同口径附带 layout-qa；交付加 `--deliver` 出七要素，不要手拼）。
-**A/B 全文对等**：`cross_verify.py` 默认 SKIP，仅 `python scripts/cross_verify.py --full-ab` 或 `regression.py --full-ab` 时启用。
+**PPTX 通道**：默认交付只跑 **B 通道**（`build_pptx.js`）；**A 通道**（`pptx-export.js` / `gen_channel_a.js`）仅预览与 `cross_verify` / 回归——**勿把 A 产物当交付**。
+**推荐一键门禁**：`python scripts/quality_gate.py 报告.html [--pptx x.pptx --model x.model.json]`（HTML/PPTX/evals **并行**；presentation 附 layout-qa；`--deliver` 出七要素，勿手拼）。
+**A/B 全文对等**：`cross_verify.py` 默认 SKIP，仅 `--full-ab` / `regression.py --full-ab` 启用。
 **PPTX 冒烟**：`bash scripts/smoke_pptx.sh`（extract_model → build_pptx → validate_pptx --strict）。
-**失败自修复**：按输出逐条修 → 重跑，直到 0/0；修复顺序见 `failure-modes.md`。
+**失败自修复**：按输出逐条修 → 重跑至 0/0；顺序见 `failure-modes.md`。
 
 ---
 
@@ -200,7 +201,7 @@ python scripts/validate_pptx.py 2026-09-15-主题.pptx --strict --model=….mode
 > 常读仍为入口两份；演示路径可加 **L1.5 工艺双件**：`default-surface.md` + `presentation-craft.md`。
 > 默认生成面：`default-surface.md`（12 页型 + 8 图 + V1–V4）。Mode A 工艺：`presentation-craft.md`。插画：`illustration-layout.md`。
 >
-> **禁止整读（强制走 `extract_snippet.py`）**：`layouts-combo.md` · `components-atoms.md` · `charts-basic.md` · `charts-extended.md` · `content-rules.md` 全文 · `pptx-export.md` · 模式模板 HTML（`assets/templates/*.html`，走 `scaffold_report.py`）。
+> **整读下列文件 = FAIL / 不合格**（强制 `extract_snippet.py`）：`layouts-combo.md` · `components-atoms.md` · `charts-basic.md` · `charts-extended.md` · `content-rules.md` 全文 · `pptx-export.md` · 模式模板 HTML（走 `scaffold_report.py`）。
 > 取码：`python scripts/extract_snippet.py --list` · `--task <名>` · `--chart <类型>` · `--page-type <页型>` · `--file components.md --section 46`（逻辑名自动路由）
 
 | 任务 | 只读 |
@@ -218,5 +219,5 @@ python scripts/validate_pptx.py 2026-09-15-主题.pptx --strict --model=….mode
 | 图标 / 语义速查 | `icons.md` · `--task icons` |
 | 起骨架用节奏包 | `scaffold_report.py --list-types` → `--preset consulting` 等 |
 
-**纪律**：L0+L1 是默认全部所需（Mode A/Fast 可加 L1.5）；上表命中才开 L2；**读完即执行，不预读下一份**；大文件**禁止整读**，一律 `extract_snippet.py`。页型语义槽位见 `layout-constants.json` → `layoutSlots`（双通道同源 IR）。
+**纪律**：L0+L1 默认全部所需（Mode A/Fast 可加 L1.5）；命中才开 L2；**读完即执行，不预读**；大文件整读 = **FAIL**，一律 `extract_snippet.py`。页型槽位见 `layout-constants.json` → `layoutSlots`（双通道同源 IR）。
 **维护者**：改常量/schema/引擎后必跑 `sync_runtime.py` → `audit_styles.py` → `audit_docs.py` → `audit_skill.py` → `build_examples.py` → `regression.py`。

@@ -2,7 +2,7 @@
 
 > **何时读**：Mode A / 正式演示 / 路演 / 演讲 / Fast 演示路径。与 `default-surface.md` 同级常读。  
 > **何时不读**：Mode B 密排、Mode C 架构深读（能力保留，不反向污染 A）。  
-> **定位**：大气、演讲友好；一屏一主张；图标/图表克制配文——非 gadget deck、非咨询 dump。
+> **定位**：优雅 · 美观 · 大气；正式场合演讲友好；版式/排版/色彩/内容组织优先；图标/图表克制配文——非 gadget deck、非咨询 dump。
 
 ## 铁律速查（Hard rules）
 
@@ -32,7 +32,8 @@
 
 ```
 validate_report.py --strict   # presentation 自动隐含 --layout-qa
-quality_gate.py … --deliver   # 同口径
+quality_gate.py … --deliver   # HTML/PPTX/evals 并行；同口径
+# PPTX 交付仅 B 通道 build_pptx.js（A 通道不交付）
 ```
 
 检查：V 契约 · 简单全幅 · 骨架连用 · 截断/溢出未拆页 · 半空卡 · 对齐节奏 · 主张标题 WARN · 核图多样性 · WCAG。
