@@ -108,6 +108,9 @@ STRICT_FAILURE_CODES = {
     "UNBALANCED_EMPTY_SPACE",
     "UNJUSTIFIED_LARGE_IMAGE",
     "TEXT_OVERFLOW_ESTIMATE",
+    "TEXT_OVERFLOW_VERTICAL",
+    "ANNOTATION_BAND_OVERLAP",
+    "FONT_SIZE_NOT_SNAPPED",
     "TEXT_INCOMPLETE",
     "CHART_SKEW_INVALID",
     "CHART_OVERSIZE",
@@ -207,9 +210,17 @@ def slide_chart_text(archive: zipfile.ZipFile, slide_name: str) -> str:
 
 
 def shape_bounds(element: ET.Element) -> tuple[int, int, int, int] | None:
+    """Read shape geometry from DrawingML ``a:xfrm`` **or** PresentationML ``p:xfrm``.
+
+    Native charts live in ``p:graphicFrame``, which carries ``p:xfrm`` (not ``a:xfrm``).
+    Skipping ``p:xfrm`` made chart overflow / overlap gates blind.
+    """
     xfrm = element.find(".//a:xfrm", NS)
     if xfrm is None:
+        xfrm = element.find(".//p:xfrm", NS)
+    if xfrm is None:
         return None
+    # p:xfrm and a:xfrm both nest a:off / a:ext
     offset = xfrm.find("a:off", NS)
     extent = xfrm.find("a:ext", NS)
     if offset is None or extent is None:
@@ -295,6 +306,147 @@ def text_overflow_check(shape: ET.Element, slide_no: int) -> list[dict[str, Any]
                 f'文本可能溢出："{line[:18]}…" 估算 {est_w:.1f}in > 容量 {capacity:.1f}in（{fz:.1f}pt × {lines_avail} 行）。',
                 slide=slide_no,
             ))
+    return out
+
+
+def text_overflow_vertical_check(shape: ET.Element, slide_no: int) -> list[dict[str, Any]]:
+    """Multi-segment cumulative vertical overflow (TEXT_OVERFLOW_VERTICAL).
+
+    Per-paragraph area checks miss the case where each line fits individually but
+    the *sum* of estimated line heights exceeds the text-frame height.
+    """
+    out: list[dict[str, Any]] = []
+    box = shape_bounds(shape)
+    if box is None:
+        return out
+    _, _, cx, cy = box
+    w_in, h_in = cx / 914400.0, cy / 914400.0
+    if w_in <= 0 or h_in <= 0:
+        return out
+    cfg = _containers_cfg()
+    lf = float(cfg.get("lineFactor") or 1.35)
+    total_h = 0.0
+    segments = 0
+    for para in shape.findall(".//a:p", NS):
+        line = "".join((t.text or "") for t in para.findall(".//a:t", NS))
+        if not line.strip():
+            continue
+        sizes = font_sizes_pt(para)
+        fz = min(sizes) if sizes else 12.0
+        est_w = est_text_width_in(line, fz)
+        lines_needed = max(1, int((est_w / max(w_in, 0.01)) + 0.999))
+        total_h += lines_needed * (fz / 72.0) * lf
+        segments += 1
+    # Single-segment cases already covered by TEXT_OVERFLOW_ESTIMATE; this gate
+    # targets multi-para cumulative overflow (tolerance mirrors horizontal gate).
+    if segments >= 2 and total_h > h_in * TEXT_OVERFLOW_TOLERANCE:
+        out.append(issue(
+            "TEXT_OVERFLOW_VERTICAL",
+            f"多段文本累计高度估算 {total_h:.2f}in > 文本框 {h_in:.2f}in"
+            f"（{segments} 段，容差 {TEXT_OVERFLOW_TOLERANCE:.0%}）——"
+            "请拆段/缩字号阶梯/换页，禁止静默截断。",
+            slide=slide_no,
+        ))
+    return out
+
+
+def annotation_band_overlap_check(
+    elements: list[ET.Element],
+    slide_no: int,
+    slide_height_emu: int,
+) -> list[dict[str, Any]]:
+    """Detect primary content crushing into the annotation band.
+
+    Annotation band ≈ [contentBottomWithNote, contentBottom] (default 6.4–6.9in).
+    Shapes that start in the body and extend into the band (e.g. streamgraph
+    legends stacked below the plot) fire ANNOTATION_BAND_OVERLAP.
+    """
+    out: list[dict[str, Any]] = []
+    try:
+        lc_path = Path(__file__).resolve().parent / "layout-constants.json"
+        lc = json.loads(lc_path.read_text(encoding="utf-8"))
+        lay = ((lc.get("pageTypes") or {}).get("layout") or {})
+        band_top_in = float(lay.get("contentBottomWithNote") or 6.4)
+        band_bot_in = float(lay.get("contentBottom") or 6.9)
+    except (OSError, json.JSONDecodeError, TypeError, ValueError):
+        band_top_in, band_bot_in = 6.4, 6.9
+    band_top = int(band_top_in * 914400)
+    band_bot = int(band_bot_in * 914400)
+    # Ignore footer/page-number chrome near the very bottom
+    pager_floor = int(min(band_bot_in + 0.05, slide_height_emu / 914400.0 - 0.05) * 914400)
+    min_overlap = int(0.08 * 914400)  # 0.08in
+    for el in elements:
+        box = shape_bounds(el)
+        if box is None:
+            continue
+        x, y, cx, cy = box
+        if cx <= 0 or cy <= 0:
+            continue
+        bottom = y + cy
+        # Legitimate annotation/note content sits entirely inside the band
+        if y >= band_top - int(0.02 * 914400):
+            continue
+        # Page chrome (pager) — tiny shapes near bottom edge
+        if y >= pager_floor:
+            continue
+        overlap = min(bottom, band_bot) - max(y, band_top)
+        if overlap >= min_overlap and bottom > band_top:
+            out.append(issue(
+                "ANNOTATION_BAND_OVERLAP",
+                f"主内容侵入注释带（元素底边 {bottom/914400:.2f}in 越过注释带顶 "
+                f"{band_top_in:.2f}in，重叠 {overlap/914400:.2f}in）——"
+                "图例/系列请收入主图区或压缩系列数，禁止压进 so-what/来源行。",
+                slide=slide_no,
+            ))
+            # One finding per slide is enough to gate
+            break
+    return out
+
+
+def font_size_snap_check(root: ET.Element, slide_no: int) -> list[dict[str, Any]]:
+    """Font sizes must sit on the fontShrink ladder (0.5pt snap grid).
+
+    fitFont already selects from the ladder; this gate catches callers that
+    arithmetic-shift sizes (e.g. fz-1) or hardcode off-ladder values without
+    re-snapping through the ladder / modeSize path.
+    """
+    out: list[dict[str, Any]] = []
+    try:
+        lc_path = Path(__file__).resolve().parent / "layout-constants.json"
+        lc = json.loads(lc_path.read_text(encoding="utf-8"))
+        ladder = ((lc.get("containers") or {}).get("fontShrink") or {}).get("ladder") or []
+        allowed = {round(float(v), 2) for v in ladder}
+    except (OSError, json.JSONDecodeError, TypeError, ValueError):
+        allowed = {15, 14, 13.5, 13, 12.5, 12, 11.5, 11, 10.5, 10, 9.5, 9, 8.5}
+    # Also allow common display sizes used by cover/hero (not on shrink ladder)
+    allowed |= {44, 36, 30, 28, 24, 22, 20, 18, 16, 8.0, 7.5}
+    alien: list[float] = []
+    for run in root.findall(".//a:r", NS):
+        text = "".join(t.text or "" for t in run.findall("a:t", NS))
+        if not text.strip():
+            continue
+        pr = run.find("a:rPr", NS)
+        raw = pr.get("sz") if pr is not None else None
+        if raw is None:
+            continue
+        try:
+            pt = int(raw) / 100.0
+        except (TypeError, ValueError):
+            continue
+        if round(pt, 2) not in allowed and abs(pt * 2 - round(pt * 2)) > 0.01:
+            alien.append(pt)
+        elif round(pt, 2) not in allowed:
+            # On 0.5 grid but not on declared ladder / display set — still flag
+            # when far from any allowed value (>0.26pt)
+            if min(abs(pt - a) for a in allowed) > 0.26:
+                alien.append(pt)
+    if alien:
+        out.append(issue(
+            "FONT_SIZE_NOT_SNAPPED",
+            f"页内出现未对齐字号阶梯的字号 {sorted(set(round(v,2) for v in alien))[:8]}——"
+            "fitFont/modeSize 须回落到 containers.fontShrink.ladder（或封面展示档）。",
+            slide=slide_no,
+        ))
     return out
 
 
@@ -628,7 +780,12 @@ def inspect_slide(
 
     for shape in shapes:
         warnings.extend(text_overflow_check(shape, slide_number))
+        warnings.extend(text_overflow_vertical_check(shape, slide_number))
         warnings.extend(container_overflow_check(shape, slide_number))
+
+    warnings.extend(annotation_band_overlap_check(
+        [*shapes, *pictures, *graphic_frames], slide_number, height))
+    warnings.extend(font_size_snap_check(root, slide_number))
 
     for table in tables:
         warnings.extend(table_checks(table, slide_number))
