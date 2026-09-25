@@ -8,6 +8,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -20,32 +24,15 @@ jobs:
         with:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
+          cache: npm
+          cache-dependency-path: top-ppt-html/package-lock.json
 
       - name: Privacy scan
         run: python3 scripts/ci_privacy_scan.py
 
-      # Same skill gates as CI — tag-only releases must not skip audits.
+      # Same skill gates as CI (incl. lightweight regression fixture + smoke_pptx).
       - name: Skill gates (all discovered skills)
-        run: |
-          set -euo pipefail
-          mapfile -t SKILLS < <(node scripts/discover_skills.js)
-          echo "discovered: ${SKILLS[*]}"
-          for skill in "${SKILLS[@]}"; do
-            echo "=== gates: ${skill} ==="
-            pushd "$skill" >/dev/null
-            if [ -f package-lock.json ]; then
-              npm ci --omit=dev
-            else
-              npm install --omit=dev
-            fi
-            python3 scripts/package_skill.py --check
-            python3 scripts/audit_styles.py
-            python3 scripts/audit_docs.py
-            python3 scripts/audit_skill.py
-            python3 scripts/audit_css.py
-            python3 scripts/negative_tests.py
-            popd >/dev/null
-          done
+        run: bash scripts/ci_skill_gates.sh --with-pptx
 
       - name: Package all skills
         run: |
@@ -77,8 +64,8 @@ jobs:
       # Publish installer package to npm (keeps npm in sync with the tag).
       # Requires repository secret NPM_TOKEN (granular token, write on @topmindspace).
       # Skip quietly when the secret is not configured.
-      # If this version is already on the registry, exit 0 (avoid E409 after Release exists).
-      - name: Publish to npm (with precheck)
+      # Treat already-published / E409 / previously-staged as success so Release stays green.
+      - name: Publish to npm (idempotent)
         run: |
           set -euo pipefail
           if [ -z "${NODE_AUTH_TOKEN:-}" ]; then
@@ -87,13 +74,34 @@ jobs:
           fi
           VERSION="$(node -p "require('./package.json').version")"
           PKG="@topmindspace/tms-skills"
-          echo "Checking whether ${PKG}@${VERSION} is already published..."
+          echo "Checking whether ${PKG}@${VERSION} is already on the registry..."
           if npm view "${PKG}@${VERSION}" version >/dev/null 2>&1; then
             echo "${PKG}@${VERSION} already on npm — skip publish (exit 0)."
             exit 0
           fi
           echo "Publishing ${PKG}@${VERSION} ..."
-          npm publish --access public
+          set +e
+          PUBLISH_LOG="$(mktemp)"
+          npm publish --access public >"$PUBLISH_LOG" 2>&1
+          rc=$?
+          set -e
+          cat "$PUBLISH_LOG"
+          if [ "$rc" -eq 0 ]; then
+            echo "npm publish OK: ${PKG}@${VERSION}"
+            exit 0
+          fi
+          # Race / prior agent publish: treat conflict as success
+          if grep -Eqi 'E409|Cannot publish over previously published|previously staged|EPUBLISHCONFLICT|cannot publish over existing' "$PUBLISH_LOG"; then
+            echo "npm publish conflict (E409 / already staged|published) for ${PKG}@${VERSION} — treating as success."
+            exit 0
+          fi
+          # Double-check registry in case view raced
+          if npm view "${PKG}@${VERSION}" version >/dev/null 2>&1; then
+            echo "${PKG}@${VERSION} now visible on npm after conflict — success."
+            exit 0
+          fi
+          echo "npm publish failed with exit ${rc} (not an already-published conflict)." >&2
+          exit "$rc"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 

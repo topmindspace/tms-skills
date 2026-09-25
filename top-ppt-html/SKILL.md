@@ -4,7 +4,7 @@ description: "Use when 用户要做报告、演示、汇报、PPT、slides、dec
 license: MIT
 compatibility: "Python 3 stdlib for HTML generation; Node >=18 + pptxgenjs for PPTX; optional playwright for browser regression / theme captures."
 metadata:
-  version: "0.1.5"
+  version: "0.1.6"
   author: TopMindspace
 ---
 # TopPPT HTML
@@ -121,7 +121,7 @@ metadata:
 
 ## 版本口径
 
-包 semver（现 0.1.5）≠ 布局 schema 线（layout-constants / model-schema 的 version，现 `0.1`）；patch 不抬 schema。
+包 semver（现 0.1.6）≠ 布局 schema 线（layout-constants / model-schema 的 version，现 `0.1`）；patch 不抬 schema。
 
 ## 环境依赖
 

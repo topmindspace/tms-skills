@@ -1,3 +1,16 @@
+## 0.1.6 — 2026-09-25
+
+### CI / Release 硬化
+- **根因 A**：`validate_pptx` 的 `ANNOTATION_BAND_OVERLAP` 把全幅背景（底边 7.50in）误判为侵入注释带；改为排除 full-bleed 背景 / 全高装饰条 / chrome 区，同时保留对图例/主图压进 so-what 带的真阳性。
+- **根因 A′**：`FONT_SIZE_NOT_SNAPPED` 未收录 `modeTypeScale` 的 **h2=17pt**；改为从 typeScale ∪ 全模式 modeTypeScale ∪ ladder 动态取允许集。
+- **冒烟可读性**：`smoke_pptx.sh` 可靠传播 validate 退出码；失败时 stderr 先打错误码/页码短摘要。
+- **根因 B**：Release `npm publish` 遇已发布/已 staged 的 **E409** 时改为 exit 0（幂等）；GitHub Release + 资产仍成功。
+- **DRY**：`scripts/ci_skill_gates.sh` 为 CI/Release 共用门禁；Release 对齐 CI 的 fixture + `smoke_pptx`；CI concurrency cancel-in-progress；npm cache；python-pptx 仅 PPTX 步骤安装。
+- 文档：新增 `docs/ci.md`；版本对齐 **0.1.6**。
+
+### 红线未动
+反截断、图表多样性地板、Mode A craft、runtime SHA 同版本门禁保持。
+
 ## 0.1.5 — 2026-09-25
 
 ### top-ppt-html · defect close-out
