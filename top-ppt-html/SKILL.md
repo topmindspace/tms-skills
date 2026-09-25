@@ -1,15 +1,15 @@
 ---
 name: top-ppt-html
-description: "Use when 用户要做报告、演示、汇报、PPT、slides、deck、路演，或写研究报告、分析报告、咨询报告、白皮书、调研、评测、对标、经营分析、复盘、项目汇报、商务/HTML/网页报告，或做架构图、拓扑图、流程图、泳道图、方案图，或把材料做成可视化报告并导出 HTML/PPT/PPTX，或优化排版/版式/配色/图文布局，或要快速模式/fast/直接生成/一键出稿/少问一句。TopPPT HTML：零外链可翻页 HTML（亮暗双主题）+ 版式保真可编辑 16:9 PPTX；三模式（A 演示·每屏一主张 / B 研究·咨询密排 / C 架构·图为王）× 9 风格。Do NOT use for 纯代码工程、非报告类网页或应用开发、视频/图片生成、直接改写已有 Word/PPT 源文件本身。"
+description: "Use when 用户要做报告、演示、汇报、PPT、slides、deck、路演，或写研究报告、分析报告、咨询报告、白皮书、调研、评测、对标、经营分析、复盘、项目汇报、商务/HTML/网页报告，或做架构图、拓扑图、流程图、泳道图、方案图，或把材料做成可视化报告并导出 HTML/PPT/PPTX，或优化排版/版式/配色/图文布局，或要快速模式/fast/直接生成/一键出稿/少问一句。TopPPT HTML：优雅大气的正式场合演讲/汇报甲板——零外链可翻页 HTML（亮暗双主题）+ 版式保真可编辑 16:9 PPTX；核心=版式·排版·色彩·内容组织；三模式（A 演示·每屏一主张 / B 研究·咨询密排 / C 架构·图为王）× 9 风格。Do NOT use for 纯代码工程、非报告类网页或应用开发、视频/图片生成、直接改写已有 Word/PPT 源文件本身。"
 license: MIT
 compatibility: "Python 3 stdlib for HTML generation; Node >=18 + pptxgenjs for PPTX; optional playwright for browser regression / theme captures."
 metadata:
-  version: "0.1.3"
+  version: "0.1.4"
   author: TopMindspace
 ---
 # TopPPT HTML
 
-**让 idea 飞，好想法被看见。** 一套技能、三种模式、两种交付：**单文件 HTML 报告**（可翻页、可演示、header 自带工具栏）+ **版式保真的原生可编辑 PPTX**（智能体精导唯一交付通道）。两者同源于一个内容模型 `REPORT_MODEL`。设计对齐 Material Design 3，执行克制（Google/Apple 风）；研究模式对齐咨询机构（McKinsey/BCG）的密度与论证结构，但**克制优先**——不加多余的页头标签、页脚信息与装饰。
+**让 idea 飞，好想法被看见。** 面向**演讲与正式场合**的优雅、大气甲板——非 gadget 堆砌、非咨询 dump 默认。三种模式、两种交付：**单文件 HTML**（可翻页演示）+ **版式保真可编辑 PPTX**（**B 通道** `build_pptx.js` 为唯一交付；**A 通道**仅预览/`cross_verify`）。同源 `REPORT_MODEL`。设计对齐 MD3，执行克制；研究模式可对齐咨询密度，但**克制优先**——少装饰、一屏一重心。
 
 ## Gate 0 · 先给参考图（**标准模式**硬门禁）
 
@@ -34,9 +34,9 @@ metadata:
 | style | B→mckinsey · A→business-blue · C→graphite-dark | |
 | theme | light（graphite→dark） | |
 | 篇幅 | A=10 / B=12 / C=6 | |
-| format | html only（用户要 PPT→html+pptx） | |
+| format | **html only**（默认；**仅当用户要 PPT / 交付含 PPTX 才开** B 通道） | |
 
-流程：一行宣布「Fast 选用：…」→ **最小大纲**（`outline-design.md`「轻量最小集」）→ playbook §二轻量链（骨架→模型单写→回填→strict→`quality_gate --deliver`；可选 pptx）。路径轻量；末可附 `assets/style-gallery.html`。开场声明「已跳过参考图」。**标准模式**仍强制 Gate 0 + 六项。
+流程：一行宣布「Fast 选用：…」→ **最小大纲**（`outline-design.md`「轻量最小集」）→ playbook §二轻量链（骨架→模型单写→回填→strict→`quality_gate --deliver`；**PPTX 显式 opt-in**）。路径轻量；末可附 `assets/style-gallery.html`。开场声明「已跳过参考图」。**标准模式**仍强制 Gate 0 + 六项。
 
 ## 唯一入口流程
 
@@ -56,7 +56,7 @@ metadata:
 2. **篇幅**——A 8–15 页（图文 V1–V4，简单图禁全幅）/ B 12–25 页 / C 1–3 张图共 6–8 页；有材料按材料量推荐。
 3. **风格（始终选择）**——默认商务蓝；B 推荐麦肯锡/墨绿/暖沙金；C 推荐石墨深灰/商务蓝/彩色；拿不准给 Gate 0 参考图。
 4. **亮暗主题（始终确认）**——浅色默认（打印/外发）/ 深色（沉浸/发布会/大屏）；石墨深灰出厂深色；双主题经 `REPORT_MODEL.theme` 贯穿 HTML 与导出。
-5. **交付格式**——仅 HTML（默认）/ HTML+PPTX（正式汇报、需协作修改时推荐）。
+5. **交付格式**——仅 HTML（默认）/ HTML+PPTX（用户要可编辑甲板时；PPTX 走 **B 通道**）。
 6. **参考图确认**——复述 Gate 0 路径，确认用户已看到。
 
 **载体**：优先结构化选项卡一次收集，否则对话文本一次列全。此后形式层面不再反复确认（内容层面按需一次大纲确认，见下）。
@@ -84,7 +84,7 @@ metadata:
 
 > 披露分层（机器可读）：`L0=SKILL.md` · `L1=references/playbook.md` · `L2=按需`
 >
-> **纪律**：L0+L1 是默认全部所需；**只在命中"何时读"时才打开 L2，读完即执行、不预读下一份**。需要代码时**一律先走节级取码** `extract_snippet.py`（`--list` 查全量路由；`--task 任务名 / --chart 图表类型 / --page-type 页型 / --file 文件 --section 节号`），逻辑名 `components.md` / `charts.md` 自动路由到物理拆分文件。
+> **纪律**：L0+L1 是默认全部所需；**只在命中"何时读"时才打开 L2，读完即执行、不预读下一份**。需要代码时**一律** `extract_snippet.py`（`--list` / `--task` / `--chart` / `--page-type` / `--file --section`）。**整读大 L2 文件 = FAIL / 不合格**（禁令清单见下与 playbook §十）。
 
 **L2 一览**（命中条件与逐任务只读清单的**详表以 playbook §十为准**，此处仅索引）：
 
@@ -94,7 +94,7 @@ metadata:
 - 配色/主题/字阶 → `styles.md` + `design-system.md` · 写作 → `content-rules.md` · 图标语义 → `icons.md`
 - PPTX 精导 → `references/pptx-export.md` · 深度高保真 → `references/high-fidelity.md` · 修复顺序 → `references/failure-modes.md` · 技能维护 → `references/tech-design.md`
 
-**操作方式**：定模式/页型/组合/图 → 只读 `playbook.md`；取代码 → **必须** `extract_snippet.py`。**禁止整读**：`layouts-combo` / `components-atoms` / `charts-basic` / `charts-extended` / `content-rules` 全文 / `pptx-export` / 模式模板 HTML（走 scaffold）。详表 playbook §十。同阶段不重读。
+**操作方式**：定模式/页型/组合/图 → 只读 `playbook.md`；取代码 → **必须** `extract_snippet.py`。**整读下列文件 = FAIL**：`layouts-combo` / `components-atoms` / `charts-basic` / `charts-extended` / `content-rules` 全文 / `pptx-export` / 模式模板 HTML（走 scaffold）。详表 playbook §十。同阶段不重读。
 
 ## 铁律（12 条 · 交付硬门禁）
 
@@ -116,9 +116,9 @@ metadata:
 ## 交付物与验收
 
 - **HTML**：单文件零外链、可翻页可演示、每页一屏高；header 工具栏（T 亮暗 / 9 风格即切 / P 预览 / H 指引 / F 全屏 / B 折叠）。
-- **PPTX**：16:9 全原生形状/文本框/表格（`pictures=0` 可编辑）；带数据图表为原生数据图表，非原生附数据表；lead/soWhat/口径/来源写入演讲者备注；按 `REPORT_MODEL.theme` 导出亮/暗版。
-- **验收**：HTML strict 0 FAIL / 0 WARN；带 PPTX 加验 PPTX 严格模式 0/0；未通过时末尾给**定向修复指引**。
-- **交付说明**：`quality_gate.py` 加 `--deliver`（含 PPTX 时带 `--pptx/--model`）自动生成七要素（路径/字节数/模式/风格/篇幅/格式/校验+引用），缺一即 gate FAIL——不要手拼。
+- **PPTX（B 通道交付）**：`extract_model` → `build_pptx.js` → `validate_pptx --strict`；16:9 全原生可编辑。**A 通道不交付**（仅预览 / `cross_verify`；细则 playbook §九）。
+- **验收**：HTML strict 0/0；含 PPTX 再加 PPTX 0/0；失败给**定向修复指引**。
+- **交付说明**：`quality_gate.py --deliver`（含 PPTX 带 `--pptx/--model`；子门禁并行）出七要素，缺一 FAIL——勿手拼。
 
 ## 环境依赖
 

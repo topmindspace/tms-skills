@@ -53,7 +53,7 @@
 ```
 scaffold_report → 只填 REPORT_MODEL → render_from_model --inplace
 → validate_report --strict   # presentation 自动 --layout-qa
-→ quality_gate --deliver →（可选）pptx
+→ quality_gate --deliver →（用户要 PPTX 时）B 通道 build_pptx → validate_pptx
 ```
 
 ## 长文与密度（Mode A）

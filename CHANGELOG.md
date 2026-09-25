@@ -1,3 +1,27 @@
+## 0.1.4 — 2026-09-25
+
+### top-ppt-html · craft + quality + docs + perf close-out
+
+- **P0 效率 / agent 工作流**（usage-feedback）：
+  - 默认交付 **仅 B 通道 PPTX**（`build_pptx.js`）；A 通道（`pptx-export.js` / `gen_channel_a.js`）限预览与 `cross_verify` / 回归。
+  - `extract_snippet` 强制 + **整读大 L2 = FAIL / 不合格**（SKILL + playbook）；`audit_skill` 新增对应门禁。
+  - `quality_gate` 对互不依赖子进程（HTML strict / PPTX strict / evals）**并行**执行。
+  - Fast / 轻量路径强化 **HTML-first**；PPTX 显式 opt-in（用户要 PPT 或交付含 PPTX）。
+  - **未削弱**红线：反截断、图表多样性（`minTypes.presentation=4` / registry）、Mode A 大气正式工艺、Gate 0 语义。
+- **质量 / 规范**：对齐 SKILL frontmatter、双 `package.json`、README 钉版本、PUBLISHING、安装说明；跑通 check / audit / feedback gates。
+- **docs 工艺改写**：定位强调优雅·美观·大气·演讲/正式场合；版式/排版/色彩/内容组织 + 质检与高保真导出；L0 仍瘦、L2 按需。
+- **此前 #7（validator / engine）**：`shape_bounds` 读 `p:xfrm`、`TEXT_OVERFLOW_VERTICAL`、`ANNOTATION_BAND_OVERLAP`、`FONT_SIZE_NOT_SNAPPED`、多系列 vbar、streamgraph 图例内收、image caption `capYImg`——随本版一并发布。
+
+### Installer
+
+- `@topmindspace/tms-skills` → **0.1.4**（整仓同 tag）。
+
+### Intentional leftovers
+
+- 不引入 Claude-only `when_to_use` / 跨端风险 `allowed-tools`（同 0.1.3）。
+- `skills-ref validate` 仍为可选，非发布硬依赖。
+- layout-constants / model-schema 事实源版本线仍为 `0.1`（patch 记在 package / metadata）。
+
 ## 0.1.3 — 2026-09-24
 
 ### top-ppt-html · QA close-out + docs
