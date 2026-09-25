@@ -102,6 +102,95 @@ def test_annotation_band_overlap() -> None:
     )
 
 
+def test_annotation_band_ignores_full_bleed_bg() -> None:
+    """Full-slide background must not false-positive as band crush."""
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        f'<p:sp xmlns:a="{NS["a"]}" xmlns:p="{NS["p"]}">'
+        "<p:spPr><a:xfrm>"
+        f'<a:off x="0" y="0"/>'
+        f'<a:ext cx="{int(13.333 * EMU)}" cy="{int(7.5 * EMU)}"/>'
+        "</a:xfrm></p:spPr></p:sp>"
+    )
+    el = ET.fromstring(xml)
+    issues = V.annotation_band_overlap_check(
+        [el], 1, int(7.5 * EMU), int(13.333 * EMU),
+    )
+    codes = [i["code"] for i in issues]
+    ok(
+        "3b full-bleed background does not fire ANNOTATION_BAND_OVERLAP",
+        "ANNOTATION_BAND_OVERLAP" not in codes,
+        f"codes={codes}",
+    )
+
+
+def test_annotation_band_allows_content_without_note() -> None:
+    """Without so-what/source, content may use up to contentBottom (~6.9)."""
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        f'<p:sp xmlns:a="{NS["a"]}" xmlns:p="{NS["p"]}">'
+        "<p:spPr><a:xfrm>"
+        f'<a:off x="{int(0.6 * EMU)}" y="{int(5.5 * EMU)}"/>'
+        f'<a:ext cx="{int(4 * EMU)}" cy="{int(1.0 * EMU)}"/>'
+        "</a:xfrm></p:spPr>"
+        "<p:txBody><a:p><a:r><a:t>AgendaCard</a:t></a:r></a:p></p:txBody>"
+        "</p:sp>"
+    )
+    el = ET.fromstring(xml)
+    issues = V.annotation_band_overlap_check([el], 1, int(7.5 * EMU))
+    codes = [i["code"] for i in issues]
+    ok(
+        "3c content to 6.50 without annotation does not fire",
+        "ANNOTATION_BAND_OVERLAP" not in codes,
+        f"codes={codes}",
+    )
+
+
+def test_annotation_band_fires_when_note_present() -> None:
+    """With so-what bar present, body overlapping the withNote band must fire."""
+    def sp(y, h, w, text):
+        return ET.fromstring(
+            '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+            f'<p:sp xmlns:a="{NS["a"]}" xmlns:p="{NS["p"]}">'
+            "<p:spPr><a:xfrm>"
+            f'<a:off x="{int(0.6 * EMU)}" y="{int(y * EMU)}"/>'
+            f'<a:ext cx="{int(w * EMU)}" cy="{int(h * EMU)}"/>'
+            "</a:xfrm></p:spPr>"
+            f"<p:txBody><a:p><a:r><a:t>{text}</a:t></a:r></a:p></p:txBody>"
+            "</p:sp>"
+        )
+    els = [
+        sp(5.5, 1.0, 4.0, "LegendSeries"),
+        sp(6.05, 0.55, 12.0, "结论 平台化是唯一路径"),
+    ]
+    issues = V.annotation_band_overlap_check(els, 1, int(7.5 * EMU), int(13.333 * EMU))
+    codes = [i["code"] for i in issues]
+    ok(
+        "3d body crush with so-what present fires ANNOTATION_BAND_OVERLAP",
+        "ANNOTATION_BAND_OVERLAP" in codes,
+        f"codes={codes}",
+    )
+
+
+def test_font_size_h2_17_allowed() -> None:
+    """modeTypeScale h2=17 must be on the allowed set (cover/display whitelist)."""
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        f'<p:sld xmlns:a="{NS["a"]}" xmlns:p="{NS["p"]}">'
+        "<p:cSld><p:spTree><p:sp><p:txBody>"
+        '<a:p><a:r><a:rPr sz="1700"/><a:t>AgendaSectionTitle</a:t></a:r></a:p>'
+        "</p:txBody></p:sp></p:spTree></p:cSld></p:sld>"
+    )
+    root = ET.fromstring(xml)
+    issues = V.font_size_snap_check(root, 1)
+    codes = [i["code"] for i in issues]
+    ok(
+        "4b FONT_SIZE_NOT_SNAPPED allows intentional 17pt h2",
+        "FONT_SIZE_NOT_SNAPPED" not in codes,
+        f"codes={codes}",
+    )
+
+
 def test_font_size_not_snapped() -> None:
     xml = (
         '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
@@ -170,6 +259,10 @@ def main() -> int:
     test_shape_bounds_still_reads_a_xfrm()
     test_text_overflow_vertical()
     test_annotation_band_overlap()
+    test_annotation_band_ignores_full_bleed_bg()
+    test_annotation_band_allows_content_without_note()
+    test_annotation_band_fires_when_note_present()
+    test_font_size_h2_17_allowed()
     test_font_size_not_snapped()
     test_engine_static()
     print(f"\n{len(fails)} failed" if fails else "\nAll feedback gates PASS")

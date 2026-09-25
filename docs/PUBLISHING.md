@@ -12,7 +12,7 @@
 - 包：<https://www.npmjs.com/package/@topmindspace/tms-skills>
 - 仓库：<https://github.com/topmindspace/tms-skills>
 
-当前线：安装器 **0.1.5** · 技能 top-ppt-html **0.1.5**（整仓同 tag 发版；见 CHANGELOG）。
+当前线：安装器 **0.1.6** · 技能 top-ppt-html **0.1.6**（整仓同 tag 发版；见 CHANGELOG）。
 
 
 ## npm 2.x 弃用说明（仓库重置）
@@ -53,6 +53,8 @@ npm 上的 `@topmindspace/tms-skills` **2.0.0–2.1.1 已弃用**（仓库重置
 | `git tag vX.Y.Z && git push --tags` | Release + zip | **自动 publish** |
 
 **Release 保留策略：最多 2 个最近版本**（CI 只通过 API 删除更旧 **Release**；**git tags 保留**，便于历史追溯与 npm 对照）。npm 历史版本可钉。
+
+CI/Release 细节见 [`docs/ci.md`](./ci.md)。
 
 ## 发布流程
 

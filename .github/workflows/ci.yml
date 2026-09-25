@@ -5,6 +5,10 @@ on:
     branches: [main, master]
   pull_request:
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   privacy:
     name: Privacy & deprecation scan
@@ -57,43 +61,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Discover skills
-        id: discover
-        run: |
-          mapfile -t SKILLS < <(node scripts/discover_skills.js)
-          echo "skills=${SKILLS[*]}" >> "$GITHUB_OUTPUT"
-          printf '%s\n' "${SKILLS[@]}" > /tmp/skills.txt
-          cat /tmp/skills.txt
-      - name: Install + package check + audits + negative
-        run: |
-          set -euo pipefail
-          while IFS= read -r skill; do
-            [ -z "$skill" ] && continue
-            echo "=== ${skill} ==="
-            pushd "$skill" >/dev/null
-            if [ -f package-lock.json ]; then
-              npm ci --omit=dev
-            else
-              npm install --omit=dev
-            fi
-            python3 scripts/package_skill.py --check
-            python3 scripts/audit_styles.py
-            python3 scripts/audit_docs.py
-            python3 scripts/audit_skill.py
-            python3 scripts/audit_css.py
-            # Lightweight PPTX fixture for N4/N5/N7 (not full regression suite)
-            pip install --quiet 'python-pptx>=0.6.21'
-            mkdir -p dist/regression
-            STEM=2026-09-09-research-mckinsey
-            if [ -f "assets/examples/${STEM}.model.json" ]; then
-              export NODE_PATH="${PWD}/node_modules${NODE_PATH:+:$NODE_PATH}"
-              node scripts/build_pptx.js "dist/regression/${STEM}.pptx" --model="assets/examples/${STEM}.model.json"
-            fi
-            python3 scripts/negative_tests.py
-            # Batch 2: one-example PPTX smoke (extract → build → validate --strict)
-            if [ -f scripts/smoke_pptx.sh ]; then
-              bash scripts/smoke_pptx.sh
-            fi
-            # Full regression.py is heavy (playwright measure_height); run locally before release.
-            popd >/dev/null
-          done < /tmp/skills.txt
+          cache: npm
+          cache-dependency-path: top-ppt-html/package-lock.json
+      - name: Skill gates (audits + negatives + PPTX smoke)
+        run: bash scripts/ci_skill_gates.sh --with-pptx

@@ -354,27 +354,111 @@ def annotation_band_overlap_check(
     elements: list[ET.Element],
     slide_no: int,
     slide_height_emu: int,
+    slide_width_emu: int | None = None,
 ) -> list[dict[str, Any]]:
     """Detect primary content crushing into the annotation band.
 
-    Annotation band ≈ [contentBottomWithNote, contentBottom] (default 6.4–6.9in).
-    Shapes that start in the body and extend into the band (e.g. streamgraph
-    legends stacked below the plot) fire ANNOTATION_BAND_OVERLAP.
+    Geometry (layout-constants pageTypes.layout / exhibit / note):
+      soWhatY ≈ 6.05 · contentBottomWithNote ≈ 6.4 · footnote/note ≈ 6.55 ·
+      contentBottom ≈ 6.9 · pager ≈ 7.0
+
+    Semantics:
+      - Full-bleed backgrounds, full-height accent strips, and pager/footer
+        chrome are never "content crushing the band".
+      - so-what / 口径 / 来源 bars that live in the annotation zone are the
+        band itself — not invaders.
+      - When the slide actually uses an annotation (so-what/source), body
+        content that starts above the band and overlaps
+        [contentBottomWithNote, contentBottom] fires ANNOTATION_BAND_OVERLAP
+        (streamgraph legend / plot crush cases).
+      - When no annotation is present, main content may use up to
+        contentBottom; only a severe invasion (≥0.35in into the nominal
+        withNote band) still fires as a safety net.
     """
     out: list[dict[str, Any]] = []
     try:
         lc_path = Path(__file__).resolve().parent / "layout-constants.json"
         lc = json.loads(lc_path.read_text(encoding="utf-8"))
         lay = ((lc.get("pageTypes") or {}).get("layout") or {})
+        exhibit = ((lc.get("pageTypes") or {}).get("exhibit") or {})
+        note = ((lc.get("pageTypes") or {}).get("note") or {})
         band_top_in = float(lay.get("contentBottomWithNote") or 6.4)
         band_bot_in = float(lay.get("contentBottom") or 6.9)
+        so_what_y_in = float(exhibit.get("soWhatY") or 6.05)
+        note_y_in = float(note.get("y") or exhibit.get("footnoteY") or 6.55)
     except (OSError, json.JSONDecodeError, TypeError, ValueError):
-        band_top_in, band_bot_in = 6.4, 6.9
+        band_top_in, band_bot_in, so_what_y_in, note_y_in = 6.4, 6.9, 6.05, 6.55
+
     band_top = int(band_top_in * 914400)
     band_bot = int(band_bot_in * 914400)
-    # Ignore footer/page-number chrome near the very bottom
-    pager_floor = int(min(band_bot_in + 0.05, slide_height_emu / 914400.0 - 0.05) * 914400)
-    min_overlap = int(0.08 * 914400)  # 0.08in
+    so_what_y = int(so_what_y_in * 914400)
+    note_y = int(note_y_in * 914400)
+    slide_w = int(slide_width_emu) if slide_width_emu else int(13.333333 * 914400)
+    slide_h = int(slide_height_emu)
+    slide_area = max(slide_w * slide_h, 1)
+    pager_floor = int(min(band_bot_in + 0.05, slide_h / 914400.0 - 0.05) * 914400)
+    min_overlap = int(0.10 * 914400)       # 0.10in — ignore sub-tenth rounding kiss
+    severe_overlap = int(0.35 * 914400)    # safety net when no annotation detected
+    full_bleed_area = 0.85
+    full_height_frac = 0.90
+    ann_pat = re.compile(
+        r"(结论|SO\s*WHAT|口径|来源|数据来源|Source\b|Note\b|footnote)",
+        re.IGNORECASE,
+    )
+
+    def _text(el: ET.Element) -> str:
+        return (text_content(el) or "").strip()
+
+    def _is_chrome_or_bg(y: int, cy: int, cx: int) -> bool:
+        if (cx * cy) / slide_area >= full_bleed_area and y <= int(0.05 * 914400):
+            return True
+        if cy >= int(full_height_frac * slide_h) and y <= int(0.05 * 914400):
+            return True
+        if y >= band_bot - int(0.02 * 914400):
+            return True
+        if y >= pager_floor:
+            return True
+        return False
+
+    def _is_annotation_self(y: int, cy: int, cx: int, text: str) -> bool:
+        """so-what / footnote / source row living in the annotation zone."""
+        if y >= so_what_y - int(0.08 * 914400) and (y + cy) <= band_bot + int(0.2 * 914400):
+            if ann_pat.search(text):
+                return True
+            # Wide short bar in so-what band (bar fill behind 结论 text)
+            if cy <= int(0.75 * 914400) and cx >= int(0.45 * slide_w):
+                return True
+        if y >= note_y - int(0.05 * 914400) and cy <= int(0.55 * 914400):
+            return True
+        # Entirely inside the nominal withNote band
+        if y >= band_top - int(0.02 * 914400):
+            return True
+        return False
+
+    # Pass 1: does this slide reserve an annotation?
+    has_annotation = False
+    for el in elements:
+        box = shape_bounds(el)
+        if box is None:
+            continue
+        _x, y, cx, cy = box
+        if cx <= 0 or cy <= 0:
+            continue
+        if _is_chrome_or_bg(y, cy, cx):
+            continue
+        if _is_annotation_self(y, cy, cx, _text(el)):
+            # Only count as "has annotation" when it looks like so-what/source,
+            # not merely any shape whose top is inside the band.
+            txt = _text(el)
+            if (
+                ann_pat.search(txt)
+                or (y >= so_what_y - int(0.08 * 914400) and cy <= int(0.75 * 914400) and cx >= int(0.45 * slide_w))
+                or (y >= note_y - int(0.05 * 914400) and cy <= int(0.55 * 914400) and txt)
+            ):
+                has_annotation = True
+                break
+
+    # Pass 2: body invaders
     for el in elements:
         box = shape_bounds(el)
         if box is None:
@@ -383,14 +467,15 @@ def annotation_band_overlap_check(
         if cx <= 0 or cy <= 0:
             continue
         bottom = y + cy
-        # Legitimate annotation/note content sits entirely inside the band
-        if y >= band_top - int(0.02 * 914400):
+        if _is_chrome_or_bg(y, cy, cx):
             continue
-        # Page chrome (pager) — tiny shapes near bottom edge
-        if y >= pager_floor:
+        if _is_annotation_self(y, cy, cx, _text(el)):
             continue
         overlap = min(bottom, band_bot) - max(y, band_top)
-        if overlap >= min_overlap and bottom > band_top:
+        if overlap < min_overlap or bottom <= band_top:
+            continue
+        # Enforce when annotation present, or when invasion is severe anyway
+        if has_annotation or overlap >= severe_overlap:
             out.append(issue(
                 "ANNOTATION_BAND_OVERLAP",
                 f"主内容侵入注释带（元素底边 {bottom/914400:.2f}in 越过注释带顶 "
@@ -398,17 +483,21 @@ def annotation_band_overlap_check(
                 "图例/系列请收入主图区或压缩系列数，禁止压进 so-what/来源行。",
                 slide=slide_no,
             ))
-            # One finding per slide is enough to gate
             break
     return out
 
 
+
 def font_size_snap_check(root: ET.Element, slide_no: int) -> list[dict[str, Any]]:
-    """Font sizes must sit on the fontShrink ladder (0.5pt snap grid).
+    """Font sizes must sit on the declared type scale / fontShrink ladder.
 
     fitFont already selects from the ladder; this gate catches callers that
     arithmetic-shift sizes (e.g. fz-1) or hardcode off-ladder values without
     re-snapping through the ladder / modeSize path.
+
+    Allowed set = containers.fontShrink.ladder ∪ typeScale ∪ all modeTypeScale
+    roles ∪ a small cover/hero display whitelist. Intentional h2 (17pt) and
+    other mode roles must pass; off-ladder 11.3pt etc. must still fail.
     """
     out: list[dict[str, Any]] = []
     try:
@@ -416,10 +505,25 @@ def font_size_snap_check(root: ET.Element, slide_no: int) -> list[dict[str, Any]
         lc = json.loads(lc_path.read_text(encoding="utf-8"))
         ladder = ((lc.get("containers") or {}).get("fontShrink") or {}).get("ladder") or []
         allowed = {round(float(v), 2) for v in ladder}
+        scale_sources: list[Any] = [lc.get("typeScale") or {}]
+        mts = lc.get("modeTypeScale") or {}
+        if isinstance(mts, dict):
+            scale_sources.extend(v for v in mts.values() if isinstance(v, dict))
+        for src in scale_sources:
+            if not isinstance(src, dict):
+                continue
+            for key, val in src.items():
+                if str(key).startswith("$"):
+                    continue
+                try:
+                    allowed.add(round(float(val), 2))
+                except (TypeError, ValueError):
+                    continue
     except (OSError, json.JSONDecodeError, TypeError, ValueError):
         allowed = {15, 14, 13.5, 13, 12.5, 12, 11.5, 11, 10.5, 10, 9.5, 9, 8.5}
-    # Also allow common display sizes used by cover/hero (not on shrink ladder)
-    allowed |= {44, 36, 30, 28, 24, 22, 20, 18, 16, 8.0, 7.5}
+        allowed |= {44, 36, 30, 22, 19, 18, 17, 14, 13, 11, 10, 8.5}
+    # Cover/hero intermediate display sizes (not every mode lists every step)
+    allowed |= {28, 24, 22, 20, 16, 8.0, 7.5}
     alien: list[float] = []
     for run in root.findall(".//a:r", NS):
         text = "".join(t.text or "" for t in run.findall("a:t", NS))
@@ -784,7 +888,7 @@ def inspect_slide(
         warnings.extend(container_overflow_check(shape, slide_number))
 
     warnings.extend(annotation_band_overlap_check(
-        [*shapes, *pictures, *graphic_frames], slide_number, height))
+        [*shapes, *pictures, *graphic_frames], slide_number, height, width))
     warnings.extend(font_size_snap_check(root, slide_number))
 
     for table in tables:
