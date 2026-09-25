@@ -81,14 +81,19 @@ jobs:
             python3 scripts/audit_docs.py
             python3 scripts/audit_skill.py
             python3 scripts/audit_css.py
+            # Lightweight PPTX fixture for N4/N5/N7 (not full regression suite)
+            pip install --quiet 'python-pptx>=0.6.21'
+            mkdir -p dist/regression
+            STEM=2026-09-09-research-mckinsey
+            if [ -f "assets/examples/${STEM}.model.json" ]; then
+              export NODE_PATH="${PWD}/node_modules${NODE_PATH:+:$NODE_PATH}"
+              node scripts/build_pptx.js "dist/regression/${STEM}.pptx" --model="assets/examples/${STEM}.model.json"
+            fi
             python3 scripts/negative_tests.py
             # Batch 2: one-example PPTX smoke (extract → build → validate --strict)
             if [ -f scripts/smoke_pptx.sh ]; then
               bash scripts/smoke_pptx.sh
             fi
-            # regression.py needs pptxgenjs (installed) but may need playwright
-            # for measure_height; that step self-SKIPs. Full regression is heavy
-            # and optional here — keep CI green; run locally before release.
-            # python3 scripts/regression.py
+            # Full regression.py is heavy (playwright measure_height); run locally before release.
             popd >/dev/null
           done < /tmp/skills.txt

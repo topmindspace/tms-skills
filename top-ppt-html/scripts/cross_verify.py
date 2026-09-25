@@ -45,7 +45,7 @@ SIGNLESS_CHARTS = {'waterfall', 'gauge', 'funnel', 'bullet'}
 # 文本（值+unit，如 "9pt"），B 通道进 chart part；比对前两端过滤。类别标签（如 "2026Q3"）
 # 不匹配此模式，仍参与一致性检查。
 NUMERIC_TOKEN = re.compile(
-    r'^[+-]?[\d.,]+\s*(?:%|‰|pt|pct|pp|TB|GB|MB|KB|k|w|万|亿|元|倍|个|人|天|家|次|项|年'
+    r'^[+-]?[\d.,]+\s*(?:%|‰|pt|pct|pp|YB|ZB|EB|PB|TB|GB|MB|KB|kWh|Gbps|k|w|万|亿|元|倍|个|人|天|家|次|项|年'
     r'|条|笔|台|套|份|款|张|篇|页|件|例|场|轮|艘|辆|吨|米|秒|分|时|档|级)?$')
 
 

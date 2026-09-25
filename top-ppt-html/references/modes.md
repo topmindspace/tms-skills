@@ -74,7 +74,7 @@
 
 ## 模式 A · 演示汇报 `presentation`（assets/templates/presentation.html）
 
-正式场合演讲甲板：优雅、大气、一屏一主张；3 秒抓住结论。工艺 → `presentation-craft.md`；默认面 → `default-surface.md`。**非**咨询密排 dump（那是 Mode B）。
+正式场合演讲演示文稿：优雅、大气、一屏一主张；3 秒抓住结论。工艺 → `presentation-craft.md`；默认面 → `default-surface.md`。**非**咨询密排 dump（那是 Mode B）。
 
 要点回顾：
 

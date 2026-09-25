@@ -59,6 +59,7 @@ UI = TPL_DIR / 'ui.js'
 TEMPLATES = [TPL_DIR / 'presentation.html',
              TPL_DIR / 'research.html',
              TPL_DIR / 'architecture.html']
+EXAMPLES = sorted((ROOT / 'assets' / 'examples').glob('*.html')) if (ROOT / 'assets' / 'examples').is_dir() else []
 BJ = ROOT / 'scripts' / 'build_pptx.js'
 EM = ROOT / 'scripts' / 'extract_model.py'
 
@@ -336,14 +337,19 @@ def main() -> int:
     ui_repl = ('/* __TOPPPT_UI_START__ */\n'
                '/* ══ TopPPT HTML 公共 UI 脚本（assets/templates/ui.js 的内联副本 · 由 scripts/sync_runtime.py 注入，禁止手改） ══ */\n'
                + ui_js + '\n/* __TOPPPT_UI_END__ */')
+    # 运行时同版本戳：对注入源 assets/pptx-export.js（rstrip 后）取 sha256[:16]，
+    # 写入模板内联块，供 validate_report 比对防「模板未 sync」漂移。
+    runtime_sha = hashlib.sha256(runtime.encode('utf-8')).hexdigest()[:16]
     runtime_repl = ('/* __TOPPPT_RUNTIME_START__ */\n'
                     '/* ══ PPTX 导出运行时（assets/pptx-export.js 的内联副本 · 由 scripts/sync_runtime.py 注入，禁止手改） ══ */\n'
+                    f'/* __TOPPPT_RUNTIME_SHA__:{runtime_sha} */\n'
                     + runtime + '\n/* __TOPPPT_RUNTIME_END__ */')
 
-    # ③ 注入三份模式模板
-    for tpl in TEMPLATES:
+    # ③ 注入三份模式模板 + 黄金样张（样张也内联运行时，须同戳）
+    inject_targets = list(TEMPLATES) + list(EXAMPLES)
+    for tpl in inject_targets:
         if not tpl.exists():
-            print(f'警告: 模板不存在 {tpl}')
+            print(f'警告: 模板/样张不存在 {tpl}')
             ok = False
             continue
         ok = inject(tpl, ENGINE_PAT, engine_repl, '__TOPPPT_ENGINE__') and ok
@@ -649,7 +655,7 @@ process.exit(bad ? 1 : 0);
     print(f'  model-schema.json      sha256[:16] = {ms_digest}  · 页型 {n_schema_pt} 种')
     print(f'  风格 token {n_styles} 套 · 三模式独立比例尺 {len([k for k in lc["modeTypeScale"] if not k.startswith("$")])} 套 · 页型几何 {n_pt} 组')
     print(f'  图表登记 {n_charts} 种（原生 {n_native} / 形状 {n_shape}） · 语义字阶 {n_typo} 级 · 12 列网格 {lc["grid"]["columns"]} 列 · 布局 IR {n_slots} 页型')
-    print('  已刷新: assets/pptx-export.js（常量块 + schema 块） · assets/style-gallery.html（常量块） · templates/{presentation,research,architecture}.html（引擎/UI/运行时内联副本）')
+    print('  已刷新: assets/pptx-export.js（常量块 + schema 块） · assets/style-gallery.html（常量块） · templates/{presentation,research,architecture}.html + assets/examples/*.html（引擎/UI/运行时内联副本，含 __TOPPPT_RUNTIME_SHA__）')
     print(f'  双端单源引用校验: {"PASS" if ok else "WARN（build_pptx 应 require layout-constants.json；extract_model 应读 model-schema.json；页型四件套与图表登记须完整）"}')
     print(f'  说明: 页型几何 {n_pt} 组（多页型共享几何组） · schema 页型 {n_schema_pt} 种')
     return 0
