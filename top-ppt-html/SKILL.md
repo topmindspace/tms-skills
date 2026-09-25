@@ -1,15 +1,15 @@
 ---
 name: top-ppt-html
-description: "Use when 用户要做报告、演示、汇报、PPT、slides、deck、路演，或写研究报告、分析报告、咨询报告、白皮书、调研、评测、对标、经营分析、复盘、项目汇报、商务/HTML/网页报告，或做架构图、拓扑图、流程图、泳道图、方案图，或把材料做成可视化报告并导出 HTML/PPT/PPTX，或优化排版/版式/配色/图文布局，或要快速模式/fast/直接生成/一键出稿/少问一句。TopPPT HTML：优雅大气的正式场合演讲/汇报甲板——零外链可翻页 HTML（亮暗双主题）+ 版式保真可编辑 16:9 PPTX；核心=版式·排版·色彩·内容组织；三模式（A 演示·每屏一主张 / B 研究·咨询密排 / C 架构·图为王）× 9 风格。Do NOT use for 纯代码工程、非报告类网页或应用开发、视频/图片生成、直接改写已有 Word/PPT 源文件本身。"
+description: "Use when 用户要做报告、演示、汇报、PPT、slides、deck、路演，或写研究报告、分析报告、咨询报告、白皮书、调研、评测、对标、经营分析、复盘、项目汇报、商务/HTML/网页报告，或做架构图、拓扑图、流程图、泳道图、方案图，或把材料做成可视化报告并导出 HTML/PPT/PPTX，或优化排版/版式/配色/图文布局，或要快速模式/fast/直接生成/一键出稿/少问一句。TopPPT HTML：优雅大气的正式场合演讲/汇报演示文稿——零外链可翻页 HTML（亮暗双主题）+ 版式保真可编辑 16:9 PPTX；核心=版式·排版·色彩·内容组织；三模式（A 演示·每屏一主张 / B 研究·咨询密排 / C 架构·图为王）× 9 风格。Do NOT use for 纯代码工程、非报告类网页或应用开发、视频/图片生成、直接改写已有 Word/PPT 源文件本身。"
 license: MIT
 compatibility: "Python 3 stdlib for HTML generation; Node >=18 + pptxgenjs for PPTX; optional playwright for browser regression / theme captures."
 metadata:
-  version: "0.1.4"
+  version: "0.1.5"
   author: TopMindspace
 ---
 # TopPPT HTML
 
-**让 idea 飞，好想法被看见。** 面向**演讲与正式场合**的优雅、大气甲板——非 gadget 堆砌、非咨询 dump 默认。三种模式、两种交付：**单文件 HTML**（可翻页演示）+ **版式保真可编辑 PPTX**（**B 通道** `build_pptx.js` 为唯一交付；**A 通道**仅预览/`cross_verify`）。同源 `REPORT_MODEL`。设计对齐 MD3，执行克制；研究模式可对齐咨询密度，但**克制优先**——少装饰、一屏一重心。
+**让 idea 飞，好想法被看见。** 面向**演讲与正式场合**的优雅、大气的演示文稿——非 gadget 堆砌、非咨询 dump 默认。三种模式、两种交付：**单文件 HTML**（可翻页演示）+ **版式保真可编辑 PPTX**（**B 通道** `build_pptx.js` 为唯一交付；**A 通道**仅预览/`cross_verify`）。同源 `REPORT_MODEL`。设计对齐 MD3，执行克制；研究模式可对齐咨询密度，但**克制优先**——少装饰、一屏一重心。
 
 ## Gate 0 · 先给参考图（**标准模式**硬门禁）
 
@@ -22,7 +22,6 @@ metadata:
 | 交互画廊 | `assets/style-gallery.html` | 用户想边看边挑 |
 
 **标准模式**：跳过参考图直接问询 = 不合格。**Fast Mode**（下节）豁免 Gate 0 与六项。
-
 
 ## Fast Mode · 快速模式（用户显式 opt-in）
 
@@ -56,7 +55,7 @@ metadata:
 2. **篇幅**——A 8–15 页（图文 V1–V4，简单图禁全幅）/ B 12–25 页 / C 1–3 张图共 6–8 页；有材料按材料量推荐。
 3. **风格（始终选择）**——默认商务蓝；B 推荐麦肯锡/墨绿/暖沙金；C 推荐石墨深灰/商务蓝/彩色；拿不准给 Gate 0 参考图。
 4. **亮暗主题（始终确认）**——浅色默认（打印/外发）/ 深色（沉浸/发布会/大屏）；石墨深灰出厂深色；双主题经 `REPORT_MODEL.theme` 贯穿 HTML 与导出。
-5. **交付格式**——仅 HTML（默认）/ HTML+PPTX（用户要可编辑甲板时；PPTX 走 **B 通道**）。
+5. **交付格式**——仅 HTML（默认）/ HTML+PPTX（用户要可编辑演示文稿时；PPTX 走 **B 通道**）。
 6. **参考图确认**——复述 Gate 0 路径，确认用户已看到。
 
 **载体**：优先结构化选项卡一次收集，否则对话文本一次列全。此后形式层面不再反复确认（内容层面按需一次大纲确认，见下）。
@@ -119,6 +118,10 @@ metadata:
 - **PPTX（B 通道交付）**：`extract_model` → `build_pptx.js` → `validate_pptx --strict`；16:9 全原生可编辑。**A 通道不交付**（仅预览 / `cross_verify`；细则 playbook §九）。
 - **验收**：HTML strict 0/0；含 PPTX 再加 PPTX 0/0；失败给**定向修复指引**。
 - **交付说明**：`quality_gate.py --deliver`（含 PPTX 带 `--pptx/--model`；子门禁并行）出七要素，缺一 FAIL——勿手拼。
+
+## 版本口径
+
+包 semver（现 0.1.5）≠ 布局 schema 线（layout-constants / model-schema 的 version，现 `0.1`）；patch 不抬 schema。
 
 ## 环境依赖
 

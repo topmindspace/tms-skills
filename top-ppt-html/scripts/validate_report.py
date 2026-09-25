@@ -28,6 +28,8 @@ research / architecture 仍须显式传 --layout-qa（不强制）。
 import sys
 import re
 import json
+import hashlib
+from typing import Optional
 from html.parser import HTMLParser
 from pathlib import Path
 
@@ -433,8 +435,22 @@ def _check_type_features(txt, chk, model):
         f"{len(missing)} 处: {missing[:4]}" if missing else "", level="WARN")
 
 
+RUNTIME_SHA_RE = re.compile(r'/\* __TOPPPT_RUNTIME_SHA__:([0-9a-f]{16}) \*/')
+
+
+def _pptx_export_source_sha() -> Optional[str]:
+    """当前技能包 assets/pptx-export.js 的 sha256[:16]（与 sync_runtime 注入口径一致）。"""
+    pe = Path(__file__).resolve().parent.parent / 'assets' / 'pptx-export.js'
+    try:
+        body = pe.read_text(encoding='utf-8').rstrip('\n')
+    except OSError:
+        return None
+    return hashlib.sha256(body.encode('utf-8')).hexdigest()[:16]
+
+
 def _check_pptx_export(txt, chk):
-    """PPTX 预览配套：有预览按钮就必须有内容模型 + 预览运行时；页面不得残留导出按钮。"""
+    """PPTX 预览配套：有预览按钮就必须有内容模型 + 预览运行时；页面不得残留导出按钮。
+    另：内联运行时必须带 __TOPPPT_RUNTIME_SHA__ 且与当前 pptx-export.js 同源。"""
     has_btn = 'id="pptPreviewBtn"' in txt
     has_model = 'REPORT_MODEL' in txt
     has_runtime = ('g.TopPptHtml = api' in txt) and ('function slidesXml' in txt)
@@ -445,6 +461,20 @@ def _check_pptx_export(txt, chk):
     else:
         chk("含 PPTX 预览按钮与内容模型（建议保留）",
             has_model and has_runtime, "未集成预览按钮/模型", level="WARN")
+    # 同版本戳：有运行时块时强制核对（缺戳或漂移 = FAIL）
+    if has_runtime or '/* __TOPPPT_RUNTIME_START__ */' in txt:
+        m = RUNTIME_SHA_RE.search(txt)
+        expected = _pptx_export_source_sha()
+        if not m:
+            chk("运行时同版本戳（__TOPPPT_RUNTIME_SHA__）", False,
+                "内联运行时缺戳；请跑 scripts/sync_runtime.py")
+        elif expected is None:
+            chk("运行时同版本戳（__TOPPPT_RUNTIME_SHA__）", False,
+                "无法读取 assets/pptx-export.js 计算源哈希")
+        else:
+            got = m.group(1)
+            chk("运行时同版本戳（__TOPPPT_RUNTIME_SHA__）", got == expected,
+                f"stamp={got} ≠ source={expected}（模板未 sync 或源已改）")
     chk("页面无 PPTX 导出按钮（仅预览 + 提示词）",
         'id="pptxBtn"' not in txt and 'id="pptDownload"' not in txt,
         "残留导出按钮 pptxBtn/pptDownload", level="WARN")

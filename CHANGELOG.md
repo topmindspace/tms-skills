@@ -1,3 +1,18 @@
+## 0.1.5 — 2026-09-25
+
+### top-ppt-html · defect close-out
+
+- **P0 D1**：环图右栏可见标题去掉作者约束「禁止叠在弧上」→ 读者向「构成明细」。
+- **P0 D2**：`sync_runtime.py` 注入 `/* __TOPPPT_RUNTIME_SHA__:<16hex> */`（源 = `assets/pptx-export.js`）；`validate_report` 缺戳/漂移 FAIL；负例 N19。
+- **P1 D3**：`cross_verify.NUMERIC_TOKEN` 增补 YB|ZB|EB|PB 与 kWh|Gbps。
+- **P1 D4**：CI 轻量生成 `dist/regression` 样张 + `python-pptx`，使 N4/N5/N7 真正跑通（非全量 regression）。
+- **P2**：package-lock 对齐 0.1.5；README/PUBLISHING 2.x 弃用改为事实陈述；`deprecate-npm-2x.sh` 精简为 `@2.x` one-shot + verify；双版本口径（包 semver vs schema `0.1`）写入 SKILL/tech-design。
+- **术语**：全库「甲板」→ 演示文稿/样页等（保留英文 trigger `deck`）。
+
+### Installer
+
+- `@topmindspace/tms-skills` → **0.1.5**（整仓同 tag）。
+
 ## 0.1.4 — 2026-09-25
 
 ### top-ppt-html · craft + quality + docs + perf close-out

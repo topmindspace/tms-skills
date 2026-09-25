@@ -220,7 +220,7 @@ def r_donut(i, sec):
         '    <div class="grid g-side rv a-start">\n'
         f'      <div class="fig" style="text-align:center"><div class="fig__cap">构成占比</div>\n'
         f'{chart_svg(ch, i, "donut")}      </div>\n'
-        '      <div class="stack gap-4"><h3 class="t-h3">数值图例（禁止叠在弧上）</h3>\n'
+        '      <div class="stack gap-4"><h3 class="t-h3">构成明细</h3>\n'
         '        <ul class="ul">' + ''.join(legend) + '</ul>\n'
         '      </div>\n    </div>\n')
     return wrap(i, 'donut', body, sec)

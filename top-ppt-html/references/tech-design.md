@@ -108,7 +108,7 @@
 
 ## 七、发布态与兼容
 
-- **发布版**：**v0.1**（布局语法 + 模型单写 + 硬门禁 + 风格语汇层）。**版本唯一事实源 = `layout-constants.json` `version`**；`model-schema.json` / `layoutSlots` 同步该值、技能 `package.json` 为 `0.1.x`；`sync_runtime.py` 校验一致。变更流水见仓库根 `CHANGELOG.md`。
+- **发布版**：**v0.1**（布局语法 + 模型单写 + 硬门禁 + 风格语汇层）。**双版本口径**：npm / `metadata.version` = **semver（0.1.x）**；`layout-constants.json` `version` = **布局语法 schema 线（`0.1`）**——`model-schema.json` / `layoutSlots` 同步 schema 线，`sync_runtime.py` 校验 `package.json` 对齐 `0.1.x`。变更流水见仓库根 `CHANGELOG.md`。
 - **兼容回落**：排版比例尺只有 `modeTypeScale` 一套；未知模式回落 `presentation` 档。环境变量 `TOP_PPT_NODE_EXE` / `TOP_PPT_NODE_PATH`（旧名已移除）。
 - **文档分工**：本文件管架构与机制；日常规范见 `references/*`，业界对标依据见 `docs/archive/refs/industry-benchmark.md`。
 

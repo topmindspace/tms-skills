@@ -20,6 +20,7 @@
   N12 模型 theme 与 data-theme 矛盾
   N13 模型 mode 与 data-mode 矛盾
   N14 内部锚点断裂（链接目标 id 不存在）
+  N19 运行时同版本戳被篡改（__TOPPPT_RUNTIME_SHA__）
   L4  截断迹象（列表项省略号砍义）
   L5  溢出未拆页
   L6  混排缺对齐（ALIGN_RHYTHM）
@@ -83,6 +84,25 @@ def expect_layout_qa_fail(name: str, path: Path, keyword: str) -> bool:
     elif not ok:
         print(f'        layout-qa 未触发（期望含「{keyword}」）')
     return ok
+
+
+def _runtime_stamp_case() -> bool:
+    """N19：篡改 __TOPPPT_RUNTIME_SHA__ → validate_report 必须 FAIL。"""
+    base = ROOT / 'assets' / 'examples' / '2026-09-09-research-mckinsey.html'
+    if not base.exists():
+        print('  [SKIP] N19 运行时同版本戳（基准示例缺失）')
+        return True
+    txt = base.read_text(encoding='utf-8')
+    m = re.search(r'/\* __TOPPPT_RUNTIME_SHA__:([0-9a-f]{16}) \*/', txt)
+    if not m:
+        print('  [SKIP] N19 运行时同版本戳（示例尚未 sync 出戳；先跑 sync_runtime）')
+        return True
+    OUT.mkdir(parents=True, exist_ok=True)
+    bad = txt[:m.start()] + '/* __TOPPPT_RUNTIME_SHA__:deadbeefdeadbeef */' + txt[m.end():]
+    out = OUT / 'N19-bad-runtime-sha.html'
+    out.write_text(bad, encoding='utf-8')
+    return expect_fail('N19 运行时同版本戳被篡改', out, '运行时同版本戳')
+
 
 
 def main() -> int:
@@ -303,19 +323,55 @@ def main() -> int:
     ok = _chart_data_case() and ok
     ok = _title_pattern_case() and ok
     ok = _font_scale_case() and ok
+    ok = _runtime_stamp_case() and ok
 
     print('反向验证通过：注入的缺陷都被门禁抓住。' if ok
           else '反向验证失败：存在抓不到的缺陷，门禁有假阴性。')
     return 0 if ok else 1
 
 
+def _ensure_regression_fixture(name: str = '2026-09-09-research-mckinsey') -> Path | None:
+    """Lightweight CI fixture: build one PPTX into dist/regression/ if missing.
+    Avoids full regression.py; enough for N4/N5/N7."""
+    dest_dir = ROOT / 'dist' / 'regression'
+    pptx = dest_dir / f'{name}.pptx'
+    if pptx.exists():
+        return pptx
+    model = ROOT / 'assets' / 'examples' / f'{name}.model.json'
+    if not model.exists():
+        print(f'  [SKIP] regression fixture（缺 model {model.name}）')
+        return None
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    build = ROOT / 'scripts' / 'build_pptx.js'
+    if not build.exists():
+        print('  [SKIP] regression fixture（缺 build_pptx.js）')
+        return None
+    import os
+    env = os.environ.copy()
+    nm = ROOT / 'node_modules'
+    if nm.is_dir():
+        env['NODE_PATH'] = str(nm) + (os.pathsep + env['NODE_PATH'] if env.get('NODE_PATH') else '')
+    r = subprocess.run(['node', str(build), str(pptx), f'--model={model}'],
+                       cwd=str(ROOT), env=env, capture_output=True, text=True,
+                       encoding='utf-8', errors='replace')
+    if r.returncode != 0 or not pptx.exists():
+        print('  [SKIP] regression fixture（build_pptx 失败）')
+        err = (r.stderr or r.stdout or '')[:200]
+        if err:
+            print(f'        {err}')
+        return None
+    print(f'  [OK] 轻量 regression fixture → {pptx.relative_to(ROOT)}')
+    return pptx
+
+
+
 def _font_scale_case() -> bool:
     """N7：往 PPTX 里塞一个比例尺外的字号 → FONT_SIZE_OFF_SCALE 必须报。"""
     name = '2026-09-09-research-mckinsey'
-    src = ROOT / 'dist' / 'regression' / f'{name}.pptx'
+    src = _ensure_regression_fixture(name)
     model = ROOT / 'assets' / 'examples' / f'{name}.model.json'
-    if not src.exists() or not model.exists():
-        print('  [SKIP] N7 字号越出比例尺（需先跑 regression）')
+    if src is None or not model.exists():
+        print('  [SKIP] N7 字号越出比例尺（需先跑 regression / 缺 node+pptxgenjs）')
         return True
     out = OUT / 'N7-off-scale.pptx'
     patched = False
@@ -375,10 +431,10 @@ def _title_pattern_case() -> bool:
 def _chart_data_case() -> bool:
     """N5：篡改模型里的图表数值 → cross_verify 的数值核对必须报不符。"""
     name = '2026-09-09-research-mckinsey'
-    pptx = ROOT / 'dist' / 'regression' / f'{name}.pptx'
+    pptx = _ensure_regression_fixture(name)
     mp = ROOT / 'assets' / 'examples' / f'{name}.model.json'
-    if not pptx.exists() or not mp.exists():
-        print('  [SKIP] N5 图表数值篡改（需先跑 regression）')
+    if pptx is None or not mp.exists():
+        print('  [SKIP] N5 图表数值篡改（需先跑 regression / 缺 node+pptxgenjs）')
         return True
     sys.path.insert(0, str(ROOT / 'scripts'))
     try:
@@ -411,10 +467,10 @@ def _chart_data_case() -> bool:
 def _pptx_notes_case() -> bool:
     """N4：剥离演讲者备注 → dataTable=notes 的图表数据不可追溯，必须被 strict 抓住。"""
     name = '2026-09-09-research-mckinsey'
-    src = ROOT / 'dist' / 'regression' / f'{name}.pptx'
+    src = _ensure_regression_fixture(name)
     model = ROOT / 'assets' / 'examples' / f'{name}.model.json'
-    if not src.exists() or not model.exists():
-        print('  [SKIP] N4 备注剥离（需先跑 regression 生成 PPTX）')
+    if src is None or not model.exists():
+        print('  [SKIP] N4 备注剥离（需先跑 regression / 缺 node+pptxgenjs）')
         return True
     stripped = OUT / 'N4-no-notes.pptx'
     with zipfile.ZipFile(src) as zin, zipfile.ZipFile(stripped, 'w', zipfile.ZIP_DEFLATED) as zout:

@@ -1,6 +1,6 @@
 # tms-skills
 
-**TopMindspace 智能体技能 monorepo** — 可安装的智能体技能集合，当前包含 **top-ppt-html**（优雅、大气、正式场合演讲/汇报甲板）。
+**TopMindspace 智能体技能 monorepo** — 可安装的智能体技能集合，当前包含 **top-ppt-html**（优雅、大气、正式场合演讲/汇报演示文稿）。
 
 让 idea 飞，好想法被看见。
 
@@ -8,9 +8,9 @@
 
 | 技能 | 版本 | 做什么 |
 |------|------|--------|
-| [`top-ppt-html`](./top-ppt-html/) | 0.1.4 | 优雅大气的正式场合演讲/汇报甲板：单文件 HTML + 版式保真可编辑 16:9 PPTX |
+| [`top-ppt-html`](./top-ppt-html/) | 0.1.5 | 优雅大气的正式场合演讲/汇报演示文稿：单文件 HTML + 版式保真可编辑 16:9 PPTX |
 
-安装器包 [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) 亦为 **0.1.4**（整仓发版：安装器与当前技能同 tag；未来多技能仍可各自演进，默认随仓库 release）。
+安装器包 [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) 亦为 **0.1.5**（整仓发版：安装器与当前技能同 tag；未来多技能仍可各自演进，默认随仓库 release）。
 
 更多技能以仓库根目录下的技能目录加入（每个目录含 `SKILL.md`）。
 
@@ -19,9 +19,9 @@
 两条通道，装出来同一套技能。**npm = 钉版本快照**；**GitHub = 跟仓库 HEAD**。
 
 
-> **警告 / Warning**：不要安装 `@topmindspace/tms-skills@^2`。npm 上残留的 **2.0.0–2.1.1** 是仓库重置前的过时线；当前线是 **0.1.x**（`latest` 亦指向 0.1.x）。维护者登录 npm 后可运行 `scripts/deprecate-npm-2x.sh` 标记弃用。
+> **警告 / Warning**：不要安装 `@topmindspace/tms-skills@^2`。npm 上的 **2.0.0–2.1.1** 已弃用（仓库重置前的过时线）；当前线是 **0.1.x**（`latest` 指向 0.1.x）。请安装 `@topmindspace/tms-skills@0.1.x`。
 >
-> Do **not** install `^2`. Versions 2.0.0–2.1.1 are obsolete after the repo reset; use **0.1.x**. Maintainers with npm auth should run `scripts/deprecate-npm-2x.sh`.
+> Do **not** install `^2`. Versions **2.0.0–2.1.1 are deprecated**; use **0.1.x** (`latest` tracks 0.1.x).
 
 
 ### npm（推荐）
@@ -30,7 +30,7 @@
 npx @topmindspace/tms-skills list
 npx @topmindspace/tms-skills install top-ppt-html
 npx @topmindspace/tms-skills install top-ppt-html --to ./.claude/skills
-npx @topmindspace/tms-skills@0.1.4 install top-ppt-html   # 钉版本
+npx @topmindspace/tms-skills@0.1.5 install top-ppt-html   # 钉版本
 ```
 
 ### GitHub 直装
