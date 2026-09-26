@@ -1,0 +1,315 @@
+{
+  "mode": "presentation",
+  "style": "business-blue",
+  "theme": "light",
+  "title": "TopMind × tms-skills",
+  "subtitle": "让 idea 飞 · 把好想法做成可上台的演示文稿",
+  "meta": "产品介绍 · 2026-09-26",
+  "agenda": [
+    [
+      "01",
+      "TopMind 定位",
+      "知识工作空间"
+    ],
+    [
+      "02",
+      "tms-skills 概览",
+      "可安装技能 monorepo"
+    ],
+    [
+      "03",
+      "top-ppt-html 特色",
+      "HTML + 保真 PPTX"
+    ],
+    [
+      "04",
+      "三模式契约",
+      "演示 · 研究 · 架构"
+    ],
+    [
+      "05",
+      "风格与主题",
+      "九风格 × 亮暗"
+    ],
+    [
+      "06",
+      "质量门禁",
+      "strict 0/0 交付"
+    ],
+    [
+      "07",
+      "Fast Mode",
+      "少问一句 · 工艺不降"
+    ]
+  ],
+  "sections": [
+    {
+      "type": "points",
+      "layoutPreset": "P4",
+      "eyebrow": "01 · TopMind",
+      "title": "TopMind：让 idea 飞的知识工作空间",
+      "points": [
+        [
+          "工作空间，不是工具箱",
+          "把想法、材料与产出收拢在同一语境，减少搬运与失真"
+        ],
+        [
+          "知识工艺，克制表达",
+          "强调结构、证据与可读性——让好想法被认真看见"
+        ],
+        [
+          "面向正式场合",
+          "演讲、汇报、路演：材料要上台，不只是堆在文档里"
+        ]
+      ],
+      "soWhat": "TopMind 把有想法推进到可上台——工艺在结构，不在堆砌。"
+    },
+    {
+      "type": "cards",
+      "layoutPreset": "P5",
+      "eyebrow": "02 · tms-skills",
+      "title": "tms-skills：整仓可安装的智能体技能",
+      "columns": 3,
+      "cards": [
+        {
+          "title": "Monorepo",
+          "points": [
+            [
+              "一仓多技能",
+              "根目录技能包 + 统一安装器"
+            ],
+            [
+              "同 tag 发版",
+              "安装器与技能整仓对齐"
+            ]
+          ]
+        },
+        {
+          "title": "双通道安装",
+          "points": [
+            [
+              "npm 钉版本",
+              "npx @topmindspace/tms-skills"
+            ],
+            [
+              "GitHub 跟 HEAD",
+              "日常可 clone / 直装"
+            ]
+          ]
+        },
+        {
+          "title": "当前主技能",
+          "points": [
+            [
+              "top-ppt-html",
+              "正式场合演示文稿"
+            ],
+            [
+              "HTML + PPTX",
+              "同源模型 · 双交付"
+            ]
+          ]
+        }
+      ],
+      "footnote": "包名 @topmindspace/tms-skills · 当前线 0.1.x（latest）"
+    },
+    {
+      "type": "split",
+      "layoutPreset": "P1",
+      "eyebrow": "03 · top-ppt-html",
+      "title": "一屏一主张：可翻页 HTML，保真可编辑 PPTX",
+      "left": {
+        "points": [
+          [
+            "模型单写",
+            "只填 REPORT_MODEL，禁手改 HTML 正文"
+          ],
+          [
+            "三模式 × 九风格",
+            "演示 / 研究 / 架构各有契约"
+          ],
+          [
+            "门禁闭环",
+            "validate --strict 0/0 才交付"
+          ]
+        ]
+      },
+      "right": {
+        "type": "bar",
+        "cap": "交付关注点（示意权重）",
+        "labels": [
+          "版式",
+          "排版",
+          "色彩",
+          "内容"
+        ],
+        "values": [
+          32,
+          28,
+          18,
+          22
+        ],
+        "unit": "",
+        "max": 40,
+        "dataTable": "notes"
+      },
+      "soWhat": "工艺是版式、排版、色彩与内容组织——图表图标克制配文。"
+    },
+    {
+      "type": "cards",
+      "layoutPreset": "P5",
+      "eyebrow": "04 · 三模式",
+      "title": "模式先定后写：A 演示 · B 研究 · C 架构",
+      "columns": 3,
+      "cards": [
+        {
+          "title": "A · 演示",
+          "points": [
+            [
+              "每屏一主张",
+              "标题即行动句，非话题标签"
+            ],
+            [
+              "大气留白",
+              "证据充分但不堆咨询 dump"
+            ]
+          ]
+        },
+        {
+          "title": "B · 研究",
+          "points": [
+            [
+              "咨询密排",
+              "Exhibit · 来源 · so-what"
+            ],
+            [
+              "结论可核对",
+              "数字与口径双向对齐"
+            ]
+          ]
+        },
+        {
+          "title": "C · 架构",
+          "points": [
+            [
+              "图为王",
+              "拓扑 / 泳道 / 分层"
+            ],
+            [
+              "少字多结构",
+              "一图说清关系"
+            ]
+          ]
+        }
+      ],
+      "footnote": "意图线索：路演/汇报/演讲 → A；调研/对标 → B；拓扑/方案图 → C"
+    },
+    {
+      "type": "metrics",
+      "layoutPreset": "P2",
+      "eyebrow": "05 · 风格主题",
+      "title": "九风格开场即可见，亮暗主题一键贯穿",
+      "metrics": [
+        [
+          "9",
+          "风格套装（商务蓝·麦肯锡·石墨等）"
+        ],
+        [
+          "2",
+          "亮暗主题（浅色外发 / 深色大屏）"
+        ],
+        [
+          "1",
+          "交互画廊 style-gallery"
+        ],
+        [
+          "3",
+          "主题参考图（演示·研究·架构）"
+        ]
+      ],
+      "soWhat": "Gate 0 先给参考图；标准模式跳过即不合格。"
+    },
+    {
+      "type": "comparison",
+      "layoutPreset": "P4",
+      "eyebrow": "06 · 质量门禁",
+      "title": "散装出稿止步，strict 0/0 才算交付",
+      "left": {
+        "title": "散装路径 · 风险",
+        "points": [
+          [
+            "手改 HTML",
+            "模型与正文双写，一改就漂"
+          ],
+          [
+            "无严格校验",
+            "截断、同型图、半空卡易漏"
+          ],
+          [
+            "口头交付",
+            "缺七要素，验收靠感觉"
+          ]
+        ]
+      },
+      "right": {
+        "title": "门禁路径 · 目标",
+        "points": [
+          [
+            "模型单写",
+            "render 回填，禁手改正文"
+          ],
+          [
+            "HTML + PPTX",
+            "validate --strict 双侧 0/0"
+          ],
+          [
+            "七要素说明",
+            "quality_gate --deliver"
+          ]
+        ]
+      },
+      "verdict": "反截断、图表多样性、runtime SHA——门禁是交付的一部分。"
+    },
+    {
+      "type": "timeline",
+      "layoutPreset": "P6",
+      "eyebrow": "07 · Fast Mode",
+      "title": "Fast Mode：跳过问询，不跳过工艺",
+      "phases": [
+        [
+          "触发",
+          "显式 opt-in",
+          "快速模式 / fast / 一键出稿 / 少问一句"
+        ],
+        [
+          "推断",
+          "默认参数",
+          "路演线索→A·business-blue；未点明→B·mckinsey"
+        ],
+        [
+          "仍须",
+          "质量闭环",
+          "最小大纲 → 模型单写 → strict 0/0 → 交付说明"
+        ]
+      ],
+      "soWhat": "Fast 豁免问询，但反截断与 Mode A craft 一律不降。"
+    }
+  ],
+  "closing": {
+    "title": "让好想法被看见",
+    "points": [
+      [
+        "装技能",
+        "npx @topmindspace/tms-skills install top-ppt-html"
+      ],
+      [
+        "看样张",
+        "assets/examples · style-gallery.html"
+      ],
+      [
+        "上台交付",
+        "HTML 可翻页 · PPTX 可编辑 · strict 0/0"
+      ]
+    ]
+  }
+}

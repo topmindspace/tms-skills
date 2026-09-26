@@ -17,7 +17,7 @@
     README.md                      人类视角的简介 / 安装 / 开发 / 打包
     package.json                   Node 依赖声明（pptxgenjs）与常用命令
     assets/templates/              三份模式模板 + engine.css / ui.js（公共片段注入源）
-    assets/examples/               3 份黄金样张 HTML + model（每模式 1；风格见 style-gallery）
+    assets/examples/               ≥3 黄金样张（每模式 1）+ 可选产品 showcase HTML/model
     assets/pptx-export.js          PPTX 预览运行时（注入源）
     assets/style-gallery.html      风格 × 模式 × 亮暗主题交互画廊
     assets/theme-overview*.png     3 张主题参考图（整体 + research + architecture；演示态与整体图相同）
@@ -42,7 +42,7 @@
 ────────────────────────────────────────────────────────────────────────
     · SKILL.md frontmatter 含 name / description；name 与分发包目录名一致；
       description 为单行双引号字符串且 ≤ 1024 字符（平台截断阈值）
-    · references（含 layout-grammar）、3 份模式模板 + engine.css / ui.js、3 组黄金样张、3 张参考图齐全
+    · references（含 layout-grammar）、3 份模式模板 + engine.css / ui.js、≥3 组样张、3 张参考图齐全
     · 关键脚本齐全（单源注入 / 审计 / 示例重建 / 回归 / 双校验器 / 精导 / 打包）
 """
 import fnmatch
@@ -84,6 +84,7 @@ INCLUDE = [
     'assets/theme-overview-architecture.png',
     'assets/templates/*',
     'assets/examples/*',
+    'assets/showcase/*',
     'references/*',
     'scripts/*',
     'evals/*',
@@ -155,7 +156,7 @@ REQUIRED = [
 
 # 必须达到最小数量的集合（名称含日期，故按数量校验）
 MIN_COUNTS = {
-    'assets/examples/*.html': 3,  # Batch3 每模式 1 份黄金样张
+    'assets/examples/*.html': 3,  # ≥3：每模式黄金样张；可另含 showcase
     'assets/examples/*.model.json': 3,
     'references/*.md': 25,  # + page-type-matrix + chart-decision-tree；≥25 防误删
 }
