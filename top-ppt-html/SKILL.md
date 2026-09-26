@@ -1,15 +1,15 @@
 ---
 name: top-ppt-html
-description: "Use when 用户要做报告、演示、汇报、PPT、slides、deck、路演，或写研究报告、分析报告、咨询报告、白皮书、调研、评测、对标、经营分析、复盘、项目汇报、商务/HTML/网页报告，或做架构图、拓扑图、流程图、泳道图、方案图，或把材料做成可视化报告并导出 HTML/PPT/PPTX，或优化排版/版式/配色/图文布局，或要快速模式/fast/直接生成/一键出稿/少问一句。TopPPT HTML：优雅大气的正式场合演讲/汇报演示文稿——零外链可翻页 HTML（亮暗双主题）+ 版式保真可编辑 16:9 PPTX；核心=版式·排版·色彩·内容组织；三模式（A 演示·每屏一主张 / B 研究·咨询密排 / C 架构·图为王）× 9 风格。Do NOT use for 纯代码工程、非报告类网页或应用开发、视频/图片生成、直接改写已有 Word/PPT 源文件本身。"
+description: "Use when 用户要做报告、演示、汇报、PPT、slides、deck、路演，或写研究报告、分析报告、咨询报告、白皮书、调研、评测、对标、经营分析、复盘、项目汇报、商务/HTML/网页报告，或做架构图、拓扑图、流程图、泳道图、方案图，或把材料做成可视化报告并导出 HTML/PPT/PPTX，或优化排版/版式/配色/图文布局，或要快速模式/fast/直接生成/一键出稿/少问一句。TopPPT HTML：正式商务演示双交付——零外链可翻页 HTML（日常上台）+ 高保真可编辑 16:9 PPTX（按需）；MD3 式密度克制；核心=版式·排版·色彩·内容；三模式（A 演示 / B 研究 / C 架构）× 9 风格。Do NOT use for 纯代码工程、非报告类网页或应用开发、视频/图片生成、直接改写已有 Word/PPT 源文件本身。"
 license: MIT
 compatibility: "Python 3 stdlib for HTML generation; Node >=18 + pptxgenjs for PPTX; optional playwright for browser regression / theme captures."
 metadata:
-  version: "0.1.10"
+  version: "0.1.11"
   author: TopMindspace
 ---
 # TopPPT HTML
 
-**让 idea 飞，好想法被看见。** 面向**演讲与正式场合**的优雅、大气的演示文稿——非 gadget 堆砌、非咨询 dump 默认。三种模式、两种交付：**单文件 HTML**（可翻页演示）+ **版式保真可编辑 PPTX**（**B 通道** `build_pptx.js` 为唯一交付；**A 通道**仅预览/`cross_verify`）。同源 `REPORT_MODEL`。设计对齐 MD3，执行克制；研究模式可对齐咨询密度，但**克制优先**——少装饰、一屏一重心。
+**让 idea 飞，好想法被看见。** 为**演示报告 / 正式商务演示**而生——**HTML + PPT 双交付**（日常 HTML 等同幻灯片；需要时再导出高保真可编辑 PPTX）。非 gadget、非咨询 dump 默认。同源 `REPORT_MODEL`；**B 通道** `build_pptx.js` 交付，**A** 仅预览/`cross_verify`。参考 MD3：合适信息密度、克制文字/图形/颜色；少装饰、一屏一重心。
 
 ## Gate 0 · 先给参考图（**标准模式**硬门禁）
 
@@ -35,7 +35,7 @@ metadata:
 | 篇幅 | A=10 / B=12 / C=6 | |
 | format | **html only**（**仅当用户要 PPT/PPTX 才开** B 通道） | |
 
-**跳过** Gate 0/六项/完整大纲。**仍须** 最小大纲→模型单写→strict 0/0→`quality_gate --deliver`（反截断、图表多样性、Mode A craft 不降）。读面 L0+L1（A/Fast 可加 L1.5）；代码一律 `extract_snippet`。一行宣布「Fast 选用：…」→ playbook §二轻量链；声明已跳过参考图。**标准模式**仍强制 Gate 0 + 六项。
+**跳过** Gate 0/六项/完整大纲。**仍须** 最小大纲→模型单写→strict 0/0→`quality_gate --deliver`（反截断、图表多样、Mode A craft 不降）。L0+L1（A/Fast 可加 L1.5）；代码一律 `extract_snippet`。一行宣布「Fast 选用：…」→ playbook §二；声明已跳过参考图。**标准模式**仍强制 Gate 0 + 六项。
 
 ## 唯一入口流程
 
@@ -132,13 +132,12 @@ metadata:
 
 ## 版本口径
 
-包 semver（现 0.1.10）≠ schema 线（layout-constants / model-schema，现 `0.1`）；patch 不抬 schema。
+包 semver（现 0.1.11）≠ schema 线（layout-constants / model-schema，现 `0.1`）；patch 不抬 schema。
 
 ## 环境依赖
 
 - **零依赖可用**：HTML 与全部 Python 脚本仅用标准库。
 - **PPTX 精导**：Node + pptxgenjs（`TOP_PPT_NODE_EXE`/`TOP_PPT_NODE_PATH`；见 `pptx-export.md`）。
 - **硬门禁**：标签泄漏/空页/极偏图/简单大图 → `layout-constants.json` + `failure-modes.md`。
-- **可选**：页高/裁切真值与参考图重生成需 playwright（`regression.py` 探测，缺失跳过）。
-- **一键回归**：`scripts/regression.py`（模板/常量/schema/运行时/示例改后必跑）。
-- **技能自检**：`audit_skill.py` · `audit_docs.py` · `audit_styles.py` · `audit_css.py`。
+- **可选**：页高/裁切与参考图重生成需 playwright（`regression.py` 探测，缺失跳过）。
+- **回归 / 自检**：`regression.py`；`audit_skill/docs/styles/css.py`。

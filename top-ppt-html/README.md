@@ -7,14 +7,18 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/topmindspace/tms-skills/ci.yml?style=flat-square&label=CI)](https://github.com/topmindspace/tms-skills/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](../LICENSE)
 
-**让 idea 飞，好想法被看见。** 面向**演讲与正式场合**的高品质演示文稿技能：把主张、调研、分析、架构方案，生成为**优雅、美观、大气**的可翻页 HTML + **版式保真可编辑 PPTX**。核心工艺是版式、排版、色彩与内容组织——克制图标/图表配文，而非 gadget 堆砌或咨询 dump 默认。
+**让 idea 飞，好想法被看见。** 为**演示报告 / 正式商务演示**而生的高品质演示文稿技能：**HTML + PPT 双交付**——日常用可翻页 HTML 等同幻灯片；需要时再导出**版式保真可编辑 PPTX**。参考 **MD3**：合适信息密度、克制文字/图形/颜色。核心工艺是版式、排版、色彩与内容组织——不是 gadget 堆砌。
+
+### 为什么还是 top-ppt-html
+
+市面 PPT 技能很多。本技能主场是**正式商务演示**：直观、美观大气、风格多样、**高保真可编辑 PPTX**（图表带数据可标注）；产出即上台。
 
 <p align="center">
   <img src="assets/showcase/showcase-cover.png" alt="TopMind × tms-skills showcase cover" width="720" />
 </p>
 
 - 技能标识：`top-ppt-html`；品牌名：**TopPPT HTML**
-- 版本：**v0.1.10**（与 `@topmindspace/tms-skills@0.1.10` 同 tag）
+- 版本：**v0.1.11**（与 `@topmindspace/tms-skills@0.1.11` 同 tag）
 - **智能体入口**：`SKILL.md` → `references/playbook.md`（L1）→ L2 按需
 - **人类维护者**：本 README（安装 / 命令 / 目录）；勿把本文件当生成规范
 
@@ -22,17 +26,7 @@
 
 <p align="center">
   <img src="assets/theme-overview.png" alt="演示模式 · business-blue 主题总览" width="860" /><br/>
-  <sub>演示 · business-blue</sub>
-</p>
-
-<p align="center">
-  <img src="assets/theme-overview-research.png" alt="研究模式 · mckinsey 主题总览" width="860" /><br/>
-  <sub>研究 · mckinsey</sub>
-</p>
-
-<p align="center">
-  <img src="assets/theme-overview-architecture.png" alt="架构模式 · graphite-dark 主题总览" width="860" /><br/>
-  <sub>架构 · graphite-dark</sub>
+  <sub>演示 · business-blue（默认）· 另见 <a href="./assets/style-gallery.html">style-gallery</a> · <a href="./assets/theme-overview-research.png">研究</a> · <a href="./assets/theme-overview-architecture.png">架构</a></sub>
 </p>
 
 ### 风格 × 模式一览
@@ -41,20 +35,21 @@
 |:---:|:---:|:---:|
 | ![bb](assets/showcase/style-business-blue-cover.png) | ![mk](assets/showcase/style-mckinsey-cover.png) | ![gr](assets/showcase/style-graphite-cover.png) |
 
-| Showcase · 双交付 | 三模式 | 质量门禁 | Header 工具栏 |
+| 定位 | 双交付 | 图表 | Header 工具栏 |
 |:---:|:---:|:---:|:---:|
-| ![sp](assets/showcase/showcase-split.png) | ![md](assets/showcase/showcase-modes.png) | ![gt](assets/showcase/showcase-gates.png) | ![tb](assets/showcase/showcase-toolbar.png) |
+| ![pos](assets/showcase/showcase-positioning.png) | ![sp](assets/showcase/showcase-split.png) | ![ch](assets/showcase/showcase-charts.png) | ![tb](assets/showcase/showcase-toolbar.png) |
 
 **在线体验** · [落地页](https://topmindspace.github.io/tms-skills/) · [Showcase 演示文稿](https://topmindspace.github.io/tms-skills/showcase.html) · [风格画廊](https://topmindspace.github.io/tms-skills/style-gallery.html)
 
 - 交互画廊（仓库内）：[`assets/style-gallery.html`](./assets/style-gallery.html)
-- 产品 Showcase（仓库内）：[`assets/examples/2026-09-26-topmind-tms-skills-showcase.html`](./assets/examples/2026-09-26-topmind-tms-skills-showcase.html)（Mode A · business-blue · 12 内容页 · **5 种图表** · Header 工具栏专页）
+- 产品 Showcase（仓库内）：[`assets/examples/2026-09-26-topmind-tms-skills-showcase.html`](./assets/examples/2026-09-26-topmind-tms-skills-showcase.html)（Mode A · 双交付叙事 · **5 种图表** · Header 工具栏）
 - 仓库级大图集：[`docs/showcase/`](../docs/showcase/)（不进技能 zip）
 
 ## 一、技能简介（人类速览）
 | 维度 | 能力 |
 |------|------|
-| 产出 | 单文件 HTML（可翻页、亮暗双主题、**Header 工具栏 T/P/H/F/B + 9 风格**）+ 16:9 可编辑 PPTX（精导通道） |
+| 产出 | **双交付**：日常 HTML 可翻页演示 + 按需 16:9 可编辑 PPTX；亮暗双主题 · **Header 工具栏 T/P/H/F/B + 9 风格** |
+| 定位 | 正式商务演示 · MD3 密度克制 · 非 gadget |
 | 三模式 | A 演示 · B 研究 · C 架构（页型/字号/密度契约见 `playbook.md` §一） |
 | 风格 | 9 套（`styles.md`）；编码色板 c1–c5 随风格 |
 | 图表 | 核图 8 默认 + registry 全量；多样性 / 反截断 / Mode A 工艺见 playbook + `presentation-craft.md` |

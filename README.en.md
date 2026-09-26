@@ -9,9 +9,17 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/topmindspace/tms-skills/ci.yml?style=flat-square&label=CI)](https://github.com/topmindspace/tms-skills/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
 
-**TopMindspace agent-skills monorepo** — turn good ideas into stage-ready deliverables.
+**TopMindspace agent-skills monorepo** — turn good ideas into stage-ready **formal business presentations**.
 
-Primary skill **[top-ppt-html](./top-ppt-html/)**: elegant, atmospheric **presentation decks** for formal occasions (single-file HTML + layout-faithful editable PPTX).
+Primary skill **[top-ppt-html](./top-ppt-html/)**: **HTML + PPT dual delivery**, built for **demo reports / formal business decks**.
+
+### Why top-ppt-html
+
+Plenty of PPT skills exist — some lean gadgety, some dump consulting density by default. **top-ppt-html** takes a different path:
+
+- **Dual delivery**: day-to-day, present with **single-file HTML** like slides; export **high-fidelity editable PPTX** when needed (charts carry data you can annotate)
+- **MD3-inspired**: spatial layout, **fitting information density**, restrained type / shapes / color
+- **Stage-ready**: clear, atmospheric, multi-style — formal business presenting, not decoration
 
 > Let ideas fly — make good thinking visible.
 
@@ -23,21 +31,11 @@ Primary skill **[top-ppt-html](./top-ppt-html/)**: elegant, atmospheric **presen
 
 ## Craft at a glance
 
-### Theme overviews (Gate 0)
+### Theme overview (Gate 0)
 
 <p align="center">
   <img src="top-ppt-html/assets/theme-overview.png" alt="Presentation mode · business-blue theme overview" width="900" /><br/>
-  <sub>Presentation · business-blue</sub>
-</p>
-
-<p align="center">
-  <img src="top-ppt-html/assets/theme-overview-research.png" alt="Research mode · mckinsey theme overview" width="900" /><br/>
-  <sub>Research · mckinsey</sub>
-</p>
-
-<p align="center">
-  <img src="top-ppt-html/assets/theme-overview-architecture.png" alt="Architecture mode · graphite-dark theme overview" width="900" /><br/>
-  <sub>Architecture · graphite-dark</sub>
+  <sub>Presentation · business-blue (default) · also <a href="./top-ppt-html/assets/style-gallery.html">style-gallery</a> · <a href="./top-ppt-html/assets/theme-overview-research.png">research overview</a> · <a href="./top-ppt-html/assets/theme-overview-architecture.png">architecture overview</a></sub>
 </p>
 
 ### Style covers
@@ -46,11 +44,11 @@ Primary skill **[top-ppt-html](./top-ppt-html/)**: elegant, atmospheric **presen
 |:---:|:---:|:---:|
 | ![bizblue](docs/showcase/presentation-business-blue/bizblue-cover.png) | ![mckinsey](docs/showcase/research-mckinsey/mckinsey-cover.png) | ![graphite](docs/showcase/architecture-graphite-dark/graphite-cover.png) |
 
-### Product showcase (Mode A · multi-chart · header toolbar)
+### Product showcase (Mode A · dual-delivery narrative · multi-chart · header toolbar)
 
-| Cover | Three modes | Quality gates | Header toolbar |
+| Positioning | Dual delivery | Charts | Header toolbar |
 |:---:|:---:|:---:|:---:|
-| ![cover](docs/showcase/topmind-showcase/showcase-cover.png) | ![modes](docs/showcase/topmind-showcase/showcase-s4.png) | ![gates](docs/showcase/topmind-showcase/showcase-s8.png) | ![toolbar](docs/showcase/topmind-showcase/showcase-s11.png) |
+| ![pos](docs/showcase/topmind-showcase/showcase-s1.png) | ![split](docs/showcase/topmind-showcase/showcase-s3.png) | ![charts](docs/showcase/topmind-showcase/showcase-s5.png) | ![toolbar](docs/showcase/topmind-showcase/showcase-s11.png) |
 
 **Live**
 
@@ -78,9 +76,9 @@ See [top-ppt-html/README.md](./top-ppt-html/README.md) and [SKILL.md](./top-ppt-
 
 | Skill | Version | What it does |
 |-------|---------|--------------|
-| [`top-ppt-html`](./top-ppt-html/) | **0.1.10** | Formal presentation decks: paginated HTML + editable 16:9 PPTX; 3 modes × 9 styles; strict 0/0 gates |
+| [`top-ppt-html`](./top-ppt-html/) | **0.1.11** | Formal business decks: paginated HTML + editable 16:9 PPTX; dual delivery · MD3-inspired density; 3 modes × 9 styles; strict 0/0 |
 
-Installer [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) is also **0.1.10** (whole-repo same-tag releases).
+Installer [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) is also **0.1.11** (whole-repo same-tag releases).
 
 ## Install
 
@@ -90,7 +88,7 @@ Installer [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspa
 npx @topmindspace/tms-skills list
 npx @topmindspace/tms-skills install top-ppt-html
 npx @topmindspace/tms-skills install top-ppt-html --to ./.claude/skills
-npx @topmindspace/tms-skills@0.1.10 install top-ppt-html   # pin
+npx @topmindspace/tms-skills@0.1.11 install top-ppt-html   # pin
 ```
 
 ```bash
@@ -109,7 +107,7 @@ PPTX export needs `npm install` in the skill folder (pptxgenjs). HTML generation
 | A Presentation | [`2026-09-09-presentation-business-blue`](./top-ppt-html/assets/examples/2026-09-09-presentation-business-blue.html) |
 | B Research | [`2026-09-09-research-mckinsey`](./top-ppt-html/assets/examples/2026-09-09-research-mckinsey.html) |
 | C Architecture | [`2026-09-09-architecture-graphite-dark`](./top-ppt-html/assets/examples/2026-09-09-architecture-graphite-dark.html) |
-| Product showcase | [`2026-09-26-topmind-tms-skills-showcase`](./top-ppt-html/assets/examples/2026-09-26-topmind-tms-skills-showcase.html) (5 chart types · toolbar page) |
+| Product showcase | [`2026-09-26-topmind-tms-skills-showcase`](./top-ppt-html/assets/examples/2026-09-26-topmind-tms-skills-showcase.html) (dual-delivery narrative · 5 chart types · toolbar page) |
 
 ## Repo layout
 

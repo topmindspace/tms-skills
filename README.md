@@ -7,9 +7,17 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/topmindspace/tms-skills/ci.yml?style=flat-square&label=CI)](https://github.com/topmindspace/tms-skills/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
 
-**TopMindspace 智能体技能 monorepo** — 把好想法做成可上台的交付。
+**TopMindspace 智能体技能 monorepo** — 把好想法做成可上台的正式商务演示。
 
-当前主技能 **[top-ppt-html](./top-ppt-html/)**：优雅、大气的正式场合**演示文稿**（单文件 HTML + 版式保真可编辑 PPTX）。
+当前主技能 **[top-ppt-html](./top-ppt-html/)**：**HTML + PPT 双交付**，为**演示报告 / 正式商务演示**而生。
+
+### 为什么是 top-ppt-html
+
+市面 PPT 技能很多：有的偏花哨装饰，有的偏咨询 dump。**top-ppt-html** 走另一条路——
+
+- **双交付**：日常用**单文件 HTML**等同幻灯片演示；需要时再导出**高保真可编辑 PPTX**（图表带数据、可标注）
+- **参考 MD3**：整体空间布局、**合适的信息密度**、克制的文字 / 图形 / 形状 / 颜色
+- **产出即上台**：直观、美观大气、风格多样；主场是正式商务演示，不是 gadget
 
 > 让 idea 飞，好想法被看见。
 
@@ -25,17 +33,7 @@
 
 <p align="center">
   <img src="top-ppt-html/assets/theme-overview.png" alt="演示模式 · business-blue 主题总览" width="900" /><br/>
-  <sub>演示 · business-blue</sub>
-</p>
-
-<p align="center">
-  <img src="top-ppt-html/assets/theme-overview-research.png" alt="研究模式 · mckinsey 主题总览" width="900" /><br/>
-  <sub>研究 · mckinsey</sub>
-</p>
-
-<p align="center">
-  <img src="top-ppt-html/assets/theme-overview-architecture.png" alt="架构模式 · graphite-dark 主题总览" width="900" /><br/>
-  <sub>架构 · graphite-dark</sub>
+  <sub>演示 · business-blue（默认）· 另见 <a href="./top-ppt-html/assets/style-gallery.html">style-gallery</a> · <a href="./top-ppt-html/assets/theme-overview-research.png">研究总览</a> · <a href="./top-ppt-html/assets/theme-overview-architecture.png">架构总览</a></sub>
 </p>
 
 ### 风格封面
@@ -44,11 +42,11 @@
 |:---:|:---:|:---:|
 | ![bizblue](docs/showcase/presentation-business-blue/bizblue-cover.png) | ![mckinsey](docs/showcase/research-mckinsey/mckinsey-cover.png) | ![graphite](docs/showcase/architecture-graphite-dark/graphite-cover.png) |
 
-### 产品 Showcase 样张（Mode A · 多图 · Header 工具栏）
+### 产品 Showcase（Mode A · 双交付叙事 · 多图 · Header 工具栏）
 
-| Cover | 三模式 | 质量门禁 | Header 工具栏 |
+| 定位 | 双交付 | 图表 | Header 工具栏 |
 |:---:|:---:|:---:|:---:|
-| ![cover](docs/showcase/topmind-showcase/showcase-cover.png) | ![modes](docs/showcase/topmind-showcase/showcase-s4.png) | ![gates](docs/showcase/topmind-showcase/showcase-s8.png) | ![toolbar](docs/showcase/topmind-showcase/showcase-s11.png) |
+| ![pos](docs/showcase/topmind-showcase/showcase-s1.png) | ![split](docs/showcase/topmind-showcase/showcase-s3.png) | ![charts](docs/showcase/topmind-showcase/showcase-s5.png) | ![toolbar](docs/showcase/topmind-showcase/showcase-s11.png) |
 
 **在线体验**
 
@@ -56,12 +54,10 @@
 - 完整演示文稿：[showcase.html](https://topmindspace.github.io/tms-skills/showcase.html)
 - 风格画廊：[style-gallery.html](https://topmindspace.github.io/tms-skills/style-gallery.html)
 - 仓库内交互画廊：[top-ppt-html/assets/style-gallery.html](./top-ppt-html/assets/style-gallery.html)
-- 仓库内 Showcase HTML：[top-ppt-html/assets/examples/2026-09-26-topmind-tms-skills-showcase.html](./top-ppt-html/assets/examples/2026-09-26-topmind-tms-skills-showcase.html)
+- 仓库内 Showcase：[top-ppt-html/assets/examples/2026-09-26-topmind-tms-skills-showcase.html](./top-ppt-html/assets/examples/2026-09-26-topmind-tms-skills-showcase.html)
 - 更多截图：[docs/showcase/](./docs/showcase/)
 
 ### HTML Header 工具栏（打开即用）
-
-生成的演示文稿顶栏提供快捷操作（样张内有专页说明）：
 
 | 控件 | 快捷键 | 做什么 |
 |------|--------|--------|
@@ -78,9 +74,9 @@
 
 | 技能 | 版本 | 做什么 |
 |------|------|--------|
-| [`top-ppt-html`](./top-ppt-html/) | **0.1.10** | 正式场合演讲/汇报演示文稿：HTML 可翻页 + 16:9 可编辑 PPTX；三模式 × 九风格；strict 0/0 门禁 |
+| [`top-ppt-html`](./top-ppt-html/) | **0.1.11** | 正式商务演示：HTML 可翻页 + 16:9 可编辑 PPTX；双交付 · MD3 密度克制；三模式 × 九风格；strict 0/0 |
 
-安装器 [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) 同为 **0.1.10**（整仓同 tag 发版）。
+安装器 [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) 同为 **0.1.11**（整仓同 tag 发版）。
 
 ## 安装
 
@@ -90,7 +86,7 @@
 npx @topmindspace/tms-skills list
 npx @topmindspace/tms-skills install top-ppt-html
 npx @topmindspace/tms-skills install top-ppt-html --to ./.claude/skills
-npx @topmindspace/tms-skills@0.1.10 install top-ppt-html   # 钉版本
+npx @topmindspace/tms-skills@0.1.11 install top-ppt-html   # 钉版本
 ```
 
 ```bash
@@ -109,7 +105,7 @@ PPTX 精导需在技能目录 `npm install`（pptxgenjs）。HTML 生成仅 Pyth
 | A 演示 | [`2026-09-09-presentation-business-blue`](./top-ppt-html/assets/examples/2026-09-09-presentation-business-blue.html) |
 | B 研究 | [`2026-09-09-research-mckinsey`](./top-ppt-html/assets/examples/2026-09-09-research-mckinsey.html) |
 | C 架构 | [`2026-09-09-architecture-graphite-dark`](./top-ppt-html/assets/examples/2026-09-09-architecture-graphite-dark.html) |
-| 产品 Showcase | [`2026-09-26-topmind-tms-skills-showcase`](./top-ppt-html/assets/examples/2026-09-26-topmind-tms-skills-showcase.html)（5 种图表 · Header 工具栏专页） |
+| 产品 Showcase | [`2026-09-26-topmind-tms-skills-showcase`](./top-ppt-html/assets/examples/2026-09-26-topmind-tms-skills-showcase.html)（双交付叙事 · 5 种图表 · Header 工具栏） |
 
 ## 仓库结构
 
