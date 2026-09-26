@@ -18,7 +18,7 @@ Plenty of PPT skills exist. This one is for **formal business presenting**: clea
 </p>
 
 - Skill id: `top-ppt-html`; brand: **TopPPT HTML**
-- Version: **v0.1.14** (same tag as `@topmindspace/tms-skills@0.1.14`)
+- Version: **v0.1.15** (same tag as `@topmindspace/tms-skills@0.1.15`)
 - **Agent entry**: `SKILL.md` → `references/playbook.md` (L1) → L2 on demand
 - **Human maintainers**: this README (install / commands / layout); do not treat it as the generation spec
 
@@ -73,7 +73,7 @@ Also: arrow-key paging; **Esc** closes modals. After style/theme change, re-run 
 
 ```bash
 npx @topmindspace/tms-skills install top-ppt-html
-npx @topmindspace/tms-skills@0.1.14 install top-ppt-html
+npx @topmindspace/tms-skills@0.1.15 install top-ppt-html
 npx github:topmindspace/tms-skills install top-ppt-html
 ```
 

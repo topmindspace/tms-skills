@@ -1,3 +1,11 @@
+## [0.1.15] - 2026-09-26
+
+### Release
+- Republish of the **0.1.14 craft overhaul** (MD3 结论条 · 一屏/大纲自适应 · 克制图标). npm registry left `0.1.14` in a staged/conflict state (`E409 previously staged`); content identical to the `v0.1.14` GitHub Release / docs Pages source.
+
+### 红线未动
+反截断、图表多样性地板、Mode A craft、runtime SHA 同版本门禁、中文「演示文稿」术语、整仓 npm 发版、motion=none。
+
 ## [0.1.14] - 2026-09-26
 
 ### Craft overhaul · 三支柱：结论条 · 一屏高度/大纲自适应 · 克制图标
