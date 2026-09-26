@@ -1,3 +1,17 @@
+## 0.1.9 — 2026-09-26
+
+### Docs · banner · theme overview · live showcase
+
+- **主题总览大图**：根 README + `top-ppt-html/README.md` 嵌入三张 Gate 0 `theme-overview*.png`（演示 / 研究 / 架构），保留风格封面与 showcase 样张画廊。
+- **Slim banner**：`docs/assets/tms-skills-banner.png` 裁为 **1280×360**；README 展示宽约 960。
+- **Badge 行**：对齐 topmind 风格（Release / npm / CI / License）。
+- **Live 链接**：指向 `https://topmindspace.github.io/tms-skills/`（落地页 / showcase.html / style-gallery.html）。
+- 模板 / runtime：经 `sync_runtime.py` 校验，无「甲板」；`REPORT_MODEL` 与引擎 SHA 一致。
+- 版本对齐 **0.1.9**（根 + 技能 package/lock / SKILL metadata / README / PUBLISHING）。
+
+### 红线未动
+反截断、图表多样性地板、Mode A craft、runtime SHA 同版本门禁、中文「演示文稿」术语、整仓 npm 发版。
+
 ## 0.1.8 — 2026-09-26
 
 ### Showcase · docs · release polish
