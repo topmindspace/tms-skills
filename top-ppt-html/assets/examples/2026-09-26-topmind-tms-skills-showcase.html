@@ -503,23 +503,24 @@ tbody tr:hover{background:var(--surface-1)}
 td strong{color:var(--text);font-weight:600}
 td.k{color:var(--text);font-weight:500;white-space:nowrap}
 td.num{font-variant-numeric:tabular-nums}
-/* ── 结论条（MD3 tonal strip · 本页重点收口；默认不显示「So what」标签） ──
+/* ── 结论条（MD3 tonal surface · 本页重点收口；默认不显示「So what」标签） ──
+   去 AI 味硬规则：禁止左侧 accent 装饰轨 / 竖条 / chip 堆；强调靠 soft 满铺 + 字重/行高/呼吸间距。
    与上方主内容呼吸间距 ≥ --sp-6；flex:none 防止被主内容挤压；一屏页不得压进注释带。 */
 .band>.wrap:has(>.sowhat),.band>.wrap:has(>.note){display:flex;flex-direction:column}
-.sowhat{display:flex;align-items:flex-start;gap:var(--sp-3);flex:none;
+.sowhat{display:flex;align-items:center;gap:var(--sp-3);flex:none;
 margin-top:clamp(28px,3.6vh,48px); /* ≥ --sp-6 量级，修「贴底」 */
-padding:var(--sp-4) var(--sp-5);background:var(--accent-soft);border:1px solid var(--accent-soft-2);
-border-left:4px solid var(--accent);border-radius:var(--r-md);max-width:100%}
+padding:var(--sp-5) var(--sp-6);background:var(--accent-soft);border:1px solid var(--accent-soft-2);
+border-radius:var(--r-md);max-width:100%}
 .sowhat__k{display:none}
 .sowhat--labeled .sowhat__k{display:inline;font-size:var(--fs-xs);font-weight:700;letter-spacing:.1em;
 text-transform:uppercase;color:var(--accent-text);white-space:nowrap;flex:none;padding-top:.15em}
 .sowhat__v,.sowhat>:not(.sowhat__k){font-size:var(--fs-h3);color:var(--text);font-weight:var(--fw-title);
-line-height:1.55;flex:1;min-width:0}
+line-height:1.65;flex:1;min-width:0}
 .sowhat__v p,.sowhat__stack{margin:0}
 .sowhat__stack{display:flex;flex-direction:column;gap:var(--sp-2)}
 
 .note{display:flex;gap:var(--sp-4);padding:clamp(20px,2vw,28px);border-radius:var(--r-lg);
-background:var(--accent-soft);border-left:3px solid var(--accent)}
+background:var(--accent-soft);border:1px solid var(--accent-soft-2)}
 .note__ico{width:26px;height:26px;flex:none;border-radius:50%;background:var(--accent);
 color:var(--accent-on);display:grid;place-items:center;font-size:13px;font-weight:700;font-style:normal}
 .note__t{font-size:var(--fs-h3);font-weight:600;color:var(--text);margin-bottom:6px}
@@ -957,7 +958,7 @@ background:var(--surface-2);border-radius:6px;padding:2px 7px;color:var(--text)}
 <section class="band band--fit" id="cover">
   <div class="wrap">
     <div class="shead rv">
-      <div class="t-eyebrow">产品介绍 · 2026-09-26 · v0.1.15</div>
+      <div class="t-eyebrow">产品介绍 · 2026-09-26 · v0.1.16</div>
       <h1 class="t-display shead__title">TopMind × tms-skills</h1>
       <p class="t-lead shead__desc">HTML + PPT 双交付 · 为正式商务演示而生</p>
     </div>
@@ -978,11 +979,13 @@ background:var(--surface-2);border-radius:6px;padding:2px 7px;color:var(--text)}
       <div class="t-eyebrow">01 · 为什么是我们</div>
       <h2 class="t-h1 shead__title">市面 PPT 技能很多，为何还要 top-ppt-html</h2>
     </div>
-    <div class="grid g-2 rv a-start">
-      <div class="card"><div class="card__hd"><div class="card__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.5 13 17 22l-5-3-5 3 1.5-9"/></svg></div><h3 class="t-h3">要点一</h3></div>
-        <ul class="ul"><li><strong>正式商务演示，不是花哨 gadget。</strong>为演示报告与上台汇报而生——直观、大气、可编辑，而非装饰堆砌</li><li><strong>HTML + PPT 双交付。</strong>日常用 HTML 等同幻灯片演示；需要时再导出高保真可编辑 PPTX</li></ul></div>
-      <div class="card"><div class="card__hd"><div class="card__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-3z"/></svg></div><h3 class="t-h3">要点二</h3></div>
-        <ul class="ul"><li><strong>信息密度与克制（参考 MD3）。</strong>整体空间布局合适、文字/图形/形状/颜色克制——读得清、站得住</li></ul></div>
+    <div class="grid g-3 rv a-start">
+      <div class="card"><div class="card__hd"><div class="card__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.5 13 17 22l-5-3-5 3 1.5-9"/></svg></div><h3 class="t-h3">正式商务演示</h3></div>
+        <ul class="ul"><li><strong>不是花哨 gadget。</strong>为演示报告与上台汇报而生——直观、大气、可编辑</li><li><strong>一屏一主张。</strong>标题即行动句，少装饰堆砌</li></ul></div>
+      <div class="card"><div class="card__hd"><div class="card__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M8 20h8"/></svg></div><h3 class="t-h3">HTML + PPT 双交付</h3></div>
+        <ul class="ul"><li><strong>HTML 日常上台。</strong>单文件可翻页，等同幻灯片</li><li><strong>PPTX 按需导出。</strong>版式保真、可继续编辑</li></ul></div>
+      <div class="card"><div class="card__hd"><div class="card__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-3z"/></svg></div><h3 class="t-h3">MD3 式克制</h3></div>
+        <ul class="ul"><li><strong>密度合适。</strong>文字/图形/形状/颜色克制</li><li><strong>无 AI chrome。</strong>结论条 tonal 满铺，禁左侧装饰轨</li></ul></div>
     </div>
     <div class="sowhat rv"><span class="sowhat__v">产出即上台：同源模型保证 HTML 与 PPTX 一致，图表带数据可核对。</span></div>
   </div>
@@ -1002,7 +1005,8 @@ background:var(--surface-2);border-radius:6px;padding:2px 7px;color:var(--text)}
       <div class="card"><div class="card__hd"><div class="card__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h6"/></svg></div><h3 class="t-h3">当前主技能</h3></div>
         <ul class="ul"><li><strong>top-ppt-html。</strong>正式场合演示文稿</li><li><strong>HTML + PPTX。</strong>同源模型 · 双交付</li></ul></div>
     </div>
-    <div class="footnote">包名 @topmindspace/tms-skills · 当前线 0.1.x（latest）</div>
+    <div class="footnote">包名 @topmindspace/tms-skills · 当前线 0.1.16（latest）</div>
+      <div class="sowhat rv"><span class="sowhat__v">安装器与技能同仓同 tag——装一次，版本线对齐。</span></div>
   </div>
 </section>
 
@@ -1046,11 +1050,12 @@ background:var(--surface-2);border-radius:6px;padding:2px 7px;color:var(--text)}
       <div class="card"><div class="card__hd"><div class="card__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div><h3 class="t-h3">A · 演示</h3></div>
         <ul class="ul"><li><strong>每屏一主张。</strong>标题即行动句，非话题标签</li><li><strong>大气留白。</strong>证据充分但不堆咨询 dump</li></ul></div>
       <div class="card"><div class="card__hd"><div class="card__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6" rx="1"/><rect x="12" y="8" width="3" height="10" rx="1"/><rect x="17" y="4" width="3" height="14" rx="1"/></svg></div><h3 class="t-h3">B · 研究</h3></div>
-        <ul class="ul"><li><strong>咨询密排。</strong>Exhibit · 来源 · so-what</li><li><strong>结论可核对。</strong>数字与口径双向对齐</li></ul></div>
+        <ul class="ul"><li><strong>咨询密排。</strong>Exhibit · 来源 · 结论条</li><li><strong>结论可核对。</strong>数字与口径双向对齐</li></ul></div>
       <div class="card"><div class="card__hd"><div class="card__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M14.5 9.5l-2 5-5 2 2-5 5-2z"/></svg></div><h3 class="t-h3">C · 架构</h3></div>
         <ul class="ul"><li><strong>图为王。</strong>拓扑 / 泳道 / 分层</li><li><strong>少字多结构。</strong>一图说清关系</li></ul></div>
     </div>
     <div class="footnote">意图线索：路演/汇报/演讲 → A；调研/对标 → B；拓扑/方案图 → C</div>
+    <div class="sowhat rv"><span class="sowhat__v">先定模式再写页——A/B/C 契约决定密度、图表与结论条用法。</span></div>
   </div>
 </section>
 
@@ -1319,7 +1324,7 @@ background:var(--surface-2);border-radius:6px;padding:2px 7px;color:var(--text)}
     <div class="pmodal__body">
       <div class="hdoc">
         <h4>HTML 与 PPTX 的分工</h4>
-        <p>HTML 是阅读与演示界面，PPTX 是协作与修改格式——两者来自同一内容模型（window.REPORT_MODEL），PPTX 内全部是原生形状、文本框、表格（<code>pictures=0</code>），可在 PowerPoint / WPS 中继续编辑；<b>带数据的图表为原生数据图表</b>（chart 对象 + 内嵌 Excel，双击即可"编辑数据"）；口径、来源与 so-what 自动写入<b>演讲者备注</b>，不占版面。</p>
+        <p>HTML 是阅读与演示界面，PPTX 是协作与修改格式——两者来自同一内容模型（window.REPORT_MODEL），PPTX 内全部是原生形状、文本框、表格（<code>pictures=0</code>），可在 PowerPoint / WPS 中继续编辑；<b>带数据的图表为原生数据图表</b>（chart 对象 + 内嵌 Excel，双击即可"编辑数据"）；口径、来源与结论条自动写入<b>演讲者备注</b>，不占版面。</p>
         <h4>怎么获得 PPTX</h4>
         <div class="hch">
           <div>
@@ -1883,7 +1888,7 @@ window.REPORT_MODEL = {
   "theme": "light",
   "title": "TopMind × tms-skills",
   "subtitle": "HTML + PPT 双交付 · 为正式商务演示而生",
-  "meta": "产品介绍 · 2026-09-26 · v0.1.15",
+  "meta": "产品介绍 · 2026-09-26 · v0.1.16",
   "agenda": [
     [
       "01",
@@ -1948,23 +1953,51 @@ window.REPORT_MODEL = {
   ],
   "sections": [
     {
-      "type": "points",
-      "layoutPreset": "P4",
+      "type": "cards",
+      "layoutPreset": "P5",
       "eyebrow": "01 · 为什么是我们",
       "title": "市面 PPT 技能很多，为何还要 top-ppt-html",
-      "points": [
-        [
-          "正式商务演示，不是花哨 gadget",
-          "为演示报告与上台汇报而生——直观、大气、可编辑，而非装饰堆砌"
-        ],
-        [
-          "HTML + PPT 双交付",
-          "日常用 HTML 等同幻灯片演示；需要时再导出高保真可编辑 PPTX"
-        ],
-        [
-          "信息密度与克制（参考 MD3）",
-          "整体空间布局合适、文字/图形/形状/颜色克制——读得清、站得住"
-        ]
+      "columns": 3,
+      "cards": [
+        {
+          "title": "正式商务演示",
+          "points": [
+            [
+              "不是花哨 gadget",
+              "为演示报告与上台汇报而生——直观、大气、可编辑"
+            ],
+            [
+              "一屏一主张",
+              "标题即行动句，少装饰堆砌"
+            ]
+          ]
+        },
+        {
+          "title": "HTML + PPT 双交付",
+          "points": [
+            [
+              "HTML 日常上台",
+              "单文件可翻页，等同幻灯片"
+            ],
+            [
+              "PPTX 按需导出",
+              "版式保真、可继续编辑"
+            ]
+          ]
+        },
+        {
+          "title": "MD3 式克制",
+          "points": [
+            [
+              "密度合适",
+              "文字/图形/形状/颜色克制"
+            ],
+            [
+              "无 AI chrome",
+              "结论条 tonal 满铺，禁左侧装饰轨"
+            ]
+          ]
+        }
       ],
       "soWhat": "产出即上台：同源模型保证 HTML 与 PPTX 一致，图表带数据可核对。"
     },
@@ -2015,7 +2048,8 @@ window.REPORT_MODEL = {
           ]
         }
       ],
-      "footnote": "包名 @topmindspace/tms-skills · 当前线 0.1.x（latest）"
+      "footnote": "包名 @topmindspace/tms-skills · 当前线 0.1.16（latest）",
+      "soWhat": "安装器与技能同仓同 tag——装一次，版本线对齐。"
     },
     {
       "type": "split",
@@ -2084,7 +2118,7 @@ window.REPORT_MODEL = {
           "points": [
             [
               "咨询密排",
-              "Exhibit · 来源 · so-what"
+              "Exhibit · 来源 · 结论条"
             ],
             [
               "结论可核对",
@@ -2106,7 +2140,8 @@ window.REPORT_MODEL = {
           ]
         }
       ],
-      "footnote": "意图线索：路演/汇报/演讲 → A；调研/对标 → B；拓扑/方案图 → C"
+      "footnote": "意图线索：路演/汇报/演讲 → A；调研/对标 → B；拓扑/方案图 → C",
+      "soWhat": "先定模式再写页——A/B/C 契约决定密度、图表与结论条用法。"
     },
     {
       "type": "donut",
@@ -2408,7 +2443,7 @@ window.REPORT_MODEL = {
 
 /* __TOPPPT_RUNTIME_START__ */
 /* ══ PPTX 导出运行时（assets/pptx-export.js 的内联副本 · 由 scripts/sync_runtime.py 注入，禁止手改） ══ */
-/* __TOPPPT_RUNTIME_SHA__:f4dc2ab366ea79c4 */
+/* __TOPPPT_RUNTIME_SHA__:57dbfb4f2b594c45 */
 /* ═══════════════════════════════════════════════════════════════════════════
  * TopPPT HTML· 浏览器端 PPTX 预览运行时
  * 零依赖、随报告单文件分发；OOXML 序列化器（仅供预览，页面不导出文件）。
@@ -2905,12 +2940,12 @@ function table(x, y, w, colW, rows, S, opts) {
 function soWhatBar(sh, text, S) {
   var R = (typeof regionOf === 'function') ? regionOf('exhibit', 'annotation')
     : { x: MX, y: PT.exhibit.soWhatY, w: CW, h: 0.62 };
-  /* MD3 结论条：衬底 + 左 accent 轨 + 正文（不绘制「SO WHAT」标签字样） */
-  var bodyW = Math.max(2.5, R.w - 0.44);
-  var fzB = fitFont([String(text || '')], bodyW, R.h - 0.14, { max: 14, gapFactor: 0.2, maxShrinkSteps: 3 });
+  /* MD3 结论条：tonal soft 满铺 + 舒适字阶；禁止左 accent 装饰轨（anti-AI-flavor） */
+  var padX = 0.28, padY = 0.10;
+  var bodyW = Math.max(2.5, R.w - padX * 2);
+  var fzB = fitFont([String(text || '')], bodyW, R.h - padY * 2, { max: 15, gapFactor: 0.2, maxShrinkSteps: 3 });
   sh.push(shape('rect', R.x, R.y, R.w, R.h, S.soft));
-  sh.push(shape('rect', R.x, R.y, 0.06, R.h, S.accent));
-  sh.push(txSp(R.x + 0.22, R.y + 0.06, R.w - 0.44, R.h - 0.12,
+  sh.push(txSp(R.x + padX, R.y + padY, R.w - padX * 2, R.h - padY * 2,
     [[{ t: String(text || ''), sz: fzB, b: 1, col: S.ink, font: S.font }]], { anchor: 'ctr' }));
 }
 function footnoteLine(sh, text, S) {

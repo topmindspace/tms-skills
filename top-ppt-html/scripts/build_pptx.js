@@ -364,13 +364,13 @@ function isRec(v) { return !!v && typeof v === 'object' && !Array.isArray(v); }
 function soWhatBar(s, text) {
   const R = REGIONS.regionOf('exhibit', 'annotation') ||
     { x: MX, y: PT.exhibit.soWhatY, w: CW, h: 0.62 };
-  /* MD3 结论条：衬底 + 左 accent 轨 + 正文（不绘制「SO WHAT」标签字样） */
-  const bodyW = Math.max(2.5, R.w - 0.44);
-  const fzB = fitFont([String(text || '')], bodyW, R.h - 0.14, { max: 14, gapFactor: 0.2, maxShrinkSteps: 3 });
+  /* MD3 结论条：tonal soft 满铺 + 舒适字阶；禁止左 accent 装饰轨（anti-AI-flavor） */
+  const padX = 0.28, padY = 0.10;
+  const bodyW = Math.max(2.5, R.w - padX * 2);
+  const fzB = fitFont([String(text || '')], bodyW, R.h - padY * 2, { max: 15, gapFactor: 0.2, maxShrinkSteps: 3 });
   s.addShape('rect', { x: R.x, y: R.y, w: R.w, h: R.h, fill: { color: STYLE.soft }, line: { type: 'none' }, objectName: trName('soWhat') });
-  s.addShape('rect', { x: R.x, y: R.y, w: 0.06, h: R.h, fill: { color: STYLE.accent }, line: { type: 'none' } });
   s.addText(String(text || ''), {
-    x: R.x + 0.22, y: R.y + 0.06, w: R.w - 0.44, h: R.h - 0.12,
+    x: R.x + padX, y: R.y + padY, w: R.w - padX * 2, h: R.h - padY * 2,
     fontFace: STYLE.font, fontSize: sz(fzB), bold: true, color: STYLE.ink, valign: 'middle',
     objectName: trName('soWhat'),
   });

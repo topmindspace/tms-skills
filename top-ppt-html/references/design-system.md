@@ -63,7 +63,8 @@
 - 不加多余角标、chips 堆叠、日期页码横条（铁律 14）
 - 不用渐变、彩色阴影、玻璃拟态、无意义图标墙
 - 图标每屏 3–8 个（`icons.md`），架构模式图为王可无图标
-- 文案层的高危词表见 `layout-constants.json` `aiFlavor.words`（`validate_report.py` 硬拦）
+- **结论条禁左侧 accent 装饰轨（left rail）**：`.sowhat` / 同类收口条只用 MD3 tonal surface（`accent-soft` 满铺 + 细描边）+ 舒适字阶/行高/内边距表达强调；**禁止**竖色条、霓虹边、装饰 chip 当「AI chrome」。功能向状态条（如 `.flagbar` 待核实）可保留细强调，但不得照搬到结论条。
+- 文案层的高危词表见 `layout-constants.json` `aiFlavor.words`（`validate_report.py` 硬拦）；视觉层本条写入 `aiFlavor.visual` 注释与 `content-rules` / `components-atoms` / SKILL
 
 ## 1b. MD3 对齐映射（m3.material.io）
 

@@ -108,7 +108,7 @@ HTML 侧仍用 MD3 clamp；双端都以「最后一排可读」为准（`present
 
 > 几何常量见 `layout-constants.json` `pageTypes.{sankey,treemap,boxplot,network,marimekko,streamgraph}`（含节点/流带上限、采样点下限、双边界追踪约束）；版式与生成规则详见 `references/infographics.md`。
 
-**通用可选字段（全部页型）**：`soWhat`（结论条，MD3 accent 左轨 + soft 底；**不绘制「SO WHAT」标签**）、`footnote`（页脚来源行）、`flags`（**待核实标注清单** `["…"]` → accent 强调色清单条，提示用户二次确认，并写入演讲者备注）、`image`（素材图片 / 配图占位，见 `image` 页型）、`exhibitNo`（非 exhibit 页型也可带 Exhibit 徽标）。research 模式 `soWhat/footnote` **只在关键论证页填写**（克制条款；结论条无 So what 字样）；comparison 页型的 `verdict` 为 accent 实底结论条。
+**通用可选字段（全部页型）**：`soWhat`（结论条，MD3 tonal soft 满铺、**无左轨**；**不绘制「SO WHAT」标签**）、`footnote`（页脚来源行）、`flags`（**待核实标注清单** `["…"]` → accent 强调色清单条，提示用户二次确认，并写入演讲者备注）、`image`（素材图片 / 配图占位，见 `image` 页型）、`exhibitNo`（非 exhibit 页型也可带 Exhibit 徽标）。research 模式 `soWhat/footnote` **只在关键论证页填写**（克制条款；结论条无 So what 字样）；comparison 页型的 `verdict` 为 accent 实底结论条。
 
 > **素材图片（单源 `layout-constants.json` 的 `imageSpec`）**：`image` 三选一必填——`src`（用户图，data: 内联或相对路径）｜`items:[{src,alt?,caption?,placeholder?}]`（多图版式）｜`placeholder:true`（**配图占位**，无素材时锁版式用）。
 > - **六版式**（`layout`）：`full` 版心全宽 3:1｜`half` 左图右注 4:3｜`bleed` 通栏出血 21:9｜`grid` 多图网格 4:3（2/3/4/6 张）｜`compare` 双图 A/B 4:3｜`wall` Logo 墙 1:1。比例写在 `imageSpec.ratioDefault`，**HTML 用同比例锁定类、PPTX 用同一比例算高度并垂直居中**——两通道版式一致。

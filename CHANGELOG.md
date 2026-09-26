@@ -1,3 +1,21 @@
+## [0.1.16] - 2026-09-26
+
+### Craft · 结论条去 AI 味：取消左侧 accent 装饰轨
+
+#### 设计决策（硬原则）
+- **结论条无 left rail**：用户明确拒绝结论条左侧色条为 AI-flavored chrome。`.sowhat` / PPTX `soWhatBar()` 改为 **MD3 tonal surface 满铺**（`accent-soft` + 细描边）+ 舒适字阶 / `line-height:1.65` / 内边距 `--sp-5`/`--sp-6`；**禁止**竖色条、霓虹边、装饰 chip 当强调。
+- 写入 `design-system` §去 AI 味、`content-rules`、`components-atoms`、`SKILL`、`layout-constants.aiFlavor.visual.forbidConclusionLeftRail`。
+- 同类收口 `.note` 同步去掉左轨，改 tonal 细描边；`.flagbar`（待核实）保留细强调（功能态，非结论装饰）。
+
+#### 深度同步
+- 引擎：`engine.css` · `build_pptx.js` · `pptx-export.js` · `style-gallery` 预览条。
+- 样张 / 模板 / `docs/showcase.html`：全量 `sync_runtime`；Showcase 全页刷新（修 s1「要点一/二」占位 → 三主张卡；s2/s4 补结论条；「so-what」用户文案 →「结论条」；meta → v0.1.16）。
+- 截图：`docs/showcase/topmind-showcase/*` + `assets/showcase/*` + theme-overview 重截。
+- 版本对齐 **0.1.16**（根 + 技能 package / SKILL / README / PUBLISHING / CHANGELOG）。
+
+### 红线未动
+反截断、图表多样性地板、Mode A craft、runtime SHA 同版本门禁、中文「演示文稿」术语、整仓 npm 发版、motion=none、结论条无「So what」标签、大纲 >8 → 2col。
+
 ## [0.1.15] - 2026-09-26
 
 ### Release

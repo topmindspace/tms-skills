@@ -4,7 +4,7 @@ description: "Use when 用户要做报告、演示、汇报、PPT、slides、dec
 license: MIT
 compatibility: "Python 3 stdlib for HTML generation; Node >=18 + pptxgenjs for PPTX; optional playwright for browser regression / theme captures."
 metadata:
-  version: "0.1.15"
+  version: "0.1.16"
   author: TopMindspace
 ---
 # TopPPT HTML
@@ -102,7 +102,7 @@ metadata:
 1. **单文件零外链**——无 CDN/外部字体/外部图片，图形一律内联 SVG；`<img src>` 仅 `data:` 或相对路径且必带 `alt`（单图 ≤1.5MB、全篇 ≤8MB）；无素材图不留空不省略，用配图占位（`components.md` §11c-3）。
 2. **模式先定后写**——从对应模式模板起步；`data-mode` = `REPORT_MODEL.mode`，页面无模式切换；MD3 映射；PPTX 字号走三模式独立比例尺。
 3. **亮暗双主题一致**——CSS 变量整块换肤 + header 切换 + 文件级记忆；`REPORT_MODEL.theme` 与页面一致，PPTX 同主题导出；强调带只用 accent 家族，**末页禁 `band--deep`**。
-4. **每页一屏 + 高度稳定**——`section.band` ≥ 一屏；主内容不得溢出画布或压进结论条/注释带。放不下按「重构承载 → 拆页/分章 → 换布局形态 → 有限缩字号」（`containers.overflowRule`）；**禁止**静默截断或为疏朗删结论条/证据。大纲 **>8 条**用 `.agenda--2col`（两列/两排）。结论条 = MD3 衬条（无「So what」标签）；要点卡/关键列表按 `icons.md` 克制取用图标。
+4. **每页一屏 + 高度稳定**——`section.band` ≥ 一屏；主内容不得溢出画布或压进结论条/注释带。放不下按「重构承载 → 拆页/分章 → 换布局形态 → 有限缩字号」（`containers.overflowRule`）；**禁止**静默截断或为疏朗删结论条/证据。大纲 **>8 条**用 `.agenda--2col`（两列/两排）。结论条 = MD3 tonal surface（无「So what」标签、**无左侧 accent 轨**）；要点卡/关键列表按 `icons.md` 克制取用图标。
 5. **PPT 式翻页 + 骨架固定**——`section.band` 即一页；方向键翻页、页码可点；Agenda 第二页（arch 内容页 ≤4 可省）；页头只留 eyebrow + 标题 + 可选导语，页脚全文一个；页头页脚之外不加装饰。
 6. **标题与字号**——主标题粗体；research=结论句（≥12 字）；**presentation=主张/行动句**（禁话题标签）；字号随模式，`clamp()`，图表不缩水。
 7. **组合版式 + 细节保全**——默认一页 = 主件 + 从件 + 注释层（矩阵 playbook §四）；先判定决策必需信息再定形态，**禁砍口径列/时间列/维度**；密度 L/M/H 禁连续 3 页同档；同一版式不连用超 2 页（扩展签名可 3 页）。
@@ -132,7 +132,7 @@ metadata:
 
 ## 版本口径
 
-包 semver（现 0.1.15）≠ schema 线（layout-constants / model-schema，现 `0.1`）；patch 不抬 schema。
+包 semver（现 0.1.16）≠ schema 线（layout-constants / model-schema，现 `0.1`）；patch 不抬 schema。
 
 ## 环境依赖
 
