@@ -540,7 +540,8 @@ python scripts/prepare_images.py ./photos --layout grid --mode path   # 大图�
 }
 ```
 
-> 条目仍放不下：压缩 `.agenda__a` 的 `padding`（如 `clamp(12px,1.6vh,18px)`）；>16 条拆「上篇/下篇」两个区，或只列一级章节。
+> **阈值（layout-constants `contentQuality.agenda`）**：≤8 单列；**>8 须 `.agenda--2col`（两列/两排）**；>16 拆「上篇/下篇」或只列一级章节。放不下先换列，禁单列撑爆一屏。
+> 条目仍偏高：压缩 `.agenda__a` 的 `padding`（如 `clamp(12px,1.6vh,18px)`）。
 
 ---
 
@@ -621,4 +622,16 @@ python scripts/prepare_images.py ./photos --layout grid --mode path   # 大图�
 > **新增页型四件套纪律**：schema 条目 + 几何常量 + 双引擎渲染 + 样例与校验断言，缺一不可；组件全部内置于 `engine.css` / 模板（HTML 侧）与 `build_pptx.js` + `pptx-export.js`（PPTX 侧），几何常量在 `layout-constants.json`。
 
 ---
+
+## 结论条 `.sowhat`（本页重点收口）
+
+> **语义**：本页关键 takeaway，不是脚注。  
+> **版式**：MD3 tonal 衬条——`accent-soft` 底 + 左 4px accent 轨 + 略大于正文的 `--fw-title` 字重。  
+> **标签**：**默认不显示**「So what / SO WHAT / 结论」字样；只写句子（或 `.sowhat__stack` 短多行）。罕见需标签时加 `.sowhat--labeled` + `.sowhat__k`。  
+> **间距**：与上方主内容 `margin-top: var(--sp-5)`（≥24px），禁止贴底。  
+> **PPTX**：`soWhatBar()` 同源衬底+左轨+正文，**不绘制 SO WHAT 字符串**。
+
+```html
+<div class="sowhat rv"><span class="sowhat__v">一行含义或建议（≤60 字）。</span></div>
+```
 

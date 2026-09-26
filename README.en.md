@@ -76,9 +76,9 @@ See [top-ppt-html/README.md](./top-ppt-html/README.md) and [SKILL.md](./top-ppt-
 
 | Skill | Version | What it does |
 |-------|---------|--------------|
-| [`top-ppt-html`](./top-ppt-html/) | **0.1.13** | Formal business decks: paginated HTML + editable 16:9 PPTX; dual delivery · MD3-inspired density; 3 modes × 9 styles; strict 0/0 |
+| [`top-ppt-html`](./top-ppt-html/) | **0.1.14** | Formal business decks: paginated HTML + editable 16:9 PPTX; dual delivery · MD3-inspired density; 3 modes × 9 styles; strict 0/0 |
 
-Installer [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) is also **0.1.13** (whole-repo same-tag releases).
+Installer [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) is also **0.1.14** (whole-repo same-tag releases).
 
 ## Install
 
@@ -88,7 +88,7 @@ Installer [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspa
 npx @topmindspace/tms-skills list
 npx @topmindspace/tms-skills install top-ppt-html
 npx @topmindspace/tms-skills install top-ppt-html --to ./.claude/skills
-npx @topmindspace/tms-skills@0.1.13 install top-ppt-html   # pin
+npx @topmindspace/tms-skills@0.1.14 install top-ppt-html   # pin
 ```
 
 ```bash

@@ -225,7 +225,7 @@ def test_annotation_band_reports_all_invaders() -> None:
     els = [
         sp(5.0, 1.2, 4.0, "PlotSeriesA"),
         sp(5.2, 1.1, 4.0, "PlotSeriesB"),
-        sp(6.05, 0.55, 12.0, "SO WHAT locked path"),
+        sp(6.05, 0.55, 12.0, "Platform locked path takeaway"),
     ]
     issues = V.annotation_band_overlap_check(els, 1, int(7.5 * EMU), int(13.333 * EMU))
     codes = [i["code"] for i in issues]
@@ -252,7 +252,7 @@ def test_annotation_band_so_what_band_top() -> None:
     els = [
         # Body ends at 6.30 — inside (soWhatY=6.05, contentBottomWithNote=6.40]
         sp(5.0, 1.3, 4.0, "LegendCrushMid"),
-        sp(6.05, 0.55, 12.0, "SO WHAT platform first"),
+        sp(6.05, 0.55, 12.0, "Platform first takeaway text"),
     ]
     issues = V.annotation_band_overlap_check(els, 1, int(7.5 * EMU), int(13.333 * EMU))
     codes = [i["code"] for i in issues]

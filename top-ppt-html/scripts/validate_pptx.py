@@ -439,7 +439,7 @@ def annotation_band_overlap_check(
     def _is_annotation_self(y: int, cy: int, cx: int, text: str) -> bool:
         """so-what / footnote / source row living in the annotation zone."""
         if _at_so_what_slot(y) and cy <= int(0.85 * 914400):
-            # Fill rect, accent strip, or SO WHAT text — all live in the slot
+            # Fill rect, accent strip, or 结论条正文 — all live in the slot
             if ann_pat.search(text) or _is_bar_like(cy, cx) or cx <= int(0.15 * 914400):
                 return True
         if _is_note_like(y, cy, text):
@@ -464,7 +464,7 @@ def annotation_band_overlap_check(
         note_like = _is_note_like(y, cy, txt)
         labeled = bool(ann_pat.search(txt))
         bar = _is_bar_like(cy, cx)
-        # Fill rect sits on soWhatY (±0.02); labeled SO WHAT text may sit slightly below
+        # Fill rect sits on soWhatY (±0.02); 结论条正文 may sit slightly below
         on_fill = abs(y - so_what_y) <= int(0.02 * 914400) and bar
         labeled_slot = labeled and _at_so_what_slot(y) and cy <= int(0.85 * 914400)
         if note_like:
@@ -503,7 +503,7 @@ def annotation_band_overlap_check(
                 "ANNOTATION_BAND_OVERLAP",
                 f"主内容侵入注释带（元素底边 {bottom/914400:.2f}in 越过注释带顶 "
                 f"{band_top_in:.2f}in，重叠 {overlap/914400:.2f}in）——"
-                "图例/系列请收入主图区或压缩系列数，禁止压进 so-what/来源行。",
+                "图例/系列请收入主图区或压缩系列数，禁止压进结论条/来源行。",
                 slide=slide_no,
             ))
     return out
@@ -619,9 +619,10 @@ def _infer_container_pad(shape: ET.Element, pad_map: dict[str, float], min_pad: 
         return float(pad_map[kind]), kind
     if kind:
         return min_pad, kind
-    # 启发式兜底：仅对明确的 so-what / 待核实文本用对应 pad（其余 minPad）
+    # 启发式兜底：仅对明确的结论条 / 待核实文本用对应 pad（其余 minPad）
     text = text_content(shape)
-    if "SO WHAT" in text:
+    # Legacy "SO WHAT" label OR tr:soWhat already handled above; keep SO WHAT for old files
+    if "SO WHAT" in text or "结论条" in text:
         return float(pad_map.get("soWhat") or min_pad), "soWhat"
     if "待核实" in text:
         return float(pad_map.get("band") or min_pad), "band"
@@ -995,12 +996,27 @@ def inspect_slide(
             issue("LOW_TEXT_DENSITY", "多个文本框但总字符 <25；信息密度不足。", slide=slide_number)
         )
 
-    if re.search(r"EXHIBIT\s*\d", combined_text, re.IGNORECASE) and "SO WHAT" not in combined_text:
-        warnings.append(
-            issue("EXHIBIT_PAGE_MISSING_SOWHAT",
-                  "页面带 Exhibit 编号但没有 'SO WHAT' 结论条（research R2 版式）。",
-                  slide=slide_number)
-        )
+    if re.search(r"EXHIBIT\s*\d", combined_text, re.IGNORECASE):
+        has_conclusion_bar = False
+        for el in all_elements:
+            oname = _shape_object_name(el)
+            if "soWhat" in (oname or ""):
+                has_conclusion_bar = True
+                break
+            box = shape_bounds(el)
+            if box is None:
+                continue
+            _x, y, cx, cy = box
+            # Wide fill at soWhatY ≈ 6.05in (MD3 结论条衬底)
+            if abs(y / 914400 - 6.05) <= 0.08 and cx / 914400 >= 6.0 and cy / 914400 <= 0.85:
+                has_conclusion_bar = True
+                break
+        if not has_conclusion_bar and "SO WHAT" not in combined_text:
+            warnings.append(
+                issue("EXHIBIT_PAGE_MISSING_SOWHAT",
+                      "页面带 Exhibit 编号但没有结论条（research R2 版式 · MD3 衬条）。",
+                      slide=slide_number)
+            )
 
     # v9：HTML 标签源码泄漏进 PPTX 文本（模型字段未净化时原样露出）
     tag_leaks = re.findall(

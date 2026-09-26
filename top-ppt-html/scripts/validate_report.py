@@ -23,7 +23,7 @@ research / architecture 仍须显式传 --layout-qa（不强制）。
   强调带约束（band--deep 反相页 ≤ 上限且不作末页） / 待核实标注（.tbd ↔ .tbd-legend/.flagbar） /
   素材图片与配图占位（零外链 + alt + 内联体积 + 版式/比例锁定类对应 + 占位可见标签 + 模型对应） /
   PPTX 预览配套（预览按钮 + 模型 + 运行时，页面无导出按钮） /
-  内容级质量（版式节奏连用上限 / so-what 实质与空洞套话 / research 标题含数字或判断词）
+  内容级质量（版式节奏连用上限 / 结论条实质与空洞套话 / research 标题含数字或判断词）
 """
 import sys
 import re
@@ -97,7 +97,7 @@ IMAGE_MAX_PER_PAGE = int(IMAGE_SPEC.get('maxPerPage') or 6)
 IMAGE_MAX_INLINE = int(IMAGE_SPEC.get('maxInlineBytes') or 1572864)
 IMAGE_MAX_TOTAL = int(IMAGE_SPEC.get('maxTotalInlineBytes') or 8388608)
 
-AGENDA_SINGLE_MAX = 8        # 超过则建议 agenda--2col
+AGENDA_SINGLE_MAX = int((((LC.get("contentQuality") or {}).get("agenda") or {}).get("singleMax")) or 8)  # 超过则须 agenda--2col
 # 页高估算参数（单源 layout-constants.pageHeightEstimate）
 _HE = LC.get('pageHeightEstimate') or {}
 SCREEN_BUDGET_PX = int(_HE.get('screenBudgetPx') or 1000)
@@ -356,7 +356,7 @@ def _check_bands(txt, chk, mode="presentation"):
 
 
 def _check_icons(txt, chk):
-    """图标使用：长报告不应全文无图标（要点卡/关键列表至少一处）。"""
+    """图标使用：长报告不应全文无图标；含 ≥2 张卡的内容页应有 .card__ico（WARN）。"""
     if len(_bands(txt)) < 6:
         return
     has_icon = ('ul--ico' in txt or 'metric__ico' in txt or
@@ -364,6 +364,24 @@ def _check_icons(txt, chk):
                 re.search(r'card__ico">\s*<svg', txt))
     chk("长报告（≥6页）要点卡/关键列表有图标", bool(has_icon),
         "全文未用图标（见 icons.md 使用准则）", level="WARN")
+    # Soft gate: points/cards pages with ≥2 .card and zero .card__ico
+    bare_card_pages = 0
+    for m in re.finditer(r'<section\b([^>]*)>([\s\S]*?)</section>', txt):
+        attrs, body = m.group(1), m.group(2)
+        pt = re.search(r'data-page-type="([^"]+)"', attrs)
+        page_type = (pt.group(1) if pt else '') or ''
+        if page_type not in ('points', 'cards', 'split', 'comparison'):
+            # Also catch sections that clearly use card grids
+            if body.count('class="card') + body.count("class='card") < 2:
+                continue
+        n_cards = len(re.findall(r'class="[^"]*\bcard\b', body))
+        if n_cards < 2:
+            continue
+        if 'card__ico' not in body:
+            bare_card_pages += 1
+    chk("要点/卡片页（≥2 卡）含 .card__ico", bare_card_pages == 0,
+        f"{bare_card_pages} 页有多卡但无图标（见 icons.md 四正当位置）" if bare_card_pages else "",
+        level="WARN")
 
 
 def _check_table_rows(txt, chk, mode="presentation"):
@@ -763,7 +781,7 @@ def _check_content_quality(txt, chk, mode, model):
         if any(f in body for f in forbidden):
             hollow.append(f'{src}:{body[:24]}')
     if texts:
-        chk(f"so-what 实质（长度 ≥{min_chars} 字且无空洞套话）", not short and not hollow,
+        chk(f"结论条实质（长度 ≥{min_chars} 字且无空洞套话）", not short and not hollow,
             "; ".join((short + hollow)[:4]) if (short or hollow) else "", level="WARN")
 
     # ③ research 行动标题须含数字或判断词
@@ -1651,8 +1669,12 @@ def main():
         n_items = txt.count('class="agenda__a"')
         chk("Agenda 条目可点击跳转 (≥4)", n_items >= 4, f"{n_items} 条")
         if n_items > AGENDA_SINGLE_MAX:
+            # 只认大纲元素 class（禁被 engine.css 的 .agenda--2col 选择器误伤）
+            has_2col = bool(re.search(
+                r'<ol\b[^>]*class="[^"]*\bagenda--2col\b', txt)) or bool(re.search(
+                r'<ol\b[^>]*class="[^"]*\bagenda\b[^"]*\bagenda--2col\b', txt))
             chk(f"Agenda >{AGENDA_SINGLE_MAX} 条时已用 agenda--2col 双列",
-                'agenda--2col' in txt, f"{n_items} 条未双列", level="WARN")
+                has_2col, f"{n_items} 条未双列（大纲很多→两排/两列，禁单列撑爆一屏）", level="WARN")
 
     # ── 主标题粗体 ──
     chk("主标题粗体 --fw-title/--fw-display",

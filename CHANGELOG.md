@@ -1,3 +1,29 @@
+## [0.1.14] - 2026-09-26
+
+### Craft overhaul · 三支柱：结论条 · 一屏高度/大纲自适应 · 克制图标
+
+#### A. MD3 结论条（原 so-what）
+- `.sowhat` 升为 MD3 tonal 衬条（`accent-soft` 底 + 左 4px accent 轨 + `--fw-title` / `fs-h3`）；**默认不显示「So what / SO WHAT」标签**（可选 `.sowhat--labeled`）。
+- 与上方主内容呼吸间距 `clamp(28px,3.6vh,48px)`；`:has(>.sowhat)` 时 wrap 纵向 flex，结论条 `flex:none` 防挤压。
+- CSS 迁入公共 `engine.css`（三模式共享）；research 模板去掉重复规则。
+- PPTX `soWhatBar()` 双通道只画衬底+左轨+正文；`chartBottom` 相对 `soWhatY` 让位 0.12→0.20in。
+- 门禁：`EXHIBIT_PAGE_MISSING_SOWHAT` 改检测结论条形状；文案「结论条」。
+
+#### B. 一页一屏 · 大纲自适应
+- 高度契约：`section.band` 一屏；主内容不得溢出或压进结论条/注释带；放不下走 `overflowRule`（重构→拆页→换形态→有限缩字），禁静默截断。
+- 大纲：**>8 条须 `.agenda--2col`（两列/两排）**；>16 拆篇。阈值入 `contentQuality.agenda`；`validate_report` 只认 `<ol class="…agenda--2col">`（修 CSS 选择器误伤假通过）。
+- Showcase 12 条大纲改双列；`layout-grammar` / `components-atoms` / SKILL 同步。
+
+#### C. 图标原则（行业共识 · 非装饰）
+- `icons.md` 增补 wayfinding / 同家族 / 有限密度 / 四正当位置 / 禁区（Agenda·表·图内）；Mode A 内容页必做。
+- Showcase / 黄金样张落地 `card__ico` / `ul--ico`；`validate_report` 对「≥2 卡且无 `.card__ico`」发 WARN。
+
+#### 发布
+- 样张、模板、references、README、PUBLISHING、截图同步；版本对齐 **0.1.14**。
+
+### 红线未动
+反截断、图表多样性地板、Mode A craft、runtime SHA 同版本门禁、中文「演示文稿」术语、整仓 npm 发版、motion=none。
+
 ## [0.1.13] - 2026-09-26
 
 ### Changed

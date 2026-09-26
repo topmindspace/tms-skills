@@ -364,16 +364,16 @@ function isRec(v) { return !!v && typeof v === 'object' && !Array.isArray(v); }
 function soWhatBar(s, text) {
   const R = REGIONS.regionOf('exhibit', 'annotation') ||
     { x: MX, y: PT.exhibit.soWhatY, w: CW, h: 0.62 };
-  /* 长结论条在 bar 内有限缩字号（fontShrink），优先保内容完整不越出容器 */
-  const labelW = 1.35;
-  const bodyW = Math.max(2.5, R.w - 0.44 - labelW);
-  const fzB = fitFont([String(text || '')], bodyW, R.h - 0.14, { max: 12.5, gapFactor: 0.2, maxShrinkSteps: 3 });
+  /* MD3 结论条：衬底 + 左 accent 轨 + 正文（不绘制「SO WHAT」标签字样） */
+  const bodyW = Math.max(2.5, R.w - 0.44);
+  const fzB = fitFont([String(text || '')], bodyW, R.h - 0.14, { max: 14, gapFactor: 0.2, maxShrinkSteps: 3 });
   s.addShape('rect', { x: R.x, y: R.y, w: R.w, h: R.h, fill: { color: STYLE.soft }, line: { type: 'none' }, objectName: trName('soWhat') });
   s.addShape('rect', { x: R.x, y: R.y, w: 0.06, h: R.h, fill: { color: STYLE.accent }, line: { type: 'none' } });
-  s.addText([
-    { text: 'SO WHAT　', options: { fontSize: sz(11), bold: true, color: STYLE.accent, charSpacing: 1.5 } },
-    { text: text, options: { fontSize: sz(fzB), color: STYLE.ink } },
-  ], { x: R.x + 0.22, y: R.y + 0.06, w: R.w - 0.44, h: R.h - 0.12, fontFace: STYLE.font, valign: 'middle', objectName: trName('soWhat') });
+  s.addText(String(text || ''), {
+    x: R.x + 0.22, y: R.y + 0.06, w: R.w - 0.44, h: R.h - 0.12,
+    fontFace: STYLE.font, fontSize: sz(fzB), bold: true, color: STYLE.ink, valign: 'middle',
+    objectName: trName('soWhat'),
+  });
 }
 function footnoteLine(s, text) {
   const R = REGIONS.regionOf('exhibit', 'footnote') ||
@@ -576,7 +576,7 @@ function chartBottom(hasSoWhat, hasFootnote) {
   /* 取最紧下界：so-what / footnote / contentBottomWithNote 并存时不得短路（D8）。
    * 与 ~1630 flagY 的 Math.min 让位同口径；withNote 时对齐 regionOf 的 contentBottomWithNote。 */
   let bot = CONTENT_BOTTOM;
-  if (hasSoWhat) bot = Math.min(bot, PT.exhibit.soWhatY - 0.12);
+  if (hasSoWhat) bot = Math.min(bot, PT.exhibit.soWhatY - 0.20);
   if (hasFootnote) bot = Math.min(bot, PT.exhibit.footnoteY - 0.12);
   if (hasSoWhat || hasFootnote) bot = Math.min(bot, CONTENT_BOTTOM_NOTE);
   return bot;
@@ -827,15 +827,22 @@ function paretoChart(s, c, pos) {
     ], Object.assign({}, barOpts, pos));
   } catch (e) { chartTry(s, pptx.ChartType.bar, chartSeries(c), Object.assign({}, barOpts, pos), c); }
 }
-function nativeDonutChart(s, dcn, dcols) {
+function nativeDonutChart(s, dcn, dcols, bottomY) {
   const d = PT.donut;
+  /* 有结论条/脚注时压半径，避免环图底边压进 soWhatY（D11） */
+  let r = d.r;
+  const cy = d.centerY;
+  if (bottomY != null && cy + r > bottomY) {
+    r = Math.max(0.9, bottomY - cy - 0.04);
+  }
   s.addChart(pptx.ChartType.doughnut, chartSeries(dcn), {
-    x: d.centerX - d.r, y: d.centerY - d.r, w: d.r * 2, h: d.r * 2,
-    holeSize: Math.round(d.holeR / d.r * 100),
+    x: d.centerX - r, y: cy - r, w: r * 2, h: r * 2,
+    holeSize: Math.round((d.holeR / d.r) * 100),
     chartColors: dcols,
     showLegend: false, showValue: false, showPercent: false, showTitle: false,
     dataBorder: { pt: 1.5, color: STYLE.bg },
   });
+  return r;
 }
 /* ═══ 形状通道图表（非原生类型的高保真形状还原）═══
  * 与 A 通道（assets/pptx-export.js 的 chartShapes）语义一致：类别标签与数值都落为文本，
@@ -1774,17 +1781,19 @@ CONTENT.sections.forEach((sec) => {
     if (dcn.labels && dcn.values) {
       const d = PT.donut;
       const dcols = dcn.colors || donutColors(styleArg);
-      nativeDonutChart(s, dcn, dcols);
-      const hb = d.holeR * 2;
+      const usedR = nativeDonutChart(s, dcn, dcols, bodyBottom) || d.r;
+      const holeR = d.holeR * (usedR / d.r);
+      const hb = holeR * 2;
       let total = 0; dcn.values.forEach(v => { total += Math.max(0, v); });
       const totalStr = (Math.round(total * 10) / 10) + (dcn.unit || '');
-      s.addText(totalStr, { x: d.centerX - d.holeR, y: d.centerY - 0.42, w: hb, h: 0.5, align: 'center',
+      s.addText(totalStr, { x: d.centerX - holeR, y: d.centerY - 0.42, w: hb, h: 0.5, align: 'center',
         fontFace: STYLE.fontDisplay, fontSize: sz(20), bold: true, color: STYLE.ink, valign: 'middle' });
-      s.addText(dcn.centerLabel || '合计', { x: d.centerX - d.holeR, y: d.centerY + 0.08, w: hb, h: 0.35, align: 'center',
+      s.addText(dcn.centerLabel || '合计', { x: d.centerX - holeR, y: d.centerY + 0.08, w: hb, h: 0.35, align: 'center',
         fontFace: STYLE.font, fontSize: sz(9.5), color: STYLE.faint, valign: 'middle' });
       const n = Math.max(1, dcn.labels.length);
-      const rowH = Math.min(d.legendRowH, 3.4 / n);
-      const ly0 = d.centerY - (n * rowH) / 2 + 0.1;
+      const maxLegH = Math.max(1.2, bodyBottom - (d.centerY - 1.7));
+      const rowH = Math.min(d.legendRowH, maxLegH / n, 3.4 / n);
+      const ly0 = Math.min(d.centerY - (n * rowH) / 2 + 0.1, bodyBottom - n * rowH - 0.04);
       const sum2 = total || 1;
       dcn.labels.forEach((lb, i) => {
         const v = dcn.values[i] || 0;
@@ -1988,11 +1997,30 @@ CONTENT.sections.forEach((sec) => {
     const isH = c.type === 'hbar';
     const reg = REGIONS.regionOf('bar', isH ? 'hbar' : 'primary', { bottom: bot }) ||
       { x: MX, y: isH ? PT.bar.hbarY0 : PT.bar.chartY, w: CW, h: 3 };
+    const pts = (sec.points || []).filter(Boolean);
+    let cx = reg.x, cw = reg.w;
+    /* 有侧栏要点时让出右栏，保证 HTML g-side / 怎么读这张图 与 PPTX 同源可核对 */
+    if (pts.length && !isH) {
+      const sideW = Math.min(3.6, Math.max(2.6, reg.w * 0.30));
+      cw = Math.max(3.2, reg.w - sideW - 0.28);
+      const sx = reg.x + cw + 0.28;
+      const rowH = Math.min(0.72, (reg.h - 0.1) / Math.max(1, pts.length));
+      pts.slice(0, 6).forEach((p, i) => {
+        const k = Array.isArray(p) ? String(p[0] || '') : String((p && p.t) || '');
+        const v = Array.isArray(p) ? String(p[1] || '') : String((p && p.d) || '');
+        const y = reg.y + i * rowH;
+        s.addShape('rect', { x: sx, y: y + 0.12, w: 0.08, h: 0.08,
+          fill: { color: STYLE.accent }, line: { type: 'none' } });
+        s.addText([
+          { text: k + (v ? '　' : ''), options: { fontSize: sz(12), bold: true, color: STYLE.ink } },
+          { text: v, options: { fontSize: sz(11), color: STYLE.body } },
+        ], { x: sx + 0.2, y, w: sideW - 0.25, h: rowH, fontFace: STYLE.font, valign: 'middle' });
+      });
+    }
     if (isH) {
-      chartBlock(s, c, reg.x, reg.y, reg.w, reg.h, dcols);
+      chartBlock(s, c, cx, reg.y, cw, reg.h, dcols);
     } else {
-      /* 非 hbar 保持两侧留白（chartX/chartW），region 已扣减 */
-      chartBlock(s, c, reg.x, reg.y, reg.w, Math.max(1.5, reg.h), dcols);
+      chartBlock(s, c, cx, reg.y, cw, Math.max(1.5, reg.h), dcols);
     }
     if (sec.note) s.addText(sec.note, { x: MX, y: PT.note.y, w: CW, h: PT.note.h, fontFace: STYLE.font,
       fontSize: sz(11), color: STYLE.faint });
@@ -2344,7 +2372,7 @@ CONTENT.sections.forEach((sec) => {
   if (sec.steps) _notes.push('步骤：' + sec.steps.map(st => (isRec(st) ? st.t : st[0]) || '').join(' → '));
   if (sec.items) _notes.push('达成对比：' + sec.items.map(it => it[0] + ' ' + it[1] + (it[2] != null ? '/' + it[2] : '')).join('；'));
   if (sec.levels) _notes.push('层级：' + sec.levels.map(l => (isRec(l) ? l.t : l[0]) || '').join(' → '));
-  if (sec.soWhat) _notes.push('So what：' + sec.soWhat);
+  if (sec.soWhat) _notes.push('结论：' + sec.soWhat);
   if (sec.layoutPreset) _notes.push('布局骨架：' + sec.layoutPreset);
   if (flagItems.length) _notes.push('待核实（需二次确认）：' + flagItems.join('；'));
   if (sec.note) _notes.push('注：' + sec.note);

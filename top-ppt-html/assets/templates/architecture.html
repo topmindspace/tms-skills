@@ -263,7 +263,8 @@ section.band{scroll-snap-align:start}
    svh 兼容移动端浏览器工具栏；旧浏览器落到 100vh。 */
 .band{padding-block:var(--band-pad);min-height:var(--band-min);
 display:flex;flex-direction:column;justify-content:center}
-.band>.wrap{width:100%}
+.band>.wrap{width:100%;min-height:0}
+.band>.wrap>.grid,.band>.wrap>.stack,.band>.wrap>.fig,.band>.wrap>.cols-2,.band>.wrap>.cols-3,.band>.wrap>.exhibit{min-height:0}
 .band--top{justify-content:flex-start}          /* 内容约六七成屏：贴顶 + 底部自然留白 */
 .band--fit{justify-content:center}              /* 内容接近一屏：垂直居中（默认行为，保留以兼容旧报告） */
 .band--flow{min-height:0;justify-content:flex-start}  /* 长内容页（附录/全量参考）显式退出固定页高 */
@@ -504,6 +505,21 @@ tbody tr:hover{background:var(--surface-1)}
 td strong{color:var(--text);font-weight:600}
 td.k{color:var(--text);font-weight:500;white-space:nowrap}
 td.num{font-variant-numeric:tabular-nums}
+/* ── 结论条（MD3 tonal strip · 本页重点收口；默认不显示「So what」标签） ──
+   与上方主内容呼吸间距 ≥ --sp-6；flex:none 防止被主内容挤压；一屏页不得压进注释带。 */
+.band>.wrap:has(>.sowhat),.band>.wrap:has(>.note){display:flex;flex-direction:column}
+.sowhat{display:flex;align-items:flex-start;gap:var(--sp-3);flex:none;
+margin-top:clamp(28px,3.6vh,48px); /* ≥ --sp-6 量级，修「贴底」 */
+padding:var(--sp-4) var(--sp-5);background:var(--accent-soft);border:1px solid var(--accent-soft-2);
+border-left:4px solid var(--accent);border-radius:var(--r-md);max-width:100%}
+.sowhat__k{display:none}
+.sowhat--labeled .sowhat__k{display:inline;font-size:var(--fs-xs);font-weight:700;letter-spacing:.1em;
+text-transform:uppercase;color:var(--accent-text);white-space:nowrap;flex:none;padding-top:.15em}
+.sowhat__v,.sowhat>:not(.sowhat__k){font-size:var(--fs-h3);color:var(--text);font-weight:var(--fw-title);
+line-height:1.55;flex:1;min-width:0}
+.sowhat__v p,.sowhat__stack{margin:0}
+.sowhat__stack{display:flex;flex-direction:column;gap:var(--sp-2)}
+
 .note{display:flex;gap:var(--sp-4);padding:clamp(20px,2vw,28px);border-radius:var(--r-lg);
 background:var(--accent-soft);border-left:3px solid var(--accent)}
 .note__ico{width:26px;height:26px;flex:none;border-radius:50%;background:var(--accent);
@@ -1498,7 +1514,7 @@ if(e.isIntersecting){e.target.classList.add('in');o.unobserve(e.target)}})},
   var PROMPT=[
 '请为这份 HTML 报告生成可编辑 PPTX 并交付：',
 '1) 阅读 references/pptx-export.md 与 references/modes.md（三模式独立规则）；',
-'2) 核对/补全 window.REPORT_MODEL 为与正文严格一致的内容（含 mode/style/theme/title/agenda/sections/closing；theme 为 light 或 dark、与页面 data-theme 一致——PPTX 按此导出亮色版或深色版；29 种页型字段与 30 类 chart.type 见 scripts/model-schema.json；research 关键图表页用 type:"exhibit" 并填 exhibitNo/soWhat/footnote）；',
+'2) 核对/补全 window.REPORT_MODEL 为与正文严格一致的内容（含 mode/style/theme/title/agenda/sections/closing；theme 为 light 或 dark、与页面 data-theme 一致——PPTX 按此导出亮色版或深色版；29 种页型字段与 30 类 chart.type 见 scripts/model-schema.json；research 关键图表页用 type:"exhibit" 并填 exhibitNo/soWhat(结论条)/footnote）；',
 '3) 运行 python scripts/validate_report.py <报告.html> 直到全 PASS（含模型一致性检查）；',
 '4) 智能体精导并质检（0/0 才交付）：python scripts/extract_model.py <报告.html> → NODE_PATH=<pptxgenjs 所在 node_modules> node scripts/build_pptx.js <报告.pptx> --model=<报告.model.json>（如需覆盖模型主题可加 --theme=light|dark） → python scripts/validate_pptx.py <报告.pptx> --strict --model=<报告.model.json>。',
 '报告文件：<请填写报告.html 的路径>'
@@ -1778,7 +1794,7 @@ window.REPORT_MODEL = {
 
 /* __TOPPPT_RUNTIME_START__ */
 /* ══ PPTX 导出运行时（assets/pptx-export.js 的内联副本 · 由 scripts/sync_runtime.py 注入，禁止手改） ══ */
-/* __TOPPPT_RUNTIME_SHA__:77ca318e7a510e01 */
+/* __TOPPPT_RUNTIME_SHA__:899c3cbd2cbb0f1f */
 /* ═══════════════════════════════════════════════════════════════════════════
  * TopPPT HTML· 浏览器端 PPTX 预览运行时
  * 零依赖、随报告单文件分发；OOXML 序列化器（仅供预览，页面不导出文件）。
@@ -1859,7 +1875,7 @@ var PRESETS_DARK = {
 var STYLE_DATA_COLORS = {"business-blue":["1a73e8","3526bb","21a199","b77148","99983d"],"apple-mono":["1d1d1f","0071e3","0f7b6c","c2410c","7c3aed"],"mckinsey":["003a70","2826bb","21a18e","b76848","99903d"],"brand-red":["d0021b","bb6326","d634ae","40a182","438aa8"],"warm-sand":["96681f","839324","cf3b3e","4d88b2","4a47a4"],"deep-teal":["0f6b5c","2683bb","22aa3e","b74870","a85c43"],"graphite-dark":["0369a1","2637bb","1f9977","b75948","a18a40"],"indigo-violet":["5b5bd6","7432ae","4197c8","a08f4b","7ca04b"],"spectrum":["4563ef","5b26bb","269ebb","af8746","83993d"]};
 var STYLE_DATA_COLORS_DARK = {"business-blue":["8ab4f8","7966e0","88e7e5","d4ad91","cbce83"],"apple-mono":["f5f5f7","2997ff","2dd4bf","ff9f0a","bf5af2"],"mckinsey":["7fb2e5","6f6bdb","8ce3d8","d1a694","cbc586"],"brand-red":["ff5a66","e09e66","e788cb","91d4c2","83b4ce"],"warm-sand":["d9b36a","c2d571","df9391","97b5ce","8e89c7"],"deep-teal":["4fc3b0","7aaecd","97d8a4","c99cac","c29c8f"],"graphite-dark":["4da3ff","6c66e0","88e7dc","d4a691","cec983"],"indigo-violet":["a5a4f0","a967e0","89c3e7","d3c792","aece83"],"spectrum":["8ba0f8","9066e0","88d6e7","d4ba91","bdce83"]};
 var GRID = {"columns":12,"gutter":0.16,"colW":0.8644,"x":[0.6,1.6244,2.6488,3.6732,4.6976,5.722,6.7464,7.7708,8.7952,9.8196,10.844,11.8684,12.733],"y":[2.35,3.27,4.19,5.11,6.03,6.9],"safe":{"top":0.4,"bottom":0.4,"left":0.6,"right":0.6}};
-var TYPO = {"levels":[{"id":"C0","name":"封面/章节幕标题","role":"coverTitle","usage":"封面主标题、章节幕标题"},{"id":"T1","name":"页码/章节徽章","role":"caption","usage":"页码徽章、章节编号"},{"id":"T2","name":"页面主标题/结论标题","role":"h1","usage":"每页顶部结论句（research 行动标题）"},{"id":"T3","name":"副标题/语境说明","role":"lead","usage":"主标题下方导语"},{"id":"T4","name":"模块标题/图表标题","role":"h2","usage":"卡片标题、图表标题、面板标题"},{"id":"T5","name":"证据编号/轻量标签","role":"micro","usage":"Exhibit 编号、状态标签"},{"id":"T6","name":"证据块标题/小节标题","role":"h2","usage":"分栏小标题、证据块标题"},{"id":"T7","name":"正文解释段落","role":"body","usage":"证据解释、管理解读正文、表格正文"},{"id":"T8","name":"结论条文字","role":"body","usage":"so-what 结论条、核心结论框"},{"id":"T9","name":"SO WHAT 标签","role":"caption","usage":"so-what 标签行"},{"id":"T10","name":"SO WHAT 正文/业务含义","role":"body","usage":"so-what 正文、行动含义、表格行动项"},{"id":"T11","name":"图表轴/图例/刻度/微标签","role":"micro","usage":"坐标轴、图例、刻度、单位（禁用于表格正文与完整短句）"},{"id":"T12","name":"图表数据标签","role":"caption","usage":"折线点值、柱形标签、百分比标注"},{"id":"T13","name":"关键 KPI 大数字","role":"h1","usage":"KPI 大数字、hero 数值"},{"id":"T14","name":"注释/口径/来源/页脚","role":"micro","usage":"footnote、来源行、页脚、小页码"}],"tableSemanticRule":{"body":["T7","T10"],"microAllowed":["T11"],"microForbiddenFor":["表格正文","行动项","风险项","解释句","建议句","长项目符号","完整短句"]}};
+var TYPO = {"levels":[{"id":"C0","name":"封面/章节幕标题","role":"coverTitle","usage":"封面主标题、章节幕标题"},{"id":"T1","name":"页码/章节徽章","role":"caption","usage":"页码徽章、章节编号"},{"id":"T2","name":"页面主标题/结论标题","role":"h1","usage":"每页顶部结论句（research 行动标题）"},{"id":"T3","name":"副标题/语境说明","role":"lead","usage":"主标题下方导语"},{"id":"T4","name":"模块标题/图表标题","role":"h2","usage":"卡片标题、图表标题、面板标题"},{"id":"T5","name":"证据编号/轻量标签","role":"micro","usage":"Exhibit 编号、状态标签"},{"id":"T6","name":"证据块标题/小节标题","role":"h2","usage":"分栏小标题、证据块标题"},{"id":"T7","name":"正文解释段落","role":"body","usage":"证据解释、管理解读正文、表格正文"},{"id":"T8","name":"结论条文字","role":"body","usage":"结论条、核心结论框"},{"id":"T9","name":"结论条标签（可选·默认隐藏）","role":"caption","usage":"结论条可选标签（默认不显示）"},{"id":"T10","name":"结论条正文/业务含义","role":"body","usage":"结论条正文、行动含义、表格行动项"},{"id":"T11","name":"图表轴/图例/刻度/微标签","role":"micro","usage":"坐标轴、图例、刻度、单位（禁用于表格正文与完整短句）"},{"id":"T12","name":"图表数据标签","role":"caption","usage":"折线点值、柱形标签、百分比标注"},{"id":"T13","name":"关键 KPI 大数字","role":"h1","usage":"KPI 大数字、hero 数值"},{"id":"T14","name":"注释/口径/来源/页脚","role":"micro","usage":"footnote、来源行、页脚、小页码"}],"tableSemanticRule":{"body":["T7","T10"],"microAllowed":["T11"],"microForbiddenFor":["表格正文","行动项","风险项","解释句","建议句","长项目符号","完整短句"]}};
 var CONT = {"pad":{"card":0.18,"panel":0.2,"cell":0.08,"band":0.16,"soWhat":0.16,"kpi":0.18,"chart":0.1,"head":0.05,"footer":0.05,"node":0.06},"minPad":0.06,"textMetrics":{"lineFactor":1.45,"emAsciiRatio":0.52},"overflowRule":"溢出处置优先级（禁静默截断）：① 重构承载（列表/卡片/表/图/组合版式）→ ② 拆页/分章（议程→主张→证据卡→明细；01a/01b；信息须完整）→ ③ 换布局形态（V1–V4/多列/卡栅格）→ ④ 有限 fontShrink（阶梯内、模式 floor 以上、最多 4 档）→ ⑤ 禁止：静默截断、砍 so-what/证据/口径、为审美稀疏删决策必需信息。单页字数预算是预警不是删字许可证。","fontShrink":{"ladder":[15,14,13.5,13,12.5,12,11.5,11,10.5,10,9.5,9,8.5],"maxShrinkSteps":4,"floorPt":{"presentation":10,"research":9,"architecture":10},"preferContentFirst":true,"warnBelow":9.5},"continuousTextRule":"语义连续的一句话 / so-what 主句 / 结论句 / 表格单元格正文不得拆成多个独立文本框（避免异常空格、断句、基线漂移）；局部加粗高亮必须用同一文本框内富文本。"};
 var REG = {"bar":{"html":"svg-bars","pptx":"native","nativeType":"bar","dataTable":"notes","min":{"vbHeightMin":160}},"hbar":{"html":"svg-hbars","pptx":"native","nativeType":"bar","dataTable":"notes","min":{"vbHeightMin":100}},"stack":{"html":"svg-stack","pptx":"native","nativeType":"bar","dataTable":"notes","min":{"vbHeightMin":160},"nativeOpt":{"barGrouping":"stacked"}},"stackline":{"html":"svg-stackline","pptx":"native","nativeType":"bar","dataTable":"notes","min":{"vbHeightMin":40},"nativeOpt":{"barGrouping":"percentStacked"}},"line":{"html":"svg-line","pptx":"native","nativeType":"line","dataTable":"notes","min":{"vbHeightMin":160}},"dualline":{"html":"svg-dualline","pptx":"native","nativeType":"line","dataTable":"notes","min":{"vbHeightMin":160}},"area":{"html":"svg-area","pptx":"native","nativeType":"area","dataTable":"notes","min":{"vbHeightMin":160}},"donut":{"html":"svg-donut","pptx":"native","nativeType":"doughnut","dataTable":"notes","min":{"pxWidthMin":140}},"multidonut":{"html":"svg-mdonut","pptx":"native","nativeType":"doughnut","dataTable":"notes","min":{"pxWidthMin":140}},"pie":{"html":"svg-pie","pptx":"native","nativeType":"pie","dataTable":"notes","min":{"pxWidthMin":140}},"radar":{"html":"svg-radar","pptx":"native","nativeType":"radar","dataTable":"notes","min":{"pxWidthMin":220}},"scatter":{"html":"svg-scatter","pptx":"native","nativeType":"scatter","dataTable":"notes","min":{"vbHeightMin":180}},"bubble":{"html":"svg-bubble","pptx":"native","nativeType":"bubble","dataTable":"notes","min":{"vbHeightMin":180}},"waterfall":{"html":"svg-wf","pptx":"native","nativeType":"bar","dataTable":"notes","min":{"vbHeightMin":170},"nativeTrick":"stacked+hiddenBase+connector"},"gauge":{"html":"svg-gauge","pptx":"native","nativeType":"doughnut","dataTable":"notes","min":{"pxWidthMin":180},"nativeTrick":"doughnut+firstSliceAng+hiddenRemainder"},"pareto":{"html":"svg-pareto","pptx":"native","nativeType":"bar","dataTable":"notes","min":{"vbHeightMin":180},"nativeTrick":"multiType+bar+line"},"gantt":{"html":"svg-gantt","pptx":"shape","dataTable":"notes","min":{"vbHeightMin":130},"path":{"forbidPresetShapes":true}},"vsbar":{"html":"svg-vsbar","pptx":"shape","dataTable":"notes","min":{"vbHeightMin":100},"path":{"forbidPresetShapes":true}},"progress":{"html":"svg-progress","pptx":"shape","dataTable":"notes","min":{"vbHeightMin":100},"path":{"forbidPresetShapes":true}},"sparkline":{"html":"svg-spark","pptx":"shape","dataTable":"off","min":{"vbHeightMin":20},"path":{"forbidPresetShapes":true}},"funnel":{"html":"svg-funnel","pptx":"shape","dataTable":"notes","min":{"vbHeightMin":160},"path":{"minSamplePoints":8,"forbidPresetShapes":true}},"treemap":{"html":"svg-treemap","pptx":"shape","dataTable":"appendix","min":{"vbHeightMin":170},"path":{"forbidPresetShapes":true}},"marimekko":{"html":"svg-marimekko","pptx":"shape","dataTable":"appendix","min":{"vbHeightMin":160},"path":{"forbidPresetShapes":true}},"boxplot":{"html":"svg-boxplot","pptx":"shape","dataTable":"appendix","min":{"vbHeightMin":180},"path":{"forbidPresetShapes":true}},"network":{"html":"svg-network","pptx":"shape","dataTable":"appendix","min":{"vbHeightMin":200},"path":{"forbidPresetShapes":true}},"sankey":{"html":"svg-sankey","pptx":"shape","dataTable":"appendix","min":{"vbHeightMin":200},"path":{"minSamplePoints":16,"trackBothEdges":true,"forbidPresetShapes":true}},"streamgraph":{"html":"svg-stream","pptx":"shape","dataTable":"appendix","min":{"vbHeightMin":160},"path":{"minSamplePoints":24,"trackBothEdges":true,"forbidPresetShapes":true}},"slope":{"html":"svg-slope","pptx":"shape","dataTable":"notes","min":{"vbHeightMin":180},"path":{"forbidPresetShapes":true}},"dumbbell":{"html":"svg-dumbbell","pptx":"shape","dataTable":"notes","min":{"vbHeightMin":160},"path":{"forbidPresetShapes":true}},"lollipop":{"html":"svg-lollipop","pptx":"shape","dataTable":"notes","min":{"vbHeightMin":140},"path":{"forbidPresetShapes":true}},"dotplot":{"html":"svg-dotplot","pptx":"shape","dataTable":"notes","min":{"vbHeightMin":120},"path":{"forbidPresetShapes":true}},"bulletchart":{"html":"svg-bullet","pptx":"shape","dataTable":"notes","min":{"vbHeightMin":140},"path":{"forbidPresetShapes":true}},"waffle":{"html":"svg-waffle","pptx":"shape","dataTable":"notes","min":{"vbHeightMin":160},"path":{"forbidPresetShapes":true}},"radialbar":{"html":"svg-radialbar","pptx":"shape","dataTable":"notes","min":{"pxWidthMin":200},"path":{"minSamplePoints":16,"forbidPresetShapes":true}},"rose":{"html":"svg-rose","pptx":"shape","dataTable":"notes","min":{"pxWidthMin":180},"path":{"minSamplePoints":16,"forbidPresetShapes":true}},"candlestick":{"html":"svg-candle","pptx":"shape","dataTable":"appendix","min":{"vbHeightMin":180},"path":{"forbidPresetShapes":true}}};
 var DEEP = {"triggers":["高保真","1:1","一比一","精确还原","按图还原","正式交付","不能偏移","像素级","严格对照","逐页验收"],"complexCharts":["sankey","streamgraph","treemap","marimekko","boxplot","network","rose","radialbar","candlestick","funnel"],"checks":{"anchors":true,"containerOverflow":true,"renderCompare":true,"manifest":true},"renderCompare":{"engine":"soffice","fallback":"powerpoint-com","skipIfMissing":true,"dpi":96}};
@@ -2110,7 +2126,7 @@ function fitRowH(avail, n, pref, floor) {
 function chartBottom(hasSoWhat, hasFootnote) {
   /* D8: tightest of soWhat/footnote/contentBottomWithNote — no short-circuit */
   var bot = CONTENT_BOTTOM;
-  if (hasSoWhat) bot = Math.min(bot, PT.exhibit.soWhatY - 0.12);
+  if (hasSoWhat) bot = Math.min(bot, PT.exhibit.soWhatY - 0.20);
   if (hasFootnote) bot = Math.min(bot, PT.exhibit.footnoteY - 0.12);
   if (hasSoWhat || hasFootnote) bot = Math.min(bot, CONTENT_BOTTOM_NOTE);
   return bot;
@@ -2194,24 +2210,31 @@ function donutWedges(labels, values) {
   });
   return segs;
 }
-function donutChart(sh, ec, S, dcols) {
+function donutChart(sh, ec, S, dcols, bottomY) {
   var d = PT.donut, labels = ec.labels || [], values = ec.values || [];
   var segs = donutWedges(labels, values);
-  var bx = d.centerX - d.r, by = d.centerY - d.r, bw = d.r * 2;
+  var r = d.r;
+  if (bottomY != null && d.centerY + r > bottomY) {
+    r = Math.max(0.9, bottomY - d.centerY - 0.04);
+  }
+  var holeR = d.holeR * (r / d.r);
+  var bx = d.centerX - r, by = d.centerY - r, bw = r * 2;
   segs.forEach(function (sg) {
     sh.push(shape('pie', bx, by, bw, bw, dcols[sg[2] % dcols.length], { av: pieAv(sg[0], sg[1]) }));
   });
-  var hb = d.holeR * 2;
-  sh.push(shape('ellipse', d.centerX - d.holeR, d.centerY - d.holeR, hb, hb, S.bg));
+  var hb = holeR * 2;
+  sh.push(shape('ellipse', d.centerX - holeR, d.centerY - holeR, hb, hb, S.bg));
   var total = 0; values.forEach(function (v) { total += Math.max(0, v); });
   var totalStr = (Math.round(total * 10) / 10) + (ec.unit || '');
-  sh.push(txSp(d.centerX - d.holeR, d.centerY - 0.42, hb, 0.5,
+  sh.push(txSp(d.centerX - holeR, d.centerY - 0.42, hb, 0.5,
     [[{ t: totalStr, sz: 20, b: 1, col: S.ink, font: S.fontDisplay }]], { align: 'ctr', anchor: 'ctr' }));
-  sh.push(txSp(d.centerX - d.holeR, d.centerY + 0.08, hb, 0.35,
+  sh.push(txSp(d.centerX - holeR, d.centerY + 0.08, hb, 0.35,
     [[{ t: ec.centerLabel || '合计', sz: 9.5, col: S.faint, font: S.font }]], { align: 'ctr', anchor: 'ctr' }));
   var n = Math.max(1, labels.length);
-  var rowH = Math.min(d.legendRowH, 3.4 / n);
+  var maxLegH = (bottomY != null) ? Math.max(1.2, bottomY - (d.centerY - 1.7)) : 3.4;
+  var rowH = Math.min(d.legendRowH, maxLegH / n, 3.4 / n);
   var ly0 = d.centerY - (n * rowH) / 2 + 0.1;
+  if (bottomY != null) ly0 = Math.min(ly0, bottomY - n * rowH - 0.04);
   var sum2 = total || 1;
   labels.forEach(function (lb, i) {
     var v = values[i] || 0;
@@ -2268,14 +2291,13 @@ function table(x, y, w, colW, rows, S, opts) {
 function soWhatBar(sh, text, S) {
   var R = (typeof regionOf === 'function') ? regionOf('exhibit', 'annotation')
     : { x: MX, y: PT.exhibit.soWhatY, w: CW, h: 0.62 };
-  /* 与 B 通道同算法：长结论条有限缩字号，优先保容器不溢出 */
-  var bodyW = Math.max(2.5, R.w - 0.44 - 1.35);
-  var fzB = fitFont([String(text || '')], bodyW, R.h - 0.14, { max: 12.5, gapFactor: 0.2, maxShrinkSteps: 3 });
+  /* MD3 结论条：衬底 + 左 accent 轨 + 正文（不绘制「SO WHAT」标签字样） */
+  var bodyW = Math.max(2.5, R.w - 0.44);
+  var fzB = fitFont([String(text || '')], bodyW, R.h - 0.14, { max: 14, gapFactor: 0.2, maxShrinkSteps: 3 });
   sh.push(shape('rect', R.x, R.y, R.w, R.h, S.soft));
   sh.push(shape('rect', R.x, R.y, 0.06, R.h, S.accent));
   sh.push(txSp(R.x + 0.22, R.y + 0.06, R.w - 0.44, R.h - 0.12,
-    [[{ t: 'SO WHAT　', sz: 11, b: 1, col: S.accent, font: S.font, spc: 150 },
-      { t: text, sz: fzB, col: S.ink, font: S.font }]], { anchor: 'ctr' }));
+    [[{ t: String(text || ''), sz: fzB, b: 1, col: S.ink, font: S.font }]], { anchor: 'ctr' }));
 }
 function footnoteLine(sh, text, S) {
   var R = (typeof regionOf === 'function') ? regionOf('exhibit', 'footnote')
@@ -3135,7 +3157,7 @@ function slidesOf(model, S) {
       if (img.caption) sh.push(txSp(MX, capYImg + 0.04, CW, capH2, [[{ t: img.caption, sz: 10.5, col: S.faint, font: S.font }]]));
     } else if (type === 'donut') {
       var dcn = sec.chart || {};
-      if (dcn.labels && dcn.values) donutChart(sh, dcn, S, dcn.colors || donutColors(model.style, S, model.theme));
+      if (dcn.labels && dcn.values) donutChart(sh, dcn, S, dcn.colors || donutColors(model.style, S, model.theme), bodyBottom);
       if (sec.note) sh.push(txSp(MX, PT.note.y, CW, PT.note.h, [[{ t: sec.note, sz: 11, col: S.faint, font: S.font }]]));
     } else if (type === 'heatmap') {
       var H = PT.heatmap;
