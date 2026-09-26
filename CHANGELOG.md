@@ -1,3 +1,18 @@
+## 0.1.8 — 2026-09-26
+
+### Showcase · docs · release polish
+
+- **产品 Showcase**：新增 Mode A 样张 `top-ppt-html/assets/examples/2026-09-26-topmind-tms-skills-showcase.html`（+ model）——介绍 TopMind / tms-skills / top-ppt-html（三模式·风格主题·质量门禁·Fast Mode）；`validate_report --strict` 与 `smoke_pptx` **0/0**。
+- **截图**：刷新 `theme-overview*.png`；新增 `docs/showcase/`（showcase 全页 + 三黄金样张关键页）与精简 `top-ppt-html/assets/showcase/`（进技能包，供 README）。
+- **README 吸引力**：根 README + 技能 README 增加 banner、风格/模式画廊、showcase 链接与安装钉版本 **0.1.8**。
+- **Banner**：`docs/assets/tms-skills-banner.png`。
+- **打包**：`package_skill` 纳入 `assets/showcase/*`；examples 最小数量仍 ≥3（黄金样张 + 可选 showcase）。
+- **文档清理**：用户向 README 对齐当前产品面；PUBLISHING 版本线 → 0.1.8；`build_examples` 说明允许 showcase 并存。
+- 版本对齐 **0.1.8**（根 + 技能 package/lock / SKILL metadata / README）。
+
+### 红线未动
+反截断、图表多样性地板、Mode A craft、runtime SHA 同版本门禁、中文「演示文稿」术语、整仓 npm 发版。
+
 ## 0.1.7 — 2026-09-26
 
 ### top-ppt-html · defect opt (D8/D9/D11/D13)

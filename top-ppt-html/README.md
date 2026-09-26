@@ -1,14 +1,32 @@
 # TopPPT HTML
 
+<p align="center">
+  <img src="assets/showcase/showcase-cover.png" alt="TopMind × tms-skills showcase cover" width="720" />
+</p>
+
 **让 idea 飞，好想法被看见。** 面向**演讲与正式场合**的高品质演示文稿技能：把主张、调研、分析、架构方案，生成为**优雅、美观、大气**的可翻页 HTML + **版式保真可编辑 PPTX**。核心工艺是版式、排版、色彩与内容组织——克制图标/图表配文，而非 gadget 堆砌或咨询 dump 默认。
 
-- 技能标识：`top-ppt-html`（安装/打包目录名与此一致）；品牌名：**TopPPT HTML**
-- 版本：**v0.1.7**（与 `@topmindspace/tms-skills@0.1.7` 同 tag）
+- 技能标识：`top-ppt-html`；品牌名：**TopPPT HTML**
+- 版本：**v0.1.8**（与 `@topmindspace/tms-skills@0.1.8` 同 tag）
 - **智能体入口**：`SKILL.md` → `references/playbook.md`（L1）→ L2 按需
 - **人类维护者**：本 README（安装 / 命令 / 目录）；勿把本文件当生成规范
 
-## 一、技能简介（人类速览）
+### 风格 × 模式一览
 
+| business-blue · 演示 | mckinsey · 研究 | graphite-dark · 架构 |
+|:---:|:---:|:---:|
+| ![bb](assets/showcase/style-business-blue-cover.png) | ![mk](assets/showcase/style-mckinsey-cover.png) | ![gr](assets/showcase/style-graphite-cover.png) |
+
+| Showcase · HTML+PPTX | 三模式 | 质量门禁 |
+|:---:|:---:|:---:|
+| ![sp](assets/showcase/showcase-split.png) | ![md](assets/showcase/showcase-modes.png) | ![gt](assets/showcase/showcase-gates.png) |
+
+- 交互画廊：[`assets/style-gallery.html`](./assets/style-gallery.html)
+- 产品 Showcase：[`assets/examples/2026-09-26-topmind-tms-skills-showcase.html`](./assets/examples/2026-09-26-topmind-tms-skills-showcase.html)（Mode A · business-blue · ~10 页）
+- 主题参考图（Gate 0）：`assets/theme-overview*.png`
+- 仓库级大图集：[`docs/showcase/`](../docs/showcase/)（不进技能 zip）
+
+## 一、技能简介（人类速览）
 | 维度 | 能力 |
 |------|------|
 | 产出 | 单文件 HTML（可翻页、亮暗双主题、header 工具栏）+ 16:9 可编辑 PPTX（精导通道） |
@@ -94,10 +112,11 @@ top-ppt-html/
 ├─ assets/                      #                                           │ 且
 │  ├─ templates/                #   三份模式模板（presentation/research/architecture）  │ 入库
 │  │                            #   + engine.css / ui.js（公共引擎/UI，sync_runtime 注入源）
-│  ├─ examples/                 #   3 份黄金样张 + model（每模式 1；风格见 style-gallery）      │
+│  ├─ examples/                 #   3 黄金样张 + showcase（HTML+model）                          │
 │  ├─ pptx-export.js            #   PPTX 预览运行时（含常量/schema 注入块）   │
 │  ├─ style-gallery.html        #   风格 × 模式 × 亮暗主题交互画廊            │
-│  └─ theme-overview*.png       #   3 张主题参考图（整体=演示 / 研究 / 架构）  │
+│  ├─ theme-overview*.png       #   3 张主题参考图（整体=演示 / 研究 / 架构）  │
+│  └─ showcase/                 #   README 用精简截图（完整集见 docs/showcase） │
 ├─ references/                  # 规范（L1 常读 1 篇 + L2 按需；components/charts 已按族拆分）│  ├─ playbook.md               #   ★ L1 唯一常读入口：模式/页型/组合/图表/配色/校验 │
 │  ├─ components.md             #   逻辑索引（§ 路由到下列物理文件）              │
 │  ├─ components-atoms.md       #   §1–§15c 结构组件                              │
@@ -167,7 +186,7 @@ python scripts/check_triggers.py
 | `references/chart-decision-tree.md` | L2 图表决策树 + 七种误用 |
 | `references/default-surface.md` | Mode A L1.5：12 页型 + 核图 8 + V1–V4 |
 | `references/presentation-craft.md` | Mode A L1.5 工艺（反截断 / 大气正式） |
-| `assets/examples/` | 3 份黄金样张（每模式 1） |
+| `assets/examples/` | 3 份黄金样张（每模式 1）+ TopMind showcase |
 | `evals/trigger-queries.json` | description 触发正/负例；`check_triggers.py` |
 | `docs/archive/` | 历史规范 / 旧示例 |
 

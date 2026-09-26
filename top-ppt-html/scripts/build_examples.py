@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""TopPPT HTML · 黄金样张维护（Batch 3 瘦身）
+"""TopPPT HTML · 黄金样张维护
 
-assets/examples/ 仅保留 3 份黄金样张（每模式 1）：
+assets/examples/ 至少保留 3 份黄金样张（每模式 1）：
   presentation-business-blue · research-mckinsey · architecture-graphite-dark
+另可含产品 showcase（如 2026-09-26-topmind-tms-skills-showcase），不替代黄金样张。
 
 完整 9 风格染色矩阵旧实现：docs/archive/build_examples.py.full
-其余示例：docs/archive/examples/
+其余历史示例：docs/archive/examples/
 """
 from __future__ import annotations
 

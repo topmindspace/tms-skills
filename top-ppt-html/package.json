@@ -1,6 +1,6 @@
 {
   "name": "top-ppt-html",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "private": true,
   "description": "TopPPT HTML：优雅大气的正式场合演讲/汇报演示文稿。单文件 HTML + 版式保真可编辑 PPTX；布局骨架 P1–P12；模型单写；strict 0/0 交付。",
   "license": "MIT",
