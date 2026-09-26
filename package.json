@@ -1,6 +1,6 @@
 {
   "name": "@topmindspace/tms-skills",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "description": "TopMindspace 智能体技能 monorepo — 通过 npm / GitHub npx 安装技能（top-ppt-html：HTML+PPT 双交付，正式商务演示文稿）。",
   "license": "MIT",
   "author": "TopMindspace",
