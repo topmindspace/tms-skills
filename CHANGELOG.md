@@ -1,3 +1,10 @@
+## [0.1.13] - 2026-09-26
+
+### Changed
+- Restored the spacious sparse cream/navy/gold banner (1280×360) with the install command as the bordered subtitle: `npx @topmindspace/tms-skills install top-ppt-html`.
+- Restored the third-row product line: **TopMindspace Agent Skills · 让 idea 飞 · 正式场合演示文稿**.
+- Aligned whole-repo package, skill metadata, and documentation versions to **0.1.13**.
+
 ## [0.1.12] - 2026-09-26
 
 ### Changed
