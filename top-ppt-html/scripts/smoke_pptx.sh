@@ -2,6 +2,7 @@
 # TopPPT HTML · PPTX 轻量冒烟（Batch 2）
 # extract_model → build_pptx → validate_pptx --strict --model=
 # 用法: bash scripts/smoke_pptx.sh [example.html]
+# CI（ci_skill_gates --with-pptx）必跑 business-blue + research-mckinsey（D13；后者覆盖 soWhat+footnote / D8）
 # 失败时打印短摘要（错误码/页码/消息），完整 JSON 落盘到 TMPDIR。
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"

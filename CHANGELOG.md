@@ -1,3 +1,19 @@
+## 0.1.7 — 2026-09-26
+
+### top-ppt-html · defect opt (D8/D9/D11/D13)
+
+- **P0 D8**：`chartBottom(hasSoWhat, hasFootnote)` 不再 footnote 短路；`Math.min(soWhatY, footnoteY, contentBottomWithNote)` 与 flagY 让位同口径。双通道（`build_pptx.js` / `pptx-export.js`）对齐；flagBar 在 withNote 时底边不越过 `contentBottomWithNote`；Agenda 预留 0.25in 避免 severe 误伤。
+- **P0 D9**：`annotation_band_overlap_check` 报告页内**全部**侵入者（去掉首条即 `break`）。
+- **P1 D11**：有 so-what 时 `band_top = soWhatY`（6.05），捕获 (6.05, 6.40] 侵入；crush = 自带顶之上压下；注释自形状/窄 accent 条豁免保留。
+- **P1 D13**：`ci_skill_gates.sh --with-pptx` 必跑 `smoke_pptx` × business-blue **与** research-mckinsey（覆盖 soWhat+footnote）；graphite-dark 可选。
+- **CHROME_DRIFT**：页码只认 `N / M`，不再把年份/Exhibit 编号当页脚（research-mckinsey 假阳性清除）。
+- **Fast Mode / 效率**：演讲/汇报线索→Mode A；明确跳过 vs 仍须（质检红线不降）；L0+L1 / `extract_snippet` 纪律不变。
+- **门禁**：`test_feedback_gates` 锁定 D8/D9/D11/CHROME；research-mckinsey `--strict` **0/0**。
+- 版本对齐 **0.1.7**（根 + 技能 package / SKILL metadata / README / PUBLISHING）。
+
+### 红线未动
+反截断、图表多样性地板、Mode A craft、runtime SHA 同版本门禁、中文「演示文稿」术语保持。
+
 ## 0.1.6 — 2026-09-25
 
 ### CI / Release 硬化

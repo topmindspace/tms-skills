@@ -2067,7 +2067,7 @@ window.REPORT_MODEL = {
 
 /* __TOPPPT_RUNTIME_START__ */
 /* ══ PPTX 导出运行时（assets/pptx-export.js 的内联副本 · 由 scripts/sync_runtime.py 注入，禁止手改） ══ */
-/* __TOPPPT_RUNTIME_SHA__:68c55206c33160af */
+/* __TOPPPT_RUNTIME_SHA__:77ca318e7a510e01 */
 /* ═══════════════════════════════════════════════════════════════════════════
  * TopPPT HTML· 浏览器端 PPTX 预览运行时
  * 零依赖、随报告单文件分发；OOXML 序列化器（仅供预览，页面不导出文件）。
@@ -2322,6 +2322,7 @@ function dataColors(style, theme) {
 var LAY = PT.layout || {};
 var CONTENT_TOP = (LAY.contentTop != null) ? LAY.contentTop : 2.5;
 var CONTENT_BOTTOM = (LAY.contentBottom != null) ? LAY.contentBottom : 6.9;
+var CONTENT_BOTTOM_NOTE = (LAY.contentBottomWithNote != null) ? LAY.contentBottomWithNote : 6.4;
 
 /* ── 自适应排版工具（与 build_pptx.js 同算法，保证两通道字号/换行一致） ── */
 function estLines(text, widthIn, fontPt) {
@@ -2396,9 +2397,12 @@ function fitRowH(avail, n, pref, floor) {
   return Math.max(lo, Math.min(pref, avail / Math.max(1, n)));
 }
 function chartBottom(hasSoWhat, hasFootnote) {
-  if (hasFootnote) return PT.exhibit.footnoteY - 0.12;
-  if (hasSoWhat) return PT.exhibit.soWhatY - 0.12;
-  return CONTENT_BOTTOM;
+  /* D8: tightest of soWhat/footnote/contentBottomWithNote — no short-circuit */
+  var bot = CONTENT_BOTTOM;
+  if (hasSoWhat) bot = Math.min(bot, PT.exhibit.soWhatY - 0.12);
+  if (hasFootnote) bot = Math.min(bot, PT.exhibit.footnoteY - 0.12);
+  if (hasSoWhat || hasFootnote) bot = Math.min(bot, CONTENT_BOTTOM_NOTE);
+  return bot;
 }
 
 /* ── XML 工具 ── */
@@ -3286,7 +3290,7 @@ function slidesOf(model, S) {
     head(ag, 'AGENDA', '报告大纲');
     var colN = items.length > 8 ? 2 : 1;
     var perCol = Math.ceil(items.length / colN) || 1;
-    var rowH = Math.min(1.05, (CONTENT_BOTTOM - CONTENT_TOP) / perCol);
+    var rowH = Math.min(1.05, (CONTENT_BOTTOM - CONTENT_TOP - 0.25) / Math.max(1, perCol));
     var numSz = rowH >= 0.85 ? 30 : (rowH >= 0.65 ? 22 : 18);
     var tSz = rowH >= 0.85 ? 16 : 14, dSz = rowH >= 0.85 ? 12 : 11;
     items.forEach(function (it, i) {
@@ -3323,6 +3327,7 @@ function slidesOf(model, S) {
       flagY = CONTENT_BOTTOM - flagH;
       if (sec.footnote) flagY = Math.min(flagY, PT.exhibit.footnoteY - flagH - 0.06);
       if (sec.soWhat) flagY = Math.min(flagY, PT.exhibit.soWhatY - flagH - 0.06);
+      if (sec.footnote || sec.soWhat) flagY = Math.min(flagY, CONTENT_BOTTOM_NOTE - flagH);
       bodyBottom = Math.min(bodyBottom, flagY - (_F.gap || 0.12));
     }
 

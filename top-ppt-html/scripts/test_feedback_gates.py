@@ -209,6 +209,98 @@ def test_font_size_not_snapped() -> None:
     )
 
 
+def test_annotation_band_reports_all_invaders() -> None:
+    """D9: do not break after the first ANNOTATION_BAND_OVERLAP on a slide."""
+    def sp(y, h, w, text):
+        return ET.fromstring(
+            '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+            f'<p:sp xmlns:a="{NS["a"]}" xmlns:p="{NS["p"]}">'
+            "<p:spPr><a:xfrm>"
+            f'<a:off x="{int(0.6 * EMU)}" y="{int(y * EMU)}"/>'
+            f'<a:ext cx="{int(w * EMU)}" cy="{int(h * EMU)}"/>'
+            "</a:xfrm></p:spPr>"
+            f"<p:txBody><a:p><a:r><a:t>{text}</a:t></a:r></a:p></p:txBody>"
+            "</p:sp>"
+        )
+    els = [
+        sp(5.0, 1.2, 4.0, "PlotSeriesA"),
+        sp(5.2, 1.1, 4.0, "PlotSeriesB"),
+        sp(6.05, 0.55, 12.0, "SO WHAT locked path"),
+    ]
+    issues = V.annotation_band_overlap_check(els, 1, int(7.5 * EMU), int(13.333 * EMU))
+    codes = [i["code"] for i in issues]
+    ok(
+        "3e D9 reports all invaders (not just first)",
+        codes.count("ANNOTATION_BAND_OVERLAP") >= 2,
+        f"codes={codes}",
+    )
+
+
+def test_annotation_band_so_what_band_top() -> None:
+    """D11: with so-what present, invasions in (6.05, 6.40] must fire."""
+    def sp(y, h, w, text):
+        return ET.fromstring(
+            '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+            f'<p:sp xmlns:a="{NS["a"]}" xmlns:p="{NS["p"]}">'
+            "<p:spPr><a:xfrm>"
+            f'<a:off x="{int(0.6 * EMU)}" y="{int(y * EMU)}"/>'
+            f'<a:ext cx="{int(w * EMU)}" cy="{int(h * EMU)}"/>'
+            "</a:xfrm></p:spPr>"
+            f"<p:txBody><a:p><a:r><a:t>{text}</a:t></a:r></a:p></p:txBody>"
+            "</p:sp>"
+        )
+    els = [
+        # Body ends at 6.30 — inside (soWhatY=6.05, contentBottomWithNote=6.40]
+        sp(5.0, 1.3, 4.0, "LegendCrushMid"),
+        sp(6.05, 0.55, 12.0, "SO WHAT platform first"),
+    ]
+    issues = V.annotation_band_overlap_check(els, 1, int(7.5 * EMU), int(13.333 * EMU))
+    codes = [i["code"] for i in issues]
+    msgs = " ".join(i.get("message") or "" for i in issues)
+    ok(
+        "3f D11 band_top=soWhatY catches invasion in (6.05, 6.40]",
+        "ANNOTATION_BAND_OVERLAP" in codes and "6.05" in msgs,
+        f"codes={codes} msgs={msgs[:120]}",
+    )
+
+
+def test_chrome_footer_ignores_bare_integers() -> None:
+    """CHROME_DRIFT FP: bare year/exhibit numbers must not count as pager."""
+    def sp(y, text):
+        return ET.fromstring(
+            '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+            f'<p:sp xmlns:a="{NS["a"]}" xmlns:p="{NS["p"]}">'
+            "<p:spPr><a:xfrm>"
+            f'<a:off x="{int(0.6 * EMU)}" y="{int(y * EMU)}"/>'
+            f'<a:ext cx="{int(1.0 * EMU)}" cy="{int(0.3 * EMU)}"/>'
+            "</a:xfrm></p:spPr>"
+            f'<p:txBody><a:p><a:r><a:rPr sz="1100"/><a:t>{text}</a:t></a:r></a:p></p:txBody>'
+            "</p:sp>"
+        )
+    shapes = [sp(6.14, "2024"), sp(6.14, "06"), sp(7.0, "3 / 14")]
+    y = V.chrome_footer_y_in(shapes, int(7.5 * EMU))
+    ok(
+        "5 chrome_footer_y_in uses N / M only (ignores bare ints)",
+        y is not None and abs(y - 7.0) < 0.05,
+        f"got {y}",
+    )
+
+
+def test_chart_bottom_no_short_circuit() -> None:
+    """D8: chartBottom must Math.min soWhat/footnote — no footnote-first return."""
+    build = (ROOT.parent / "scripts" / "build_pptx.js").read_text(encoding="utf-8")
+    m = re.search(r"function chartBottom\([\s\S]*?\n\}", build)
+    body = m.group(0) if m else ""
+    ok(
+        "D8 chartBottom uses Math.min (no footnote short-circuit)",
+        "Math.min" in body
+        and "hasFootnote) return" not in body
+        and "CONTENT_BOTTOM_NOTE" in body,
+        f"body={body[:200]!r}",
+    )
+
+
+
 def test_engine_static() -> None:
     export = (ROOT.parent / "assets" / "pptx-export.js").read_text(encoding="utf-8")
     build = (ROOT.parent / "scripts" / "build_pptx.js").read_text(encoding="utf-8")
@@ -262,6 +354,10 @@ def main() -> int:
     test_annotation_band_ignores_full_bleed_bg()
     test_annotation_band_allows_content_without_note()
     test_annotation_band_fires_when_note_present()
+    test_annotation_band_reports_all_invaders()
+    test_annotation_band_so_what_band_top()
+    test_chrome_footer_ignores_bare_integers()
+    test_chart_bottom_no_short_circuit()
     test_font_size_h2_17_allowed()
     test_font_size_not_snapped()
     test_engine_static()

@@ -76,7 +76,14 @@ run_one() {
 
   if [[ "$WITH_PPTX" == "1" && -f scripts/smoke_pptx.sh ]]; then
     ensure_python_pptx
+    # D13: business-blue (default) + research-mckinsey (soWhat+footnote; catches D8)
     bash scripts/smoke_pptx.sh
+    bash scripts/smoke_pptx.sh assets/examples/2026-09-09-research-mckinsey.html
+    if [[ -f assets/examples/2026-09-09-architecture-graphite-dark.html ]]; then
+      bash scripts/smoke_pptx.sh assets/examples/2026-09-09-architecture-graphite-dark.html || {
+        echo "ci_skill_gates: graphite-dark smoke WARN (non-fatal)" >&2
+      }
+    fi
   elif [[ "$WITH_PPTX" == "1" ]]; then
     echo "ci_skill_gates: smoke_pptx.sh not present — skip"
   fi
