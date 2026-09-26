@@ -12,7 +12,7 @@
 - 包：<https://www.npmjs.com/package/@topmindspace/tms-skills>
 - 仓库：<https://github.com/topmindspace/tms-skills>
 
-当前线：安装器 **0.1.10** · 技能 top-ppt-html **0.1.10**（整仓同 tag 发版；见 CHANGELOG）。
+当前线：安装器 **0.1.11** · 技能 top-ppt-html **0.1.11**（整仓同 tag 发版；见 CHANGELOG）。
 
 
 ## npm 2.x 弃用说明（仓库重置）

@@ -1,3 +1,18 @@
+## 0.1.11 — 2026-09-26
+
+### Positioning · README slim · showcase narrative
+
+- **差异化定位**：根 README / 技能 README（中英）开篇写清——市面 PPT 技能很多，为何还要 top-ppt-html；特色 **HTML + PPT 双交付**；为**演示报告 / 正式商务演示**而生；参考 **MD3** 信息密度与克制；日常 HTML 等同幻灯片，需要时再导出高保真可编辑 PPTX。
+- **主题总览只留一张**：默认 `theme-overview.png`（演示·business-blue）；caption 链到 style-gallery / 研究·架构总览路径；正文不再三张并排占屏（落地页同步精简）。
+- **Showcase 叙事**：改写「为什么是我们」与「双交付」两页；subtitle / meta → v0.1.11；版本折线含 0.1.11；`validate_report --strict` **0/0**（5 种图表保持）。
+- **截图**：刷新 `docs/showcase/topmind-showcase/*` 与 `top-ppt-html/assets/showcase/`（含 positioning / charts / toolbar）。
+- **SKILL.md**：开篇与 description 产品句对齐定位；等量删减冗余，体积仍 ≤13KB。
+- **Live**：`docs/showcase.html` / Pages 源与 github.io `tms-skills/` 同步本版。
+- 版本对齐 **0.1.11**（根 + 技能 package/lock / SKILL metadata / README / PUBLISHING）。
+
+### 红线未动
+反截断、图表多样性地板、Mode A craft、runtime SHA 同版本门禁、中文「演示文稿」术语、整仓 npm 发版、motion=none。
+
 ## 0.1.10 — 2026-09-26
 
 ### Showcase · header toolbar docs · bilingual README
