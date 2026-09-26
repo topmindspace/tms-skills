@@ -6,6 +6,7 @@
 - **Slim banner**：`docs/assets/tms-skills-banner.png` 裁为 **1280×360**；README 展示宽约 960。
 - **Badge 行**：对齐 topmind 风格（Release / npm / CI / License）。
 - **Live 链接**：指向 `https://topmindspace.github.io/tms-skills/`（落地页 / showcase.html / style-gallery.html）。
+- **Pages 源**：`docs/index.html` + `docs/showcase.html` + `docs/style-gallery.html` + `docs/site-assets/`（启用 GitHub Pages → Deploy from branch `main` / `/docs` 即可上线同路径 URL）。
 - 模板 / runtime：经 `sync_runtime.py` 校验，无「甲板」；`REPORT_MODEL` 与引擎 SHA 一致。
 - 版本对齐 **0.1.9**（根 + 技能 package/lock / SKILL metadata / README / PUBLISHING）。
 
