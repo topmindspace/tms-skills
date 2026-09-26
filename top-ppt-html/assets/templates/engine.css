@@ -237,7 +237,8 @@ section.band{scroll-snap-align:start}
    svh 兼容移动端浏览器工具栏；旧浏览器落到 100vh。 */
 .band{padding-block:var(--band-pad);min-height:var(--band-min);
 display:flex;flex-direction:column;justify-content:center}
-.band>.wrap{width:100%}
+.band>.wrap{width:100%;min-height:0}
+.band>.wrap>.grid,.band>.wrap>.stack,.band>.wrap>.fig,.band>.wrap>.cols-2,.band>.wrap>.cols-3,.band>.wrap>.exhibit{min-height:0}
 .band--top{justify-content:flex-start}          /* 内容约六七成屏：贴顶 + 底部自然留白 */
 .band--fit{justify-content:center}              /* 内容接近一屏：垂直居中（默认行为，保留以兼容旧报告） */
 .band--flow{min-height:0;justify-content:flex-start}  /* 长内容页（附录/全量参考）显式退出固定页高 */
@@ -478,6 +479,21 @@ tbody tr:hover{background:var(--surface-1)}
 td strong{color:var(--text);font-weight:600}
 td.k{color:var(--text);font-weight:500;white-space:nowrap}
 td.num{font-variant-numeric:tabular-nums}
+/* ── 结论条（MD3 tonal strip · 本页重点收口；默认不显示「So what」标签） ──
+   与上方主内容呼吸间距 ≥ --sp-6；flex:none 防止被主内容挤压；一屏页不得压进注释带。 */
+.band>.wrap:has(>.sowhat),.band>.wrap:has(>.note){display:flex;flex-direction:column}
+.sowhat{display:flex;align-items:flex-start;gap:var(--sp-3);flex:none;
+margin-top:clamp(28px,3.6vh,48px); /* ≥ --sp-6 量级，修「贴底」 */
+padding:var(--sp-4) var(--sp-5);background:var(--accent-soft);border:1px solid var(--accent-soft-2);
+border-left:4px solid var(--accent);border-radius:var(--r-md);max-width:100%}
+.sowhat__k{display:none}
+.sowhat--labeled .sowhat__k{display:inline;font-size:var(--fs-xs);font-weight:700;letter-spacing:.1em;
+text-transform:uppercase;color:var(--accent-text);white-space:nowrap;flex:none;padding-top:.15em}
+.sowhat__v,.sowhat>:not(.sowhat__k){font-size:var(--fs-h3);color:var(--text);font-weight:var(--fw-title);
+line-height:1.55;flex:1;min-width:0}
+.sowhat__v p,.sowhat__stack{margin:0}
+.sowhat__stack{display:flex;flex-direction:column;gap:var(--sp-2)}
+
 .note{display:flex;gap:var(--sp-4);padding:clamp(20px,2vw,28px);border-radius:var(--r-lg);
 background:var(--accent-soft);border-left:3px solid var(--accent)}
 .note__ico{width:26px;height:26px;flex:none;border-radius:50%;background:var(--accent);

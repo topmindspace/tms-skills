@@ -18,7 +18,7 @@
 </p>
 
 - 技能标识：`top-ppt-html`；品牌名：**TopPPT HTML**
-- 版本：**v0.1.13**（与 `@topmindspace/tms-skills@0.1.13` 同 tag）
+- 版本：**v0.1.14**（与 `@topmindspace/tms-skills@0.1.14` 同 tag）
 - **智能体入口**：`SKILL.md` → `references/playbook.md`（L1）→ L2 按需
 - **人类维护者**：本 README（安装 / 命令 / 目录）；勿把本文件当生成规范
 

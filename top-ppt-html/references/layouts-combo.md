@@ -105,12 +105,11 @@
   </div>
 </div>
 <div class="sowhat rv">
-  <span class="sowhat__k">结论</span>
   <span class="sowhat__v">平台化不是可选项，而是规模化穿越分水岭的唯一共同路径。</span>
 </div>
 ```
 
-> 每栏要点 ≤4 条、同构对仗（同一维度正面 vs 反面）；结论条演示模式用 `.sowhat__k` 写"结论"，research 沿用"So what"。
+> 每栏要点 ≤4 条、同构对仗（同一维度正面 vs 反面）；结论条默认**不写标签字样**（无「So what」/「结论」），靠 MD3 衬条强调；罕见需标签时用 `.sowhat--labeled` + （已弃用默认标签）。
 > **PPTX 映射**：`comparison` 页型——`left/right = {title, points:[[k,v]…]}`，左 surface / 右 soft 面板 + `verdict`（结论条，accent 实底）；research 亦可填 `soWhat`（soft 底结论条，与 R 系页型通用件同源）。
 
 ---
@@ -445,8 +444,7 @@
     </ul>
   </div>
 </div>
-<div class="sowhat rv"><span class="sowhat__k">So what</span>
-  <span class="sowhat__v">一行含义（≤60 字）。</span></div>
+<div class="sowhat rv"><span class="sowhat__v">一行含义（≤60 字）。</span></div>
 ```
 
 ### 46c-3 代码：双区自由组合（左图 + 右表 / 左文 + 右图）

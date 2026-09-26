@@ -77,8 +77,7 @@ def sowhat(sec: dict) -> str:
     t = sec.get('soWhat')
     if not t:
         return ''
-    return (f'    <div class="sowhat rv"><span class="sowhat__k">So what</span>'
-            f'<span class="sowhat__v">{cite(t)}</span></div>\n')
+    return (f'    <div class="sowhat rv"><span class="sowhat__v">{cite(t)}</span></div>\n')
 
 
 def footnote(sec: dict) -> str:
@@ -326,8 +325,7 @@ def r_comparison(i, sec):
             + panel(sec.get('left')) + '\n' + panel(sec.get('right'), True) + '\n'
             + '    </div>\n')
     if sec.get('verdict'):
-        body += (f'    <div class="sowhat rv"><span class="sowhat__k">结论</span>'
-                 f'<span class="sowhat__v">{cite(sec["verdict"])}</span></div>\n')
+        body += (f'    <div class="sowhat rv"><span class="sowhat__v">{cite(sec["verdict"])}</span></div>\n')
     sec = dict(sec)
     sec.pop('verdict', None)
     return wrap(i, 'comparison', body, sec)

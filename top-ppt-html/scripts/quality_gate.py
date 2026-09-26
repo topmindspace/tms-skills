@@ -134,9 +134,9 @@ def heuristic_rubric(html: Path) -> dict:
         c_score += 15
     if n_sowhat >= max(1, n_sec // 4):
         c_score += 15
-        c_notes.append(f'so-what {n_sowhat}')
+        c_notes.append(f'结论条 {n_sowhat}')
     else:
-        c_notes.append(f'so-what 偏少({n_sowhat})')
+        c_notes.append(f'结论条偏少({n_sowhat})')
     if n_points >= n_sec * 2:
         c_score += 10
     if n_refs:

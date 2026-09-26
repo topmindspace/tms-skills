@@ -282,8 +282,7 @@ def pg_chart(i, sec):
       </div>
 {SIDE_NOTES}
     </div>
-    <div class="sowhat rv"><span class="sowhat__k">So what</span>
-      <span class="sowhat__v">一行含义（≤60 字）。</span></div>
+    <div class="sowhat rv"><span class="sowhat__v">一行含义（≤60 字）。</span></div>
   </div>
 </section>'''
     return html, {'type': 'bar', 'chart': {'type': ct, 'labels': ['A', 'B', 'C'], 'values': [42, 61, 35],
@@ -303,8 +302,7 @@ def pg_donut(i, sec):
       </div>
 {SIDE_NOTES}
     </div>
-    <div class="sowhat rv"><span class="sowhat__k">So what</span>
-      <span class="sowhat__v">一行含义（≤60 字）。</span></div>
+    <div class="sowhat rv"><span class="sowhat__v">一行含义（≤60 字）。</span></div>
   </div>
 </section>'''
     return html, {'type': 'donut', 'chart': {'labels': ['A', 'B', 'C'], 'values': [45, 35, 20],
@@ -327,7 +325,6 @@ def pg_exhibit(i, sec):
 {SIDE_NOTES}
     </div>
     <div class="sowhat rv">
-      <span class="sowhat__k">So what</span>
       <span class="sowhat__v">一行含义或建议（≤60 字）。</span>
     </div>
   </div>
@@ -556,8 +553,7 @@ def pg_comparison(i, sec):
         <h3 class="t-h3" style="color:var(--accent)">目标</h3>
         <ul class="ul"><li><strong>要点。</strong>一句话。</li><li><strong>要点。</strong>一句话。</li></ul></div>
     </div>
-    <div class="sowhat rv"><span class="sowhat__k">结论</span>
-      <span class="sowhat__v">一行结论（≤60 字）。</span></div>
+    <div class="sowhat rv"><span class="sowhat__v">一行结论（≤60 字）。</span></div>
   </div>
 </section>'''
     return html, {'type': 'comparison',
@@ -721,8 +717,7 @@ def pg_info(i, sec):
         <text x="{w // 2}" y="{h // 2}" text-anchor="middle" class="f-txt3" font-size="13">{t} 信息图占位</text>
       </svg>
     </div>
-{src}    <div class="sowhat rv"><span class="sowhat__k">So what</span>
-      <span class="sowhat__v">一行含义（≤60 字）。</span></div>
+{src}    <div class="sowhat rv"><span class="sowhat__v">一行含义（≤60 字）。</span></div>
   </div>
 </section>'''
     model = {'type': t}
@@ -760,7 +755,6 @@ BUILDERS = {
 
 
 SOWHAT_BLOCK = '''    <div class="sowhat rv">
-      <span class="sowhat__k">So what</span>
       <span class="sowhat__v">这一页的含义或下一步建议（≤60 字）。</span>
     </div>
 '''

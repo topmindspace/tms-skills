@@ -323,3 +323,20 @@ fill = Body 区被内容覆盖的估算面积 / Body 区面积
 - [ ] `LAYOUT_*` 全 PASS
 
 > 门禁与失败修复见 `layout-constants.qualityGates` 与 `failure-modes.md`。间距与色 token 见 `design-system.md`。
+
+## 大纲自适应（Agenda）
+
+| 条目数 | 版式 | 类名 |
+|--------|------|------|
+| ≤8 | 单列 | `.agenda` |
+| 9–16 | **两列 / 两排** | `.agenda.agenda--2col` |
+| >16 | 拆上篇/下篇或只列一级章节 | — |
+
+阈值单源：`layout-constants.json` → `contentQuality.agenda.singleMax`（默认 8）。校验：`validate_report` WARN（只认 `<ol class="…agenda--2col">`，不被 CSS 选择器误伤）。
+
+## 一页一屏（高度契约）
+
+- `section.band` 默认 `min-height: 100vh/svh`；主内容**不得**溢出画布底或压进结论条 / 注释带。
+- 放不下按 `containers.overflowRule`：重构承载 → 拆页/分章 → 换布局形态 → 有限 fontShrink；**禁静默截断**。
+- `band--flow` 仅长结构/附录；结论条 `margin-top: clamp(28px,3.6vh,48px)` + PPTX `chartBottom` 相对 `soWhatY` 让位。
+

@@ -141,19 +141,19 @@
         "id": "T8",
         "name": "结论条文字",
         "role": "body",
-        "usage": "so-what 结论条、核心结论框"
+        "usage": "结论条、核心结论框"
       },
       {
         "id": "T9",
-        "name": "SO WHAT 标签",
+        "name": "结论条标签（可选·默认隐藏）",
         "role": "caption",
-        "usage": "so-what 标签行"
+        "usage": "结论条可选标签（默认不显示）"
       },
       {
         "id": "T10",
-        "name": "SO WHAT 正文/业务含义",
+        "name": "结论条正文/业务含义",
         "role": "body",
-        "usage": "so-what 正文、行动含义、表格行动项"
+        "usage": "结论条正文、行动含义、表格行动项"
       },
       {
         "id": "T11",
@@ -1297,13 +1297,25 @@
         "进一步研究",
         "需要进一步",
         "保持关注"
-      ]
+      ],
+      "$comment": " 结论条无 So what 标签；HTML margin 与 PPTX chartBottom/soWhatY 共同保证呼吸间距。"
     },
     "researchTitle": {
       "$comment": "判断词负向前瞻（应用/需求/一览/将来…）不可省：去掉后『智能体平台的应用架构说明』这类主题词式长标题会因命中单字『应』而被误判为结论句，门禁形同虚设。",
       "minChars": 12,
       "requireDigitOrJudgment": true,
       "judgmentPattern": "\\d|[二两三四五六七八九十半]|一(?!览|体|致|直|些|般|系列|同|起|方面)|是(?!否)|应(?!用|急|对|届)|需(?!求)|将(?!来|近)|增|降|优先|瓶颈|关键|高于|低于|快于|慢于|第一|唯一|从.{1,12}到|翻倍|过半|不足|领先|落后|卡在|分化|出现|成为|仍|并非|必须|才能|才是|最大|最浅|最深|马当先|明显|尚在|已(?!知)|提升|贡献|占比|领跑|先行|滞后|分野|显著|差异|穿越|兑现|放量|[：:—–]"
+    },
+    "agenda": {
+      "$comment": "大纲条目数阈值：≤singleMax 单列；>singleMax 须 .agenda--2col（两列/两排）；>splitMax 拆上篇/下篇或只列一级章节。scaffold / validate_report 消费。",
+      "singleMax": 8,
+      "splitMax": 16,
+      "twoColClass": "agenda--2col"
+    },
+    "pageHeight": {
+      "$comment": "一页一屏：section.band 默认 min-height=100vh(svh)；主内容不得压进结论条/注释带。放不下按 overflowRule：重构承载→拆页→换形态→有限 fontShrink；禁静默截断。band--flow 仅长结构/附录。",
+      "fitContract": "16:9 / band--fit",
+      "forbidCrushAnnotation": true
     }
   },
   "containers": {

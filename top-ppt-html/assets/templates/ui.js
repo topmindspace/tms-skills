@@ -262,7 +262,7 @@ if(e.isIntersecting){e.target.classList.add('in');o.unobserve(e.target)}})},
   var PROMPT=[
 '请为这份 HTML 报告生成可编辑 PPTX 并交付：',
 '1) 阅读 references/pptx-export.md 与 references/modes.md（三模式独立规则）；',
-'2) 核对/补全 window.REPORT_MODEL 为与正文严格一致的内容（含 mode/style/theme/title/agenda/sections/closing；theme 为 light 或 dark、与页面 data-theme 一致——PPTX 按此导出亮色版或深色版；29 种页型字段与 30 类 chart.type 见 scripts/model-schema.json；research 关键图表页用 type:"exhibit" 并填 exhibitNo/soWhat/footnote）；',
+'2) 核对/补全 window.REPORT_MODEL 为与正文严格一致的内容（含 mode/style/theme/title/agenda/sections/closing；theme 为 light 或 dark、与页面 data-theme 一致——PPTX 按此导出亮色版或深色版；29 种页型字段与 30 类 chart.type 见 scripts/model-schema.json；research 关键图表页用 type:"exhibit" 并填 exhibitNo/soWhat(结论条)/footnote）；',
 '3) 运行 python scripts/validate_report.py <报告.html> 直到全 PASS（含模型一致性检查）；',
 '4) 智能体精导并质检（0/0 才交付）：python scripts/extract_model.py <报告.html> → NODE_PATH=<pptxgenjs 所在 node_modules> node scripts/build_pptx.js <报告.pptx> --model=<报告.model.json>（如需覆盖模型主题可加 --theme=light|dark） → python scripts/validate_pptx.py <报告.pptx> --strict --model=<报告.model.json>。',
 '报告文件：<请填写报告.html 的路径>'
