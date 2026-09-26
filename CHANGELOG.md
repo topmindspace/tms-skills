@@ -1,3 +1,18 @@
+## 0.1.10 — 2026-09-26
+
+### Showcase · header toolbar docs · bilingual README
+
+- **产品 Showcase 加厚**：`2026-09-26-topmind-tms-skills-showcase` 扩为 Mode A · 12 内容页；**5 种图表**（`bar` / `donut` / `line` / `waterfall` / `hbar`）经 `render_from_model` + `hydrate_charts` 回填；含 **Header 工具栏专页**（控件 × 快捷键 × 行为表）；`validate_report --strict` **0/0**。
+- **Header 工具栏文档**：`SKILL.md` 交付物表（T/P/H/F/B + 9 风格 + Esc/翻页 + `REPORT_MODEL` 同步）；根 README / 技能 README（中英）显著说明。
+- **双语 README**：保持 **`README.md` = 中文默认**；新增 **`README.en.md`** 全量英文平行；`top-ppt-html/README.en.md` 用户向摘要；文首互链。
+- **截图**：刷新 `docs/showcase/topmind-showcase/*` 与 `top-ppt-html/assets/showcase/`（含 `showcase-toolbar.png`）。
+- **维护工具**：新增 `scripts/hydrate_charts.py`（核心图类型占位 SVG → 模型数据绘形，供样张重建）。
+- **Live**：`docs/showcase.html` / Pages 源与 github.io `tms-skills/` 同步本版 showcase。
+- 版本对齐 **0.1.10**（根 + 技能 package/lock / SKILL metadata / README / PUBLISHING）。
+
+### 红线未动
+反截断、图表多样性地板、Mode A craft、runtime SHA 同版本门禁、中文「演示文稿」术语、整仓 npm 发版、motion=none。
+
 ## 0.1.9 — 2026-09-26
 
 ### Docs · banner · theme overview · live showcase

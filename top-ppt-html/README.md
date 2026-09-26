@@ -1,5 +1,7 @@
 # TopPPT HTML
 
+[English](./README.en.md) | 中文
+
 [![Release](https://img.shields.io/github/v/release/topmindspace/tms-skills?style=flat-square&color=blue)](https://github.com/topmindspace/tms-skills/releases)
 [![npm](https://img.shields.io/npm/v/@topmindspace/tms-skills?style=flat-square)](https://www.npmjs.com/package/@topmindspace/tms-skills)
 [![CI](https://img.shields.io/github/actions/workflow/status/topmindspace/tms-skills/ci.yml?style=flat-square&label=CI)](https://github.com/topmindspace/tms-skills/actions/workflows/ci.yml)
@@ -12,7 +14,7 @@
 </p>
 
 - 技能标识：`top-ppt-html`；品牌名：**TopPPT HTML**
-- 版本：**v0.1.9**（与 `@topmindspace/tms-skills@0.1.9` 同 tag）
+- 版本：**v0.1.10**（与 `@topmindspace/tms-skills@0.1.10` 同 tag）
 - **智能体入口**：`SKILL.md` → `references/playbook.md`（L1）→ L2 按需
 - **人类维护者**：本 README（安装 / 命令 / 目录）；勿把本文件当生成规范
 
@@ -39,24 +41,39 @@
 |:---:|:---:|:---:|
 | ![bb](assets/showcase/style-business-blue-cover.png) | ![mk](assets/showcase/style-mckinsey-cover.png) | ![gr](assets/showcase/style-graphite-cover.png) |
 
-| Showcase · HTML+PPTX | 三模式 | 质量门禁 |
-|:---:|:---:|:---:|
-| ![sp](assets/showcase/showcase-split.png) | ![md](assets/showcase/showcase-modes.png) | ![gt](assets/showcase/showcase-gates.png) |
+| Showcase · 双交付 | 三模式 | 质量门禁 | Header 工具栏 |
+|:---:|:---:|:---:|:---:|
+| ![sp](assets/showcase/showcase-split.png) | ![md](assets/showcase/showcase-modes.png) | ![gt](assets/showcase/showcase-gates.png) | ![tb](assets/showcase/showcase-toolbar.png) |
 
 **在线体验** · [落地页](https://topmindspace.github.io/tms-skills/) · [Showcase 演示文稿](https://topmindspace.github.io/tms-skills/showcase.html) · [风格画廊](https://topmindspace.github.io/tms-skills/style-gallery.html)
 
 - 交互画廊（仓库内）：[`assets/style-gallery.html`](./assets/style-gallery.html)
-- 产品 Showcase（仓库内）：[`assets/examples/2026-09-26-topmind-tms-skills-showcase.html`](./assets/examples/2026-09-26-topmind-tms-skills-showcase.html)（Mode A · business-blue · ~10 页）
+- 产品 Showcase（仓库内）：[`assets/examples/2026-09-26-topmind-tms-skills-showcase.html`](./assets/examples/2026-09-26-topmind-tms-skills-showcase.html)（Mode A · business-blue · 12 内容页 · **5 种图表** · Header 工具栏专页）
 - 仓库级大图集：[`docs/showcase/`](../docs/showcase/)（不进技能 zip）
 
 ## 一、技能简介（人类速览）
 | 维度 | 能力 |
 |------|------|
-| 产出 | 单文件 HTML（可翻页、亮暗双主题、header 工具栏）+ 16:9 可编辑 PPTX（精导通道） |
+| 产出 | 单文件 HTML（可翻页、亮暗双主题、**Header 工具栏 T/P/H/F/B + 9 风格**）+ 16:9 可编辑 PPTX（精导通道） |
 | 三模式 | A 演示 · B 研究 · C 架构（页型/字号/密度契约见 `playbook.md` §一） |
 | 风格 | 9 套（`styles.md`）；编码色板 c1–c5 随风格 |
 | 图表 | 核图 8 默认 + registry 全量；多样性 / 反截断 / Mode A 工艺见 playbook + `presentation-craft.md` |
 | 质量 | `validate_report --strict`（A 隐含 layout-qa）· `validate_pptx --strict` · `quality_gate --deliver` |
+
+## HTML Header 工具栏
+
+打开交付的 HTML 即可使用顶栏快捷操作（产品 Showcase 有专页演示）：
+
+| 控件 | 快捷键 | 行为 |
+|------|--------|------|
+| 亮暗主题 | **T** | 浅色外发 / 深色大屏；**按文件记忆**；同步 `REPORT_MODEL.theme` |
+| 风格选择 | 9 套下拉 | 九风格实时切换（纯视觉，不动内容）；交付前 `data-style` = `REPORT_MODEL.style` |
+| 预览 PPTX | **P** | 页序列所见即所得；可复制提示词回对话走精导 |
+| PPT 生成指引 | **H** | 双通道说明与环境依赖（与 `?` 同效） |
+| 全屏 | **F** | 沉浸演示 |
+| 收起工具栏 | **B** | 折叠为迷你条；锚点自适应并按文件记忆 |
+
+另：方向键翻页；**Esc** 关闭预览/帮助模态。风格或主题变更后须重跑 `validate_report --strict`（不重写内容）。
 
 生成规范、页型/图表穷举、铁律 **不在本文件**——智能体读 `SKILL.md` / playbook；选型大表见 `page-type-matrix.md` / `chart-decision-tree.md`。
 

@@ -1,5 +1,7 @@
 # tms-skills
 
+[English](./README.en.md) | 中文
+
 [![Release](https://img.shields.io/github/v/release/topmindspace/tms-skills?style=flat-square&color=blue)](https://github.com/topmindspace/tms-skills/releases)
 [![npm](https://img.shields.io/npm/v/@topmindspace/tms-skills?style=flat-square)](https://www.npmjs.com/package/@topmindspace/tms-skills)
 [![CI](https://img.shields.io/github/actions/workflow/status/topmindspace/tms-skills/ci.yml?style=flat-square&label=CI)](https://github.com/topmindspace/tms-skills/actions/workflows/ci.yml)
@@ -42,11 +44,11 @@
 |:---:|:---:|:---:|
 | ![bizblue](docs/showcase/presentation-business-blue/bizblue-cover.png) | ![mckinsey](docs/showcase/research-mckinsey/mckinsey-cover.png) | ![graphite](docs/showcase/architecture-graphite-dark/graphite-cover.png) |
 
-### 产品 Showcase 样张（Mode A · ~10 页）
+### 产品 Showcase 样张（Mode A · 多图 · Header 工具栏）
 
-| Cover | 三模式 | 质量门禁 |
-|:---:|:---:|:---:|
-| ![cover](docs/showcase/topmind-showcase/showcase-cover.png) | ![modes](docs/showcase/topmind-showcase/showcase-s4.png) | ![gates](docs/showcase/topmind-showcase/showcase-s6.png) |
+| Cover | 三模式 | 质量门禁 | Header 工具栏 |
+|:---:|:---:|:---:|:---:|
+| ![cover](docs/showcase/topmind-showcase/showcase-cover.png) | ![modes](docs/showcase/topmind-showcase/showcase-s4.png) | ![gates](docs/showcase/topmind-showcase/showcase-s8.png) | ![toolbar](docs/showcase/topmind-showcase/showcase-s11.png) |
 
 **在线体验**
 
@@ -57,13 +59,28 @@
 - 仓库内 Showcase HTML：[top-ppt-html/assets/examples/2026-09-26-topmind-tms-skills-showcase.html](./top-ppt-html/assets/examples/2026-09-26-topmind-tms-skills-showcase.html)
 - 更多截图：[docs/showcase/](./docs/showcase/)
 
+### HTML Header 工具栏（打开即用）
+
+生成的演示文稿顶栏提供快捷操作（样张内有专页说明）：
+
+| 控件 | 快捷键 | 做什么 |
+|------|--------|--------|
+| 亮暗主题 | **T** | 浅/深切换，按文件记忆，同步 `REPORT_MODEL.theme` |
+| 风格选择 | 9 套 | 九风格实时换肤；交付前写回 `REPORT_MODEL.style` |
+| 预览 PPTX | **P** | 页序列预览 + 可复制精导提示词 |
+| PPT 生成指引 | **H** | 双通道与环境说明 |
+| 全屏 | **F** | 沉浸演示 |
+| 收起工具栏 | **B** | 折叠为迷你条 |
+
+详见 [top-ppt-html/README.md](./top-ppt-html/README.md#html-header-工具栏) · [SKILL.md 交付物](./top-ppt-html/SKILL.md)。
+
 ## 技能一览
 
 | 技能 | 版本 | 做什么 |
 |------|------|--------|
-| [`top-ppt-html`](./top-ppt-html/) | **0.1.9** | 正式场合演讲/汇报演示文稿：HTML 可翻页 + 16:9 可编辑 PPTX；三模式 × 九风格；strict 0/0 门禁 |
+| [`top-ppt-html`](./top-ppt-html/) | **0.1.10** | 正式场合演讲/汇报演示文稿：HTML 可翻页 + 16:9 可编辑 PPTX；三模式 × 九风格；strict 0/0 门禁 |
 
-安装器 [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) 同为 **0.1.9**（整仓同 tag 发版）。
+安装器 [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) 同为 **0.1.10**（整仓同 tag 发版）。
 
 ## 安装
 
@@ -73,7 +90,7 @@
 npx @topmindspace/tms-skills list
 npx @topmindspace/tms-skills install top-ppt-html
 npx @topmindspace/tms-skills install top-ppt-html --to ./.claude/skills
-npx @topmindspace/tms-skills@0.1.9 install top-ppt-html   # 钉版本
+npx @topmindspace/tms-skills@0.1.10 install top-ppt-html   # 钉版本
 ```
 
 ```bash
@@ -92,7 +109,7 @@ PPTX 精导需在技能目录 `npm install`（pptxgenjs）。HTML 生成仅 Pyth
 | A 演示 | [`2026-09-09-presentation-business-blue`](./top-ppt-html/assets/examples/2026-09-09-presentation-business-blue.html) |
 | B 研究 | [`2026-09-09-research-mckinsey`](./top-ppt-html/assets/examples/2026-09-09-research-mckinsey.html) |
 | C 架构 | [`2026-09-09-architecture-graphite-dark`](./top-ppt-html/assets/examples/2026-09-09-architecture-graphite-dark.html) |
-| 产品 Showcase | [`2026-09-26-topmind-tms-skills-showcase`](./top-ppt-html/assets/examples/2026-09-26-topmind-tms-skills-showcase.html) |
+| 产品 Showcase | [`2026-09-26-topmind-tms-skills-showcase`](./top-ppt-html/assets/examples/2026-09-26-topmind-tms-skills-showcase.html)（5 种图表 · Header 工具栏专页） |
 
 ## 仓库结构
 
@@ -100,10 +117,10 @@ PPTX 精导需在技能目录 `npm install`（pptxgenjs）。HTML 生成仅 Pyth
 tms-skills/
 ├─ top-ppt-html/             # 技能（SKILL.md + assets + references + scripts）
 ├─ bin/tms-skills.js         # CLI：list / install
-├─ docs/                     # 发布规范 · showcase 截图 · banner
+├─ docs/                     # 发布规范 · showcase 截图 · banner · Pages 源
 ├─ scripts/                  # 仓库级门禁 / 隐私扫描
 ├─ package.json              # @topmindspace/tms-skills
-└─ LICENSE · CHANGELOG.md · README.md
+└─ LICENSE · CHANGELOG.md · README.md · README.en.md
 ```
 
 ## 发布与 CI

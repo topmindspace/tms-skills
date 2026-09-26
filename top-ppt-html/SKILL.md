@@ -4,7 +4,7 @@ description: "Use when 用户要做报告、演示、汇报、PPT、slides、dec
 license: MIT
 compatibility: "Python 3 stdlib for HTML generation; Node >=18 + pptxgenjs for PPTX; optional playwright for browser regression / theme captures."
 metadata:
-  version: "0.1.9"
+  version: "0.1.10"
   author: TopMindspace
 ---
 # TopPPT HTML
@@ -114,20 +114,31 @@ metadata:
 
 ## 交付物与验收
 
-- **HTML**：单文件零外链、可翻页可演示、每页一屏高；header 工具栏（T 亮暗 / 9 风格即切 / P 预览 / H 指引 / F 全屏 / B 折叠）。
-- **PPTX（B 通道交付）**：`extract_model` → `build_pptx.js` → `validate_pptx --strict`；16:9 全原生可编辑。**A 通道不交付**（仅预览 / `cross_verify`；细则 playbook §九）。
-- **验收**：HTML strict 0/0；含 PPTX 再加 PPTX 0/0；失败给**定向修复指引**。
-- **交付说明**：`quality_gate.py --deliver`（含 PPTX 带 `--pptx/--model`；子门禁并行）出七要素，缺一 FAIL——勿手拼。
+- **HTML**：零外链可翻页、每页一屏。**Header 工具栏**（样张专页）：
+
+| 键 | 控件 | 要点 |
+|----|------|------|
+| **T** | 亮暗 | 按文件记忆；同步 `REPORT_MODEL.theme` |
+| 9 套 | 风格 | 实时换肤；交付前写回 `REPORT_MODEL.style` |
+| **P** | 预览 PPTX | 页序列 + 精导提示词 |
+| **H** | 生成指引 | 双通道说明（=?） |
+| **F**/**B** | 全屏/折叠 | 沉浸演示；迷你条记忆 |
+| 方向键/**Esc** | 翻页/关模态 | PPT 式翻页 |
+
+> 改风格/主题后同步 `REPORT_MODEL` 并重跑校验（不重写）。
+- **PPTX（B 通道）**：`extract_model` → `build_pptx.js` → `validate_pptx --strict`；16:9 可编辑。**A 不交付**（仅预览/`cross_verify`；playbook §九）。
+- **验收**：HTML strict 0/0；含 PPTX 再加 PPTX 0/0；失败给定向修复指引。
+- **交付说明**：`quality_gate.py --deliver`（PPTX 带 `--pptx/--model`）出七要素，缺一 FAIL。
 
 ## 版本口径
 
-包 semver（现 0.1.9）≠ 布局 schema 线（layout-constants / model-schema 的 version，现 `0.1`）；patch 不抬 schema。
+包 semver（现 0.1.10）≠ schema 线（layout-constants / model-schema，现 `0.1`）；patch 不抬 schema。
 
 ## 环境依赖
 
-- **零依赖可用**：HTML 生成与全部 Python 脚本只用 **Python 标准库**。
-- **PPTX 精导**：另需 Node + pptxgenjs（安装与 `TOP_PPT_NODE_EXE`/`TOP_PPT_NODE_PATH` 探测细节见 `pptx-export.md` 环境备注，探测失败会打印指引）。
-- **硬门禁**：标签泄漏/空页/极偏图/简单大图 → `scripts/layout-constants.json`（qualityGates）+ `failure-modes.md`。
-- **可选**：浏览器页高/裁切真值、参考图重生成需 playwright（`regression.py` 自动探测，缺失即跳过）。
-- **一键回归**：`scripts/regression.py`——模板/常量/schema/运行时/示例改动后必跑。
-- **技能自检**：`audit_skill.py`（体积/披露/Gate 0/内容重复）· `audit_docs.py`（§ 引用 + 任务路由可解析）· `audit_styles.py`（9 风格 × 亮暗 token 与对比度）· `audit_css.py`（CSS 类覆盖率 · 报告制）。
+- **零依赖可用**：HTML 与全部 Python 脚本仅用标准库。
+- **PPTX 精导**：Node + pptxgenjs（`TOP_PPT_NODE_EXE`/`TOP_PPT_NODE_PATH`；见 `pptx-export.md`）。
+- **硬门禁**：标签泄漏/空页/极偏图/简单大图 → `layout-constants.json` + `failure-modes.md`。
+- **可选**：页高/裁切真值与参考图重生成需 playwright（`regression.py` 探测，缺失跳过）。
+- **一键回归**：`scripts/regression.py`（模板/常量/schema/运行时/示例改后必跑）。
+- **技能自检**：`audit_skill.py` · `audit_docs.py` · `audit_styles.py` · `audit_css.py`。

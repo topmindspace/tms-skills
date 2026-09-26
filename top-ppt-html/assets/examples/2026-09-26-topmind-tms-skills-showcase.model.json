@@ -4,7 +4,7 @@
   "theme": "light",
   "title": "TopMind × tms-skills",
   "subtitle": "让 idea 飞 · 把好想法做成可上台的演示文稿",
-  "meta": "产品介绍 · 2026-09-26",
+  "meta": "产品介绍 · 2026-09-26 · v0.1.10",
   "agenda": [
     [
       "01",
@@ -18,7 +18,7 @@
     ],
     [
       "03",
-      "top-ppt-html 特色",
+      "top-ppt-html",
       "HTML + 保真 PPTX"
     ],
     [
@@ -28,16 +28,26 @@
     ],
     [
       "05",
+      "图表工艺",
+      "多样 · 可编辑 · 门禁"
+    ],
+    [
+      "06",
       "风格与主题",
       "九风格 × 亮暗"
     ],
     [
-      "06",
+      "07",
       "质量门禁",
       "strict 0/0 交付"
     ],
     [
-      "07",
+      "08",
+      "Header 工具栏",
+      "演示即文档"
+    ],
+    [
+      "09",
       "Fast Mode",
       "少问一句 · 工艺不降"
     ]
@@ -136,7 +146,7 @@
       },
       "right": {
         "type": "bar",
-        "cap": "交付关注点（示意权重）",
+        "cap": "工艺关注点（产品强调 · 示意权重）",
         "labels": [
           "版式",
           "排版",
@@ -205,9 +215,70 @@
       "footnote": "意图线索：路演/汇报/演讲 → A；调研/对标 → B；拓扑/方案图 → C"
     },
     {
+      "type": "donut",
+      "layoutPreset": "P3",
+      "eyebrow": "05 · 图表工艺",
+      "title": "交付面三件套：演示 HTML · 可编辑 PPTX · 门禁说明",
+      "chart": {
+        "labels": [
+          "可翻页 HTML",
+          "保真 PPTX",
+          "质检交付说明"
+        ],
+        "values": [
+          40,
+          35,
+          25
+        ],
+        "unit": "%",
+        "centerLabel": "同源模型",
+        "dataTable": "notes"
+      },
+      "note": "口径：产品交付构成示意——三者同源 REPORT_MODEL，缺一则不算完整上台交付。",
+      "soWhat": "双通道不是二选一：HTML 上台演示，PPTX 可继续编辑，门禁证明可交付。"
+    },
+    {
+      "type": "bar",
+      "layoutPreset": "P7",
+      "eyebrow": "05 · 图表工艺",
+      "title": "0.1.x 能力累进：门禁与样张随版本加厚",
+      "chart": {
+        "type": "line",
+        "labels": [
+          "0.1.6",
+          "0.1.7",
+          "0.1.8",
+          "0.1.9",
+          "0.1.10"
+        ],
+        "values": [
+          6,
+          8,
+          10,
+          11,
+          12
+        ],
+        "unit": "项",
+        "max": 14,
+        "dataTable": "notes"
+      },
+      "points": [
+        [
+          "真实版本线",
+          "对应 CHANGELOG 已合并能力，非虚构增速"
+        ],
+        [
+          "本版加厚",
+          "多图样张 · Header 工具栏文档 · 双语 README"
+        ]
+      ],
+      "note": "口径：累计能力项为发布说明中的能力主题计数（示意刻度），用于展示版本节奏。",
+      "soWhat": "质量不是口号——版本线把门禁、样张与文档一起推进。"
+    },
+    {
       "type": "metrics",
       "layoutPreset": "P2",
-      "eyebrow": "05 · 风格主题",
+      "eyebrow": "06 · 风格主题",
       "title": "九风格开场即可见，亮暗主题一键贯穿",
       "metrics": [
         [
@@ -232,7 +303,7 @@
     {
       "type": "comparison",
       "layoutPreset": "P4",
-      "eyebrow": "06 · 质量门禁",
+      "eyebrow": "07 · 质量门禁",
       "title": "散装出稿止步，strict 0/0 才算交付",
       "left": {
         "title": "散装路径 · 风险",
@@ -271,9 +342,136 @@
       "verdict": "反截断、图表多样性、runtime SHA——门禁是交付的一部分。"
     },
     {
+      "type": "bar",
+      "layoutPreset": "P6",
+      "eyebrow": "07 · 质量门禁",
+      "title": "从想法到上台：工艺链路如何把主张垫实",
+      "chart": {
+        "type": "waterfall",
+        "labels": [
+          "意图",
+          "模式",
+          "模型",
+          "图表",
+          "门禁",
+          "上台"
+        ],
+        "values": [
+          20,
+          15,
+          25,
+          15,
+          15,
+          90
+        ],
+        "unit": "pt",
+        "dataTable": "notes"
+      },
+      "points": [
+        [
+          "意图定模式",
+          "路演→A · 调研→B · 拓扑→C"
+        ],
+        [
+          "门禁收口",
+          "strict 0/0 前不算交付"
+        ]
+      ],
+      "note": "口径：链路贡献为工艺阶段示意分，用于说明流程而非外部 KPI。",
+      "soWhat": "上台交付 = 模式契约 + 模型单写 + 多样图表 + 门禁收口。"
+    },
+    {
+      "type": "split",
+      "layoutPreset": "P1",
+      "eyebrow": "05 · 图表工艺",
+      "title": "核图优先：排名对比用横向条，一眼分出轻重",
+      "left": {
+        "points": [
+          [
+            "产品已交付能力",
+            "五项均为当前线真实能力，不是预测"
+          ],
+          [
+            "图表选型",
+            "谁大谁小 → hbar；趋势 → line；占比 → donut"
+          ]
+        ]
+      },
+      "right": {
+        "type": "hbar",
+        "cap": "能力就绪（当前发布线）",
+        "labels": [
+          "strict 0/0",
+          "三模式契约",
+          "九风格皮肤",
+          "双通道交付",
+          "Fast Mode"
+        ],
+        "values": [
+          100,
+          100,
+          100,
+          100,
+          100
+        ],
+        "max": 100,
+        "unit": "%",
+        "dataTable": "notes"
+      },
+      "footnote": "口径：能力就绪度 = 当前发布线已具备并写入文档/门禁的能力（均为 100%）。",
+      "soWhat": "说服力来自可核对的能力清单与图表多样性，而非单张柱图凑数。"
+    },
+    {
+      "type": "table",
+      "layoutPreset": "P8",
+      "eyebrow": "08 · Header 工具栏",
+      "title": "打开 HTML 即演示：顶栏快捷操作一览",
+      "table": {
+        "head": [
+          "控件",
+          "快捷键",
+          "行为"
+        ],
+        "rows": [
+          [
+            "亮暗主题",
+            "T",
+            "浅色外发 / 深色大屏；按文件记忆；同步 REPORT_MODEL.theme"
+          ],
+          [
+            "风格选择",
+            "9 套",
+            "九风格实时切换（纯视觉）；交付前 data-style = REPORT_MODEL.style"
+          ],
+          [
+            "预览 PPTX",
+            "P",
+            "页序列所见即所得；可复制提示词回对话走精导"
+          ],
+          [
+            "PPT 生成指引",
+            "H",
+            "双通道说明与环境依赖；与 ? 帮助同效"
+          ],
+          [
+            "全屏",
+            "F",
+            "沉浸演示（requestFullscreen）；图标随进入/退出切换"
+          ],
+          [
+            "收起工具栏",
+            "B",
+            "折叠为品牌标+展开迷你条；锚点自适应并按文件记忆"
+          ]
+        ]
+      },
+      "footnote": "另：方向键翻页 · Esc 关闭模态 · 风格/主题变更后须重跑校验",
+      "soWhat": "工具栏不是装饰——演示、预览、换肤与交付指引同一顶栏完成。"
+    },
+    {
       "type": "timeline",
       "layoutPreset": "P6",
-      "eyebrow": "07 · Fast Mode",
+      "eyebrow": "09 · Fast Mode",
       "title": "Fast Mode：跳过问询，不跳过工艺",
       "phases": [
         [
@@ -304,7 +502,7 @@
       ],
       [
         "看样张",
-        "assets/examples · style-gallery.html"
+        "assets/examples · style-gallery.html · 顶栏 T/P/H/F/B"
       ],
       [
         "上台交付",
