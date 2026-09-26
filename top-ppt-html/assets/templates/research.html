@@ -506,23 +506,24 @@ tbody tr:hover{background:var(--surface-1)}
 td strong{color:var(--text);font-weight:600}
 td.k{color:var(--text);font-weight:500;white-space:nowrap}
 td.num{font-variant-numeric:tabular-nums}
-/* ── 结论条（MD3 tonal strip · 本页重点收口；默认不显示「So what」标签） ──
+/* ── 结论条（MD3 tonal surface · 本页重点收口；默认不显示「So what」标签） ──
+   去 AI 味硬规则：禁止左侧 accent 装饰轨 / 竖条 / chip 堆；强调靠 soft 满铺 + 字重/行高/呼吸间距。
    与上方主内容呼吸间距 ≥ --sp-6；flex:none 防止被主内容挤压；一屏页不得压进注释带。 */
 .band>.wrap:has(>.sowhat),.band>.wrap:has(>.note){display:flex;flex-direction:column}
-.sowhat{display:flex;align-items:flex-start;gap:var(--sp-3);flex:none;
+.sowhat{display:flex;align-items:center;gap:var(--sp-3);flex:none;
 margin-top:clamp(28px,3.6vh,48px); /* ≥ --sp-6 量级，修「贴底」 */
-padding:var(--sp-4) var(--sp-5);background:var(--accent-soft);border:1px solid var(--accent-soft-2);
-border-left:4px solid var(--accent);border-radius:var(--r-md);max-width:100%}
+padding:var(--sp-5) var(--sp-6);background:var(--accent-soft);border:1px solid var(--accent-soft-2);
+border-radius:var(--r-md);max-width:100%}
 .sowhat__k{display:none}
 .sowhat--labeled .sowhat__k{display:inline;font-size:var(--fs-xs);font-weight:700;letter-spacing:.1em;
 text-transform:uppercase;color:var(--accent-text);white-space:nowrap;flex:none;padding-top:.15em}
 .sowhat__v,.sowhat>:not(.sowhat__k){font-size:var(--fs-h3);color:var(--text);font-weight:var(--fw-title);
-line-height:1.55;flex:1;min-width:0}
+line-height:1.65;flex:1;min-width:0}
 .sowhat__v p,.sowhat__stack{margin:0}
 .sowhat__stack{display:flex;flex-direction:column;gap:var(--sp-2)}
 
 .note{display:flex;gap:var(--sp-4);padding:clamp(20px,2vw,28px);border-radius:var(--r-lg);
-background:var(--accent-soft);border-left:3px solid var(--accent)}
+background:var(--accent-soft);border:1px solid var(--accent-soft-2)}
 .note__ico{width:26px;height:26px;flex:none;border-radius:50%;background:var(--accent);
 color:var(--accent-on);display:grid;place-items:center;font-size:13px;font-weight:700;font-style:normal}
 .note__t{font-size:var(--fs-h3);font-weight:600;color:var(--text);margin-bottom:6px}
@@ -1470,7 +1471,7 @@ transition:color .18s,background-color .18s}
     <div class="pmodal__body">
       <div class="hdoc">
         <h4>HTML 与 PPTX 的分工</h4>
-        <p>HTML 是阅读与演示界面，PPTX 是协作与修改格式——两者来自同一内容模型（window.REPORT_MODEL），PPTX 内全部是原生形状、文本框、表格（<code>pictures=0</code>），可在 PowerPoint / WPS 中继续编辑；<b>带数据的图表为原生数据图表</b>（chart 对象 + 内嵌 Excel，双击即可"编辑数据"）；口径、来源与 so-what 自动写入<b>演讲者备注</b>，不占版面。</p>
+        <p>HTML 是阅读与演示界面，PPTX 是协作与修改格式——两者来自同一内容模型（window.REPORT_MODEL），PPTX 内全部是原生形状、文本框、表格（<code>pictures=0</code>），可在 PowerPoint / WPS 中继续编辑；<b>带数据的图表为原生数据图表</b>（chart 对象 + 内嵌 Excel，双击即可"编辑数据"）；口径、来源与结论条自动写入<b>演讲者备注</b>，不占版面。</p>
         <h4>怎么获得 PPTX</h4>
         <div class="hch">
           <div>
@@ -2077,7 +2078,7 @@ window.REPORT_MODEL = {
 
 /* __TOPPPT_RUNTIME_START__ */
 /* ══ PPTX 导出运行时（assets/pptx-export.js 的内联副本 · 由 scripts/sync_runtime.py 注入，禁止手改） ══ */
-/* __TOPPPT_RUNTIME_SHA__:f4dc2ab366ea79c4 */
+/* __TOPPPT_RUNTIME_SHA__:57dbfb4f2b594c45 */
 /* ═══════════════════════════════════════════════════════════════════════════
  * TopPPT HTML· 浏览器端 PPTX 预览运行时
  * 零依赖、随报告单文件分发；OOXML 序列化器（仅供预览，页面不导出文件）。
@@ -2574,12 +2575,12 @@ function table(x, y, w, colW, rows, S, opts) {
 function soWhatBar(sh, text, S) {
   var R = (typeof regionOf === 'function') ? regionOf('exhibit', 'annotation')
     : { x: MX, y: PT.exhibit.soWhatY, w: CW, h: 0.62 };
-  /* MD3 结论条：衬底 + 左 accent 轨 + 正文（不绘制「SO WHAT」标签字样） */
-  var bodyW = Math.max(2.5, R.w - 0.44);
-  var fzB = fitFont([String(text || '')], bodyW, R.h - 0.14, { max: 14, gapFactor: 0.2, maxShrinkSteps: 3 });
+  /* MD3 结论条：tonal soft 满铺 + 舒适字阶；禁止左 accent 装饰轨（anti-AI-flavor） */
+  var padX = 0.28, padY = 0.10;
+  var bodyW = Math.max(2.5, R.w - padX * 2);
+  var fzB = fitFont([String(text || '')], bodyW, R.h - padY * 2, { max: 15, gapFactor: 0.2, maxShrinkSteps: 3 });
   sh.push(shape('rect', R.x, R.y, R.w, R.h, S.soft));
-  sh.push(shape('rect', R.x, R.y, 0.06, R.h, S.accent));
-  sh.push(txSp(R.x + 0.22, R.y + 0.06, R.w - 0.44, R.h - 0.12,
+  sh.push(txSp(R.x + padX, R.y + padY, R.w - padX * 2, R.h - padY * 2,
     [[{ t: String(text || ''), sz: fzB, b: 1, col: S.ink, font: S.font }]], { anchor: 'ctr' }));
 }
 function footnoteLine(sh, text, S) {

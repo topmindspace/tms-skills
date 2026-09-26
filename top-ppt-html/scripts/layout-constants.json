@@ -1298,7 +1298,7 @@
         "需要进一步",
         "保持关注"
       ],
-      "$comment": " 结论条无 So what 标签；HTML margin 与 PPTX chartBottom/soWhatY 共同保证呼吸间距。"
+      "$comment": "结论条无 So what 标签、无左侧 accent 装饰轨（anti-AI-flavor：tonal soft 满铺）；HTML margin 与 PPTX chartBottom/soWhatY 共同保证呼吸间距。"
     },
     "researchTitle": {
       "$comment": "判断词负向前瞻（应用/需求/一览/将来…）不可省：去掉后『智能体平台的应用架构说明』这类主题词式长标题会因命中单字『应』而被误判为结论句，门禁形同虚设。",
@@ -2184,7 +2184,11 @@
     ]
   },
   "aiFlavor": {
-    "$comment": "去AI味高危词（validate_report.py 与 content-rules.md 共用同一份；正则为子串/表达式）。",
+    "$comment": "去AI味：words=文案高危词（validate_report.py）；visual=视觉禁则（结论条等，由 engine/PPTX/docs 落实，非词表扫描）。",
+    "visual": {
+      "forbidConclusionLeftRail": true,
+      "$comment": "结论条/.sowhat 禁止左侧 accent 装饰轨；用 accent-soft 满铺 + 舒适字阶/行高/内边距。禁止把竖色条/霓虹边/装饰 chip 当 AI chrome。"
+    },
     "words": [
       "赋能",
       "彰显",

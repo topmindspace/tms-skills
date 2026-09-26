@@ -479,23 +479,24 @@ tbody tr:hover{background:var(--surface-1)}
 td strong{color:var(--text);font-weight:600}
 td.k{color:var(--text);font-weight:500;white-space:nowrap}
 td.num{font-variant-numeric:tabular-nums}
-/* ── 结论条（MD3 tonal strip · 本页重点收口；默认不显示「So what」标签） ──
+/* ── 结论条（MD3 tonal surface · 本页重点收口；默认不显示「So what」标签） ──
+   去 AI 味硬规则：禁止左侧 accent 装饰轨 / 竖条 / chip 堆；强调靠 soft 满铺 + 字重/行高/呼吸间距。
    与上方主内容呼吸间距 ≥ --sp-6；flex:none 防止被主内容挤压；一屏页不得压进注释带。 */
 .band>.wrap:has(>.sowhat),.band>.wrap:has(>.note){display:flex;flex-direction:column}
-.sowhat{display:flex;align-items:flex-start;gap:var(--sp-3);flex:none;
+.sowhat{display:flex;align-items:center;gap:var(--sp-3);flex:none;
 margin-top:clamp(28px,3.6vh,48px); /* ≥ --sp-6 量级，修「贴底」 */
-padding:var(--sp-4) var(--sp-5);background:var(--accent-soft);border:1px solid var(--accent-soft-2);
-border-left:4px solid var(--accent);border-radius:var(--r-md);max-width:100%}
+padding:var(--sp-5) var(--sp-6);background:var(--accent-soft);border:1px solid var(--accent-soft-2);
+border-radius:var(--r-md);max-width:100%}
 .sowhat__k{display:none}
 .sowhat--labeled .sowhat__k{display:inline;font-size:var(--fs-xs);font-weight:700;letter-spacing:.1em;
 text-transform:uppercase;color:var(--accent-text);white-space:nowrap;flex:none;padding-top:.15em}
 .sowhat__v,.sowhat>:not(.sowhat__k){font-size:var(--fs-h3);color:var(--text);font-weight:var(--fw-title);
-line-height:1.55;flex:1;min-width:0}
+line-height:1.65;flex:1;min-width:0}
 .sowhat__v p,.sowhat__stack{margin:0}
 .sowhat__stack{display:flex;flex-direction:column;gap:var(--sp-2)}
 
 .note{display:flex;gap:var(--sp-4);padding:clamp(20px,2vw,28px);border-radius:var(--r-lg);
-background:var(--accent-soft);border-left:3px solid var(--accent)}
+background:var(--accent-soft);border:1px solid var(--accent-soft-2)}
 .note__ico{width:26px;height:26px;flex:none;border-radius:50%;background:var(--accent);
 color:var(--accent-on);display:grid;place-items:center;font-size:13px;font-weight:700;font-style:normal}
 .note__t{font-size:var(--fs-h3);font-weight:600;color:var(--text);margin-bottom:6px}

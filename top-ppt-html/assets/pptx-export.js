@@ -494,12 +494,12 @@ function table(x, y, w, colW, rows, S, opts) {
 function soWhatBar(sh, text, S) {
   var R = (typeof regionOf === 'function') ? regionOf('exhibit', 'annotation')
     : { x: MX, y: PT.exhibit.soWhatY, w: CW, h: 0.62 };
-  /* MD3 结论条：衬底 + 左 accent 轨 + 正文（不绘制「SO WHAT」标签字样） */
-  var bodyW = Math.max(2.5, R.w - 0.44);
-  var fzB = fitFont([String(text || '')], bodyW, R.h - 0.14, { max: 14, gapFactor: 0.2, maxShrinkSteps: 3 });
+  /* MD3 结论条：tonal soft 满铺 + 舒适字阶；禁止左 accent 装饰轨（anti-AI-flavor） */
+  var padX = 0.28, padY = 0.10;
+  var bodyW = Math.max(2.5, R.w - padX * 2);
+  var fzB = fitFont([String(text || '')], bodyW, R.h - padY * 2, { max: 15, gapFactor: 0.2, maxShrinkSteps: 3 });
   sh.push(shape('rect', R.x, R.y, R.w, R.h, S.soft));
-  sh.push(shape('rect', R.x, R.y, 0.06, R.h, S.accent));
-  sh.push(txSp(R.x + 0.22, R.y + 0.06, R.w - 0.44, R.h - 0.12,
+  sh.push(txSp(R.x + padX, R.y + padY, R.w - padX * 2, R.h - padY * 2,
     [[{ t: String(text || ''), sz: fzB, b: 1, col: S.ink, font: S.font }]], { anchor: 'ctr' }));
 }
 function footnoteLine(sh, text, S) {
