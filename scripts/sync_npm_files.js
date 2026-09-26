@@ -13,7 +13,7 @@ const path = require('path');
 const { discoverSkills, ROOT } = require('./discover_skills');
 
 const PKG_PATH = path.join(ROOT, 'package.json');
-const BASE_FILES = ['bin', 'README.md', 'LICENSE', 'CHANGELOG.md'];
+const BASE_FILES = ['bin', 'README.md', 'README.en.md', 'LICENSE', 'CHANGELOG.md'];
 
 function desiredFiles(skills) {
   return [...BASE_FILES, ...skills];
