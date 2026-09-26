@@ -573,9 +573,13 @@ function imageLayoutShapes(s, layout, img, items, points, isPh, fit, y0, y1) {
 }
 /* 数据图表上下文（供备注与自适应使用） */
 function chartBottom(hasSoWhat, hasFootnote) {
-  if (hasFootnote) return PT.exhibit.footnoteY - 0.12;
-  if (hasSoWhat) return PT.exhibit.soWhatY - 0.12;
-  return CONTENT_BOTTOM;
+  /* 取最紧下界：so-what / footnote / contentBottomWithNote 并存时不得短路（D8）。
+   * 与 ~1630 flagY 的 Math.min 让位同口径；withNote 时对齐 regionOf 的 contentBottomWithNote。 */
+  let bot = CONTENT_BOTTOM;
+  if (hasSoWhat) bot = Math.min(bot, PT.exhibit.soWhatY - 0.12);
+  if (hasFootnote) bot = Math.min(bot, PT.exhibit.footnoteY - 0.12);
+  if (hasSoWhat || hasFootnote) bot = Math.min(bot, CONTENT_BOTTOM_NOTE);
+  return bot;
 }
 
 /* ═══ 原生数据图表（pptxgenjs addChart → 真 chart part + 内嵌 Excel 工作簿）═══
@@ -1581,8 +1585,9 @@ function addTable(s, tbl, x, y, w, availH, opts) {
   const items = CONTENT.agenda;
   const colN = items.length > 8 ? 2 : 1;
   const perCol = Math.ceil(items.length / colN);
-  const availH = CONTENT_BOTTOM - CONTENT_TOP;
-  const rowH = Math.min(1.05, availH / perCol);
+  /* 预留 0.25in，避免末行底边落入 severe-overlap 安全网（无注释页亦勿压进 withNote 带过深） */
+  const availH = CONTENT_BOTTOM - CONTENT_TOP - 0.25;
+  const rowH = Math.min(1.05, availH / Math.max(1, perCol));
   const numSize = rowH >= 0.85 ? sz(30) : (rowH >= 0.65 ? sz(22) : sz(18));
   const tSize = rowH >= 0.85 ? sz(16) : sz(14);
   const dSize = rowH >= 0.85 ? sz(12) : sz(11);
@@ -1630,6 +1635,8 @@ CONTENT.sections.forEach((sec) => {
     flagY = CONTENT_BOTTOM - flagH;
     if (sec.footnote) flagY = Math.min(flagY, PT.exhibit.footnoteY - flagH - 0.06);
     if (sec.soWhat) flagY = Math.min(flagY, PT.exhibit.soWhatY - flagH - 0.06);
+    /* withNote 时 flag 底不得越过 contentBottomWithNote（与 chartBottom / regionOf 同口径） */
+    if (sec.footnote || sec.soWhat) flagY = Math.min(flagY, CONTENT_BOTTOM_NOTE - flagH);
     bodyBottom = Math.min(bodyBottom, flagY - (_F.gap || 0.12));
   }
 

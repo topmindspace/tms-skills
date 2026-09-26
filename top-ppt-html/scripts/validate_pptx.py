@@ -362,18 +362,20 @@ def annotation_band_overlap_check(
       soWhatY ≈ 6.05 · contentBottomWithNote ≈ 6.4 · footnote/note ≈ 6.55 ·
       contentBottom ≈ 6.9 · pager ≈ 7.0
 
-    Semantics:
+    Semantics (0.1.7 · D9/D11):
       - Full-bleed backgrounds, full-height accent strips, and pager/footer
         chrome are never "content crushing the band".
       - so-what / 口径 / 来源 bars that live in the annotation zone are the
         band itself — not invaders.
-      - When the slide actually uses an annotation (so-what/source), body
-        content that starts above the band and overlaps
-        [contentBottomWithNote, contentBottom] fires ANNOTATION_BAND_OVERLAP
-        (streamgraph legend / plot crush cases).
+      - Crush = starts ABOVE band_top and overlaps down into the band.
+        Shapes whose top is already at/below band_top are in-band chrome.
+      - When so-what is present, band_top = soWhatY so invasions in
+        (soWhatY, contentBottomWithNote] are reported (D11). Footnote/source
+        only keeps band_top = contentBottomWithNote.
       - When no annotation is present, main content may use up to
         contentBottom; only a severe invasion (≥0.35in into the nominal
         withNote band) still fires as a safety net.
+      - Report ALL invaders per slide (D9) — do not break after the first.
     """
     out: list[dict[str, Any]] = []
     try:
@@ -382,14 +384,16 @@ def annotation_band_overlap_check(
         lay = ((lc.get("pageTypes") or {}).get("layout") or {})
         exhibit = ((lc.get("pageTypes") or {}).get("exhibit") or {})
         note = ((lc.get("pageTypes") or {}).get("note") or {})
-        band_top_in = float(lay.get("contentBottomWithNote") or 6.4)
+        nominal_band_top_in = float(lay.get("contentBottomWithNote") or 6.4)
         band_bot_in = float(lay.get("contentBottom") or 6.9)
         so_what_y_in = float(exhibit.get("soWhatY") or 6.05)
         note_y_in = float(note.get("y") or exhibit.get("footnoteY") or 6.55)
     except (OSError, json.JSONDecodeError, TypeError, ValueError):
-        band_top_in, band_bot_in, so_what_y_in, note_y_in = 6.4, 6.9, 6.05, 6.55
+        nominal_band_top_in, band_bot_in, so_what_y_in, note_y_in = 6.4, 6.9, 6.05, 6.55
 
+    band_top_in = nominal_band_top_in
     band_top = int(band_top_in * 914400)
+    nominal_band_top = int(nominal_band_top_in * 914400)
     band_bot = int(band_bot_in * 914400)
     so_what_y = int(so_what_y_in * 914400)
     note_y = int(note_y_in * 914400)
@@ -397,12 +401,14 @@ def annotation_band_overlap_check(
     slide_h = int(slide_height_emu)
     slide_area = max(slide_w * slide_h, 1)
     pager_floor = int(min(band_bot_in + 0.05, slide_h / 914400.0 - 0.05) * 914400)
-    min_overlap = int(0.10 * 914400)       # 0.10in — ignore sub-tenth rounding kiss
-    severe_overlap = int(0.35 * 914400)    # safety net when no annotation detected
+    min_overlap = int(0.10 * 914400)
+    severe_overlap = int(0.35 * 914400)
     full_bleed_area = 0.85
     full_height_frac = 0.90
+    # Label-like prefixes only — body text containing「来源」must not count (agenda FP)
     ann_pat = re.compile(
-        r"(结论|SO\s*WHAT|口径|来源|数据来源|Source\b|Note\b|footnote)",
+        r"(?:^|\n)\s*(结论|SO\s*WHAT|口径\s*[:：]?|来源\s*[:：]|数据来源\s*[:：]|"
+        r"Source\s*[:：]|Note\s*[:：]|footnote|注\s*[:：])",
         re.IGNORECASE,
     )
 
@@ -420,23 +426,31 @@ def annotation_band_overlap_check(
             return True
         return False
 
+    def _is_bar_like(cy: int, cx: int) -> bool:
+        return cy <= int(0.75 * 914400) and cx >= int(0.45 * slide_w)
+
+    def _is_note_like(y: int, cy: int, text: str) -> bool:
+        return y >= note_y - int(0.05 * 914400) and cy <= int(0.55 * 914400) and bool(text)
+
+    def _at_so_what_slot(y: int) -> bool:
+        # Engine locks so-what to soWhatY; agenda trailing rows sit lower (~+0.12)
+        return abs(y - so_what_y) <= int(0.08 * 914400)
+
     def _is_annotation_self(y: int, cy: int, cx: int, text: str) -> bool:
         """so-what / footnote / source row living in the annotation zone."""
-        if y >= so_what_y - int(0.08 * 914400) and (y + cy) <= band_bot + int(0.2 * 914400):
-            if ann_pat.search(text):
+        if _at_so_what_slot(y) and cy <= int(0.85 * 914400):
+            # Fill rect, accent strip, or SO WHAT text — all live in the slot
+            if ann_pat.search(text) or _is_bar_like(cy, cx) or cx <= int(0.15 * 914400):
                 return True
-            # Wide short bar in so-what band (bar fill behind 结论 text)
-            if cy <= int(0.75 * 914400) and cx >= int(0.45 * slide_w):
-                return True
-        if y >= note_y - int(0.05 * 914400) and cy <= int(0.55 * 914400):
+        if _is_note_like(y, cy, text):
             return True
-        # Entirely inside the nominal withNote band
-        if y >= band_top - int(0.02 * 914400):
+        # Entirely inside the nominal withNote band (6.40 口径)
+        if y >= nominal_band_top - int(0.02 * 914400):
             return True
         return False
 
-    # Pass 1: does this slide reserve an annotation?
     has_annotation = False
+    has_so_what = False
     for el in elements:
         box = shape_bounds(el)
         if box is None:
@@ -446,19 +460,24 @@ def annotation_band_overlap_check(
             continue
         if _is_chrome_or_bg(y, cy, cx):
             continue
-        if _is_annotation_self(y, cy, cx, _text(el)):
-            # Only count as "has annotation" when it looks like so-what/source,
-            # not merely any shape whose top is inside the band.
-            txt = _text(el)
-            if (
-                ann_pat.search(txt)
-                or (y >= so_what_y - int(0.08 * 914400) and cy <= int(0.75 * 914400) and cx >= int(0.45 * slide_w))
-                or (y >= note_y - int(0.05 * 914400) and cy <= int(0.55 * 914400) and txt)
-            ):
-                has_annotation = True
-                break
+        txt = _text(el)
+        note_like = _is_note_like(y, cy, txt)
+        labeled = bool(ann_pat.search(txt))
+        bar = _is_bar_like(cy, cx)
+        # Fill rect sits on soWhatY (±0.02); labeled SO WHAT text may sit slightly below
+        on_fill = abs(y - so_what_y) <= int(0.02 * 914400) and bar
+        labeled_slot = labeled and _at_so_what_slot(y) and cy <= int(0.85 * 914400)
+        if note_like:
+            has_annotation = True
+        elif labeled_slot or on_fill:
+            has_annotation = True
+            has_so_what = True
 
-    # Pass 2: body invaders
+    if has_so_what:
+        band_top_in = min(nominal_band_top_in, so_what_y_in)
+        band_top = int(band_top_in * 914400)
+
+    # Pass 2: body invaders that START ABOVE the band and crush down (D9: all of them)
     for el in elements:
         box = shape_bounds(el)
         if box is None:
@@ -471,10 +490,14 @@ def annotation_band_overlap_check(
             continue
         if _is_annotation_self(y, cy, cx, _text(el)):
             continue
-        overlap = min(bottom, band_bot) - max(y, band_top)
-        if overlap < min_overlap or bottom <= band_top:
+        # Crush-from-above only: top must sit above band_top
+        if y >= band_top - int(0.02 * 914400):
             continue
-        # Enforce when annotation present, or when invasion is severe anyway
+        if bottom <= band_top:
+            continue
+        overlap = min(bottom, band_bot) - band_top
+        if overlap < min_overlap:
+            continue
         if has_annotation or overlap >= severe_overlap:
             out.append(issue(
                 "ANNOTATION_BAND_OVERLAP",
@@ -483,7 +506,6 @@ def annotation_band_overlap_check(
                 "图例/系列请收入主图区或压缩系列数，禁止压进 so-what/来源行。",
                 slide=slide_no,
             ))
-            break
     return out
 
 
@@ -795,7 +817,8 @@ def chrome_footer_y_in(shapes: list[ET.Element], height: int) -> float | None:
     bottom_frac = float(chrome[1] if isinstance(chrome, list) and len(chrome) > 1 else 24) / 100.0
     threshold = int(height * (1.0 - bottom_frac))
     ys: list[float] = []
-    pager = re.compile(r"^\s*\d+\s*/\s*\d+\s*$|^\s*\d+\s*$")
+    # Engine footer is always "N / M"; bare integers are chart/exhibit labels (CHROME_DRIFT FP)
+    pager = re.compile(r"^\s*\d+\s*/\s*\d+\s*$")
     for shape in shapes:
         text = (text_content(shape) or "").strip()
         box = shape_bounds(shape)

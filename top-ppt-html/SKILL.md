@@ -4,7 +4,7 @@ description: "Use when 用户要做报告、演示、汇报、PPT、slides、dec
 license: MIT
 compatibility: "Python 3 stdlib for HTML generation; Node >=18 + pptxgenjs for PPTX; optional playwright for browser regression / theme captures."
 metadata:
-  version: "0.1.6"
+  version: "0.1.7"
   author: TopMindspace
 ---
 # TopPPT HTML
@@ -25,17 +25,17 @@ metadata:
 
 ## Fast Mode · 快速模式（用户显式 opt-in）
 
-触发词任一即进入（**跳过 Gate 0 与六项问询**）：`快速模式` / `fast` / `直接生成` / `一键出稿` / `fast mode` / `少问一句`。
+触发词即进入（**跳过 Gate 0 与六项**）：`快速模式` / `fast` / `直接生成` / `一键出稿` / `fast mode` / `少问一句`。
 
 | 参数 | 默认 | 推断 |
 |------|------|------|
-| mode | **B** | **路演/汇报/发布/演讲/demo/融资→A**；架构/拓扑→C；未点明→B |
+| mode | **B** | **路演/汇报/发布/演讲/demo/融资/宣讲→A**；架构/拓扑→C；未点明→B |
 | style | B→mckinsey · A→business-blue · C→graphite-dark | |
 | theme | light（graphite→dark） | |
 | 篇幅 | A=10 / B=12 / C=6 | |
-| format | **html only**（默认；**仅当用户要 PPT / 交付含 PPTX 才开** B 通道） | |
+| format | **html only**（**仅当用户要 PPT/PPTX 才开** B 通道） | |
 
-流程：一行宣布「Fast 选用：…」→ **最小大纲**（`outline-design.md`「轻量最小集」）→ playbook §二轻量链（骨架→模型单写→回填→strict→`quality_gate --deliver`；**PPTX 显式 opt-in**）。路径轻量；末可附 `assets/style-gallery.html`。开场声明「已跳过参考图」。**标准模式**仍强制 Gate 0 + 六项。
+**跳过** Gate 0/六项/完整大纲。**仍须** 最小大纲→模型单写→strict 0/0→`quality_gate --deliver`（反截断、图表多样性、Mode A craft 不降）。读面 L0+L1（A/Fast 可加 L1.5）；代码一律 `extract_snippet`。一行宣布「Fast 选用：…」→ playbook §二轻量链；声明已跳过参考图。**标准模式**仍强制 Gate 0 + 六项。
 
 ## 唯一入口流程
 
@@ -121,7 +121,7 @@ metadata:
 
 ## 版本口径
 
-包 semver（现 0.1.6）≠ 布局 schema 线（layout-constants / model-schema 的 version，现 `0.1`）；patch 不抬 schema。
+包 semver（现 0.1.7）≠ 布局 schema 线（layout-constants / model-schema 的 version，现 `0.1`）；patch 不抬 schema。
 
 ## 环境依赖
 

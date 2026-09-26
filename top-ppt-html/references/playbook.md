@@ -46,7 +46,7 @@
 Gate 0 参考图 → 六项问询（1 轮）→ 最小大纲（outline-design「轻量最小集」）→ 1 张规划卡 → scaffold_report.py
   → **只填 REPORT_MODEL** → render_from_model.py --inplace → validate_report.py --strict → 交付
 ```
-（Fast Mode 跳过 Gate 0/六项，仍须最小大纲；默认 **HTML-only**，PPTX 显式 opt-in 走 B 通道；**禁止**手改 HTML 正文与模型双写。）
+（Fast Mode 跳过 Gate 0/六项，仍须最小大纲+strict；默认 **HTML-only**，PPTX 显式 opt-in 走 B 通道；路演/汇报/演讲线索→Mode A；**禁止**手改 HTML 正文与模型双写。）
 
 **完整路径**（任一命中）——研究 ≥20 页 / 演示 ≥12 页 / 材料量大且杂 / 含未敲定关键判断 / 用户要看框架。
 ```
