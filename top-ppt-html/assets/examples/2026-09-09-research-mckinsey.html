@@ -3576,7 +3576,7 @@ window.REPORT_MODEL = {
 
 /* __TOPPPT_RUNTIME_START__ */
 /* ══ PPTX 导出运行时（assets/pptx-export.js 的内联副本 · 由 scripts/sync_runtime.py 注入，禁止手改） ══ */
-/* __TOPPPT_RUNTIME_SHA__:899c3cbd2cbb0f1f */
+/* __TOPPPT_RUNTIME_SHA__:f4dc2ab366ea79c4 */
 /* ═══════════════════════════════════════════════════════════════════════════
  * TopPPT HTML· 浏览器端 PPTX 预览运行时
  * 零依赖、随报告单文件分发；OOXML 序列化器（仅供预览，页面不导出文件）。
@@ -5092,10 +5092,27 @@ function slidesOf(model, S) {
       var bRR = regOf('bar', isHBar ? 'hbar' : 'primary', { bottom: botY }) ||
         { x: isHBar ? MX : MX + PT.bar.chartX, y: isHBar ? PT.bar.hbarY0 : PT.bar.chartY,
           w: isHBar ? CW : CW - PT.bar.chartW, h: 3 };
+      var ptsB = (sec.points || []).filter(Boolean);
+      var bx = bRR.x, bw = bRR.w;
+      if (ptsB.length && !isHBar) {
+        var sideW = Math.min(3.6, Math.max(2.6, bRR.w * 0.30));
+        bw = Math.max(3.2, bRR.w - sideW - 0.28);
+        var sx = bRR.x + bw + 0.28;
+        var rowHb = Math.min(0.72, (bRR.h - 0.1) / Math.max(1, ptsB.length));
+        ptsB.slice(0, 6).forEach(function (p, i) {
+          var k = Array.isArray(p) ? String(p[0] || '') : String((p && p.t) || '');
+          var v = Array.isArray(p) ? String(p[1] || '') : String((p && p.d) || '');
+          var y = bRR.y + i * rowHb;
+          sh.push(shape('rect', sx, y + 0.12, 0.08, 0.08, S.accent));
+          sh.push(txSp(sx + 0.2, y, sideW - 0.25, rowHb,
+            [[{ t: k + (v ? '　' : ''), sz: 12, b: 1, col: S.ink, font: S.font },
+              { t: v, sz: 11, col: S.body, font: S.font }]], { anchor: 'ctr' }));
+        });
+      }
       if (isHBar) {
-        chartBlockShapes(sh, ch, S, bRR.x, bRR.y, bRR.w, bRR.h, dcols2);
+        chartBlockShapes(sh, ch, S, bx, bRR.y, bw, bRR.h, dcols2);
       } else {
-        chartBlockShapes(sh, ch, S, bRR.x, bRR.y, bRR.w, Math.max(1.5, bRR.h), dcols2);
+        chartBlockShapes(sh, ch, S, bx, bRR.y, bw, Math.max(1.5, bRR.h), dcols2);
       }
       if (sec.note) sh.push(txSp(MX, PT.note.y, CW, PT.note.h, [[{ t: sec.note, sz: 11, col: S.faint, font: S.font }]]));
     } else if (type === 'twocol' || type === 'threecol') {
