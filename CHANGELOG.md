@@ -1,3 +1,8 @@
+## [0.1.12] - 2026-09-26
+
+### Changed
+- Regenerated `docs/assets/tms-skills-banner.png` (1280×360): includes core skill name **top-ppt-html**, formal keynote / presentation stage intent, tagline HTML + PPT.
+
 ## 0.1.11 — 2026-09-26
 
 ### Positioning · README slim · showcase narrative

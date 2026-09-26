@@ -24,7 +24,7 @@ Plenty of PPT skills exist — some lean gadgety, some dump consulting density b
 > Let ideas fly — make good thinking visible.
 
 <p align="center">
-  <img src="docs/assets/tms-skills-banner.png" alt="tms-skills — TopMindspace agent skills" width="960" />
+  <img src="docs/assets/tms-skills-banner.png" alt="tms-skills · top-ppt-html — formal business presentations" width="960" />
 </p>
 
 > **Warning**: do not install `@topmindspace/tms-skills@^2` (2.0.0–2.1.1 deprecated). Current line is **0.1.x** (`latest`).
@@ -76,9 +76,9 @@ See [top-ppt-html/README.md](./top-ppt-html/README.md) and [SKILL.md](./top-ppt-
 
 | Skill | Version | What it does |
 |-------|---------|--------------|
-| [`top-ppt-html`](./top-ppt-html/) | **0.1.11** | Formal business decks: paginated HTML + editable 16:9 PPTX; dual delivery · MD3-inspired density; 3 modes × 9 styles; strict 0/0 |
+| [`top-ppt-html`](./top-ppt-html/) | **0.1.12** | Formal business decks: paginated HTML + editable 16:9 PPTX; dual delivery · MD3-inspired density; 3 modes × 9 styles; strict 0/0 |
 
-Installer [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) is also **0.1.11** (whole-repo same-tag releases).
+Installer [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) is also **0.1.12** (whole-repo same-tag releases).
 
 ## Install
 
@@ -88,7 +88,7 @@ Installer [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspa
 npx @topmindspace/tms-skills list
 npx @topmindspace/tms-skills install top-ppt-html
 npx @topmindspace/tms-skills install top-ppt-html --to ./.claude/skills
-npx @topmindspace/tms-skills@0.1.11 install top-ppt-html   # pin
+npx @topmindspace/tms-skills@0.1.12 install top-ppt-html   # pin
 ```
 
 ```bash
