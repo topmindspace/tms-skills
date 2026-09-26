@@ -4,7 +4,7 @@
   "theme": "light",
   "title": "TopMind × tms-skills",
   "subtitle": "HTML + PPT 双交付 · 为正式商务演示而生",
-  "meta": "产品介绍 · 2026-09-26 · v0.1.16",
+  "meta": "产品介绍 · 2026-09-26 · v0.1.17",
   "agenda": [
     [
       "01",
@@ -164,7 +164,7 @@
           ]
         }
       ],
-      "footnote": "包名 @topmindspace/tms-skills · 当前线 0.1.16（latest）",
+      "footnote": "包名 @topmindspace/tms-skills · 当前线 0.1.17（latest）",
       "soWhat": "安装器与技能同仓同 tag——装一次，版本线对齐。"
     },
     {

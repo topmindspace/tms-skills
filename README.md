@@ -74,9 +74,9 @@
 
 | 技能 | 版本 | 做什么 |
 |------|------|--------|
-| [`top-ppt-html`](./top-ppt-html/) | **0.1.16** | 正式商务演示：HTML 可翻页 + 16:9 可编辑 PPTX；双交付 · MD3 密度克制；三模式 × 九风格；strict 0/0 |
+| [`top-ppt-html`](./top-ppt-html/) | **0.1.17** | 正式商务演示：HTML 可翻页 + 16:9 可编辑 PPTX；双交付 · MD3 密度克制；三模式 × 九风格；strict 0/0 |
 
-安装器 [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) 同为 **0.1.16**（整仓同 tag 发版）。
+安装器 [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) 同为 **0.1.17**（整仓同 tag 发版）。
 
 ## 安装
 
@@ -86,7 +86,7 @@
 npx @topmindspace/tms-skills list
 npx @topmindspace/tms-skills install top-ppt-html
 npx @topmindspace/tms-skills install top-ppt-html --to ./.claude/skills
-npx @topmindspace/tms-skills@0.1.16 install top-ppt-html   # 钉版本
+npx @topmindspace/tms-skills@0.1.17 install top-ppt-html   # 钉版本
 ```
 
 ```bash

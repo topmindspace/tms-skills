@@ -1,3 +1,11 @@
+## [0.1.17] - 2026-09-26
+
+### Release
+- Republish of the **0.1.16 craft** (结论条去左轨 · anti-AI-flavor · Showcase 全页刷新). npm registry left `0.1.16` in a staged/conflict state (`E409 previously staged`); content identical to the `v0.1.16` GitHub Release / docs Pages source.
+
+### 红线未动
+反截断、图表多样性地板、Mode A craft、runtime SHA 同版本门禁、中文「演示文稿」术语、整仓 npm 发版、motion=none、结论条无「So what」标签、无左侧 accent 装饰轨。
+
 ## [0.1.16] - 2026-09-26
 
 ### Craft · 结论条去 AI 味：取消左侧 accent 装饰轨
