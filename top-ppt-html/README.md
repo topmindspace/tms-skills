@@ -1,15 +1,37 @@
 # TopPPT HTML
 
+[![Release](https://img.shields.io/github/v/release/topmindspace/tms-skills?style=flat-square&color=blue)](https://github.com/topmindspace/tms-skills/releases)
+[![npm](https://img.shields.io/npm/v/@topmindspace/tms-skills?style=flat-square)](https://www.npmjs.com/package/@topmindspace/tms-skills)
+[![CI](https://img.shields.io/github/actions/workflow/status/topmindspace/tms-skills/ci.yml?style=flat-square&label=CI)](https://github.com/topmindspace/tms-skills/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](../LICENSE)
+
+**让 idea 飞，好想法被看见。** 面向**演讲与正式场合**的高品质演示文稿技能：把主张、调研、分析、架构方案，生成为**优雅、美观、大气**的可翻页 HTML + **版式保真可编辑 PPTX**。核心工艺是版式、排版、色彩与内容组织——克制图标/图表配文，而非 gadget 堆砌或咨询 dump 默认。
+
 <p align="center">
   <img src="assets/showcase/showcase-cover.png" alt="TopMind × tms-skills showcase cover" width="720" />
 </p>
 
-**让 idea 飞，好想法被看见。** 面向**演讲与正式场合**的高品质演示文稿技能：把主张、调研、分析、架构方案，生成为**优雅、美观、大气**的可翻页 HTML + **版式保真可编辑 PPTX**。核心工艺是版式、排版、色彩与内容组织——克制图标/图表配文，而非 gadget 堆砌或咨询 dump 默认。
-
 - 技能标识：`top-ppt-html`；品牌名：**TopPPT HTML**
-- 版本：**v0.1.8**（与 `@topmindspace/tms-skills@0.1.8` 同 tag）
+- 版本：**v0.1.9**（与 `@topmindspace/tms-skills@0.1.9` 同 tag）
 - **智能体入口**：`SKILL.md` → `references/playbook.md`（L1）→ L2 按需
 - **人类维护者**：本 README（安装 / 命令 / 目录）；勿把本文件当生成规范
+
+### 主题总览（Gate 0）
+
+<p align="center">
+  <img src="assets/theme-overview.png" alt="演示模式 · business-blue 主题总览" width="860" /><br/>
+  <sub>演示 · business-blue</sub>
+</p>
+
+<p align="center">
+  <img src="assets/theme-overview-research.png" alt="研究模式 · mckinsey 主题总览" width="860" /><br/>
+  <sub>研究 · mckinsey</sub>
+</p>
+
+<p align="center">
+  <img src="assets/theme-overview-architecture.png" alt="架构模式 · graphite-dark 主题总览" width="860" /><br/>
+  <sub>架构 · graphite-dark</sub>
+</p>
 
 ### 风格 × 模式一览
 
@@ -21,9 +43,10 @@
 |:---:|:---:|:---:|
 | ![sp](assets/showcase/showcase-split.png) | ![md](assets/showcase/showcase-modes.png) | ![gt](assets/showcase/showcase-gates.png) |
 
-- 交互画廊：[`assets/style-gallery.html`](./assets/style-gallery.html)
-- 产品 Showcase：[`assets/examples/2026-09-26-topmind-tms-skills-showcase.html`](./assets/examples/2026-09-26-topmind-tms-skills-showcase.html)（Mode A · business-blue · ~10 页）
-- 主题参考图（Gate 0）：`assets/theme-overview*.png`
+**在线体验** · [落地页](https://topmindspace.github.io/tms-skills/) · [Showcase 演示文稿](https://topmindspace.github.io/tms-skills/showcase.html) · [风格画廊](https://topmindspace.github.io/tms-skills/style-gallery.html)
+
+- 交互画廊（仓库内）：[`assets/style-gallery.html`](./assets/style-gallery.html)
+- 产品 Showcase（仓库内）：[`assets/examples/2026-09-26-topmind-tms-skills-showcase.html`](./assets/examples/2026-09-26-topmind-tms-skills-showcase.html)（Mode A · business-blue · ~10 页）
 - 仓库级大图集：[`docs/showcase/`](../docs/showcase/)（不进技能 zip）
 
 ## 一、技能简介（人类速览）

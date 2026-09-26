@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>tms-skills · top-ppt-html Showcase</title>
+  <meta name="description" content="TopMindspace tms-skills / top-ppt-html — 正式场合演示文稿技能：三模式 × 九风格，HTML + 可编辑 PPTX。" />
+  <meta name="theme-color" content="#0a0b0f" />
+  <link rel="canonical" href="https://topmindspace.github.io/tms-skills/" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Sora:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0b0f; --bg-card: #12141a; --text: #e8eaef; --muted: #9aa3b2;
+      --accent: #6ea8fe; --teal: #3dd6c2; --border: rgba(255,255,255,0.08);
+      --r: 14px; --font: Sora, system-ui, sans-serif; --display: Fraunces, Georgia, serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.6; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .wrap { max-width: 960px; margin: 0 auto; padding: 48px 20px 80px; }
+    .eyebrow { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--teal); font-weight: 600; }
+    h1 { font-family: var(--display); font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 600; margin: 8px 0 12px; }
+    .lead { color: var(--muted); font-size: 1.05rem; max-width: 42rem; }
+    .cta { display: flex; flex-wrap: wrap; gap: 12px; margin: 28px 0 40px; }
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 18px; border-radius: 10px;
+      border: 1px solid var(--border); background: var(--bg-card); color: var(--text); font-weight: 600; }
+    .btn--primary { background: var(--accent); color: #0a0b0f; border-color: transparent; }
+    .btn:hover { text-decoration: none; filter: brightness(1.05); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 24px; }
+    figure { margin: 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+    figure img { width: 100%; display: block; aspect-ratio: 16/9; object-fit: cover; }
+    figcaption { padding: 10px 14px; font-size: 0.85rem; color: var(--muted); }
+    .meta { margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--border); font-size: 0.9rem; color: var(--muted); }
+    code { font-size: 0.85em; background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <p class="eyebrow">TopMindspace · Agent Skills</p>
+    <h1>tms-skills / top-ppt-html</h1>
+    <p class="lead">把好想法做成可上台的正式场合<strong>演示文稿</strong>：三模式（演示 / 研究 / 架构）× 九风格，单文件 HTML 可翻页 + 版式保真可编辑 PPTX。strict 0/0 质量门禁。</p>
+    <div class="cta">
+      <a class="btn btn--primary" href="./showcase.html">打开 Showcase 演示文稿</a>
+      <a class="btn" href="./style-gallery.html">风格画廊</a>
+      <a class="btn" href="https://github.com/topmindspace/tms-skills">GitHub</a>
+      <a class="btn" href="https://www.npmjs.com/package/@topmindspace/tms-skills">npm</a>
+      <a class="btn" href="https://topmindspace.github.io/">← Topmind 官网</a>
+    </div>
+    <h2 style="font-family:var(--display);font-size:1.35rem;margin:0 0 8px">主题总览（Gate 0）</h2>
+    <div class="grid">
+      <figure>
+        <img src="./site-assets/theme-overview.png" alt="演示 · business-blue" loading="lazy" />
+        <figcaption>演示 · business-blue</figcaption>
+      </figure>
+      <figure>
+        <img src="./site-assets/theme-overview-research.png" alt="研究 · mckinsey" loading="lazy" />
+        <figcaption>研究 · mckinsey</figcaption>
+      </figure>
+      <figure>
+        <img src="./site-assets/theme-overview-architecture.png" alt="架构 · graphite-dark" loading="lazy" />
+        <figcaption>架构 · graphite-dark</figcaption>
+      </figure>
+    </div>
+    <h2 style="font-family:var(--display);font-size:1.35rem;margin:36px 0 8px">产品 Showcase 样张</h2>
+    <div class="grid">
+      <figure>
+        <img src="./site-assets/showcase-cover.png" alt="Showcase cover" loading="lazy" />
+        <figcaption>Cover</figcaption>
+      </figure>
+      <figure>
+        <img src="./site-assets/showcase-s4.png" alt="三模式" loading="lazy" />
+        <figcaption>三模式</figcaption>
+      </figure>
+      <figure>
+        <img src="./site-assets/showcase-s6.png" alt="质量门禁" loading="lazy" />
+        <figcaption>质量门禁</figcaption>
+      </figure>
+    </div>
+    <div class="meta">
+      <p>安装：<code>npx @topmindspace/tms-skills install top-ppt-html</code></p>
+      <p>姊妹产品：<a href="https://topmindspace.github.io/">Topmind</a> 本地优先知识工作台 · MIT © TopMindSpace</p>
+    </div>
+  </main>
+</body>
+</html>
