@@ -1,3 +1,41 @@
+## [0.1.18] - 2026-09-28
+
+### PPTX 导出质量整改 · 双通道几何收敛 + 门禁盲区补齐
+
+> 源起：2026-09-28 研究报告双通道交付复盘（HTML/PPTX），PPTX 有 4 类硬伤（含两处大面积文字叠印）、HTML 有 4 类空间利用问题、门禁全绿而效果不合格。本次按六类根因（R1–R7）系统整改。
+
+#### A. 几何叠印硬伤（R1/R2 · PPTX 导出）
+- **架构节点标题/注解叠印**：注解改为钳制在标题下边（原底对齐 `y=lh-0.5` 在 `lh≈0.59` 时与标题完全重合）；节点高不足降级单框混排。双引擎同步。
+- **verdict/soWhat 同槽叠印**：共用 annotation 结论条槽位——渲染器互斥（verdict 优先）、`extract_model` WARN、`model-schema` 加 `mutualExclusionHint`。HTML 同步去重。
+- **图例压来源行**：图例改落图区底部（`bodyBottom-0.28`），禁 `PH-0.62` 固定偏移。
+- **`sec.note` 压 so-what 带**：`note` 与 `footnote` 合并到 `footnoteY=6.72`，禁用 `note.y=6.55` 绘制。
+- **图表类目标签越出图区**：标签带含在图高 `h` 内（原画到 `y+h` 外）。
+- **图片底边侵入注释带**：有图注时下界收到 `contentBottomWithNote`。
+
+#### B. 列宽 / 槽位几何（R3）
+- **三栏只占半幅（栏宽 1.69in）**：`regionOf('twocol')` 单栏宽被当总宽——改用版心全宽推导。双引擎同步。
+- **KPI 支撑指标铺满整页**：A 通道 `regOf('kpi','metrics')` 缺分支——补 dividerX 右侧分栏。
+- **halftable 图表越过 so-what**：`regOf('halftable')` 忽略 opts.top/bottom——传导 opts。
+
+#### C. Agenda 分页与列序统一（R4）
+- >8 条自动双列（列优先）；**>12 条自动分页**（Agenda I/II）；长标题截断全称沉 notes（`titleMaxChars=36`）。双引擎 + HTML 同步。
+
+#### D. 门禁盲区补齐（R6）
+- **新增 `ELEMENT_OVERLAP`**（元素两两重叠 ≥0.05in²）与 **`LAYOUT_FILL`**（版心填充率 <55%）。
+- **Agenda 容量契约**：条数 ≤16、标题 ≤36 字、>8 条须双列。
+- **图表还原度分级**（`charts.fidelityMap`）：low = area/radar/treemap/sankey/streamgraph/marimekko/boxplot/network；决策树标注 + 改判建议。
+- **跨通道一致性**（`cross_verify`）：Agenda 阅读顺序、图片数量、图表数据标签。
+
+#### E. 图标与图片正确使用
+- **图标**：`render_from_model` 内置语义图标库 + `card_head()`；PPTX 保持 accent 方块路标。
+- **图片**：`r_image` 支持真图渲染、占位同串、`fit=contain`、多图版式（grid/compare/wall）。
+
+#### 文档同步
+- `page-type-matrix` 容量契约 + 还原度；`failure-modes` F19/F20；`pptx-export` 几何铁律；`chart-decision-tree` 还原度列；`content-rules` / `components-atoms` / `modes` / `layouts-combo` 契约更新。
+
+### 红线未动
+反截断、图表多样性地板、Mode A craft、runtime SHA 同版本门禁、中文「演示文稿」术语、整仓 npm 发版、motion=none、结论条无「So what」标签、无左侧 accent 装饰轨、大纲 >8 → 2col。
+
 ## [0.1.17] - 2026-09-26
 
 ### Release

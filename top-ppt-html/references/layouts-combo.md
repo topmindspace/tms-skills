@@ -110,7 +110,7 @@
 ```
 
 > 每栏要点 ≤4 条、同构对仗（同一维度正面 vs 反面）；结论条默认**不写标签字样**（无「So what」/「结论」），靠 MD3 衬条强调；罕见需标签时用 `.sowhat--labeled` + （已弃用默认标签）。
-> **PPTX 映射**：`comparison` 页型——`left/right = {title, points:[[k,v]…]}`，左 surface / 右 soft 面板 + `verdict`（结论条，accent 实底）；research 亦可填 `soWhat`（soft 底结论条，与 R 系页型通用件同源）。
+> **PPTX 映射**：`comparison` 页型——`left/right = {title, points:[[k,v]…]}`，左 surface / 右 soft 面板 + `verdict`（结论条，accent 实底）。**`verdict` 与 `soWhat` 互斥**（共用 annotation 结论条槽位，同页双填必叠印）：comparison 填 `verdict` 时不要再填 `soWhat`；渲染器已自动二选一（verdict 优先），模型侧应只给一个。
 
 ---
 

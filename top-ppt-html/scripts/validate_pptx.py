@@ -117,6 +117,9 @@ STRICT_FAILURE_CODES = {
     "LAYOUT_MULTI_FOCUS",
     "LAYOUT_ALIGN_DRIFT",
     "LAYOUT_LABEL_COLLIDE",
+    # R6：元素两两重叠 + 版心填充率（本次诊断盲区）
+    "ELEMENT_OVERLAP",
+    "LAYOUT_FILL",
 }
 # 深度模式专属校验码（--deep 时并入 STRICT_FAILURE_CODES；默认不跑，保持轻量）
 DEEP_STRICT_CODES = {
@@ -506,6 +509,143 @@ def annotation_band_overlap_check(
                 "图例/系列请收入主图区或压缩系列数，禁止压进结论条/来源行。",
                 slide=slide_no,
             ))
+    return out
+
+
+# ── R6：元素两两重叠（本次诊断 31 处节点叠印 + 2 处整条结论叠印均漏检） ──
+# 面积阈值 0.05 in²；同页 >3 处升为硬失败。chrome/背景/注释带自身豁免。
+ELEMENT_OVERLAP_MIN_AREA_IN2 = 0.05
+ELEMENT_OVERLAP_MAX_PER_SLIDE = 3
+
+
+def _is_full_bleed_or_bg(box: tuple[int, int, int, int], width: int, height: int) -> bool:
+    """整页/大面积底衬：不参与两两重叠判定。"""
+    x, y, cx, cy = box
+    return cx * cy >= 0.85 * width * height
+
+
+def element_overlap_check(
+    elements: list[ET.Element],
+    slide_no: int,
+    width: int,
+    height: int,
+) -> list[dict[str, Any]]:
+    """元素两两重叠（ELEMENT_OVERLAP）。
+
+    收集所有可测元素的包围盒，跳过整页背景 / 页码 chrome / 注释带自身
+    （tr:soWhat / tr:footnote / tr:band），以及页头区（眉题/标题/装饰线，y < 2.0in）
+    ——页头元素上下紧邻是版式语义，不是叠印。只对正文区（y ≥ 2.0in）元素做两两相交判定。
+    同页超过 ELEMENT_OVERLAP_MAX_PER_SLIDE 处时在末条 issue 标注「密集叠印」。
+    """
+    out: list[dict[str, Any]] = []
+    boxes: list[tuple[tuple[int, int, int, int], str]] = []
+    min_area = int(ELEMENT_OVERLAP_MIN_AREA_IN2 * 914400 * 914400)
+    head_limit = int(2.0 * 914400)  # 页头区下界：眉题 0.48 / 标题 0.82 / 装饰线 1.72
+    for el in elements:
+        box = shape_bounds(el)
+        if box is None:
+            continue
+        if _is_full_bleed_or_bg(box, width, height):
+            continue
+        x, y, cx, cy = box
+        # 页头/页码 chrome 不参与正文叠印判定
+        if y + cy <= head_limit:
+            continue
+        oname = (_shape_object_name(el) or "")
+        # 注释带自身（结论条/来源/待核实条）不参与互撞——它们共用槽位由引擎互斥
+        if any(k in oname for k in ("soWhat", "footnote", "tr:band", "tr:flag")):
+            continue
+        text = text_content(el).strip()
+        label = (text[:14] + "…") if len(text) > 14 else (text or oname or "shape")
+        boxes.append((box, label))
+
+    hits = 0
+    for i in range(len(boxes)):
+        (ax, ay, aw, ah), la = boxes[i]
+        for j in range(i + 1, len(boxes)):
+            (bx, by, bw, bh), lb = boxes[j]
+            ox = min(ax + aw, bx + bw) - max(ax, bx)
+            oy = min(ay + ah, by + bh) - max(ay, by)
+            if ox <= 0 or oy <= 0:
+                continue
+            area = ox * oy
+            if area < min_area:
+                continue
+            # 纯包含（一方完全罩住另一方）多半是卡片+内文，不算叠印
+            if (ax >= bx and ay >= by and ax + aw <= bx + bw and ay + ah <= by + bh) or \
+               (bx >= ax and by >= ay and bx + bw <= ax + aw and by + bh <= ay + ah):
+                continue
+            # 短标签 + 长正文共处一卡（title+body 紧排）不算叠印：两者水平对齐且纵向仅微碰
+            short_long = (len(la) <= 12) != (len(lb) <= 12)
+            v_touch = oy < int(0.12 * 914400)  # 纵向重叠 <0.12in 视为基线紧排
+            if short_long and v_touch:
+                continue
+            # 两个都是短标签/数值（图表轴标签、指标值、图例文字）：数据展示的常规紧排，不是叠印
+            if len(la) <= 12 and len(lb) <= 12:
+                continue
+            hits += 1
+            out.append(issue(
+                "ELEMENT_OVERLAP",
+                f"元素叠印：「{la}」∩「{lb}」重叠 {area / (914400 * 914400):.2f}in²"
+                f"（≥{ELEMENT_OVERLAP_MIN_AREA_IN2}in²）——请错开坐标或合并为同一文本框。",
+                slide=slide_no,
+            ))
+    if hits > ELEMENT_OVERLAP_MAX_PER_SLIDE:
+        out.append(issue(
+            "ELEMENT_OVERLAP",
+            f"同页元素叠印 {hits} 处（>{ELEMENT_OVERLAP_MAX_PER_SLIDE}）——几何算法与内容量脱钩，需重构布局。",
+            slide=slide_no,
+        ))
+    return out
+
+
+def layout_fill_check(
+    bounds: list[tuple[int, int, int, int]],
+    slide_no: int,
+    width: int,
+    height: int,
+    is_structural: bool = False,
+) -> list[dict[str, Any]]:
+    """版心填充率（LAYOUT_FILL）：宽、高分别算，低于下限告警。
+
+    structural 页（封面/大纲/收尾/引用）豁免——它们本来就是留白页。
+    目标带取 layout-constants.json 的 layoutSystem.fillTarget（按模式），
+    这里用「包围盒占画布比」的宽高分量做保守近似。
+    """
+    out: list[dict[str, Any]] = []
+    if is_structural or not bounds:
+        return out
+    try:
+        lc_path = Path(__file__).resolve().parent / "layout-constants.json"
+        lc = json.loads(lc_path.read_text(encoding="utf-8"))
+        ft = ((lc.get("layoutSystem") or {}).get("fillTarget") or {})
+        # 默认取 research 带（最常见研究报告）
+        target = ft.get("research") or [70, 85]
+        fill_min = float(target[0]) / 100.0
+    except (OSError, json.JSONDecodeError, TypeError, ValueError):
+        fill_min = 0.55
+
+    left = min(x for x, _, _, _ in bounds)
+    top = min(y for _, y, _, _ in bounds)
+    right = max(x + cx for x, _, cx, _ in bounds)
+    bottom = max(y + cy for _, y, _, cy in bounds)
+    w_fill = max(0.0, (right - left) / max(width, 1))
+    h_fill = max(0.0, (bottom - top) / max(height, 1))
+    # 硬下限 0.55（诊断口径），目标带下限作 WARN
+    hard_min = 0.55
+    if w_fill < hard_min or h_fill < hard_min:
+        out.append(issue(
+            "LAYOUT_FILL",
+            f"版心填充不足（宽 {w_fill:.0%} / 高 {h_fill:.0%}，硬下限 {hard_min:.0%}）——"
+            "多栏请按版心推导列宽，低密度页补从件（指标/小图/对照表）。",
+            slide=slide_no,
+        ))
+    elif w_fill < fill_min or h_fill < fill_min:
+        out.append(issue(
+            "LAYOUT_FILL",
+            f"版心填充偏低（宽 {w_fill:.0%} / 高 {h_fill:.0%}，目标下限 {fill_min:.0%}）。",
+            slide=slide_no,
+        ))
     return out
 
 
@@ -913,6 +1053,9 @@ def inspect_slide(
 
     warnings.extend(annotation_band_overlap_check(
         [*shapes, *pictures, *graphic_frames], slide_number, height, width))
+    # R6：元素两两重叠（节点叠印 / 结论条叠印漏检主因）
+    warnings.extend(element_overlap_check(
+        [*shapes, *pictures, *graphic_frames], slide_number, width, height))
     warnings.extend(font_size_snap_check(root, slide_number))
 
     for table in tables:
@@ -985,6 +1128,11 @@ def inspect_slide(
         warnings.append(
             issue("EMPTY_OR_UNMEASURABLE_SLIDE", "页面没有任何可测量的原生元素。", slide=slide_number)
         )
+
+    # R6：版心填充率（宽/高分别算；封面/大纲/收尾等结构页豁免）
+    _struct_text = combined_text[:200] if combined_text else ""
+    _is_struct = bool(re.search(r"(报告大纲|AGENDA|下一步|参考资料|封面)", _struct_text)) or slide_number <= 2
+    warnings.extend(layout_fill_check(bounds, slide_number, width, height, is_structural=_is_struct))
 
     if len(all_elements) <= 1 and not pictures:
         warnings.append(

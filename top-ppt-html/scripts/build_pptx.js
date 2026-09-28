@@ -381,6 +381,15 @@ function footnoteLine(s, text) {
   s.addText(text, { x: R.x, y: R.y, w: R.w, h: R.h,
     fontFace: STYLE.font, fontSize: sz(9.5), color: STYLE.faint, objectName: trName('footnote') });
 }
+/* R2：sec.note 与 sec.footnote 共用注释带末行（footnoteY=6.72）。
+   note.y=6.55 会压进 so-what 带——同页二者合并为一行。 */
+function noteOrFootnote(s, sec) {
+  const parts = [];
+  if (sec && sec.note) parts.push(String(sec.note));
+  if (sec && sec.footnote) parts.push(String(sec.footnote));
+  if (!parts.length) return;
+  footnoteLine(s, parts.join('　·　'));
+}
 /* 待核实清单条（accent 强调色标注 · 与 HTML .flagbar 同源）
  * 底对齐 contentBottom，正文区在调用点按 flagH 让位。 */
 function flagBar(s, items, yTop) {
@@ -1584,30 +1593,55 @@ function addTable(s, tbl, x, y, w, availH, opts) {
   s.addNotes([CONTENT.subtitle, CONTENT.meta].filter(Boolean).join('\n'));
 })();
 
-/* Agenda（architecture 极简形态可省略 agenda → 不产出大纲页；>8 条自动双列；行高自适应防溢出） */
+/* Agenda（architecture 极简形态可省略 agenda → 不产出大纲页；
+   >8 条自动双列；>12 条自动分页 Agenda I/II；长标题截断+全称入 notes；
+   行高自适应防溢出；列填充与 HTML 统一为列优先） */
 (function agenda() {
   if (!Array.isArray(CONTENT.agenda) || !CONTENT.agenda.length) return;
-  const s = base();
-  head(s, 'AGENDA', '报告大纲');
   const items = CONTENT.agenda;
-  const colN = items.length > 8 ? 2 : 1;
-  const perCol = Math.ceil(items.length / colN);
-  /* 预留 0.25in，避免末行底边落入 severe-overlap 安全网（无注释页亦勿压进 withNote 带过深） */
-  const availH = CONTENT_BOTTOM - CONTENT_TOP - 0.25;
-  const rowH = Math.min(1.05, availH / Math.max(1, perCol));
-  const numSize = rowH >= 0.85 ? sz(30) : (rowH >= 0.65 ? sz(22) : sz(18));
-  const tSize = rowH >= 0.85 ? sz(16) : sz(14);
-  const dSize = rowH >= 0.85 ? sz(12) : sz(11);
-  items.forEach((it, i) => {
-    const col = Math.floor(i / perCol), row = i % perCol;
-    const x = MX + col * (CW / colN), y = CONTENT_TOP + row * rowH;
-    s.addText(it[0], { x, y, w: 0.9, h: rowH - 0.05, fontFace: STYLE.font, fontSize: numSize,
-      bold: true, color: STYLE.accent, valign: 'top' });
-    s.addText([
-      { text: it[1] + '\n', options: { fontSize: tSize, bold: true, color: STYLE.ink } },
-      { text: it[2] || '', options: { fontSize: dSize, color: STYLE.body } },
-    ], { x: x + 1.0, y: y + 0.03, w: CW / colN - 1.15, h: rowH - 0.08, fontFace: STYLE.font,
-      valign: 'top', lineSpacing: tSize + 5 });
+  /* R4：单页容量 = 双列 × 每列最多 6 行（行高 ≥0.55in 可读） */
+  const ROWS_PER_PAGE = 12;
+  const pages = [];
+  for (let i = 0; i < items.length; i += ROWS_PER_PAGE) pages.push(items.slice(i, i + ROWS_PER_PAGE));
+  pages.forEach((pageItems, pi) => {
+    const s = base();
+    const sub = pages.length > 1 ? `（${pi + 1}/${pages.length}）` : '';
+    head(s, 'AGENDA', '报告大纲' + sub);
+    const colN = pageItems.length > 8 ? 2 : 1;
+    const perCol = Math.ceil(pageItems.length / colN);
+    /* 预留 0.25in，避免末行底边落入 severe-overlap 安全网 */
+    const availH = CONTENT_BOTTOM - CONTENT_TOP - 0.25;
+    const rowH = Math.min(1.05, availH / Math.max(1, perCol));
+    const numSize = rowH >= 0.85 ? sz(30) : (rowH >= 0.65 ? sz(22) : sz(18));
+    const tSize = rowH >= 0.85 ? sz(16) : sz(14);
+    const dSize = rowH >= 0.85 ? sz(12) : sz(11);
+    const notes = [];
+    pageItems.forEach((it, i) => {
+      /* 列优先：先填左列再填右列（与 HTML grid-auto-flow:column 一致） */
+      const col = Math.floor(i / perCol), row = i % perCol;
+      const x = MX + col * (CW / colN), y = CONTENT_TOP + row * rowH;
+      /* R4：标题按盒宽估算折行，超 1 行则截断并把全称沉 notes */
+      const titleBoxW = CW / colN - 1.15;
+      const rawTitle = String(it[1] || '');
+      const titleEstW = estTextH(rawTitle, titleBoxW, tSize, 1.2);
+      const maxTitleH = rowH * 0.55;
+      let title = rawTitle;
+      if (titleEstW > maxTitleH) {
+        const maxChars = Math.max(10, Math.floor(rawTitle.length * (maxTitleH / titleEstW)));
+        if (rawTitle.length > maxChars) {
+          title = rawTitle.slice(0, maxChars - 1) + '…';
+          notes.push(`条目 ${it[0]} 全称：${rawTitle}`);
+        }
+      }
+      s.addText(it[0], { x, y, w: 0.9, h: rowH - 0.05, fontFace: STYLE.font, fontSize: numSize,
+        bold: true, color: STYLE.accent, valign: 'top' });
+      s.addText([
+        { text: title + '\n', options: { fontSize: tSize, bold: true, color: STYLE.ink } },
+        { text: it[2] || '', options: { fontSize: dSize, color: STYLE.body } },
+      ], { x: x + 1.0, y: y + 0.03, w: titleBoxW, h: rowH - 0.08, fontFace: STYLE.font,
+        valign: 'top', lineSpacing: tSize + 5 });
+    });
+    if (notes.length) s.addNotes(notes.join('\n'));
   });
 })();
 
@@ -1729,15 +1763,18 @@ CONTENT.sections.forEach((sec) => {
         ], { x: sd.x + 0.5, y: py, w: cw2 - 0.75, h: rowH - 0.04, fontFace: STYLE.font, valign: 'top' });
       });
     });
+    /* R2：verdict 与 soWhat 共用 annotation 槽位——只画一个（verdict 优先，语义更具体）。
+       两者同页必须互斥，否则结论条整条叠印。 */
     if (sec.verdict) {
       const vreg = REGIONS.regionOf('exhibit', 'annotation') ||
         { x: MX, y: PT.exhibit.soWhatY, w: CW, h: 0.62 };
       s.addShape('rect', { x: vreg.x, y: vreg.y, w: vreg.w, h: vreg.h,
-        fill: { color: STYLE.accent }, line: { type: 'none' } });
+        fill: { color: STYLE.accent }, line: { type: 'none' }, objectName: trName('soWhat') });
       s.addText([
         { text: '结论　', options: { fontSize: sz(11), bold: true, color: STYLE.onAccent, charSpacing: 1.5 } },
         { text: sec.verdict, options: { fontSize: sz(12.5), bold: true, color: STYLE.onAccent } },
-      ], { x: vreg.x + 0.22, y: vreg.y + 0.06, w: vreg.w - 0.44, h: vreg.h - 0.12, fontFace: STYLE.font, valign: 'middle' });
+      ], { x: vreg.x + 0.22, y: vreg.y + 0.06, w: vreg.w - 0.44, h: vreg.h - 0.12, fontFace: STYLE.font,
+        valign: 'middle', objectName: trName('soWhat') });
     }
   } else if (type === 'quote') {
     const Q = PT.quote;
@@ -1808,8 +1845,6 @@ CONTENT.sections.forEach((sec) => {
           align: 'right', valign: 'middle', fontFace: STYLE.font, fontSize: sz(10.5), color: STYLE.faint });
       });
     }
-    if (sec.note) s.addText(sec.note, { x: MX, y: PT.note.y, w: CW, h: PT.note.h,
-      fontFace: STYLE.font, fontSize: sz(11), color: STYLE.faint });
   } else if (type === 'heatmap') {
     /* 热力矩阵：行 × 列 + 4 级色阶（surface-1 → accent-soft → accent-soft-2 → accent） */
     const H = PT.heatmap;
@@ -1993,7 +2028,7 @@ CONTENT.sections.forEach((sec) => {
   } else if (type === 'bar') {
     const c = sec.chart || {};
     const dcols = c.colors || dataColors(styleArg);
-    const bot = chartBottom(!!sec.soWhat, !!sec.footnote) - (sec.note ? 0.42 : 0.05);
+    const bot = chartBottom(!!sec.soWhat, !!(sec.footnote || sec.note)) - 0.05;
     const isH = c.type === 'hbar';
     const reg = REGIONS.regionOf('bar', isH ? 'hbar' : 'primary', { bottom: bot }) ||
       { x: MX, y: isH ? PT.bar.hbarY0 : PT.bar.chartY, w: CW, h: 3 };
@@ -2022,15 +2057,13 @@ CONTENT.sections.forEach((sec) => {
     } else {
       chartBlock(s, c, cx, reg.y, cw, Math.max(1.5, reg.h), dcols);
     }
-    if (sec.note) s.addText(sec.note, { x: MX, y: PT.note.y, w: CW, h: PT.note.h, fontFace: STYLE.font,
-      fontSize: sz(11), color: STYLE.faint });
   } else if (type === 'twocol' || type === 'threecol') {
     const ps = sec.paragraphs || [];
     const nCol = (type === 'threecol') ? 3 : 2;
     const gap = (type === 'threecol') ? PT.research.col3Gap : PT.twocol.colGap;
-    const treg = REGIONS.regionOf('twocol', 'primary', { top: bodyY, bottom: bodyBottom }) ||
-      { x: MX, y: bodyY, w: CW, h: bodyBottom - bodyY };
-    /* threecol 用 3 栏均分（twocol IR 的 colW 仅适用 2 栏） */
+    /* R3：多栏均分必须用版心全宽。regionOf('twocol','primary') 返回的是「单栏宽」，
+       直接当总宽再 cols() 会把三栏压成 1.69in、右侧 55% 全空。 */
+    const treg = { x: MX, y: bodyY, w: CW, h: bodyBottom - bodyY };
     const g = cols(treg.w, nCol, gap);
     const per = Math.ceil(ps.length / nCol);
     const availH = treg.h;
@@ -2258,11 +2291,30 @@ CONTENT.sections.forEach((sec) => {
         const nds = isRec(nd) ? (nd.d || '') : '';
         s.addShape('roundRect', { x, y, w: nw, h: lh, rectRadius: 0.06,
           fill: { color: acc ? STYLE.soft : STYLE.surface }, line: { color: STYLE.line, width: 0.75 } });
-        s.addText(ntt, { x: x + 0.12, y: y + (nds ? 0.12 : lh / 2 - 0.2), w: nw - 0.24, h: 0.38,
-          fontFace: STYLE.font, fontSize: sz(12.5), bold: true, color: acc ? STYLE.accent : STYLE.ink,
-          valign: nds ? 'top' : 'middle' });
-        if (nds) s.addText(nds, { x: x + 0.12, y: y + lh - 0.5, w: nw - 0.24, h: 0.4,
-          fontFace: STYLE.font, fontSize: sz(10), color: STYLE.faint });
+        /* 节点内标题/注解：注解底对齐会「浮回」标题上（R1）。改为标题顶对齐 + 注解钳在标题下边；
+           空间不足时降级为单框混排（标题粗体 + 注解小字），禁止叠印。 */
+        const padX = 0.12, padY = 0.10;
+        const innerW = nw - padX * 2;
+        const titleH = 0.32, noteH = 0.34, gapTN = 0.04;
+        const needH = titleH + gapTN + (nds ? noteH : 0) + padY * 2;
+        if (!nds || lh >= needH) {
+          const tY = y + padY;
+          s.addText(ntt, { x: x + padX, y: nds ? tY : y + lh / 2 - 0.18, w: innerW, h: titleH,
+            fontFace: STYLE.font, fontSize: sz(nds ? 12 : 12.5), bold: true,
+            color: acc ? STYLE.accent : STYLE.ink, valign: 'middle' });
+          if (nds) {
+            const nY = Math.max(tY + titleH + gapTN, y + lh - padY - noteH);
+            s.addText(nds, { x: x + padX, y: nY, w: innerW, h: Math.min(noteH, y + lh - padY - nY),
+              fontFace: STYLE.font, fontSize: sz(10), color: STYLE.faint, valign: 'top' });
+          }
+        } else {
+          /* 空间不足：单框混排（同一文本框内富文本，禁拆两框叠印） */
+          s.addText([
+            { text: ntt, options: { fontSize: sz(11), bold: true, color: acc ? STYLE.accent : STYLE.ink, breakLine: true } },
+            { text: nds, options: { fontSize: sz(9), color: STYLE.faint } },
+          ], { x: x + padX, y: y + padY * 0.5, w: innerW, h: lh - padY,
+            fontFace: STYLE.font, valign: 'top', lineSpacing: sz(11 * 1.25) });
+        }
       });
       if (li < lys.length - 1) {
         const cy = y + lh + D.layerGap / 2;
@@ -2275,10 +2327,15 @@ CONTENT.sections.forEach((sec) => {
       }
     });
     if (sec.legend) {
-      let lx = MX;
-      sec.legend.forEach((lg) => {
-        s.addText('● ' + lg, { x: lx, y: PH - 0.62, w: 3.2, h: 0.3, fontFace: STYLE.font, fontSize: sz(10), color: STYLE.faint });
-        lx += 2.0;
+      /* R2：图例进图区底部（与 HTML .arch__legend 同源），禁用 PH-0.62 固定偏移——
+         那会压到来源行(6.72)与页码(7.0)。图例条自适应行内均分，右对齐。 */
+      const lgH = 0.28;
+      const lgY = Math.max(dStart, bodyBottom - lgH - 0.02);
+      const nLg = Math.max(1, sec.legend.length);
+      const step = Math.min(2.4, CW / nLg);
+      sec.legend.forEach((lg, li) => {
+        s.addText('● ' + lg, { x: MX + CW - nLg * step + li * step, y: lgY, w: step - 0.05, h: lgH,
+          fontFace: STYLE.font, fontSize: sz(10), color: STYLE.faint, align: 'left' });
       });
     }
   } else if (type === 'exhibit') {
@@ -2348,8 +2405,10 @@ CONTENT.sections.forEach((sec) => {
     }
   }
   /* research 通用可选件：so-what 结论条 + 页脚来源行 + 待核实条（所有页型共用同一槽位） */
-  if (sec.soWhat) soWhatBar(s, sec.soWhat);
-  if (sec.footnote) footnoteLine(s, sec.footnote);
+  /* R2：verdict 已占 annotation 槽位时跳过 soWhat，禁止同槽双条叠印 */
+  if (sec.soWhat && !sec.verdict) soWhatBar(s, sec.soWhat);
+  /* R2：note 与 footnote 共用注释带末行（禁 note.y=6.55 压 so-what） */
+  noteOrFootnote(s, sec);
   if (flagH) flagBar(s, flagItems, flagY);
   /* 演讲者备注（口径/含义/来源沉 notes，不堆版面） */
   const _notes = [];

@@ -312,10 +312,13 @@ function regionOf(pageType, slotId, opts) {
   if (type === 'image') {
     if (slot === 'primary') {
       const y = Math.max(PT.y || 2.3, (opts && opts.top) || 0);
-      const bottom = (opts && opts.bottom != null) ? opts.bottom : L.contentBottom;
-      const capH = (opts && opts.caption) ? 0.32 : 0;
+      /* R2：有图注时图片不得越过 contentBottomWithNote（图注本身落在注释带，属 annotation self）。
+         否则图片底边（如 6.58）会被判「主内容侵入注释带」。 */
+      const hasCap = !!(opts && opts.caption);
+      const bottom = (opts && opts.bottom != null) ? opts.bottom
+        : (hasCap ? L.contentBottomWithNote : L.contentBottom);
       return {
-        x: mx, y, w: cw, h: Math.max(1.2, Math.min(PT.h || 4.2, bottom - y - capH)),
+        x: mx, y, w: cw, h: Math.max(1.2, Math.min(PT.h || 4.2, bottom - y)),
         halfW: PT.halfW, halfGap: PT.halfGap, capY: PT.capY, capH: PT.capH || 0.3,
         radius: PT.radius, gridGap: PT.gridGap, gridCols: PT.gridCols,
       };

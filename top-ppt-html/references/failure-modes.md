@@ -1,10 +1,10 @@
 # 失败模式库（交付前自检）
 
-> **何时读本文**：生成完成、跑完校验脚本后，若想确认"没有踩坑"，按本文**十六类**模式逐条对照；或当校验器报出某类问题时，查本文的**修复顺序铁律**（先改什么、不要改什么）。
+> **何时读本文**：生成完成、跑完校验脚本后，若想确认"没有踩坑"，按本文**二十类**模式逐条对照；或当校验器报出某类问题时，查本文的**修复顺序铁律**（先改什么、不要改什么）。
 > 本文与校验器一一对应：每类模式给出**识别信号 → 校验器错误码 → 修复动作**。
-> F1–F14 为结构/导出/内容硬缺陷；F15–F16 为内容节奏与导出诚实性；F17 为 v9 截图级缺陷（标签泄漏/空页/极偏图）。
+> F1–F14 为结构/导出/内容硬缺陷；F15–F16 为内容节奏与导出诚实性；F17 为 v9 截图级缺陷；F18 为截断/溢出/半空卡；F19 为几何叠印/同槽双条（PPTX 导出硬伤）；F20 为 Agenda 容量/图表退化/图标缺失。
 
-## 一、十六类失败模式
+## 一、二十类失败模式
 
 ### F1 内容不足 `underfill`
 
@@ -224,4 +224,30 @@
 | PPTX 页脚 y 跨页漂移 | `CHROME_DRIFT` | 锁死 chrome 槽位几何（pageTypes） |
 
 反模式：为稀疏 demo 感删证据 / so-what。原则见 `presentation-craft.md`「长文与信息承载」。
+
+## F19 · 几何叠印 / 同槽双条 / 注释带侵入（v9.2 · PPTX 导出硬伤）
+
+| 信号 | 错误码 | 修复 |
+|------|--------|------|
+| 元素两两重叠 ≥0.05in² | `ELEMENT_OVERLAP` | 错开坐标或合并为同一文本框；同页 >3 处=几何算法脱钩，需重构布局 |
+| 架构节点标题/注解叠印 | （R1 根因） | 注解钳制在标题下边；节点高不足降级单框混排（双引擎已修，自定义几何勿回退） |
+| verdict 与 soWhat 同页双填叠印 | `MODEL_VERDICT_SOWHAT_CONFLICT`（extract_model WARN） | **二选一**：comparison 填 `verdict` 就不要填 `soWhat`；渲染器自动去重但模型侧应只给一个 |
+| 图例/类目标签压 so-what/来源行 | `ANNOTATION_BAND_OVERLAP` | 图例落图区底部（`bodyBottom-0.28`）；类目标签含在图高 `h` 内；禁 `PH-0.62` 固定偏移 |
+| `sec.note` 压 so-what 带 | （R2 根因） | `note` 与 `footnote` 共用注释带末行 `footnoteY=6.72`，同页自动合并；禁用 `note.y=6.55` |
+| 版心填充 <55%（宽/高任一轴） | `LAYOUT_FILL` | 多栏按版心全宽推导列宽；低密度页补从件（指标/小图/对照表） |
+
+**根因**：几何算法与内容量脱钩（固定偏移、单栏宽当总宽、同槽位无仲裁）。**门禁**：`validate_pptx.py --strict` 已含 `ELEMENT_OVERLAP` / `LAYOUT_FILL` / `ANNOTATION_BAND_OVERLAP`；`cross_verify` 比对 Agenda 阅读顺序、图片数、图表数据标签。
+
+## F20 · Agenda 溢出 / 图表退化 / 图标缺失（v9.2 · 容量与跨通道）
+
+| 信号 | 错误码 | 修复 |
+|------|--------|------|
+| Agenda >16 条撑爆一屏 | `Agenda 条数 ≤16`（validate_report） | 拆上/下篇或改章节级大纲 6–8 条；PPTX 已自动分页（>12 条） |
+| Agenda 单条标题 >36 字 | `Agenda 单条标题 ≤36 字`（WARN） | 截断+全称沉 notes；或精炼标题 |
+| Agenda 两通道阅读顺序不一致 | `Agenda序=DRIFT`（cross_verify） | 列优先（先左列后右列）；HTML 用 `column-count`，PPTX 用列填充 |
+| low 图型无数据表 | `图表 PPTX 还原度提示`（WARN） | area/radar/treemap/sankey/streamgraph/marimekko/boxplot/network 在 PPTX 显著退化——改 bar/line/hbar/donut 或 `dataTable=inline` |
+| ≥2 卡且无 `.card__ico` | `要点/卡片页含 .card__ico`（WARN） | 从 `icons.md` 取语义图标（`render_from_model.py` 已内置 `card_head()` 自动出图标） |
+| 图片占位标签 A/B 不同串 | `图片数=DRIFT` / 文本覆盖不足 | 占位标签由 `imageSpec` 同源拼接；`render_from_model` 与 PPTX `imgPlaceholderLabel` 必须同串 |
+
+**根因**：页型容量契约缺失 + 图表双通道无还原度约定 + 图标/占位文本两处手写。**门禁**：`contentQuality.agenda`（singleMax/splitMax/titleMaxChars）、`charts.fidelityMap`、`cross_verify --full-ab` 三项一致性检查。
 

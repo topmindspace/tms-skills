@@ -217,6 +217,20 @@ def _check_charts(txt, chk):
     chk("图表最小尺寸·建议（通宽图 viewBox 高）", not small_note,
         "; ".join(small_note) if small_note else "", level="WARN")
 
+    # R5：PPTX 还原度——low 图型在 PPTX 显著退化，仅提示不卡门禁（HTML 交付合法；
+    # PPTX 交付时在选型决策树里改 bar/line/hbar 或 dataTable=inline）
+    fidelity_map = (LC.get('charts') or {}).get('fidelityMap') or {}
+    if fidelity_map:
+        low_used = []
+        for t in chart_tags:
+            m = re.search(r'data-chart="([^"]+)"', t)
+            if m and fidelity_map.get(m.group(1)) == 'low':
+                low_used.append(m.group(1))
+        if low_used:
+            chk("图表 PPTX 还原度提示（low 图型 PPTX 会退化）", True,
+                f"低还原度: {sorted(set(low_used))}——HTML 合法；PPTX 建议改 bar/line/hbar 或 dataTable=inline",
+                level="WARN")
+
 
 CARRIERS = checks_html.CARRIERS  # 单源 scripts/checks_html.py
 
@@ -1675,6 +1689,16 @@ def main():
                 r'<ol\b[^>]*class="[^"]*\bagenda\b[^"]*\bagenda--2col\b', txt))
             chk(f"Agenda >{AGENDA_SINGLE_MAX} 条时已用 agenda--2col 双列",
                 has_2col, f"{n_items} 条未双列（大纲很多→两排/两列，禁单列撑爆一屏）", level="WARN")
+        # R4：Agenda 容量契约——条数超上限须分页/章节级大纲；单条标题限长
+        ag_cfg = (LC.get('contentQuality') or {}).get('agenda') or {}
+        split_max = int(ag_cfg.get('splitMax') or 16)
+        title_max = int(ag_cfg.get('titleMaxChars') or 36)
+        chk(f"Agenda 条数 ≤{split_max}（超出请拆上/下篇或章节级大纲）",
+            n_items <= split_max,
+            f"{n_items} 条超上限——PPTX 已自动分页，HTML 会撑出一屏，建议改章节级大纲 6–8 条")
+        long_titles = re.findall(r'class="agenda__t"[^>]*>([^<]{%d,})' % (title_max + 1), txt)
+        chk(f"Agenda 单条标题 ≤{title_max} 字", not long_titles,
+            f"{len(long_titles)} 条超长：{long_titles[:3]}…" if long_titles else "", level="WARN")
 
     # ── 主标题粗体 ──
     chk("主标题粗体 --fw-title/--fw-display",

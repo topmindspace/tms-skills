@@ -95,6 +95,11 @@ def validate_against_schema(model, schema):
         warnings.append(f"章节页仅 {len(secs)} 页，正式报告建议 ≥3")
     if len(ag) > ms.get('agendaComfortMax', 16):
         warnings.append(f"agenda {len(ag)} 条超出单页舒适上限，建议拆分")
+    # R2：verdict 与 soWhat 共用 annotation 槽位——同页双填必叠印
+    for i, sec in enumerate(secs if isinstance(secs, list) else []):
+        if isinstance(sec, dict) and sec.get('verdict') and sec.get('soWhat'):
+            warnings.append(
+                f"sections[{i}] 同时填写 verdict 与 soWhat（共用结论条槽位，渲染会叠印）——请二选一")
     return missing, warnings
 
 

@@ -525,7 +525,7 @@ python scripts/prepare_images.py ./photos --layout grid --mode path   # 大图�
 
 ---
 
-## 14. Agenda 多列（条目 9–16 个时）
+## 14. Agenda 多列（条目 >8 个时）
 
 ```html
 <ol class="agenda agenda--2col rv">
@@ -535,12 +535,13 @@ python scripts/prepare_images.py ./photos --layout grid --mode path   # 大图�
 
 ```css
 @media (min-width:900px){
-  .agenda--2col{display:grid;grid-template-columns:1fr 1fr;column-gap:clamp(20px,3vw,48px)}
-  .agenda--2col .agenda__i{border-top:1px solid var(--border-soft)}
+  /* 列优先（先左列后右列），与 PPTX Agenda 列填充一致 */
+  .agenda--2col{display:block;column-count:2;column-gap:clamp(20px,3vw,48px)}
+  .agenda--2col .agenda__i{break-inside:avoid;border-top:1px solid var(--border-soft)}
 }
 ```
 
-> **阈值（layout-constants `contentQuality.agenda`）**：≤8 单列；**>8 须 `.agenda--2col`（两列/两排）**；>16 拆「上篇/下篇」或只列一级章节。放不下先换列，禁单列撑爆一屏。
+> **阈值（layout-constants `contentQuality.agenda`）**：≤8 单列；**>8 须 `.agenda--2col`（两列，列优先）**；>12 条 PPTX 自动分页（Agenda I/II）；>16 拆「上篇/下篇」或只列一级章节。单条标题 ≤36 字（`titleMaxChars`，超长截断+全称沉 notes）。放不下先换列/分页，禁单列撑爆一屏。
 > 条目仍偏高：压缩 `.agenda__a` 的 `padding`（如 `clamp(12px,1.6vh,18px)`）。
 
 ---

@@ -345,6 +345,77 @@ def test_engine_static() -> None:
     )
 
 
+def _sp(x: float, y: float, w: float, h: float, text: str = "T") -> ET.Element:
+    """构造带 xfrm + 文本的 p:sp 测试件。"""
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        f'<p:sp xmlns:a="{NS["a"]}" xmlns:p="{NS["p"]}">'
+        f'<p:spPr><a:xfrm><a:off x="{int(x * EMU)}" y="{int(y * EMU)}"/>'
+        f'<a:ext cx="{int(w * EMU)}" cy="{int(h * EMU)}"/></a:xfrm></p:spPr>'
+        f'<p:txBody><a:p><a:r><a:t>{text}</a:t></a:r></a:p></p:txBody>'
+        "</p:sp>"
+    )
+    return ET.fromstring(xml)
+
+
+def test_element_overlap() -> None:
+    """R6: 两个内容框明显叠印必须 fire；纯包含（卡片+内文）不 fire。"""
+    a = _sp(1.0, 2.0, 2.0, 1.0, "这是一个足够长的正文标题占位符")
+    b = _sp(2.0, 2.3, 2.0, 1.0, "另一段同样足够长的正文内容占位")  # 与 A 重叠 1.0×0.7 = 0.7 in²
+    issues = V.element_overlap_check([a, b], 1, int(13.333 * EMU), int(7.5 * EMU))
+    codes = [i["code"] for i in issues]
+    ok(
+        "6a ELEMENT_OVERLAP fires on side-by-side crush",
+        "ELEMENT_OVERLAP" in codes,
+        f"codes={codes}",
+    )
+    outer = _sp(1.0, 2.0, 4.0, 2.0, "卡片容器标题占位")
+    inner = _sp(1.2, 2.2, 1.0, 0.4, "内文")
+    issues2 = V.element_overlap_check([outer, inner], 1, int(13.333 * EMU), int(7.5 * EMU))
+    ok(
+        "6b containment (card+inner) does not fire ELEMENT_OVERLAP",
+        "ELEMENT_OVERLAP" not in [i["code"] for i in issues2],
+    )
+    # 两个短标签/数值（图表轴标签、指标值）不算叠印
+    lab = _sp(1.0, 3.0, 1.0, 0.3, "已规模化")
+    val = _sp(1.2, 3.15, 0.8, 0.3, "18%")
+    issues3 = V.element_overlap_check([lab, val], 1, int(13.333 * EMU), int(7.5 * EMU))
+    ok(
+        "6f short label+value pairs do not fire ELEMENT_OVERLAP",
+        "ELEMENT_OVERLAP" not in [i["code"] for i in issues3],
+    )
+
+
+def test_layout_fill() -> None:
+    """R6: 宽/高填充低于硬下限须 fire；结构页豁免。"""
+    def _box(x: float, y: float, w: float, h: float) -> tuple[int, int, int, int]:
+        return (int(x * EMU), int(y * EMU), int(w * EMU), int(h * EMU))
+    # 只占左侧窄条：宽填充 ~15%
+    narrow = [_box(0.6, 2.0, 1.5, 3.0)]
+    issues = V.layout_fill_check(narrow, 3, int(13.333 * EMU), int(7.5 * EMU), is_structural=False)
+    codes = [i["code"] for i in issues]
+    ok(
+        "6c LAYOUT_FILL fires on underfill content page",
+        "LAYOUT_FILL" in codes,
+        f"codes={codes}",
+    )
+    ok(
+        "6d structural page exempt from LAYOUT_FILL",
+        "LAYOUT_FILL" not in [
+            i["code"]
+            for i in V.layout_fill_check(narrow, 2, int(13.333 * EMU), int(7.5 * EMU), is_structural=True)
+        ],
+    )
+    wide = [_box(0.6, 1.5, 12.0, 5.5)]  # 宽 90% / 高 73%，落在 research 目标带 70–85 内
+    ok(
+        "6e full-width content page passes LAYOUT_FILL",
+        "LAYOUT_FILL" not in [
+            i["code"]
+            for i in V.layout_fill_check(wide, 3, int(13.333 * EMU), int(7.5 * EMU), is_structural=False)
+        ],
+    )
+
+
 def main() -> int:
     print("feedback-gates regression")
     test_shape_bounds_reads_p_xfrm()
@@ -356,6 +427,8 @@ def main() -> int:
     test_annotation_band_fires_when_note_present()
     test_annotation_band_reports_all_invaders()
     test_annotation_band_so_what_band_top()
+    test_element_overlap()
+    test_layout_fill()
     test_chrome_footer_ignores_bare_integers()
     test_chart_bottom_no_short_circuit()
     test_font_size_h2_17_allowed()

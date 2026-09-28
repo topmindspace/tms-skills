@@ -791,8 +791,9 @@ color:var(--accent);font-variant-numeric:tabular-nums;line-height:1;min-width:2.
 .agenda__a:hover .agenda__go{color:var(--accent);transform:translateX(4px)}
 .agenda__go svg{width:20px;height:20px;display:block}
 @media (min-width:900px){
-.agenda--2col{display:grid;grid-template-columns:1fr 1fr;column-gap:clamp(20px,3vw,48px)}
-.agenda--2col .agenda__i{border-top:1px solid var(--border-soft)}}
+/* R4：列优先（先左列后右列），与 PPTX Agenda 列填充一致——grid 行优先会打乱阅读顺序 */
+.agenda--2col{display:block;column-count:2;column-gap:clamp(20px,3vw,48px)}
+.agenda--2col .agenda__i{break-inside:avoid;border-top:1px solid var(--border-soft)}}
 /* ── 页码指示（翻页导航） ── */
 .pager{position:fixed;right:clamp(10px,1.6vw,26px);top:50%;transform:translateY(-50%);
 z-index:60;display:flex;flex-direction:column;align-items:center;gap:10px}

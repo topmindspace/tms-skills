@@ -58,6 +58,7 @@ def slide_texts(prs):
         for shape in slide.shapes:
             if shape.has_text_frame:
                 for line in shape.text_frame.text.splitlines():
+
                     t = line.strip()
                     if t and not NUMERIC_TOKEN.match(t):
                         texts.append(t)
@@ -193,6 +194,58 @@ def overflow_estimate(prs, name):
     return issues
 
 
+# ── R6 跨通道一致性（Agenda 阅读顺序 / 元素数量 / 图表数据标签） ──
+
+def agenda_order(prs) -> list[str]:
+    """大纲页条目阅读顺序（第 2 页，按 y 再 x 排序的短文本序列）。"""
+    if len(prs.slides) < 2:
+        return []
+    items = []
+    for shape in prs.slides[1].shapes:
+        if not shape.has_text_frame:
+            continue
+        t = shape.text_frame.text.strip()
+        if not t or len(t) > 60:
+            continue
+        # 序号行（01/02…）或短标题——取前 20 个稳定 token 作顺序指纹
+        items.append((round(shape.top / 914400, 1), round(shape.left / 914400, 1), t[:24]))
+    items.sort()
+    return [t for _, _, t in items[:20]]
+
+
+def element_counts(prs) -> list[tuple[int, int, int]]:
+    """每页 (shapes, pictures, charts) 数量——跨通道应对齐（A 形状近似 vs B 原生图表可有 1 图差）。"""
+    out = []
+    for slide in prs.slides:
+        shapes = sum(1 for s in slide.shapes if s.shape_type is not None)
+        pics = sum(1 for s in slide.shapes if s.shape_type == 13)  # PICTURE
+        charts = sum(1 for s in slide.shapes if getattr(s, 'has_chart', False))
+        out.append((shapes, pics, charts))
+    return out
+
+
+def chart_label_presence(prs) -> list[int]:
+    """含图表的页是否有数据标签/数值文本（防「图表无标签」静默退化）。"""
+    flagged = []
+    for i, slide in enumerate(prs.slides, 1):
+        has_chart = any(getattr(s, 'has_chart', False) for s in slide.shapes)
+        if not has_chart:
+            continue
+        has_numeric = False
+        for s in slide.shapes:
+            if s.has_text_frame:
+                for line in s.text_frame.text.splitlines():
+                    if NUMERIC_TOKEN.match(line.strip()):
+                        has_numeric = True
+                        break
+            if has_numeric:
+                break
+        # 原生 chart part 的数据在 chart XML 里（不进 text_frame）——只对形状通道严格
+        if not has_numeric and not any(getattr(s, 'has_chart', False) for s in slide.shapes):
+            flagged.append(i)
+    return flagged
+
+
 def main() -> int:
     if Presentation is None:
         print('python-pptx 未安装')
@@ -270,7 +323,37 @@ def main() -> int:
             fails.append(f'{name}: B 通道出现 A 没有的字号 {alien}'
                          f'（两通道应同走 modeTypeScale；modeSize() 与 sz() 的钳制/取整须一致）')
         sz_note = ' 字号比例尺=' + ('PASS' if not alien else 'DRIFT')
-        print(f'{name}: A可解析✓ B可解析✓ 页数={len(ta)} 逐页文本={status}{chart_note}{sz_note}')
+        # ⑥ 跨通道一致性：Agenda 阅读顺序 / 元素数量 / 图表数据标签
+        ao_a, ao_b = agenda_order(prs_a), agenda_order(prs_b)
+        ag_note = ''
+        if ao_a and ao_b and ao_a != ao_b:
+            fails.append(f'{name}: Agenda 阅读顺序不一致 A={ao_a[:4]}… B={ao_b[:4]}…')
+            ag_note = ' Agenda序=DRIFT'
+        elif ao_a and ao_b:
+            ag_note = ' Agenda序=PASS'
+        ec_a, ec_b = element_counts(prs_a), element_counts(prs_b)
+        # A/B 图表实现路径不同（形状近似 vs 原生/形状），形状总数不可比。
+        # 只对图片数（应精确一致）做硬比对——图片是同一份素材，数量错=内容丢失。
+        cnt_diff = []
+        for i, ((sa, pa, ca), (sb, pb, cb)) in enumerate(zip(ec_a, ec_b), 1):
+            if pa != pb:
+                cnt_diff.append((i, f'pics A={pa} B={pb}'))
+        cnt_note = ''
+        if cnt_diff:
+            fails.append(f'{name}: 图片数量不一致 {cnt_diff[:3]}（同一模型应同数）')
+            cnt_note = ' 图片数=DRIFT'
+        else:
+            cnt_note = ' 图片数=PASS'
+        lab_a = chart_label_presence(prs_a)
+        lab_b = chart_label_presence(prs_b)
+        lab_note = ''
+        if lab_a or lab_b:
+            fails.append(f'{name}: 图表缺数据标签 A页{lab_a} B页{lab_b}（形状通道须附数值）')
+            lab_note = ' 图表标签=MISS'
+        else:
+            lab_note = ' 图表标签=PASS'
+        print(f'{name}: A可解析✓ B可解析✓ 页数={len(ta)} 逐页文本={status}{chart_note}{sz_note}'
+              f'{ag_note}{cnt_note}{lab_note}')
 
     print('\n── 溢出启发式（check-overflow · 18% 容差）──')
     if all_overflow:

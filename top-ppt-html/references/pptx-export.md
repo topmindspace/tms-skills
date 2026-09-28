@@ -108,7 +108,7 @@ HTML 侧仍用 MD3 clamp；双端都以「最后一排可读」为准（`present
 
 > 几何常量见 `layout-constants.json` `pageTypes.{sankey,treemap,boxplot,network,marimekko,streamgraph}`（含节点/流带上限、采样点下限、双边界追踪约束）；版式与生成规则详见 `references/infographics.md`。
 
-**通用可选字段（全部页型）**：`soWhat`（结论条，MD3 tonal soft 满铺、**无左轨**；**不绘制「SO WHAT」标签**）、`footnote`（页脚来源行）、`flags`（**待核实标注清单** `["…"]` → accent 强调色清单条，提示用户二次确认，并写入演讲者备注）、`image`（素材图片 / 配图占位，见 `image` 页型）、`exhibitNo`（非 exhibit 页型也可带 Exhibit 徽标）。research 模式 `soWhat/footnote` **只在关键论证页填写**（克制条款；结论条无 So what 字样）；comparison 页型的 `verdict` 为 accent 实底结论条。
+**通用可选字段（全部页型）**：`soWhat`（结论条，MD3 tonal soft 满铺、**无左轨**；**不绘制「SO WHAT」标签**）、`footnote`（页脚来源行）、`note`（口径注，与 `footnote` 共用注释带末行 `footnoteY=6.72`，同页二者自动合并为一行）、`flags`（**待核实标注清单** `["…"]` → accent 强调色清单条，提示用户二次确认，并写入演讲者备注）、`image`（素材图片 / 配图占位，见 `image` 页型）、`exhibitNo`（非 exhibit 页型也可带 Exhibit 徽标）。research 模式 `soWhat/footnote` **只在关键论证页填写**（克制条款；结论条无 So what 字样）。**`verdict` 与 `soWhat` 互斥**（共用 annotation 结论条槽位，同页双填必叠印）——comparison 页填 `verdict`（accent 实底结论条）时不要再填 `soWhat`；渲染器自动二选一（verdict 优先），`extract_model` 对同页双填发 WARN。
 
 > **素材图片（单源 `layout-constants.json` 的 `imageSpec`）**：`image` 三选一必填——`src`（用户图，data: 内联或相对路径）｜`items:[{src,alt?,caption?,placeholder?}]`（多图版式）｜`placeholder:true`（**配图占位**，无素材时锁版式用）。
 > - **六版式**（`layout`）：`full` 版心全宽 3:1｜`half` 左图右注 4:3｜`bleed` 通栏出血 21:9｜`grid` 多图网格 4:3（2/3/4/6 张）｜`compare` 双图 A/B 4:3｜`wall` Logo 墙 1:1。比例写在 `imageSpec.ratioDefault`，**HTML 用同比例锁定类、PPTX 用同一比例算高度并垂直居中**——两通道版式一致。
@@ -118,7 +118,7 @@ HTML 侧仍用 MD3 clamp；双端都以「最后一排可读」为准（`present
 > - **准入门**：`imageAdmission`（`forbidden` 禁图片化区域 / `allowed` 可保留的复杂视觉资产 / `maxPageAreaPct` 40% / `fullSlideRiskPct` 90%）。
 > - **素材准备**：`python scripts/prepare_images.py <图片|目录> --layout full|half|grid…` → 产出可粘贴的 `.media` HTML 片段与 `image` 模型对象（自动缩放/压缩/内联，体积超限自动转相对路径）。
 
-> **图表双通道**：图表类型与通道归属以 `scripts/layout-constants.json` 的 `charts.registry` 为唯一事实源（四元组：`html` 实现 / `pptx` 通道 / `nativeType` 或 `path` 几何约束 / `dataTable` 策略）。
+> **图表双通道**：图表类型与通道归属以 `scripts/layout-constants.json` 的 `charts.registry` 为唯一事实源（四元组：`html` 实现 / `pptx` 通道 / `nativeType` 或 `path` 几何约束 / `dataTable` 策略）。**PPTX 还原度分级**（`charts.fidelityMap`）：`high` 双通道等价｜`medium` 形状可读但视觉降级｜`low` PPTX 显著退化（area/radar/treemap/sankey/streamgraph/marimekko/boxplot/network）。**交付 PPTX 时优先 high 图型**（`bar`/`hbar`/`line`/`donut`），或对 low 图型强制 `dataTable=inline` 补数据表——详见 `chart-decision-tree.md`。
 > - **原生通道（16 类，`pptx:"native"`）**：`bar / hbar / stack / stackline / line / dualline / area / donut / multidonut / pie / radar / scatter / bubble` + 3 类原生技巧 `waterfall`（堆叠柱 + 隐藏基底 + 累计连接线）、`gauge`（doughnut + firstSliceAng 270° 扇形）、`pareto`（多类型组合：柱 + 累计折线）——一律走 `pptxgenjs addChart`，产出真 chart part + 内嵌 Excel 工作簿，PowerPoint/WPS 中双击即可"编辑数据"。`chart.series` 传多系列（`[{name, values}…]`）；`chart.points` 传 XY 点（scatter `[[x,y]…]` / bubble `[[x,y,size]…]`）。
 > - **形状通道（`pptx:"shape"`，20 类）**：全部走 OOXML 原生形状高保真还原（`charts.registry[type].path` 约束采样点下限、双边界追踪、禁预设形状替代）。按**载荷形态**分两组：
 >   - **可作 `chart.type` 的 14 类**（载荷 = `chart:{labels, values, series?, start?, target?, max?, unit?}`）：`funnel / gantt / vsbar / progress / sparkline / slope / dumbbell / lollipop / dotplot / bulletchart / waffle / radialbar / rose / candlestick`——由 `bar` / `exhibit` / `halftable` / `split` 页型承载。
@@ -129,7 +129,7 @@ HTML 侧仍用 MD3 clamp；双端都以「最后一排可读」为准（`present
 > - **A/B 双通道语义一致**：A 通道（浏览器预览 `pptx-export.js`）对所有类型做形状近似（类别标签与数值都落为文本），B 通道交付走原生图表；`cross_verify.py` 对两侧文本做归一化（chart categories 并入 + `NUMERIC_TOKEN` 纯数值过滤 + `sorted(set())` 去重），并额外核对 **B 通道原生图表数值 ↔ 模型数值**（类别标签一致不代表数值一致）。
 > - **通道能力边界（演讲者备注）**：A 预览通道**不产 notesSlide**（浏览器预览也看不到备注），故 `MODEL_CHART_NOTES_MISSING` 与 `MODEL_CHART_COUNT` 同走 `--allow-shape-charts` 豁免；**交付通道（B）不豁免**——`dataTable=notes` 的图表必须在备注里真的有数据表。
 >
-> **自适应排版**：所有文本块按可用高度自适应字号/行距（`fitFont`），表格行高按可用高度计算，列表/泳道/矩阵/卡片行高随容器收敛——保证不越界、不重叠（`validate_pptx.py` 硬拦越界与文本溢出）。
+> **自适应排版**：所有文本块按可用高度自适应字号/行距（`fitFont`），表格行高按可用高度计算，列表/泳道/矩阵/卡片行高随容器收敛——保证不越界、不重叠（`validate_pptx.py` 硬拦越界与文本溢出）。**几何铁律**：① 架构节点标题/注解按实际节点高度钳制（注解不得「浮回」标题上，空间不足降级单框混排）；② 图表类目标签含在图高 `h` 内（禁画到 `y+h` 外压 so-what）；③ 多栏均分用**版心全宽**推导（`(CW-(n-1)×gap)/n`，禁用单栏宽当总宽）；④ 图例落图区底部（`bodyBottom-0.28`），禁用页面底部固定偏移；⑤ KPI 支撑指标列在 `dividerX` 右侧（禁全宽默认返回压住 hero）；⑥ 有图注时图片下界收到 `contentBottomWithNote`。Agenda：>8 条自动双列、>12 条自动分页（Agenda I/II）、长标题截断全称沉 notes（`titleMaxChars=36`）、两通道列优先一致。
 
 > 保真机制：每种子页型对应 HTML 的一种锁定版式（`components.md` §36d/§37–38b/§39–42 ↔ 页型表），坐标/字号按同一套常量映射（`layout-constants.json` 的 `pageTypes` + `modeTypeScale`）。**三模式独立比例尺**：research 密排（正文 10.5pt、h1 22pt）；architecture 与 presentation 同基但 diagram 走全幅几何。图表颜色：**9 套风格各有自己的编码色板 c1–c5**（单源 `styleDataColors` / `styleDataColorsDark`，按 `model.theme` 选择），多系列图表自动取用（`dataColors(style, theme)`）；未登记风格时回落「accent / faint / body / line」四阶单色系。**页型字段与必填约束以 `model-schema.json` 为唯一事实源**（`:array` = 非空数组、`:str` = 非空字符串），浏览器端 `validateModel` 与 `extract_model.py` 校验同一份定义。
 

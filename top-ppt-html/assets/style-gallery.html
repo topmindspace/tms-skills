@@ -284,6 +284,15 @@ function regionOf(pageType, slotId, opts) {
     return { x: MX, y: P.heroY || 2.9, w: CW * (P.heroW || 0.52), h: P.heroH || 1.6,
       dividerX: P.dividerX, metricY0: P.metricY0, metricRowH: P.metricRowH };
   }
+  /* R3：kpi 支撑指标列——落在 dividerX 右侧（默认全宽返回会压住 hero） */
+  if (type === 'kpi' && slot === 'metrics') {
+    var dxK = P.dividerX != null ? P.dividerX : 0.56;
+    return {
+      x: MX + CW * dxK + 0.35, y: P.metricY0 || 2.95,
+      w: CW * (1 - dxK) - 0.5,
+      h: Math.max(0.6, bottomDefault - (P.metricY0 || 2.95)),
+    };
+  }
   if (type === 'comparison' && (slot === 'left' || slot === 'primary' || slot === 'right')) {
     var cg = P.panelGap || 0.4, pw = (CW - cg) / 2;
     if (slot === 'right') return { x: MX + pw + cg, y: P.panelY || 2.55, w: pw, h: P.panelH || 3.4 };
@@ -316,15 +325,22 @@ function regionOf(pageType, slotId, opts) {
   }
   if (type === 'image' && slot === 'primary') {
     var iy2 = Math.max(P.y || 2.3, opts.top || 0);
-    return { x: MX, y: iy2, w: CW, h: Math.max(1.2, Math.min(P.h || 4.2, (opts.bottom != null ? opts.bottom : bottomDefault) - iy2)) };
+    /* R2：有图注时图片不得越过 contentBottomWithNote（图注落注释带，属 annotation self） */
+    var iBottom = (opts.bottom != null) ? opts.bottom
+      : (opts.caption ? (L.contentBottomWithNote || 6.4) : bottomDefault);
+    return { x: MX, y: iy2, w: CW, h: Math.max(1.2, Math.min(P.h || 4.2, iBottom - iy2)) };
   }
   if ((type === 'halftable') && (slot === 'left' || slot === 'primary')) {
     var rs = PT.research || {};
-    return { x: MX, y: topDefault, w: CW * (rs.halfTableW || 0.52), h: Math.max(1, bottomDefault - topDefault) };
+    var ht = opts.top != null ? opts.top : topDefault;
+    var hb = opts.bottom != null ? opts.bottom : bottomDefault;
+    return { x: MX, y: ht, w: CW * (rs.halfTableW || 0.52), h: Math.max(1, hb - ht) };
   }
   if ((type === 'halftable') && (slot === 'right' || slot === 'secondary')) {
     var rs2 = PT.research || {};
-    return { x: MX + CW * (rs2.halfChartX || 0.57), y: topDefault, w: CW * (rs2.halfChartW || 0.43), h: Math.max(1, bottomDefault - topDefault) };
+    var ht2 = opts.top != null ? opts.top : topDefault;
+    var hb2 = opts.bottom != null ? opts.bottom : bottomDefault;
+    return { x: MX + CW * (rs2.halfChartX || 0.57), y: ht2, w: CW * (rs2.halfChartW || 0.43), h: Math.max(1, hb2 - ht2) };
   }
   if (type === 'matrix' && slot === 'primary') {
     var rm = PT.research || {};

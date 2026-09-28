@@ -156,6 +156,15 @@ function regionOf(pageType, slotId, opts) {
     return { x: MX, y: P.heroY || 2.9, w: CW * (P.heroW || 0.52), h: P.heroH || 1.6,
       dividerX: P.dividerX, metricY0: P.metricY0, metricRowH: P.metricRowH };
   }
+  /* R3：kpi 支撑指标列——落在 dividerX 右侧（默认全宽返回会压住 hero） */
+  if (type === 'kpi' && slot === 'metrics') {
+    var dxK = P.dividerX != null ? P.dividerX : 0.56;
+    return {
+      x: MX + CW * dxK + 0.35, y: P.metricY0 || 2.95,
+      w: CW * (1 - dxK) - 0.5,
+      h: Math.max(0.6, bottomDefault - (P.metricY0 || 2.95)),
+    };
+  }
   if (type === 'comparison' && (slot === 'left' || slot === 'primary' || slot === 'right')) {
     var cg = P.panelGap || 0.4, pw = (CW - cg) / 2;
     if (slot === 'right') return { x: MX + pw + cg, y: P.panelY || 2.55, w: pw, h: P.panelH || 3.4 };
@@ -188,15 +197,22 @@ function regionOf(pageType, slotId, opts) {
   }
   if (type === 'image' && slot === 'primary') {
     var iy2 = Math.max(P.y || 2.3, opts.top || 0);
-    return { x: MX, y: iy2, w: CW, h: Math.max(1.2, Math.min(P.h || 4.2, (opts.bottom != null ? opts.bottom : bottomDefault) - iy2)) };
+    /* R2：有图注时图片不得越过 contentBottomWithNote（图注落注释带，属 annotation self） */
+    var iBottom = (opts.bottom != null) ? opts.bottom
+      : (opts.caption ? (L.contentBottomWithNote || 6.4) : bottomDefault);
+    return { x: MX, y: iy2, w: CW, h: Math.max(1.2, Math.min(P.h || 4.2, iBottom - iy2)) };
   }
   if ((type === 'halftable') && (slot === 'left' || slot === 'primary')) {
     var rs = PT.research || {};
-    return { x: MX, y: topDefault, w: CW * (rs.halfTableW || 0.52), h: Math.max(1, bottomDefault - topDefault) };
+    var ht = opts.top != null ? opts.top : topDefault;
+    var hb = opts.bottom != null ? opts.bottom : bottomDefault;
+    return { x: MX, y: ht, w: CW * (rs.halfTableW || 0.52), h: Math.max(1, hb - ht) };
   }
   if ((type === 'halftable') && (slot === 'right' || slot === 'secondary')) {
     var rs2 = PT.research || {};
-    return { x: MX + CW * (rs2.halfChartX || 0.57), y: topDefault, w: CW * (rs2.halfChartW || 0.43), h: Math.max(1, bottomDefault - topDefault) };
+    var ht2 = opts.top != null ? opts.top : topDefault;
+    var hb2 = opts.bottom != null ? opts.bottom : bottomDefault;
+    return { x: MX + CW * (rs2.halfChartX || 0.57), y: ht2, w: CW * (rs2.halfChartW || 0.43), h: Math.max(1, hb2 - ht2) };
   }
   if (type === 'matrix' && slot === 'primary') {
     var rm = PT.research || {};
@@ -217,7 +233,7 @@ function regionOf(pageType, slotId, opts) {
 /* __TOPPPT_SCHEMA_START__ */
 /* ── 由 scripts/sync_runtime.py 从 scripts/model-schema.json 注入 · 禁止手改 ── */
 /* DSL schema 单源：浏览器端 validateModel 与 scripts/extract_model.py 消费同一份定义 */
-var MODEL_SCHEMA = {"version":"0.1","modes":["presentation","research","architecture"],"model":{"required":["title","sections:array","closing.title","closing.points:array"],"optional":["mode","style","theme","subtitle","meta","agenda:array"],"agendaMin":{"presentation":3,"research":3,"architecture":0},"sectionsMin":1,"sectionsRecommended":3,"agendaComfortMax":16},"commonSectionFields":["eyebrow","title","lead","soWhat","footnote","flags","image","exhibitNo","layoutPreset"],"flagsHint":"flags = 待核实/待二次修改条目字符串数组（如 '2027 增速 xx%（口径未定）'）；渲染为 accent 强调色标注行，提示用户核对。","imageHint":"image = 素材图片/配图占位对象。三选一必填：src（用户图，data: 内联或相对路径，零外链铁律禁 http(s)）｜items（多图版式：grid/compare/wall，元素 {src?, alt?, caption?, placeholder?}）｜placeholder:true（无图时出配图占位，原生形状渲染、pictures 不增）。其余可选：layout（full/half/bleed/grid/compare/wall，见 layout-constants.json imageSpec.layouts）、fit（cover 默认 / contain）、caption、alt、hint、ratio。","imageLayoutHint":"layout 与 HTML 版式对应：full=版心全宽图｜half=左图右注（points 为右栏注解）｜bleed=通栏出血｜grid=多图网格（items 2/3/4/6 张）｜compare=双图 A/B 对比（items 2 张）｜wall=Logo 墙（items 3–12 张小图）。占位符标签文本由双引擎按 imageSpec 拼同一串，保证 A/B 通道逐页文本一致。","chartTypes":["bar","hbar","stack","stackline","line","dualline","area","donut","multidonut","pie","radar","scatter","bubble","waterfall","gauge","pareto","funnel","gantt","vsbar","progress","sparkline","slope","dumbbell","lollipop","dotplot","bulletchart","waffle","radialbar","rose","candlestick"],"chartTypesHint":"chart.type 可取值 = 本表（30 类：16 原生 + 14 形状还原）。其余 6 类复杂信息图（sankey/treemap/boxplot/network/marimekko/streamgraph）是**专属页型**而非 chart.type——它们要按列/段/节点等结构化载荷表达，故走 sections[].type。不变量：charts.registry.types == chartTypes ∪ 上述 6 类页型（sync_runtime.py 校验）。","chartDataTable":{"enum":["notes","inline","appendix","off"],"default":"notes","rule":"非原生图表（registry.pptx=shape）的 dataTable 不得为 off；缺失时按 registry 默认值补齐。"},"pageTypes":{"points":{"label":"要点列表页","modes":["presentation","research","architecture"],"required":["points:array"],"optional":["metrics:array"]},"metrics":{"label":"指标带页（4–6 个核心数字）","modes":["presentation","research"],"required":["metrics:array"]},"kpi":{"label":"大数指标页（hero 大数字 + 支撑指标行）","modes":["presentation","research"],"required":["hero:array"],"optional":["metrics:array"]},"table":{"label":"对比表页","modes":["presentation","research","architecture"],"required":["table.head:array","table.rows:array"],"optional":["table.colW:array"]},"timeline":{"label":"时间线 / 路线页","modes":["presentation","research"],"required":["phases:array"]},"steps":{"label":"步骤条页（N 步横排 + 箭头，可分组）","modes":["presentation","research","architecture"],"required":["steps:array"],"optional":["groups:array","note"]},"bar":{"label":"图表页（chart.type 见 chartTypes；native 通道走原生数据图表，shape 通道走高保真形状还原 + 数据表）","modes":["presentation","research"],"required":["chart.labels:array","chart.values:array"],"optional":["chart.type","chart.series:array","chart.points:array","chart.max","chart.unit","chart.colors:array","chart.start:array","chart.target:array","chart.dataTable","note"]},"donut":{"label":"环形图页（原生 pie 楔形 + 图例）","modes":["presentation","research"],"required":["chart.labels:array","chart.values:array"],"optional":["chart.unit","chart.centerLabel","chart.colors:array","chart.dataTable","note"]},"heatmap":{"label":"热力矩阵页（行 × 列 + 强度色阶）","modes":["presentation","research"],"required":["rowHeads:array","colHeads:array","cells:array"],"optional":["unit","scaleLabel:array","note"]},"bullet":{"label":"达成对比页（实际 vs 目标条）","modes":["presentation","research"],"required":["items:array"],"optional":["unit","max","note"]},"pyramid":{"label":"金字塔页（层级递进，顶层最窄）","modes":["presentation","research","architecture"],"required":["levels:array"],"optional":["note"]},"image":{"label":"素材图片页（full/half/bleed/grid/compare/wall，效果与位置锁定；支持配图占位）","modes":["presentation","research","architecture"],"required":["anyof:image.src:str|image.items:array|image.placeholder"],"optional":["image.caption","image.alt","image.layout","image.fit","image.ratio","image.hint","points:array","note"]},"cards":{"label":"卡片网格页（cards 元素须为 {title, points:[[k,v]…]}，不接受元组）","modes":["presentation","research"],"required":["cards:array"],"optional":["columns"]},"split":{"label":"双区组合页（left / right 各可为 要点｜图表｜表格｜图片：type = points（默认）| table | image | 图表类型名；图表/表格字段直接挂在对应侧）","modes":["presentation","research"],"required":["anyof:left.points:array|left.type:str"],"optional":["left.cap","left.image","left.labels:array","left.values:array","left.series:array","left.points:array","left.max","left.unit","left.colors:array","left.dataTable","left.head:array","left.rows:array","left.colW:array","right.type","right.cap","right.image","right.labels:array","right.values:array","right.series:array","right.points:array","right.max","right.unit","right.colors:array","right.dataTable","right.head:array","right.rows:array","right.colW:array"]},"comparison":{"label":"对比页（左右双栏 + 可选结论条）","modes":["presentation","research"],"required":["left.title","left.points:array","right.title","right.points:array"],"optional":["verdict"]},"quote":{"label":"引用 / 金句页（深色全幅）","modes":["presentation","research"],"required":["quote","author"],"optional":["context"]},"diagram":{"label":"分层架构页（architecture 模式走全幅几何）","modes":["presentation","research","architecture"],"required":["layers:array"],"optional":["legend:array"]},"exhibit":{"label":"Exhibit 编号图表页（research R2）","modes":["research"],"required":["chart.labels:array","chart.values:array"],"optional":["exhibitNo","chart.type","chart.series:array","chart.points:array","chart.max","chart.unit","chart.colors:array","chart.dataTable","note"]},"twocol":{"label":"双栏论证页（research R1）","modes":["research"],"required":["paragraphs:array"]},"threecol":{"label":"三栏证据页（research R6）","modes":["research"],"required":["paragraphs:array"]},"halftable":{"label":"半表半图页（research R7）","modes":["research"],"required":["table.head:array","table.rows:array","chart.labels:array","chart.values:array"],"optional":["table.colW:array","chart.type","chart.series:array","chart.points:array","chart.max","chart.unit","chart.colors:array","chart.dataTable","note"]},"matrix":{"label":"矩阵图页（research R8）","modes":["research"],"required":["rowHeads:array","colHeads:array","cells:array"]},"lane":{"label":"泳道页（architecture A2）","modes":["architecture"],"required":["lanes:array"]},"sankey":{"label":"桑基图页（节点-流带，流向与流量）","modes":["research","architecture"],"required":["flows:array"],"optional":["unit","chart.dataTable","note"]},"treemap":{"label":"树图页（面积编码的层级构成）","modes":["research","architecture"],"required":["items:array"],"optional":["unit","chart.dataTable","note"]},"boxplot":{"label":"箱线图页（分布对比：min/q1/median/q3/max）","modes":["research","architecture"],"required":["groups:array"],"optional":["unit","chart.dataTable","note"]},"network":{"label":"关系网络页（节点-边拓扑）","modes":["research","architecture"],"required":["nodes:array","edges:array"],"optional":["chart.dataTable","note"]},"marimekko":{"label":"马赛克图页（列宽 × 列高双重编码）","modes":["research","architecture"],"required":["cols:array","cells:array"],"optional":["unit","chart.dataTable","note"]},"streamgraph":{"label":"流带图页（时间上的构成演变）","modes":["research","architecture"],"required":["series:array"],"optional":["labels:array","chart.dataTable","note"]}}};
+var MODEL_SCHEMA = {"version":"0.1","modes":["presentation","research","architecture"],"model":{"required":["title","sections:array","closing.title","closing.points:array"],"optional":["mode","style","theme","subtitle","meta","agenda:array"],"agendaMin":{"presentation":3,"research":3,"architecture":0},"sectionsMin":1,"sectionsRecommended":3,"agendaComfortMax":16},"commonSectionFields":["eyebrow","title","lead","soWhat","footnote","flags","image","exhibitNo","layoutPreset"],"mutualExclusionHint":"verdict 与 soWhat 互斥：二者共用 annotation 结论条槽位，同页双填必叠印。comparison 页填 verdict 时不要再填 soWhat（渲染器已自动二选一，但模型侧应只给一个）。","flagsHint":"flags = 待核实/待二次修改条目字符串数组（如 '2027 增速 xx%（口径未定）'）；渲染为 accent 强调色标注行，提示用户核对。","imageHint":"image = 素材图片/配图占位对象。三选一必填：src（用户图，data: 内联或相对路径，零外链铁律禁 http(s)）｜items（多图版式：grid/compare/wall，元素 {src?, alt?, caption?, placeholder?}）｜placeholder:true（无图时出配图占位，原生形状渲染、pictures 不增）。其余可选：layout（full/half/bleed/grid/compare/wall，见 layout-constants.json imageSpec.layouts）、fit（cover 默认 / contain）、caption、alt、hint、ratio。","imageLayoutHint":"layout 与 HTML 版式对应：full=版心全宽图｜half=左图右注（points 为右栏注解）｜bleed=通栏出血｜grid=多图网格（items 2/3/4/6 张）｜compare=双图 A/B 对比（items 2 张）｜wall=Logo 墙（items 3–12 张小图）。占位符标签文本由双引擎按 imageSpec 拼同一串，保证 A/B 通道逐页文本一致。","chartTypes":["bar","hbar","stack","stackline","line","dualline","area","donut","multidonut","pie","radar","scatter","bubble","waterfall","gauge","pareto","funnel","gantt","vsbar","progress","sparkline","slope","dumbbell","lollipop","dotplot","bulletchart","waffle","radialbar","rose","candlestick"],"chartTypesHint":"chart.type 可取值 = 本表（30 类：16 原生 + 14 形状还原）。其余 6 类复杂信息图（sankey/treemap/boxplot/network/marimekko/streamgraph）是**专属页型**而非 chart.type——它们要按列/段/节点等结构化载荷表达，故走 sections[].type。不变量：charts.registry.types == chartTypes ∪ 上述 6 类页型（sync_runtime.py 校验）。","chartDataTable":{"enum":["notes","inline","appendix","off"],"default":"notes","rule":"非原生图表（registry.pptx=shape）的 dataTable 不得为 off；缺失时按 registry 默认值补齐。"},"pageTypes":{"points":{"label":"要点列表页","modes":["presentation","research","architecture"],"required":["points:array"],"optional":["metrics:array"]},"metrics":{"label":"指标带页（4–6 个核心数字）","modes":["presentation","research"],"required":["metrics:array"]},"kpi":{"label":"大数指标页（hero 大数字 + 支撑指标行）","modes":["presentation","research"],"required":["hero:array"],"optional":["metrics:array"]},"table":{"label":"对比表页","modes":["presentation","research","architecture"],"required":["table.head:array","table.rows:array"],"optional":["table.colW:array"]},"timeline":{"label":"时间线 / 路线页","modes":["presentation","research"],"required":["phases:array"]},"steps":{"label":"步骤条页（N 步横排 + 箭头，可分组）","modes":["presentation","research","architecture"],"required":["steps:array"],"optional":["groups:array","note"]},"bar":{"label":"图表页（chart.type 见 chartTypes；native 通道走原生数据图表，shape 通道走高保真形状还原 + 数据表）","modes":["presentation","research"],"required":["chart.labels:array","chart.values:array"],"optional":["chart.type","chart.series:array","chart.points:array","chart.max","chart.unit","chart.colors:array","chart.start:array","chart.target:array","chart.dataTable","note"]},"donut":{"label":"环形图页（原生 pie 楔形 + 图例）","modes":["presentation","research"],"required":["chart.labels:array","chart.values:array"],"optional":["chart.unit","chart.centerLabel","chart.colors:array","chart.dataTable","note"]},"heatmap":{"label":"热力矩阵页（行 × 列 + 强度色阶）","modes":["presentation","research"],"required":["rowHeads:array","colHeads:array","cells:array"],"optional":["unit","scaleLabel:array","note"]},"bullet":{"label":"达成对比页（实际 vs 目标条）","modes":["presentation","research"],"required":["items:array"],"optional":["unit","max","note"]},"pyramid":{"label":"金字塔页（层级递进，顶层最窄）","modes":["presentation","research","architecture"],"required":["levels:array"],"optional":["note"]},"image":{"label":"素材图片页（full/half/bleed/grid/compare/wall，效果与位置锁定；支持配图占位）","modes":["presentation","research","architecture"],"required":["anyof:image.src:str|image.items:array|image.placeholder"],"optional":["image.caption","image.alt","image.layout","image.fit","image.ratio","image.hint","points:array","note"]},"cards":{"label":"卡片网格页（cards 元素须为 {title, points:[[k,v]…]}，不接受元组）","modes":["presentation","research"],"required":["cards:array"],"optional":["columns"]},"split":{"label":"双区组合页（left / right 各可为 要点｜图表｜表格｜图片：type = points（默认）| table | image | 图表类型名；图表/表格字段直接挂在对应侧）","modes":["presentation","research"],"required":["anyof:left.points:array|left.type:str"],"optional":["left.cap","left.image","left.labels:array","left.values:array","left.series:array","left.points:array","left.max","left.unit","left.colors:array","left.dataTable","left.head:array","left.rows:array","left.colW:array","right.type","right.cap","right.image","right.labels:array","right.values:array","right.series:array","right.points:array","right.max","right.unit","right.colors:array","right.dataTable","right.head:array","right.rows:array","right.colW:array"]},"comparison":{"label":"对比页（左右双栏 + 可选结论条）","modes":["presentation","research"],"required":["left.title","left.points:array","right.title","right.points:array"],"optional":["verdict"]},"quote":{"label":"引用 / 金句页（深色全幅）","modes":["presentation","research"],"required":["quote","author"],"optional":["context"]},"diagram":{"label":"分层架构页（architecture 模式走全幅几何）","modes":["presentation","research","architecture"],"required":["layers:array"],"optional":["legend:array"]},"exhibit":{"label":"Exhibit 编号图表页（research R2）","modes":["research"],"required":["chart.labels:array","chart.values:array"],"optional":["exhibitNo","chart.type","chart.series:array","chart.points:array","chart.max","chart.unit","chart.colors:array","chart.dataTable","note"]},"twocol":{"label":"双栏论证页（research R1）","modes":["research"],"required":["paragraphs:array"]},"threecol":{"label":"三栏证据页（research R6）","modes":["research"],"required":["paragraphs:array"]},"halftable":{"label":"半表半图页（research R7）","modes":["research"],"required":["table.head:array","table.rows:array","chart.labels:array","chart.values:array"],"optional":["table.colW:array","chart.type","chart.series:array","chart.points:array","chart.max","chart.unit","chart.colors:array","chart.dataTable","note"]},"matrix":{"label":"矩阵图页（research R8）","modes":["research"],"required":["rowHeads:array","colHeads:array","cells:array"]},"lane":{"label":"泳道页（architecture A2）","modes":["architecture"],"required":["lanes:array"]},"sankey":{"label":"桑基图页（节点-流带，流向与流量）","modes":["research","architecture"],"required":["flows:array"],"optional":["unit","chart.dataTable","note"]},"treemap":{"label":"树图页（面积编码的层级构成）","modes":["research","architecture"],"required":["items:array"],"optional":["unit","chart.dataTable","note"]},"boxplot":{"label":"箱线图页（分布对比：min/q1/median/q3/max）","modes":["research","architecture"],"required":["groups:array"],"optional":["unit","chart.dataTable","note"]},"network":{"label":"关系网络页（节点-边拓扑）","modes":["research","architecture"],"required":["nodes:array","edges:array"],"optional":["chart.dataTable","note"]},"marimekko":{"label":"马赛克图页（列宽 × 列高双重编码）","modes":["research","architecture"],"required":["cols:array","cells:array"],"optional":["unit","chart.dataTable","note"]},"streamgraph":{"label":"流带图页（时间上的构成演变）","modes":["research","architecture"],"required":["series:array"],"optional":["labels:array","chart.dataTable","note"]}}};
 /* __TOPPPT_SCHEMA_END__ */
 
 var _mode = 'presentation';   /* 当前模式（slidesOf 里按 model.mode 设置） */
@@ -508,6 +524,15 @@ function footnoteLine(sh, text, S) {
   sh.push(txSp(R.x, R.y, R.w, R.h,
     [[{ t: text, sz: 9.5, col: S.faint, font: S.font }]]));
 }
+/* R2：sec.note 与 sec.footnote 共用注释带末行（footnoteY=6.72）。
+   note.y=6.55 会压进 so-what 带（6.05–6.67）——同页二者必须合并为一行。 */
+function noteOrFootnote(sh, sec, S) {
+  var parts = [];
+  if (sec && sec.note) parts.push(String(sec.note));
+  if (sec && sec.footnote) parts.push(String(sec.footnote));
+  if (!parts.length) return;
+  footnoteLine(sh, parts.join('　·　'), S);
+}
 /* 待核实清单条（accent 强调色标注 · 与 build_pptx.js / HTML .flagbar 同源） */
 function flagBar(sh, items, S, yTop) {
   var F = PT.flagbar || { hdH: 0.26, rowH: 0.24, maxRows: 3, gap: 0.12 };
@@ -696,7 +721,9 @@ function vbarShapes(sh, ec, S, x, y, w, h, dcols) {
     : [{ name: '数值', values: ec.values || [] }];
   var nb = Math.max(1, labels.length);
   var ns = Math.max(1, series.length);
-  var baseY = y + h, plotW = w, step = plotW / nb;
+  /* R2：类目标签带必须含在 h 内（原 baseY+0.08 画在图区外，会压进 so-what/来源行） */
+  var labelH = 0.36;
+  var baseY = y + Math.max(0.6, h - labelH), plotW = w, step = plotW / nb;
   var cluster = Math.min(1.1, step * (ns > 1 ? 0.78 : 0.55));
   var bw = cluster / ns;
   var all = [];
@@ -705,26 +732,27 @@ function vbarShapes(sh, ec, S, x, y, w, h, dcols) {
   });
   var vmax = ec.max || Math.max.apply(null, all.concat([1]));
   var top = all.length ? Math.max.apply(null, all) : 0;
+  var plotH = Math.max(0.35, baseY - y);
   sh.push(shape('rect', x, baseY, plotW, 0.02, S.line));
   series.forEach(function (se, si) {
     var vals = se.values || [];
     var col = dcols ? dcols[si % 5] : (si === 0 ? S.accent : S.faint);
     vals.forEach(function (v, i) {
       var num = Number(v) || 0;
-      var hh = Math.max(0.05, num / vmax * (h - 0.5));
+      var hh = Math.max(0.05, num / vmax * (plotH - 0.35));
       var bx = x + i * step + (step - cluster) / 2 + si * bw;
       var hot = ns === 1 && num === top;
       sh.push(shape('roundRect', bx, baseY - hh, Math.max(0.04, bw * 0.92), hh,
         hot ? (dcols ? dcols[i % 5] : S.accent) : col, { adj: 6000 }));
       if (ns === 1) {
-        sh.push(txSp(bx - 0.3, baseY - hh - 0.4, bw + 0.6, 0.32,
+        sh.push(txSp(bx - 0.3, baseY - hh - 0.36, bw + 0.6, 0.30,
           [[{ t: valText(num, ec.unit), sz: 12.5, b: 1, col: hot ? S.accent : S.body, font: S.font }]], { align: 'ctr' }));
       }
     });
   });
   labels.forEach(function (lb, i) {
     var lx = x + i * step;
-    sh.push(txSp(lx, baseY + 0.08, step, 0.32,
+    sh.push(txSp(lx, baseY + 0.06, step, labelH - 0.08,
       [[{ t: lb, sz: 10.5, col: S.faint, font: S.font }]], { align: 'ctr' }));
   });
   /* Multi-series legend along top of plot (keeps category labels; avoids blank chart). */
@@ -747,7 +775,10 @@ function lineShapes(sh, ec, S, x, y, w, h, dcols) {
   var all = [];
   series.forEach(function (se) { (se.values || []).forEach(function (v) { all.push(Number(v) || 0); }); });
   var vmax = ec.max || Math.max.apply(null, all.concat([1]));
-  var plotH = h - 0.5, baseY = y + h;
+  /* R2：类目标签带含在 h 内，禁画到图区外压 so-what */
+  var labelH = 0.36;
+  var baseY = y + Math.max(0.6, h - labelH);
+  var plotH = Math.max(0.35, baseY - y - 0.2);
   sh.push(shape('rect', x, baseY, w, 0.02, S.line));
   var stepX = n > 1 ? w / (n - 1) : 0;
   series.forEach(function (se, si) {
@@ -767,7 +798,7 @@ function lineShapes(sh, ec, S, x, y, w, h, dcols) {
   });
   labels.forEach(function (lb, i) {
     var px = x + (n > 1 ? i * stepX : w / 2);
-    sh.push(txSp(px - 0.5, baseY + 0.08, 1.0, 0.32,
+    sh.push(txSp(px - 0.5, baseY + 0.06, 1.0, labelH - 0.08,
       [[{ t: lb, sz: 10.5, col: S.faint, font: S.font }]], { align: 'ctr' }));
   });
 }
@@ -1219,25 +1250,44 @@ function slidesOf(model, S) {
   c.push(txSp(MX, CV.subtitleY, CW - 1, CV.subtitleH, [[{ t: model.subtitle || '', sz: 18, col: S.soft, font: S.font }]]));
   slides.push(c);
 
-  /* Agenda（>8 条自动双列，行高自适应防溢出；architecture 极简形态可省略 agenda） */
+  /* Agenda（>8 条自动双列；>12 条自动分页；长标题截断+全称入 notes；列优先与 HTML 一致） */
   var items = model.agenda || [];
   if (items.length) {
-    var ag = [];
-    head(ag, 'AGENDA', '报告大纲');
-    var colN = items.length > 8 ? 2 : 1;
-    var perCol = Math.ceil(items.length / colN) || 1;
-    var rowH = Math.min(1.05, (CONTENT_BOTTOM - CONTENT_TOP - 0.25) / Math.max(1, perCol));
-    var numSz = rowH >= 0.85 ? 30 : (rowH >= 0.65 ? 22 : 18);
-    var tSz = rowH >= 0.85 ? 16 : 14, dSz = rowH >= 0.85 ? 12 : 11;
-    items.forEach(function (it, i) {
-      var col = Math.floor(i / perCol), row = i % perCol;
-      var x = MX + col * (CW / colN), y = CONTENT_TOP + row * rowH;
-      ag.push(txSp(x, y, 0.9, Math.min(0.9, rowH), [[{ t: it[0], sz: numSz, b: 1, col: S.accent, font: S.font }]]));
-      ag.push(txSp(x + 1.0, y + 0.03, CW / colN - 1.1, Math.min(0.95, rowH),
-        [[{ t: it[1], sz: tSz, b: 1, col: S.ink, font: S.font }],
-         [{ t: it[2] || '', sz: dSz, col: S.body, font: S.font }]], { lineSpacing: tSz + 5 }));
+    var ROWS_PER_PAGE = 12;
+    var agPages = [];
+    for (var ai = 0; ai < items.length; ai += ROWS_PER_PAGE) agPages.push(items.slice(ai, ai + ROWS_PER_PAGE));
+    agPages.forEach(function (pageItems, pi) {
+      var ag = [];
+      var sub = agPages.length > 1 ? '（' + (pi + 1) + '/' + agPages.length + '）' : '';
+      head(ag, 'AGENDA', '报告大纲' + sub);
+      var colN = pageItems.length > 8 ? 2 : 1;
+      var perCol = Math.ceil(pageItems.length / colN) || 1;
+      var rowH = Math.min(1.05, (CONTENT_BOTTOM - CONTENT_TOP - 0.25) / Math.max(1, perCol));
+      var numSz = rowH >= 0.85 ? 30 : (rowH >= 0.65 ? 22 : 18);
+      var tSz = rowH >= 0.85 ? 16 : 14, dSz = rowH >= 0.85 ? 12 : 11;
+      var agNotes = [];
+      pageItems.forEach(function (it, i) {
+        var col = Math.floor(i / perCol), row = i % perCol;
+        var x = MX + col * (CW / colN), y = CONTENT_TOP + row * rowH;
+        var titleBoxW = CW / colN - 1.15;
+        var rawTitle = String(it[1] || '');
+        var titleEstW = estTextH(rawTitle, titleBoxW, tSz, 1.2);
+        var maxTitleH = rowH * 0.55;
+        var title = rawTitle;
+        if (titleEstW > maxTitleH) {
+          var maxChars = Math.max(10, Math.floor(rawTitle.length * (maxTitleH / titleEstW)));
+          if (rawTitle.length > maxChars) {
+            title = rawTitle.slice(0, maxChars - 1) + '…';
+            agNotes.push('条目 ' + it[0] + ' 全称：' + rawTitle);
+          }
+        }
+        ag.push(txSp(x, y, 0.9, Math.min(0.9, rowH), [[{ t: it[0], sz: numSz, b: 1, col: S.accent, font: S.font }]]));
+        ag.push(txSp(x + 1.0, y + 0.03, titleBoxW, Math.min(0.95, rowH),
+          [[{ t: title, sz: tSz, b: 1, col: S.ink, font: S.font }],
+           [{ t: it[2] || '', sz: dSz, col: S.body, font: S.font }]], { lineSpacing: tSz + 5 }));
+      });
+      slides.push(ag);
     });
-    slides.push(ag);
   }
 
   /* 章节页 */
@@ -1323,12 +1373,13 @@ function slidesOf(model, S) {
               { t: p[1], sz: fz - 1, col: S.body, font: S.font }]]));
         });
       });
+      /* R2：verdict 与 soWhat 共用 annotation 槽位——只画一个（verdict 优先） */
       if (sec.verdict) {
         var vR = regOf('exhibit', 'annotation') || { x: MX, y: PT.exhibit.soWhatY, w: CW, h: 0.62 };
-        sh.push(shape('rect', vR.x, vR.y, vR.w, vR.h, S.accent));
+        sh.push(shape('rect', vR.x, vR.y, vR.w, vR.h, S.accent, { name: 'tr:soWhat' }));
         sh.push(txSp(vR.x + 0.22, vR.y + 0.06, vR.w - 0.44, vR.h - 0.12,
           [[{ t: '结论　', sz: 11, b: 1, col: S.onAccent, font: S.font, spc: 150 },
-            { t: sec.verdict, sz: 12.5, b: 1, col: S.onAccent, font: S.font }]], { anchor: 'ctr' }));
+            { t: sec.verdict, sz: 12.5, b: 1, col: S.onAccent, font: S.font }]], { anchor: 'ctr', name: 'tr:soWhat' }));
       }
     } else if (type === 'quote') {
       var Q = PT.quote;
@@ -1361,7 +1412,6 @@ function slidesOf(model, S) {
     } else if (type === 'donut') {
       var dcn = sec.chart || {};
       if (dcn.labels && dcn.values) donutChart(sh, dcn, S, dcn.colors || donutColors(model.style, S, model.theme), bodyBottom);
-      if (sec.note) sh.push(txSp(MX, PT.note.y, CW, PT.note.h, [[{ t: sec.note, sz: 11, col: S.faint, font: S.font }]]));
     } else if (type === 'heatmap') {
       var H = PT.heatmap;
       var hR = regOf('heatmap', 'primary', { bottom: bodyBottom }) || { x: MX, y: H.y, w: CW, h: bodyBottom - H.y };
@@ -1508,7 +1558,7 @@ function slidesOf(model, S) {
     } else if (type === 'bar') {
       var ch = sec.chart || {};
       var dcols2 = (ch.colors || dataColors(model.style, model.theme));
-      var botY = chartBottom(!!sec.soWhat, !!sec.footnote) - (sec.note ? 0.42 : 0.05);
+      var botY = chartBottom(!!sec.soWhat, !!(sec.footnote || sec.note)) - 0.05;
       var isHBar = ch.type === 'hbar';
       var bRR = regOf('bar', isHBar ? 'hbar' : 'primary', { bottom: botY }) ||
         { x: isHBar ? MX : MX + PT.bar.chartX, y: isHBar ? PT.bar.hbarY0 : PT.bar.chartY,
@@ -1535,13 +1585,12 @@ function slidesOf(model, S) {
       } else {
         chartBlockShapes(sh, ch, S, bx, bRR.y, bw, Math.max(1.5, bRR.h), dcols2);
       }
-      if (sec.note) sh.push(txSp(MX, PT.note.y, CW, PT.note.h, [[{ t: sec.note, sz: 11, col: S.faint, font: S.font }]]));
     } else if (type === 'twocol' || type === 'threecol') {
       var ps2 = sec.paragraphs || [];
       var nCol = (type === 'threecol') ? 3 : 2;
       var gapC = (type === 'threecol') ? PT.research.col3Gap : PT.twocol.colGap;
-      var tcR = regOf('twocol', 'primary', { top: bodyY, bottom: bodyBottom }) ||
-        { x: MX, y: bodyY, w: CW, h: bodyBottom - bodyY };
+      /* R3：多栏均分用版心全宽（regOf('twocol') 返回单栏宽，当总宽会压扁三栏） */
+      var tcR = { x: MX, y: bodyY, w: CW, h: bodyBottom - bodyY };
       var gC = cols(tcR.w, nCol, gapC);
       var perC = Math.ceil(ps2.length / nCol);
       var availC = tcR.h;
@@ -1737,7 +1786,7 @@ function slidesOf(model, S) {
       var dStart = dgR.y;
       var dEnd = dgR.y + dgR.h;
       var nLay = Math.max(1, lys.length);
-      var lh2 = Math.max(0.6, Math.min(D.maxLayerH, (dEnd - dStart) / nLay - D.layerGap));
+      var lh2 = Math.max(0.5, Math.min(D.maxLayerH, (dEnd - dStart) / nLay - D.layerGap));
       lys.forEach(function (lay, li) {
         var y9 = dStart + li * (lh2 + D.layerGap);
         var focus = lay[2] === 'focus';
@@ -1753,9 +1802,26 @@ function slidesOf(model, S) {
           var ntt = isRec(nd) ? nd.t : nd;
           var nds = isRec(nd) ? (nd.d || '') : '';
           sh.push(shape('roundRect', x10, y9, nw2, lh2, ndacc ? S.soft : S.surface, { adj: 4000, line: S.line }));
-          sh.push(txSp(x10 + 0.12, y9 + (nds ? 0.12 : lh2 / 2 - 0.2), nw2 - 0.24, 0.38,
-            [[{ t: ntt, sz: 12.5, b: 1, col: ndacc ? S.accent : S.ink, font: S.font }]], { anchor: nds ? 't' : 'ctr' }));
-          if (nds) sh.push(txSp(x10 + 0.12, y9 + lh2 - 0.5, nw2 - 0.24, 0.4, [[{ t: nds, sz: 10, col: S.faint, font: S.font }]]));
+          /* R1: 注解不得「浮回」标题上。标题顶对齐，注解钳在标题下边；空间不足降级单框混排。 */
+          var padXn = 0.12, padYn = 0.10;
+          var innerWn = nw2 - padXn * 2;
+          var titleHn = 0.32, noteHn = 0.34, gapTNn = 0.04;
+          var needHn = titleHn + gapTNn + (nds ? noteHn : 0) + padYn * 2;
+          if (!nds || lh2 >= needHn) {
+            var tYn = y9 + padYn;
+            sh.push(txSp(x10 + padXn, nds ? tYn : y9 + lh2 / 2 - 0.18, innerWn, titleHn,
+              [[{ t: ntt, sz: nds ? 11 : 12.5, b: 1, col: ndacc ? S.accent : S.ink, font: S.font }]],
+              { anchor: 'ctr' }));
+            if (nds) {
+              var nYn = Math.max(tYn + titleHn + gapTNn, y9 + lh2 - padYn - noteHn);
+              sh.push(txSp(x10 + padXn, nYn, innerWn, Math.min(noteHn, y9 + lh2 - padYn - nYn),
+                [[{ t: nds, sz: 10, col: S.faint, font: S.font }]], { anchor: 't' }));
+            }
+          } else {
+            sh.push(txSp(x10 + padXn, y9 + padYn * 0.5, innerWn, lh2 - padYn,
+              [[{ t: ntt, sz: 11, b: 1, col: ndacc ? S.accent : S.ink, font: S.font }],
+               [{ t: nds, sz: 9, col: S.faint, font: S.font }]], { anchor: 't', lineSpacing: 12 }));
+          }
         });
         if (li < lys.length - 1) {
           var cy2 = y9 + lh2 + D.layerGap / 2;
@@ -1765,10 +1831,14 @@ function slidesOf(model, S) {
         }
       });
       if (sec.legend) {
-        var lx2 = MX;
-        sec.legend.forEach(function (lg2) {
-          sh.push(txSp(lx2, PH - 0.62, 3.2, 0.3, [[{ t: '● ' + lg2, sz: 10, col: S.faint, font: S.font }]]));
-          lx2 += 2.0;
+        /* R2：图例进图区底部（与 HTML .arch__legend 同源），禁用 PH-0.62 固定偏移 */
+        var lgH2 = 0.28;
+        var lgY2 = Math.max(dStart, bodyBottom - lgH2 - 0.02);
+        var nLg2 = Math.max(1, sec.legend.length);
+        var step2 = Math.min(2.4, CW / nLg2);
+        sec.legend.forEach(function (lg2, li2) {
+          sh.push(txSp(MX + CW - nLg2 * step2 + li2 * step2, lgY2, step2 - 0.05, lgH2,
+            [[{ t: '● ' + lg2, sz: 10, col: S.faint, font: S.font }]]));
         });
       }
     } else if (type === 'exhibit') {
@@ -1825,8 +1895,10 @@ function slidesOf(model, S) {
       }
     }
     /* research 通用可选件：so-what 结论条 + 页脚来源行 + 待核实条（共用同一槽位） */
-    if (sec.soWhat) soWhatBar(sh, sec.soWhat, S);
-    if (sec.footnote) footnoteLine(sh, sec.footnote, S);
+    /* R2：verdict 已占 annotation 槽位时跳过 soWhat，禁止同槽双条叠印 */
+    if (sec.soWhat && !sec.verdict) soWhatBar(sh, sec.soWhat, S);
+    /* R2：note 与 footnote 共用注释带末行（禁 note.y=6.55 压 so-what） */
+    noteOrFootnote(sh, sec, S);
     if (flagH) flagBar(sh, flagItems, S, flagY);
     slides.push(sh);
   });
@@ -1996,9 +2068,10 @@ function validateModel(model) {
   }
   var agMax = (M.model && M.model.agendaComfortMax) || 16;
   if ((model.agenda || []).length > agMax) {
-    warnings.push('agenda ' + model.agenda.length + ' 条超出单页舒适上限 ' + agMax + '，建议拆分');
+    warnings.push('agenda ' + model.agenda.length + ' 条超出单页舒适上限 ' + agMax + '，将自动分页');
   }
-  var pages = 1 + (hasAgenda ? 1 : 0) + secs.length + 1;   /* 封面+大纲(可选)+章节+收尾 */
+  var agPageCount = hasAgenda ? Math.ceil(model.agenda.length / 12) : 0;
+  var pages = 1 + agPageCount + secs.length + 1;   /* 封面+大纲(可多页)+章节+收尾 */
   return { ok: missing.length === 0, missing: missing, warnings: warnings, pages: pages };
 }
 
