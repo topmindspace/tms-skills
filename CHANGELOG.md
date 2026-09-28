@@ -32,6 +32,7 @@
 
 #### 文档同步
 - `page-type-matrix` 容量契约 + 还原度；`failure-modes` F19/F20；`pptx-export` 几何铁律；`chart-decision-tree` 还原度列；`content-rules` / `components-atoms` / `modes` / `layouts-combo` 契约更新。
+- Pages 源同步：`docs/showcase.html` / `docs/style-gallery.html` 与技能侧 assets 副本逐字节一致（meta → v0.1.18）。
 
 ### 红线未动
 反截断、图表多样性地板、Mode A craft、runtime SHA 同版本门禁、中文「演示文稿」术语、整仓 npm 发版、motion=none、结论条无「So what」标签、无左侧 accent 装饰轨、大纲 >8 → 2col。
