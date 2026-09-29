@@ -4,7 +4,7 @@
 
 A reusable skill for generating cover art for X long-form posts and WeChat articles. Goal: **striking, eye-catching, theme-focused**.
 
-- Version: **v0.2.0** (same tag as `@topmindspace/tms-skills@0.5.0`)
+- Version: **v0.3.0** (same tag as `@topmindspace/tms-skills@0.6.0`)
 
 ## Style gallery
 
@@ -26,20 +26,20 @@ npx @topmindspace/tms-skills install topmind-cover
 1. **Refine the title**: lock the title copy first (usually ≤ 10 chars) using that style's title rules; rewrite until it lands — no drawing yet.
 2. **Composition brief**: one-sentence brief (theme / audience / mood / visual metaphor / palette direction) before composing the prompt.
 3. Input: article title + 3 theme keywords + platform (x / wechat / both, default both).
-4. Generate with the agent's image-generation capability (landscape 16:9, 8% margin on all sides).
+4. Generate with the agent's image-generation capability (landscape 5:2, 8% margin on all sides).
 5. **Impact self-check** (required): pass every item in the [impact self-check list](./SKILL.md#冲击力自检清单); on failure, tweak the prompt and regenerate, max 3 attempts.
 6. Crop and save:
 
 ```bash
 python3 scripts/crop-cover.py <main-image> --out-dir <package>/images/
-# produces 00-封面.png (1200×675) + 00-封面-公众号.png (900×383, center crop)
+# produces 00-封面.png (1500x600) + 00-封面-公众号.png (900x383, center crop)
 ```
 
 ## Sizes
 
 | Platform | Size | Aspect |
 |----------|------|--------|
-| X Article cover | 1200×675 | 16:9 (master image) |
+| X Article cover | 1500x600 | 5:2 (master image) |
 | WeChat cover large image | 900×383 | 2.35:1 (center crop) |
 
 ## Design rules

@@ -1,3 +1,31 @@
+## [0.6.0] - 2026-09-30
+
+> 根包 0.5.0 → **0.6.0**（minor，本轮是功能轮）；技能版本：topmind-cover 0.2.0 → **0.3.0**、
+> topmind-x-article 0.2.0 → **0.3.0**、topmind-wechat-post 保持 0.1.0（无变更）、
+> top-ppt-html 保持 0.2.1（无变更）。
+
+### topmind-cover 0.3.0（X 封面主尺寸改为 5:2）
+
+- X Article 封面主尺寸从 1200×675（16:9）改为 **1500×600（5:2）**：SKILL.md 尺寸表、
+  流程步骤（横构图 5:2）、`scripts/crop-cover.py`、`scripts/negative_tests.py` 全量对齐
+- topmind-x-article README 中英封面引用同步为 `cover-1500x600.png` / 1500×600
+- `assets/examples/` 旧样张仍为 16:9 版，README 已明确标注"旧版、仅供风格参考"，不重制
+
+### topmind-x-article 0.3.0（图片点击放大 lightbox）
+
+- `scripts/md2x-html.py`：正文图与封面预览新增 lightbox——点击放大看原图，
+  支持新标签页打开原图 / 下载原图，Esc / 点背景 / 关闭按钮退出；**不屏蔽右键**
+  （`oncontextmenu` 未添加），放大后可右键另存或直接截图
+- 加固：嵌套代码围栏（四反引号开栏）不会被内部三反引号提前关闭；未闭合围栏文末自动收尾；
+  标题从 frontmatter 之后的首个一级标题提取；图片/封面缺失时干净报错
+- 技能 README 中英补 lightbox 说明
+
+### 文档与元数据
+
+- 根 README 中英：技能表（x-article 0.3.0、cover 0.3.0 + 新描述）、安装器版本 0.6.0、钉版本示例 `@0.6.0`
+- 四技能 README 中英「同 tag」引用全部 → `@topmindspace/tms-skills@0.6.0`
+- `docs/PUBLISHING.md`：当前线（安装器 0.6.0、cover 0.3.0、x-article 0.3.0）与整仓同 tag 示例 v0.6.0
+
 ## [0.5.0] - 2026-09-29
 
 > 根包 0.4.1 → **0.5.0**（minor，本轮是功能轮）；技能版本：topmind-x-article 0.1.0 → **0.2.0**、
