@@ -31,7 +31,10 @@ def main() -> None:
 
     src = Path(args.src)
     out_dir = Path(args.out_dir)
-    out_dir.mkdir(parents=True, exist_ok=True)
+    try:
+        out_dir.mkdir(parents=True, exist_ok=True)
+    except OSError as e:
+        sys.exit(f"错误：无法创建输出目录 {out_dir}（{e}）")
 
     if not src.is_file():
         sys.exit(f"错误：找不到输入图片 {src}")
@@ -50,18 +53,21 @@ def main() -> None:
     x0, y0 = (w - cw) // 2, (h - ch) // 2
     base = img.crop((x0, y0, x0 + cw, y0 + ch))
 
-    for name, (tw, th) in TARGETS.items():
-        ratio = tw / th
-        bw, bh = base.size
-        if bw / bh > ratio:
-            cw2, ch2 = int(bh * ratio), bh
-        else:
-            cw2, ch2 = bw, int(bw / ratio)
-        x1, y1 = (bw - cw2) // 2, (bh - ch2) // 2
-        out = base.crop((x1, y1, x1 + cw2, y1 + ch2)).resize((tw, th), Image.LANCZOS)
-        dest = out_dir / name
-        out.save(dest)
-        print(f"OK {dest} ({tw}x{th})")
+    try:
+        for name, (tw, th) in TARGETS.items():
+            ratio = tw / th
+            bw, bh = base.size
+            if bw / bh > ratio:
+                cw2, ch2 = int(bh * ratio), bh
+            else:
+                cw2, ch2 = bw, int(bw / ratio)
+            x1, y1 = (bw - cw2) // 2, (bh - ch2) // 2
+            out = base.crop((x1, y1, x1 + cw2, y1 + ch2)).resize((tw, th), Image.LANCZOS)
+            dest = out_dir / name
+            out.save(dest)
+            print(f"OK {dest} ({tw}x{th})")
+    except OSError as e:
+        sys.exit(f"错误：写入封面图失败（{e}）")
 
 
 if __name__ == "__main__":

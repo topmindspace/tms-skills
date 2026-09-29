@@ -301,10 +301,10 @@ def inject(path: Path, pat: re.Pattern, repl: str, label: str) -> bool:
     try:
         src = path.read_text(encoding='utf-8')
     except OSError as e:
-        print(f'错误: 无法读取 {path.name}: {e}')
+        print(f'错误： 无法读取 {path.name}: {e}')
         return False
     if not pat.search(src):
-        print(f'错误: {path.name} 缺少 {label} 标记块')
+        print(f'错误： {path.name} 缺少 {label} 标记块')
         return False
     path.write_text(pat.sub(lambda m: repl, src, count=1), encoding='utf-8')
     return True
@@ -312,32 +312,32 @@ def inject(path: Path, pat: re.Pattern, repl: str, label: str) -> bool:
 
 def main() -> int:
     if not LC.exists():
-        print(f'错误: 找不到 {LC}')
+        print(f'错误： 找不到 {LC}')
         return 2
     try:
         lc = json.loads(LC.read_text(encoding='utf-8'))
     except UnicodeDecodeError as e:
-        print(f'错误: {LC.name} 不是合法 UTF-8: {e}')
+        print(f'错误： {LC.name} 不是合法 UTF-8: {e}')
         return 2
     except json.JSONDecodeError as e:
-        print(f'错误: {LC.name} 不是合法 JSON: {e}')
+        print(f'错误： {LC.name} 不是合法 JSON: {e}')
         return 2
     except OSError as e:
-        print(f'错误: 无法读取 {LC}: {e}')
+        print(f'错误： 无法读取 {LC}: {e}')
         return 2
     if not MS.exists():
-        print(f'错误: 找不到 {MS}（DSL schema 单源）')
+        print(f'错误： 找不到 {MS}（DSL schema 单源）')
         return 2
     try:
         ms = json.loads(MS.read_text(encoding='utf-8'))
     except UnicodeDecodeError as e:
-        print(f'错误: {MS.name} 不是合法 UTF-8: {e}')
+        print(f'错误： {MS.name} 不是合法 UTF-8: {e}')
         return 2
     except json.JSONDecodeError as e:
-        print(f'错误: {MS.name} 不是合法 JSON: {e}')
+        print(f'错误： {MS.name} 不是合法 JSON: {e}')
         return 2
     except OSError as e:
-        print(f'错误: 无法读取 {MS}: {e}')
+        print(f'错误： 无法读取 {MS}: {e}')
         return 2
     ok = True
 
@@ -345,13 +345,13 @@ def main() -> int:
     try:
         src = PE.read_text(encoding='utf-8')
     except OSError as e:
-        print(f'错误: 无法读取 {PE}: {e}')
+        print(f'错误： 无法读取 {PE}: {e}')
         return 1
     if not CONST_PAT.search(src):
-        print('错误: assets/pptx-export.js 缺少 __TOPPPT_CONSTANTS__ 标记块')
+        print('错误： assets/pptx-export.js 缺少 __TOPPPT_CONSTANTS__ 标记块')
         return 1
     if not SCHEMA_PAT.search(src):
-        print('错误: assets/pptx-export.js 缺少 __TOPPPT_SCHEMA__ 标记块')
+        print('错误： assets/pptx-export.js 缺少 __TOPPPT_SCHEMA__ 标记块')
         return 1
     block = build_const_block(lc)
     PE.write_text(CONST_PAT.sub(lambda m: block, src), encoding='utf-8')
@@ -370,7 +370,7 @@ def main() -> int:
 
     # ② 公共片段源
     if not ENGINE.exists() or not UI.exists():
-        print(f'错误: 缺少公共片段 {ENGINE} / {UI}')
+        print(f'错误： 缺少公共片段 {ENGINE} / {UI}')
         return 1
     engine_css = ENGINE.read_text(encoding='utf-8').rstrip('\n')
     ui_js = UI.read_text(encoding='utf-8').rstrip('\n')

@@ -50,7 +50,7 @@ updated: 2026-09-29
 | `scripts/scan_ai_flavor.py` | 中文去 AI 味扫描（与 `qu-aiwei-zh` 同源） |
 
 ```bash
-# 路径解析：CLI --base/--workspace → env TOPMIND_WECHAT_BASE / TOPMIND_WORKSPACE / TOPSTREAM_ROOT → 惯例
+# 路径解析：CLI --base → env TOPMIND_WECHAT_BASE / TOPMIND_WORKSPACE / TOPSTREAM_ROOT → 惯例
 export TOPMIND_WORKSPACE=/path/to/workspace   # 推荐
 python3 scripts/new-article.py --slug demo --title "标题" --direction reverse
 python3 scripts/lint-wechat.py --input <包>/公众号稿.md --fix

@@ -140,7 +140,15 @@ function install(skillId, targetRoot, { force = false } = {}) {
   }
   const dest = path.join(targetRoot, skillId);
   assertDestOutsideSource(src, dest);
-  fs.mkdirSync(targetRoot, { recursive: true });
+  try {
+    fs.mkdirSync(targetRoot, { recursive: true });
+  } catch (e) {
+    die(
+      `Cannot create install directory: ${targetRoot}\n` +
+        `  reason: ${e.message}\n` +
+        'Choose a --to directory that can be created (not a file, not unwritable).'
+    );
+  }
   if (fs.existsSync(dest)) {
     if (!force) {
       die(

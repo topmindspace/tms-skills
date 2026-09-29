@@ -281,6 +281,8 @@ def main() -> None:
 
     inp = Path(args.input)
     if not inp.is_file():
+        if inp.is_dir():
+            sys.exit(f"错误：输入是目录不是文件 {inp}")
         sys.exit(f"错误：找不到输入文件 {inp}")
     try:
         md = inp.read_text(encoding="utf-8-sig")
@@ -291,8 +293,11 @@ def main() -> None:
     text, images = convert(md)
 
     out = Path(args.out)
-    out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(text, encoding="utf-8")
+    try:
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(text, encoding="utf-8")
+    except OSError as e:
+        sys.exit(f"错误：无法写入输出文件 {out}（{e}）")
 
     chars = len(text.replace("\n", ""))
     print(f"OK {out}")

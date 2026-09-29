@@ -64,10 +64,10 @@ def main() -> int:
     node = find_node()
     node_path = find_node_modules()
     if not node:
-        print('错误: ' + NODE_HINT)
+        print('错误： ' + NODE_HINT)
         return 2
     if not node_path:
-        print('错误: ' + NODE_MODULES_HINT)
+        print('错误： ' + NODE_MODULES_HINT)
         return 2
     env = node_env(node_path)
     print(f'Node: {node}')
@@ -82,7 +82,7 @@ def main() -> int:
     if args.only:
         examples = [h for h in examples if args.only in h.stem]
     if not examples:
-        print('错误: assets/examples/ 下没有可回归的示例。')
+        print('错误： assets/examples/ 下没有可回归的示例。')
         return 2
 
     for html in examples:

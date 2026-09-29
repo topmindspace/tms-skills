@@ -113,7 +113,7 @@ CHART_CYCLE = CHART_CORE  # 轮换默认序列（骨架示范「图要选对」�
 _SCAFFOLD = (LC.get('charts') or {}).get('scaffold') or {}
 if not _SCAFFOLD.get('viewBoxHeight') or not _SCAFFOLD.get('infoTypes'):
     # 启动自检：单源缺键时立刻失败，防「静默退回默认值 180」的窗口期
-    print('错误: layout-constants.json 缺 charts.scaffold.viewBoxHeight/infoTypes'
+    print('错误：layout-constants.json 缺 charts.scaffold.viewBoxHeight/infoTypes'
           '（骨架尺寸单源不完整；补单源后先跑 sync_runtime.py）', file=sys.stderr)
     sys.exit(2)
 CHART_VIEWBOX = dict(_SCAFFOLD.get('viewBoxHeight') or {})

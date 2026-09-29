@@ -4,7 +4,7 @@
 
 为 X 长文和公众号文章生成封面图的可复用技能。目标：**震撼、醒目、主题突出**。
 
-- 版本：**v0.1.0**（与 `@topmindspace/tms-skills@0.3.8` 同 tag）
+- 版本：**v0.1.0**（与 `@topmindspace/tms-skills@0.3.9` 同 tag）
 
 ## 风格样张
 

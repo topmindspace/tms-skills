@@ -1,7 +1,34 @@
+## [0.3.9] - 2026-09-29
+
+> **本版备发**（tag v0.3.9 待打；npm 待发布；commit = 本轮审计报告落盘时的 `git log` 首条）。
+> 注：0.3.7、0.3.8 未发布，全部内容已并入本版。
+> 根包 0.3.8 → **0.3.9**（patch）；4 个技能 `version` 保持不动（top-ppt-html 0.1.19，其余 0.1.0）。
+> 本轮是"新鲜眼睛"横扫（第十一轮）：只找前十轮没覆盖的盲区，改动最小。
+
+### 代码异味横扫（第十一轮 Worker A）
+
+- TODO 注释 6 命中 → 0 真遗留（均为有意为之：文档纪律说明/scaffold 指导注释/校验正则/示例代称）
+- 死代码：全仓 Python + top-ppt-html JS 逐函数交叉 grep，零死函数；12 个 CLI 参数逐个验证全部在用
+- 跨技能一致性修复：19 处错误信息半角冒号 `错误:` → 全角 `错误：`（多数派 47 处）；`validate_report.py` 加 `-h/--help` 早退（exit 0），与其他 argparse CLI 一致
+- 重复逻辑（仅记录，不重构）：`esc()` HTML 转义三处逐字相同、`read_frontmatter()` 跨技能同构、`load_constants()` 各自实现——均为四技能同构门禁的有意设计
+
+### 对抗输入测试（第十一轮 Worker B：5 真崩溃全部修复）
+
+- `bin/tms-skills.js`：`--to` 指向已存在文件时 `mkdirSync` 抛未捕获堆栈 → try/catch 干净报错 exit 1
+- `md2wechat.py`：`resolve_image` 的 `shutil.copy2`/`os.makedirs` 未捕获 OSError（磁盘满/目录当图片）→ 干净报错 exit 1
+- `md2x.py`：输出写入 `mkdir`+`write_text` 未捕获 OSError → 干净报错 exit 1；目录当输入的报错文案修正（"找不到输入文件"→"输入是目录不是文件"）
+- `crop-cover.py`：`out_dir.mkdir` 与渲染循环 `out.save` 未捕获 OSError（磁盘满→截断 PNG）→ 干净报错 exit 1
+- 对抗矩阵：100KB 单行/emoji+零宽+混合换行/非法 UTF-8/空文件/纯标题/48MB 图片，其余全部干净通过
+
+### 文档一致性（第十一轮 Worker C）
+
+- 审计结论抽查 5 处全部为真（architecture 归一化/SKILL.md 13KB 预算/cover 触发词/ip-fun 原位垫色块补丁/footer 移出 content 标记）
+- SKILL.md vs --help 漂移修复 1 处：wechat-post SKILL.md 注释声称 `--workspace` 参数，全仓无此参数 → 改为 `--base`
+- README 示例 10/10 实跑通过（/tmp 干净目录，本地包安装）
+
 ## [0.3.8] - 2026-09-29
 
-> **本版备发**（tag v0.3.8 待打；npm 待发布；commit = 本轮审计报告落盘时的 `git log` 首条）。
-> 注：0.3.7 未发布，全部内容已并入本版。
+> **本版未发布**（未打 tag、未推 npm；0.3.8 全部内容已并入 0.3.9）。
 > 根包 0.3.6 → **0.3.8**（patch）；4 个技能 `version` 保持不动（top-ppt-html 0.1.19，其余 0.1.0）。
 > 本轮只动 top-ppt-html + 文档：渲染产出目检修复（A）+ PPTX 双引擎保真修复 11 bug（B）+ 文档修正（C）。
 

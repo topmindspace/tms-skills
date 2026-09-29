@@ -920,7 +920,10 @@ def resolve_image(src, md_path, out_dir, assets, asset_root):
                        "missing": True})
         return src
     img_dir = os.path.join(out_dir, "images")
-    os.makedirs(img_dir, exist_ok=True)
+    try:
+        os.makedirs(img_dir, exist_ok=True)
+    except OSError as e:
+        sys.exit("错误：无法创建图片目录 %s（%s）" % (img_dir, e))
     base = os.path.basename(abs_path)
     target = os.path.join(img_dir, base)
     n = 1
@@ -929,7 +932,10 @@ def resolve_image(src, md_path, out_dir, assets, asset_root):
         target = os.path.join(img_dir, "%s-%d%s" % (stem, n, ext))
         n += 1
     if not os.path.exists(target):
-        shutil.copy2(abs_path, target)
+        try:
+            shutil.copy2(abs_path, target)
+        except OSError as e:
+            sys.exit("错误：复制图片失败 %s → %s（%s）" % (abs_path, target, e))
     rel = os.path.relpath(target, out_dir)
     assets.append({"src": src, "local": rel, "remote": False,
                    "basename": os.path.basename(target),
@@ -1609,7 +1615,10 @@ def main():
     except OSError as e:
         sys.exit("错误：无法读取输入文件 %s（%s）" % (args.input, e))
 
-    os.makedirs(args.out_dir, exist_ok=True)
+    try:
+        os.makedirs(args.out_dir, exist_ok=True)
+    except OSError as e:
+        sys.exit("错误：无法创建输出目录 %s（%s）" % (args.out_dir, e))
     body, assets, diagrams, footnotes = convert(
         md_text, os.path.abspath(args.input), args.out_dir, theme,
         args.link_mode, args.render_mermaid, args.asset_root or None,

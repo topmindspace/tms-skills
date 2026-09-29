@@ -71,7 +71,7 @@ def strip_blocks(css: str) -> str:
 
 def main() -> int:
     if not ENGINE.exists():
-        print('错误: 缺 assets/templates/engine.css')
+        print('错误： 缺 assets/templates/engine.css')
         return 2
 
     selector_zone = strip_blocks(ENGINE.read_text(encoding='utf-8'))

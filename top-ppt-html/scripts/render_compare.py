@@ -211,7 +211,7 @@ def main(argv: list[str] | None = None) -> int:
 
     pptx = Path(args.pptx).resolve()
     if not pptx.exists():
-        print(f'错误: 找不到 {pptx}')
+        print(f'错误： 找不到 {pptx}')
         return 2
     out = Path(args.out).resolve() if args.out else pptx.parent / 'render-compare'
     out.mkdir(parents=True, exist_ok=True)

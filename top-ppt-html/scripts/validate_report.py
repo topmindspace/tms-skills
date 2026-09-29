@@ -4,6 +4,7 @@
 TopPPT HTML· HTML 报告质量校验（交付闭环）
 用法:
     python validate_report.py <报告.html> [--strict] [--layout-qa] [--json]
+    python validate_report.py --help
 
 输出每项 PASS/FAIL，结尾给汇总与结论；任一 FAIL 时退出码为 1（--strict 时 WARN 也计失败）。
 --json 以 JSON 输出全部检查结果（供脚本/流水线读取）。
@@ -1630,6 +1631,9 @@ def main():
     if len(sys.argv) < 2:
         print(__doc__)
         return 2
+    if sys.argv[1] in ('-h', '--help'):
+        print(__doc__)
+        return 0
     path = Path(sys.argv[1])
     strict = '--strict' in sys.argv
     as_json = '--json' in sys.argv
