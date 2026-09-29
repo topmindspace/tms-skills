@@ -4,7 +4,7 @@
 
 A reusable skill for generating cover art for X long-form posts and WeChat articles. Goal: **striking, eye-catching, theme-focused**.
 
-- Version: **v0.1.0** (same tag as `@topmindspace/tms-skills@0.3.5`)
+- Version: **v0.1.0** (same tag as `@topmindspace/tms-skills@0.3.6`)
 
 ## Style gallery
 
@@ -22,14 +22,13 @@ npx @topmindspace/tms-skills install topmind-cover
 
 ## Usage
 
-0. **Pick a style (3 steps, required)**: choose 1 of 8 styles from `references/cover-styles.md` by topic
-   → check `assets/examples/<style>.png` to confirm the visual language
-   → compose the prompt from that style's recipe (replace `{TITLE}` with the real title).
-1. Input: article title + 3 theme keywords + platform (x / wechat / both, default both).
-2. Generate with the agent's image-generation capability (landscape 16:9, 8% margin on all sides).
-3. Eyeball check (required): title text correct word for word, subject complete, theme legible at a glance;
-   title text and key subject stay inside the central vertical 60% safe zone (so the 900×383 center crop never cuts the title).
-4. Crop and save:
+0. **Pick a style**: choose 1 of 8 styles from `references/cover-styles.md` by topic → check the example image to confirm the visual language.
+1. **Refine the title**: lock the title copy first (usually ≤ 10 chars) using that style's title rules; rewrite until it lands — no drawing yet.
+2. **Composition brief**: one-sentence brief (theme / audience / mood / visual metaphor / palette direction) before composing the prompt.
+3. Input: article title + 3 theme keywords + platform (x / wechat / both, default both).
+4. Generate with the agent's image-generation capability (landscape 16:9, 8% margin on all sides).
+5. **Impact self-check** (required): pass every item in the [impact self-check list](./SKILL.md#冲击力自检清单); on failure, tweak the prompt and regenerate, max 3 attempts.
+6. Crop and save:
 
 ```bash
 python3 scripts/crop-cover.py <main-image> --out-dir <package>/images/
