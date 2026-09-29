@@ -3,13 +3,15 @@
 
 用法：
     python3 md2x-html.py 原稿.md --out X长文.html \\
-        --images 样张1.png 样张2.png ... [--cover cover-1200x675.png]
+        --images 样张1.png 样张2.png ... [--cover cover-1500x600.png]
 
 约定（与 md2x.py 对齐）：
-- `[图N]` 独占一行 → 按顺序取 --images[N-1]，转成内嵌 data-URI 的 <figure>
+- `[图N]` 独占一行 → 按顺序取 --images[N-1]，转成内嵌 data-URI 的 <figure>；
+  点击图片弹出 lightbox 放大查看原图（右键可另存/截图，不拦截右键菜单）
 - ``` 围栏代码块（直出提示词）→ <blockquote> + 「复制提示词」按钮。
   原因：X 文章编辑器没有"粘贴 <pre> 即代码块"的识别，原生代码块只能走
-  Insert 菜单；<blockquote> 粘贴后即 X 原生引用块，格式不丢、读者全选即拷
+  Insert 菜单；<blockquote> 粘贴后即 X 原生引用块，格式不丢、读者全选即拷。
+  支持嵌套围栏（```` 开栏不被内层 ``` 提前闭合）；未闭合围栏在文末自动收尾
 - `#` → h1（X 标题栏专用，复制全文时自动剔除）；`##`/`###` → h2/h3
   （对应 X 的"标题/副标题"两级）
 - `- ` / `1. ` → ul/ol；`**x**` → strong；`` `x` `` → code（X 粘贴后变纯文本）；
@@ -22,7 +24,8 @@
   复制前自动剔除按钮/UI 与 .no-paste 块（标题、封面预览），只剩 X 可识别的
   语义标签：h2/h3/p/ul/ol/blockquote/a/hr/img
 - 图片：data-URI 内嵌（X 若支持则随粘贴带入）；每张图带 [图N] 编号 + 「下载图片」
-  按钮保底，图片没跟过去时按编号下载再上传，不用找文件、不用对顺序
+  按钮保底，图片没跟过去时按编号下载再上传，不用找文件、不用对顺序；
+  点击图片 lightbox 放大看原图，方便核对、截图或右键另存
 - 封面：X 有独立封面上传入口，始终单独文件；HTML 顶部仅作预览 + 下载链接
 
 只用 Python 标准库。
@@ -66,10 +69,11 @@ body { margin: 0; background: #f7f9fa; color: #0f1419;
                        border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; }
 .cover-note { background: #f7f9fa; border: 1px dashed #cfd9de; border-radius: 12px;
               padding: 14px 16px; font-size: 14px; color: #536471; margin-bottom: 24px; }
-.cover-note img { width: 100%; border-radius: 8px; display: block; margin-bottom: 10px; }
+.cover-note img { width: 100%; border-radius: 8px; display: block; margin-bottom: 10px;
+                  cursor: zoom-in; }
 figure.ximg { margin: 22px 0; }
 figure.ximg img { width: 100%; border-radius: 10px; display: block;
-                 border: 1px solid #eff3f4; }
+                 border: 1px solid #eff3f4; cursor: zoom-in; }
 figure.ximg figcaption { display: flex; justify-content: space-between; align-items: center;
                         margin-top: 8px; font-size: 13px; color: #536471; }
 .prompt { position: relative; margin: 14px 0 20px; }
@@ -82,10 +86,22 @@ figure.ximg figcaption { display: flex; justify-content: space-between; align-it
                font-size: 12px; }
 .toast { position: fixed; left: 50%; bottom: 40px; transform: translateX(-50%);
          background: #0f1419; color: #fff; font-size: 14px; padding: 10px 20px;
-         border-radius: 9999px; opacity: 0; transition: opacity .25s; pointer-events: none; }
+         border-radius: 9999px; opacity: 0; transition: opacity .25s; pointer-events: none;
+         z-index: 200; }
+/* 图片 lightbox：点击放大看原图；不拦截右键，可右键另存/截图 */
+.lightbox { position: fixed; inset: 0; z-index: 100; background: rgba(10,14,20,.93);
+            display: none; align-items: center; justify-content: center; padding: 24px; }
+.lightbox.open { display: flex; }
+.lb-inner { max-width: 96vw; max-height: 94vh; display: flex; flex-direction: column;
+            gap: 10px; align-items: center; }
+.lb-inner img { max-width: 94vw; max-height: 76vh; border-radius: 8px; background: #fff; }
+.lb-bar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: center; }
+.lb-cap { color: #cfd9de; font-size: 13px; }
+.lb-tip { color: #8a93a6; font-size: 12px; }
 """
 
 JS = """
+var lbFname = '';
 function toast(msg){ var t=document.getElementById('toast'); t.textContent=msg;
   t.style.opacity=1; setTimeout(function(){ t.style.opacity=0; }, 1800); }
 function cleanClone(){
@@ -116,19 +132,48 @@ async function copyPrompt(btn){
   catch(e){ toast('复制失败，请手动复制'); }
 }
 function dlImg(btn){
-  var img=btn.closest('figure').querySelector('img');
+  var fig=btn.closest('figure');
+  var img=fig ? fig.querySelector('img') : document.querySelector('#coverbox img');
+  if(!img){ toast('找不到图片'); return; }
   var a=document.createElement('a');
-  a.href=img.src; a.download=btn.getAttribute('data-fname');
+  a.href=img.src; a.download=btn.getAttribute('data-fname') || 'image.png';
   document.body.appendChild(a); a.click(); a.remove();
-  toast('开始下载 '+btn.getAttribute('data-fname'));
+  toast('开始下载 '+(btn.getAttribute('data-fname')||'图片'));
 }
-function dlCover(btn){
-  var img=document.querySelector('#coverbox img');
+/* lightbox：点击图片放大看原图。刻意不拦截右键，放大后可右键另存 / 直接截图。 */
+function openLightbox(img){
+  var lb=document.getElementById('lightbox');
+  document.getElementById('lbimg').src=img.src;
+  document.getElementById('lbimg').alt=img.alt||'原图';
+  lbFname=img.getAttribute('data-fname')||'image.png';
+  document.getElementById('lbcap').textContent=(img.alt||'原图')+' · '+lbFname;
+  lb.classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeLightbox(){
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow='';
+}
+function openFullsize(){
+  var src=document.getElementById('lbimg').src;
+  var parts=src.split(','), mime='image/png';
+  var m=parts[0].match(/:(.*?);/); if(m){ mime=m[1]; }
+  try{
+    var bin=atob(parts[1]), arr=new Uint8Array(bin.length);
+    for(var i=0;i<bin.length;i++){ arr[i]=bin.charCodeAt(i); }
+    var url=URL.createObjectURL(new Blob([arr],{type:mime}));
+    window.open(url,'_blank');
+  }catch(e){ toast('打开失败，可右键图片另存'); }
+}
+function dlLightbox(){
   var a=document.createElement('a');
-  a.href=img.src; a.download=btn.getAttribute('data-fname');
+  a.href=document.getElementById('lbimg').src; a.download=lbFname;
   document.body.appendChild(a); a.click(); a.remove();
-  toast('封面开始下载');
+  toast('开始下载 '+lbFname);
 }
+document.addEventListener('keydown', function(e){
+  if(e.key==='Escape'){ closeLightbox(); }
+});
 """
 
 HTML_TMPL = """<!DOCTYPE html>
@@ -136,28 +181,46 @@ HTML_TMPL = """<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{title}</title>
-<style>{css}</style>
+<title>@@TITLE@@</title>
+<style>@@CSS@@</style>
 </head>
 <body>
 <div class="toolbar">
   <span class="steps">1. 标题填入 X 标题栏 → 2. 一键复制全文 → 3. 粘贴到 X 正文</span>
   <button class="btn primary" onclick="copyArticle()">一键复制全文</button>
-  <span class="hint">图片随粘贴带入则直接用；没带入就按 [图N] 下载上传。封面始终单独上传。</span>
+  <span class="hint">图片随粘贴带入则直接用；没带入就按 [图N] 下载上传。封面始终单独上传。点击图片可放大查看原图。</span>
 </div>
 <article class="article" id="article">
-{body}
+@@BODY@@
 </article>
+<div class="lightbox" id="lightbox" onclick="if(event.target===this)closeLightbox()">
+  <div class="lb-inner">
+    <img id="lbimg" alt="原图">
+    <div class="lb-bar">
+      <span class="lb-cap" id="lbcap"></span>
+      <button class="btn" onclick="openFullsize()">新标签页打开原图</button>
+      <button class="btn" onclick="dlLightbox()">下载原图</button>
+      <button class="btn" onclick="closeLightbox()">关闭</button>
+    </div>
+    <div class="lb-tip">可右键图片另存 / 直接截图 · Esc 关闭</div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
-<script>{js}</script>
+<script>@@JS@@</script>
 </body>
 </html>
 """
 
+COVER_FNAME = "cover-1500x600.png"
+
 
 def data_uri(path):
-    with open(path, "rb") as f:
-        raw = f.read()
+    try:
+        with open(path, "rb") as f:
+            raw = f.read()
+    except OSError:
+        print("图片读取失败：%s" % path, file=sys.stderr)
+        sys.exit(1)
     ext = os.path.splitext(path)[1].lower()
     mime = {"png": "image/png", "jpg": "image/jpeg", "jpeg": "image/jpeg",
             "webp": "image/webp", "gif": "image/gif"}.get(ext.lstrip("."), "image/png")
@@ -177,7 +240,6 @@ def inline_md(s):
 def md_to_html(md_text, images, cover):
     lines = md_text.split("\n")
     out = []
-    img_idx = 0
     cover_uri = data_uri(cover) if cover else None
 
     i = 0
@@ -187,7 +249,7 @@ def md_to_html(md_text, images, cover):
             i += 1
         i += 1
 
-    in_code = False
+    in_fence = None  # 开栏的反引号串（如 '```'）；None 表示不在围栏内
     code_buf = []
     in_ul = False
     in_ol = False
@@ -224,28 +286,38 @@ def md_to_html(md_text, images, cover):
         in_table = False
         table_buf = []
 
+    def flush_prompt():
+        body = "\n".join(code_buf)
+        esc = html.escape(body).replace("\n", "<br>")
+        out.append(
+            '<div class="prompt"><blockquote><code>%s</code></blockquote>'
+            '<button class="btn" onclick="copyPrompt(this)">复制提示词</button>'
+            "</div>" % esc
+        )
+
     while i < len(lines):
         line = lines[i]
         s = line.strip()
 
-        if s.startswith("```"):
-            if not in_code:
+        fm = re.match(r"^(`{3,})", s)
+        if fm:
+            fence = fm.group(1)
+            if in_fence is None:
+                # 开栏
                 close_lists()
                 flush_table()
-                in_code = True
+                in_fence = fence
+                code_buf = []
+            elif len(fence) >= len(in_fence) and s.strip("`") == "":
+                # 闭栏：纯反引号行且长度不短于开栏（内层短围栏视为代码内容）
+                flush_prompt()
+                in_fence = None
                 code_buf = []
             else:
-                in_code = False
-                body = "\n".join(code_buf)
-                esc = html.escape(body).replace("\n", "<br>")
-                out.append(
-                    '<div class="prompt"><blockquote><code>%s</code></blockquote>'
-                    '<button class="btn" onclick="copyPrompt(this)">复制提示词</button>'
-                    "</div>" % esc
-                )
+                code_buf.append(line)
             i += 1
             continue
-        if in_code:
+        if in_fence is not None:
             code_buf.append(line)
             i += 1
             continue
@@ -269,15 +341,16 @@ def md_to_html(md_text, images, cover):
                 uri = data_uri(images[n - 1])
                 fname = "图%d-%s" % (n, os.path.basename(images[n - 1]))
                 out.append(
-                    '<figure class="ximg"><img src="%s" alt="图%d">'
+                    '<figure class="ximg"><img src="%s" alt="图%d" data-fname="%s" '
+                    'onclick="openLightbox(this)">'
                     '<figcaption><span class="cap">[图%d]</span>'
                     '<button class="btn" data-fname="%s" '
                     'onclick="dlImg(this)">下载图片</button></figcaption></figure>'
-                    % (uri, n, n, html.escape(fname, quote=True))
+                    % (uri, n, html.escape(fname, quote=True), n,
+                       html.escape(fname, quote=True))
                 )
             else:
                 out.append("<p>[图%d]（图片缺失）</p>" % n)
-            img_idx = max(img_idx, n)
             i += 1
             continue
 
@@ -337,6 +410,9 @@ def md_to_html(md_text, images, cover):
 
     close_lists()
     flush_table()
+    if in_fence is not None:
+        # 未闭合围栏：文末自动收尾，不丢内容
+        flush_prompt()
 
     body = "\n".join(out)
 
@@ -344,12 +420,12 @@ def md_to_html(md_text, images, cover):
     if cover_uri:
         cover_html = (
             '<div class="cover-note no-paste" id="coverbox">'
-            '<img src="%s" alt="封面预览">'
-            '<div>封面图预览（1200×675）。X 文章有独立封面上传入口，'
+            '<img src="%s" alt="封面预览（点击放大）" data-fname="%s" onclick="openLightbox(this)">'
+            '<div>封面图预览（1500×600 · 5:2）。X 文章有独立封面上传入口，'
             '请单独上传，不要随正文粘贴。<br>'
-            '<button class="btn" data-fname="cover-1200x675.png" '
-            'onclick="dlCover(this)">下载封面图</button></div></div>'
-        ) % cover_uri
+            '<button class="btn" data-fname="%s" '
+            'onclick="dlImg(this)">下载封面图</button></div></div>'
+        ) % (cover_uri, COVER_FNAME, COVER_FNAME)
     return cover_html + "\n" + body
 
 
@@ -358,24 +434,38 @@ def main():
     ap.add_argument("md", help="原稿 markdown 路径")
     ap.add_argument("--out", required=True, help="输出 HTML 路径")
     ap.add_argument("--images", nargs="*", default=[], help="[图N] 对应的图片路径（按顺序）")
-    ap.add_argument("--cover", default=None, help="封面图路径（1200×675）")
+    ap.add_argument("--cover", default=None, help="封面图路径（1500×600，5:2）")
     args = ap.parse_args()
 
     if not os.path.isfile(args.md):
         print("输入文件不存在：%s" % args.md, file=sys.stderr)
         sys.exit(1)
+    for p in args.images:
+        if not os.path.isfile(p):
+            print("图片不存在：%s" % p, file=sys.stderr)
+            sys.exit(1)
+    if args.cover and not os.path.isfile(args.cover):
+        print("封面图不存在：%s" % args.cover, file=sys.stderr)
+        sys.exit(1)
 
     with open(args.md, encoding="utf-8") as f:
         md_text = f.read()
 
-    m = re.search(r"^#\s+(.+)$", md_text, re.M)
+    # 标题取 frontmatter 之后的第一个 #（frontmatter 里可能有 # 开头的行）
+    body_lines = md_text.split("\n")
+    if body_lines and body_lines[0].strip() == "---":
+        j = 1
+        while j < len(body_lines) and body_lines[j].strip() != "---":
+            j += 1
+        body_lines = body_lines[j + 1:]
+    m = re.search(r"^#\s+(.+)$", "\n".join(body_lines), re.M)
     title = m.group(1).strip() if m else "X长文"
 
     body = md_to_html(md_text, args.images, args.cover)
-    page = HTML_TMPL.replace("{title}", html.escape(title), 1) \
-                    .replace("{css}", CSS, 1) \
-                    .replace("{body}", body, 1) \
-                    .replace("{js}", JS, 1)
+    page = HTML_TMPL.replace("@@TITLE@@", html.escape(title)) \
+                    .replace("@@CSS@@", CSS) \
+                    .replace("@@BODY@@", body) \
+                    .replace("@@JS@@", JS)
 
     out_dir = os.path.dirname(os.path.abspath(args.out))
     os.makedirs(out_dir, exist_ok=True)

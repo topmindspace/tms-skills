@@ -53,6 +53,13 @@
   直接双击打开不卡
 - 下载按钮用 JS 取同图 `src` 触发下载，data-URI 在 HTML 里只存一份（体积减半）
 
+## 点击放大（lightbox）
+
+- 正文每张配图、封面预览图均可点击，弹出全屏 lightbox 放大查看原图
+- lightbox 内提供「新标签页打开原图」（Blob URL，绕开浏览器对 data: URL 顶层导航的限制）、
+  「下载原图」按钮；**刻意不拦截右键菜单**，放大后可右键图片另存，或直接截图
+- lightbox 位于 `#article` 之外，「一键复制全文」不会把它带入剪贴板
+
 ## 复制行为
 
 - 「一键复制全文」：`ClipboardItem` 同时写 `text/html` + `text/plain`，
