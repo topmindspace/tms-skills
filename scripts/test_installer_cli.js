@@ -13,6 +13,8 @@
  *   8. uninstall 正常路径：install → uninstall → 目录消失
  *   9. uninstall 未知选项 → 失败
  *  10. install 未知选项 → 失败
+ *  11. uninstall --to 经符号链接指向包根 → 拒绝，源目录完好（realpath 守卫）
+ *  12. install --force --to 经符号链接指向包根 → 拒绝，源目录完好
  *
  * 隔离设计：把 bin/tms-skills.js 复制到临时目录，旁边搭假技能树，
  * 最多删 /tmp 下的假目录，绝不碰仓库真技能。
@@ -236,6 +238,50 @@ function main() {
       const r = runCli(env, ['install', 'testskill', '--bogus']);
       ok(r.status !== 0, 'case10: install 未知选项 exit 非 0');
       ok(noTraceback(out(r)), 'case10: 无 Traceback');
+    } finally {
+      destroy(env);
+    }
+  }
+
+  // 11. uninstall --to 经符号链接指向包根 → 拒绝（词法比对会被绕过），源完好
+  {
+    const env = makeEnv();
+    try {
+      const link = path.join(env.tmp, 'linkroot');
+      try {
+        fs.symlinkSync(env.tmp, link, 'dir');
+      } catch (e) {
+        ok(false, 'case11: 创建符号链接失败（' + e.message + '），跳过本用例');
+      }
+      if (fs.existsSync(link)) {
+        const r = runCli(env, ['uninstall', 'testskill', '--to', link]);
+        const o = out(r);
+        ok(r.status !== 0, 'case11: --to 符号链接指向包根被拒绝（exit 非 0）');
+        ok(fs.existsSync(path.join(env.skill, 'SKILL.md')), 'case11: 源目录未被删除');
+        ok(noTraceback(o), 'case11: 无 Traceback');
+      }
+    } finally {
+      destroy(env);
+    }
+  }
+
+  // 12. install --force --to 经符号链接指向包根 → 拒绝，源完好（防删源后虚假成功）
+  {
+    const env = makeEnv();
+    try {
+      const link = path.join(env.tmp, 'linkroot');
+      try {
+        fs.symlinkSync(env.tmp, link, 'dir');
+      } catch (e) {
+        ok(false, 'case12: 创建符号链接失败（' + e.message + '），跳过本用例');
+      }
+      if (fs.existsSync(link)) {
+        const r = runCli(env, ['install', 'testskill', '--to', link, '--force']);
+        const o = out(r);
+        ok(r.status !== 0, 'case12: install --force 经符号链接指包内被拒绝（exit 非 0）');
+        ok(fs.existsSync(path.join(env.skill, 'SKILL.md')), 'case12: 源目录未被删除');
+        ok(noTraceback(o), 'case12: 无 Traceback');
+      }
     } finally {
       destroy(env);
     }

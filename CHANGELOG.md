@@ -1,3 +1,34 @@
+## [0.4.1] - 2026-09-29
+
+> **本版备发**（tag v0.4.1 待打；npm 待发布；commit = 本轮审计报告落盘时的 `git log` 首条）。
+> 根包 0.4.0 → **0.4.1**（patch）；技能版本：top-ppt-html 0.2.0 → **0.2.1**（修技能数据 bug 则 patch）、
+> topmind-cover 保持 0.2.0（仅换样张图+描述文案，无功能变更）、topmind-wechat-post / topmind-x-article 保持 0.1.0。
+> 本轮是第十三轮集成轮（A 文档抛光 + B 示例与描述 + C 新代码复审），改动最小、无新功能。
+
+### 安装器 bug 修复（高危 · Worker C 复审发现）
+
+- `uninstall`/`install` 的 `assertDestOutsideSource` 守卫被符号链接绕过：`path.resolve` 不解析软链，
+  `--to <软链指向包根>` 会跟随链接 `rmSync` 删掉包内技能源目录（已实测验证旧代码确会删源）
+- 修复：`bin/tms-skills.js` 改用 `realpath` 归一化比对（`realOrResolved()`：dest 不存在时向上找最深存在祖先），+25/−4
+- `scripts/test_installer_cli.js` 新增 case11/case12（uninstall/install 经软链指包根 → 拒绝、源目录完好），12 用例全过
+
+### top-ppt-html 0.2.1（Worker C 复审发现 · 低危数据 bug）
+
+- `assets/icons/index.json`：「组织」图标关键词含裸「架构」，会把「系统架构」类标题配上人物组织图 → 已收窄为「组织架构」
+
+### 文档抛光（Worker A）
+
+- topmind-cover/SKILL.md：冲击力自检清单 10→9（合并逐字正确项）、设计铁律去重
+- impact-language.md：删除与 cover-styles.md 重复的「白色清新」章节（只在 cover-styles 保留，出处回指用户参考图）
+- 根 README 中英：封面技能描述 8 种风格 → 11 种；top-ppt-html README 中英版本口径改为与 `@topmindspace/tms-skills@0.4.1` 同 tag
+
+### 示例与描述（Worker B）
+
+- `white-clean-alt.png`（white-clean-2）已重生成：标题「极简收纳全攻略」摆正、逐字正确；配套
+  `white-clean-alt-wechat.png`（900×383）新增落盘并纳入 git；示例目录 README 计数同步为 26 张
+- 4 处 description 更新（cover package.json + SKILL frontmatter 加「11 种风格模板」；ppt-html package.json + SKILL frontmatter 加「48 图标 + 弹性版式」）；overview alt 文案 8→11
+- cover 安装文案复核：`list` 输出已准确，未动安装器
+
 ## [0.4.0] - 2026-09-29
 
 > **本版备发**（tag v0.4.0 待打；npm 待发布；commit = 本轮审计报告落盘时的 `git log` 首条）。

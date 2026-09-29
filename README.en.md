@@ -39,14 +39,14 @@ npx @topmindspace/tms-skills install topmind-x-article
 
 ### topmind-cover · Cover art generation
 
-Shared cover art for X long-form and WeChat: striking, eye-catching, theme-focused. **Pick a style → check the example → compose the prompt from the recipe**, then one-click crop to both platform sizes with `crop-cover.py` (X 1200×675, WeChat 900×383). 8-style index and recipes: [`references/cover-styles.md`](./topmind-cover/references/cover-styles.md).
+Shared cover art for X long-form and WeChat: striking, eye-catching, theme-focused. **Pick a style → check the example → compose the prompt from the recipe**, then one-click crop to both platform sizes with `crop-cover.py` (X 1200×675, WeChat 900×383). 11-style index and recipes: [`references/cover-styles.md`](./topmind-cover/references/cover-styles.md).
 
 ```bash
 npx @topmindspace/tms-skills install topmind-cover
 ```
 
 <p align="center">
-  <img src="https://github.com/topmindspace/tms-skills/raw/main/topmind-cover/assets/examples/overview.png" alt="topmind-cover · 8 cover-style overview" width="960" />
+  <img src="https://github.com/topmindspace/tms-skills/raw/main/topmind-cover/assets/examples/overview.png" alt="topmind-cover · 11 cover-style overview" width="960" />
 </p>
 
 > Let ideas fly — make good thinking visible.
@@ -61,12 +61,12 @@ npx @topmindspace/tms-skills install topmind-cover
 
 | Skill | Version | What it does |
 |-------|---------|--------------|
-| [`top-ppt-html`](./top-ppt-html/) | **0.2.0** | Formal business decks: paginated HTML + editable 16:9 PPTX; dual delivery · MD3-inspired density; 3 modes × 9 styles; strict 0/0 |
+| [`top-ppt-html`](./top-ppt-html/) | **0.2.1** | Formal business decks: paginated HTML + editable 16:9 PPTX; dual delivery · MD3-inspired density; 3 modes × 9 styles; strict 0/0 |
 | [`topmind-wechat-post`](./topmind-wechat-post/) | **0.1.0** | WeChat article lifecycle: package, review, 3 quality gates, inline typography & publish checklist |
 | [`topmind-x-article`](./topmind-x-article/) | **0.1.0** | X long-form one-click publish: Markdown → paste-ready plain text + cover + checklist |
-| [`topmind-cover`](./topmind-cover/) | **0.2.0** | Cover art for X / WeChat: striking, theme-focused; 8-style cover style library + 16 dual-size example images + 1 style overview |
+| [`topmind-cover`](./topmind-cover/) | **0.2.0** | Cover art for X / WeChat: striking, theme-focused; 11-style cover style library + 26 example images (incl. 3 alt samples) + 1 style overview |
 
-Installer [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) is **0.4.0** (whole-repo same-tag releases).
+Installer [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) is **0.4.1** (whole-repo same-tag releases).
 
 ## Install
 
@@ -76,7 +76,7 @@ Installer [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspa
 npx @topmindspace/tms-skills list
 npx @topmindspace/tms-skills install top-ppt-html
 npx @topmindspace/tms-skills install top-ppt-html --to ./.claude/skills
-npx @topmindspace/tms-skills@0.4.0 install top-ppt-html   # pin
+npx @topmindspace/tms-skills@0.4.1 install top-ppt-html   # pin
 npx @topmindspace/tms-skills uninstall top-ppt-html --to ./.claude/skills
 ```
 

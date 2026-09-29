@@ -17,10 +17,10 @@ triggers:
   - 培训课件
   - 答辩
   - fast
-description: "为正式商务演示把材料做成可视化报告：零外链可翻页 HTML（日常上台）+ 高保真可编辑 16:9 PPTX（按需）双交付；MD3 式密度克制；三模式（A 演示 / B 研究 / C 架构）× 9 风格。Use when 用户要做报告、演示、汇报、PPT、slides、deck、路演，或写研究报告、分析报告、咨询报告、白皮书、调研、评测、对标、经营分析、复盘、项目汇报、商务/HTML/网页报告，或做架构图、拓扑图、流程图、泳道图、方案图，或把材料做成可视化报告并导出 HTML/PPT/PPTX，或优化报告的排版/版式/配色/图文布局，或做报告时说快速模式/fast/直接生成/一键出稿/少问一句。Do NOT use for 纯代码工程、非报告类网页或应用开发、视频/图片生成、直接改写已有 Word/PPT 源文件本身、封面配图（→topmind-cover）。"
+description: "为正式商务演示把材料做成可视化报告：零外链可翻页 HTML（日常上台）+ 高保真可编辑 16:9 PPTX（按需）双交付；MD3 式密度克制；三模式（A 演示 / B 研究 / C 架构）× 9 风格；内置 48 原创线性图标 + bento/timeline/2col 弹性版式。Use when 用户要做报告、演示、汇报、PPT、slides、deck、路演，或写研究报告、分析报告、咨询报告、白皮书、调研、评测、对标、经营分析、复盘、项目汇报、商务/HTML/网页报告，或做架构图、拓扑图、流程图、泳道图、方案图，或把材料做成可视化报告并导出 HTML/PPT/PPTX，或优化报告的排版/版式/配色/图文布局，或做报告时说快速模式/fast/直接生成/一键出稿/少问一句。Do NOT use for 纯代码工程、非报告类网页或应用开发、视频/图片生成、直接改写已有 Word/PPT 源文件本身、封面配图（→topmind-cover）。"
 license: MIT
 compatibility: "Python 3 stdlib for HTML generation; Node >=18 + pptxgenjs for PPTX; optional playwright for browser regression / theme captures."
-version: 0.2.0
+version: 0.2.1
 author: TopMindspace
 ---
 # TopPPT HTML
@@ -51,7 +51,7 @@ author: TopMindspace
 | 篇幅 | A=10 / B=12 / C=6 | |
 | format | **html only**（用户要 PPT/PPTX 才开 B 通道） | |
 
-**跳过** Gate 0/六项/完整大纲；**仍须**最小大纲→模型单写→strict 0/0→`quality_gate --deliver`（反截断、图表多样、Mode A craft 不降）。L0+L1（A/Fast 可加 L1.5）；代码一律 `extract_snippet`。一行宣布「Fast 选用：…」→ playbook §二；声明已跳过参考图。**标准模式**仍强制 Gate 0 + 六项。
+**跳过** Gate 0/六项/完整大纲；**仍须**最小大纲→模型单写→strict 0/0→`quality_gate --deliver`（反截断、图表多样、Mode A craft 不降）。L0+L1（A/Fast 可加 L1.5）；一行宣布「Fast 选用：…」→ playbook §二；声明已跳过参考图。**标准模式**仍强制 Gate 0 + 六项。
 
 ## 唯一入口流程
 
@@ -82,7 +82,7 @@ author: TopMindspace
 | **轻量**（默认） | 页数不多、材料单一完整、关键判断已敲定 | 最小大纲 → 1 张规划卡（`outline-design.md`「轻量最小集」） |
 | **完整** | 长篇、材料杂、含未敲定关键判断、用户要看框架 | 证据盘点 → 故事线 → 主张树 → 逐页规划卡 → 大纲确认（1 轮） |
 
-精确判定条件与完整步骤见 `references/playbook.md` §二。完整路径确认只做一次；确认后只改指定处。
+精确判定条件与完整步骤详见 playbook §二。完整路径确认只做一次；确认后只改指定处。
 
 ## 变更与中断（过程可控 · 不重启六项问询）
 
@@ -105,7 +105,7 @@ author: TopMindspace
 - 模式契约与锁定版式 → `references/modes.md` · 完整路径七步 → `references/outline-design.md`
 - A/Fast L1.5 → `default-surface.md` + `presentation-craft.md` · 骨架 `layout-grammar.md` · 插画规范 → `illustration-layout.md`
 - 组件/版式**代码** → `components.md` · 页型表 `page-type-matrix.md` · 图表门面 `charts.md` + 决策树 `chart-decision-tree.md` · 信息图 → `infographics.md`
-- 配色/主题/字阶 → `styles.md` + `design-system.md` · 写作 → `content-rules.md` · 图标语义 → `icons.md`（48 原创图标包 `assets/icons/`：HTML 内联 SVG / PPTX 用 PNG；`icon:<名>` 或 `data-icon`；按内容选图标，选不出用默认 7 个；**只在必须/有必要用图标的场景使用，不要为装饰而堆图标**）
+- 配色/主题/字阶 → `styles.md` + `design-system.md` · 写作 → `content-rules.md` · 图标语义 → `icons.md`（48 原创图标包 `assets/icons/`：HTML 内联 SVG / PPTX 用 PNG；`icon:<名>` 或 `data-icon`；按内容选图标，选不出用默认 7 个）
 - 风格包 → `references/style-pack.md`（`layout-constants.json` token 单源）· 布局变体 → `references/layout-variants.md`（`layoutVariants` 注册表：`bento-grid` / `timeline` / `2-col-feature`，section 字段 `variant` 指定）
 - PPTX 精导 → `references/pptx-export.md` · 深度高保真 → `references/high-fidelity.md` · 修复顺序 → `references/failure-modes.md` · 技能维护 → `references/tech-design.md`
 
