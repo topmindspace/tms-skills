@@ -7,17 +7,39 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/topmindspace/tms-skills/ci.yml?style=flat-square&label=CI)](https://github.com/topmindspace/tms-skills/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
 
-**TopMindspace 智能体技能 monorepo** — 把好想法做成可上台的正式商务演示。
+**TopMindspace 智能体技能 monorepo** —— 演示报告、公众号文章、X 长文、封面配图：四个技能，一个仓库。
 
-当前主技能 **[top-ppt-html](./top-ppt-html/)**：**HTML + PPT 双交付**，为**演示报告 / 正式商务演示**而生。
+### top-ppt-html · 正式商务演示
 
-### 为什么是 top-ppt-html
+为**演示报告 / 正式商务演示**而生：**HTML + PPT 双交付**。日常用单文件 HTML 等同幻灯片演示；需要时再导出**高保真可编辑 PPTX**（图表带数据、可标注）。参考 MD3：合适的信息密度、克制的文字 / 图形 / 形状 / 颜色。主场是正式商务演示，不是 gadget。
 
-市面 PPT 技能很多：有的偏花哨装饰，有的偏咨询 dump。**top-ppt-html** 走另一条路——
+```bash
+npx @topmindspace/tms-skills install top-ppt-html
+```
 
-- **双交付**：日常用**单文件 HTML**等同幻灯片演示；需要时再导出**高保真可编辑 PPTX**（图表带数据、可标注）
-- **参考 MD3**：整体空间布局、**合适的信息密度**、克制的文字 / 图形 / 形状 / 颜色
-- **产出即上台**：直观、美观大气、风格多样；主场是正式商务演示，不是 gadget
+### topmind-wechat-post · 公众号创作
+
+公众号文章全生命周期：交付包、审校改写、质量三关（事实 / 逻辑 / 去 AI 味）、微信内联排版（图片必内嵌）、发布清单与状态同步。脚本纯 Python 标准库，零依赖。
+
+```bash
+npx @topmindspace/tms-skills install topmind-wechat-post
+```
+
+### topmind-x-article · X 长文一键发布
+
+Markdown 原稿 → 可直接粘贴的纯文本（`md2x.py` 按 X Article 编辑器支持转制：图片→`[图N]`、表格→"项：值"列表）+ 封面图 + 发布清单。发布走人工粘贴，发布后抓回核对。
+
+```bash
+npx @topmindspace/tms-skills install topmind-x-article
+```
+
+### topmind-cover · 封面配图生成
+
+X 长文与公众号共用的封面图：震撼、醒目、主题突出。按 `references/cover-styles.md` 风格模板组 prompt 出图，`crop-cover.py` 一键裁出双平台尺寸（X 1200×675、公众号 900×383）。
+
+```bash
+npx @topmindspace/tms-skills install topmind-cover
+```
 
 > 让 idea 飞，好想法被看见。
 

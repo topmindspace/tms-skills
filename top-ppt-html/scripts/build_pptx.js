@@ -62,6 +62,42 @@ const pptxgen = require('pptxgenjs');
 const fs = require('fs');
 const path = require('path');
 
+/* ═══ CLI 参数 fail-fast（审计 中等-12）═══
+ * 未知参数一律报错退出（exit 2），不再执行默认构建并写出文件；
+ * --help / -h 打印用法并正常退出（exit 0）。
+ * 位置参数只接受一个（输出文件名）。 */
+(function failFastOnUnknownArgs() {
+  const raw = process.argv.slice(2);
+  if (raw.includes('--help') || raw.includes('-h')) {
+    console.log(
+`用法：
+  node scripts/build_pptx.js [输出.pptx] --model=<模型.json> [--style=<风格>] [--theme=light|dark]
+
+  1) 抽模型：python scripts/extract_model.py <报告.html>（生成 <报告>.model.json）
+  2) 生成：  node scripts/build_pptx.js 报告.pptx --model=报告.model.json
+  3) 质检：  python scripts/validate_pptx.py 报告.pptx --strict --model=报告.model.json
+
+参数：
+  --model=<file>   内容模型 JSON（推荐：由 extract_model.py 从 HTML 报告抽取；缺省用内嵌示例）
+  --style=<name>   覆盖模型的风格（9 套风格 token 见 scripts/layout-constants.json）
+  --theme=light|dark  主题（--theme 覆盖 > 模型 theme > 默认 light）`);
+    process.exit(0);
+  }
+  const known = /^(--model=|--style=|--theme=)/;
+  let positional = 0;
+  for (const a of raw) {
+    if (a.startsWith('-')) {
+      if (!known.test(a)) {
+        console.error(`[build_pptx] FAIL: 未知参数 ${a} —— 拒绝执行（用 --help 查看用法）`);
+        process.exit(2);
+      }
+    } else if (++positional > 1) {
+      console.error(`[build_pptx] FAIL: 多余的位置参数 ${a} —— 只接受一个输出文件名`);
+      process.exit(2);
+    }
+  }
+})();
+
 /* ══════════ 版式常量单源（scripts/layout-constants.json · 两通道共用，禁止在此手写常量） ══════════ */
 const LC = JSON.parse(fs.readFileSync(path.join(__dirname, 'layout-constants.json'), 'utf-8'));
 const STYLE_PRESETS = LC.styles;                      // 9 套风格 token（light）

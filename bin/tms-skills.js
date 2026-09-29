@@ -107,6 +107,31 @@ function copyDir(src, dest) {
   }
 }
 
+function normPath(p) {
+  const s = path.resolve(p);
+  return process.platform === 'win32' ? s.toLowerCase() : s;
+}
+
+/** 安装目标守卫（审计 严重-2）：
+ *  dest == 技能源目录  → --force 会先 rmSync 删掉源目录，再"成功"装出空目录（数据丢失 + 虚假成功）；
+ *  dest 在源目录内部  → copyDir 无限递归复制直至 ENAMETOOLONG，并留下垃圾目录树。
+ *  path.resolve 归一化后比对（dest === src，或 dest 以 src + 路径分隔符开头），
+ *  Windows 下额外做大小写归一。无论是否 --force，一律拒绝。
+ */
+function assertDestOutsideSource(src, dest) {
+  const absSrc = normPath(src);
+  const absDest = normPath(dest);
+  if (absDest === absSrc || absDest.startsWith(absSrc + path.sep)) {
+    die(
+      `Refusing to install into the skill's own directory tree.\n` +
+        `  skill source: ${absSrc}\n` +
+        `  destination:  ${absDest}\n` +
+        `Choose a --to directory outside the skill source ` +
+        `(installing into it would delete or recurse into the source).`
+    );
+  }
+}
+
 function install(skillId, targetRoot, { force = false } = {}) {
   assertSkillId(skillId);
   const src = skillDir(skillId);
@@ -114,6 +139,7 @@ function install(skillId, targetRoot, { force = false } = {}) {
     die(`Skill not found: ${skillId}\nAvailable: ${listSkillIds().join(', ') || '(none)'}`);
   }
   const dest = path.join(targetRoot, skillId);
+  assertDestOutsideSource(src, dest);
   fs.mkdirSync(targetRoot, { recursive: true });
   if (fs.existsSync(dest)) {
     if (!force) {

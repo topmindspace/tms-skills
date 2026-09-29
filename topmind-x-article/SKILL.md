@@ -1,6 +1,6 @@
 ---
 name: topmind-x-article
-version: 1.0.0
+version: 0.1.0
 description: "X 长文（Article）一键发布：Markdown 原稿 → 可直接粘贴的 X发布稿.txt + 封面图 + 发布清单。沉淀自实战。Use when X 长文、发 X 文章、X article、长文发 X。Do NOT use for 短推文（走推文流程）、公众号。"
 action_category: write
 triggers:
@@ -11,8 +11,9 @@ triggers:
 triggers_cn:
   - 写 X 长文
   - X 长文发布
-author: Muse
+author: TopMindspace
 license: MIT
+homepage: https://github.com/topmindspace/tms-skills#readme
 updated: 2026-09-29
 ---
 
@@ -60,3 +61,11 @@ updated: 2026-09-29
 - 280 字短推文 → `topmind-x`
 - 公众号 → `topmind-wechat-post`
 - 只想存档不发布 → `topmind-capture`
+
+## 外部依赖
+
+以下技能**不在本仓库**（一般随用户侧 workbuddy 环境提供）；缺失时对应路由能力不可用，
+本技能核心流程（原稿转文本、封面、发布清单）不受影响：
+
+- `topmind-x`：280 字短推文发布（其 xurl 只覆盖短推文，不发长文）。
+- `topmind-capture`：「只想存档不发布」时的收录路由。

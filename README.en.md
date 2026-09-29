@@ -9,17 +9,39 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/topmindspace/tms-skills/ci.yml?style=flat-square&label=CI)](https://github.com/topmindspace/tms-skills/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
 
-**TopMindspace agent-skills monorepo** — turn good ideas into stage-ready **formal business presentations**.
+**TopMindspace agent-skills monorepo** — formal business presentations, WeChat articles, X long-form posts, cover art: four skills, one repo.
 
-Primary skill **[top-ppt-html](./top-ppt-html/)**: **HTML + PPT dual delivery**, built for **demo reports / formal business decks**.
+### top-ppt-html · Formal business presentations
 
-### Why top-ppt-html
+Built for **demo reports / formal business decks**: **HTML + PPT dual delivery**. Day-to-day, present with single-file HTML like slides; export **high-fidelity editable PPTX** when needed (charts carry data you can annotate). MD3-inspired: fitting information density, restrained type / shapes / color. Formal business presenting — not decoration.
 
-Plenty of PPT skills exist — some lean gadgety, some dump consulting density by default. **top-ppt-html** takes a different path:
+```bash
+npx @topmindspace/tms-skills install top-ppt-html
+```
 
-- **Dual delivery**: day-to-day, present with **single-file HTML** like slides; export **high-fidelity editable PPTX** when needed (charts carry data you can annotate)
-- **MD3-inspired**: spatial layout, **fitting information density**, restrained type / shapes / color
-- **Stage-ready**: clear, atmospheric, multi-style — formal business presenting, not decoration
+### topmind-wechat-post · WeChat article authoring
+
+Full lifecycle for WeChat articles: delivery package, review & rewrite, three quality gates (facts / logic / de-AI-flavor), WeChat inline typography (images must be embedded), publish checklist and status sync. Python stdlib only — zero dependencies.
+
+```bash
+npx @topmindspace/tms-skills install topmind-wechat-post
+```
+
+### topmind-x-article · One-click X long-form publishing
+
+Markdown draft → paste-ready plain text (`md2x.py` adapts to the X Article editor: images → `[图N]`, tables → "item: value" lists) + cover art + publish checklist. Publishing is done by hand-pasting; fetch the text back for verification after posting.
+
+```bash
+npx @topmindspace/tms-skills install topmind-x-article
+```
+
+### topmind-cover · Cover art generation
+
+Shared cover art for X long-form and WeChat: striking, eye-catching, theme-focused. Compose prompts from the `references/cover-styles.md` style templates, then one-click crop to both platform sizes with `crop-cover.py` (X 1200×675, WeChat 900×383).
+
+```bash
+npx @topmindspace/tms-skills install topmind-cover
+```
 
 > Let ideas fly — make good thinking visible.
 

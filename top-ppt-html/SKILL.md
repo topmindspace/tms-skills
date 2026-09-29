@@ -4,8 +4,7 @@ description: "Use when 用户要做报告、演示、汇报、PPT、slides、dec
 license: MIT
 compatibility: "Python 3 stdlib for HTML generation; Node >=18 + pptxgenjs for PPTX; optional playwright for browser regression / theme captures."
 version: 0.1.19
-metadata:
-  author: TopMindspace
+author: TopMindspace
 ---
 # TopPPT HTML
 

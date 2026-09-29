@@ -160,7 +160,7 @@ def main() -> int:
         f'compatibility 缺失或超 500 字符（{clen}）',
         f'{clen} 字符')
     meta_ver = re.search(r'^\s*version:\s*"?([\w.\-]+)"?\s*$', sk, re.M)
-    meta_author = re.search(r'^\s+author:\s*(\S+)\s*$', sk, re.M)
+    meta_author = re.search(r'^\s*author:\s*(\S+)\s*$', sk, re.M)
     pkg_ver = ''
     try:
         import json as _json

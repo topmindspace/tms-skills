@@ -23,7 +23,11 @@ for arg in "$@"; do
   esac
 done
 
-mapfile -t SKILLS < <(node scripts/discover_skills.js)
+SKILLS=()
+# NOTE: `while read` instead of `mapfile` — macOS ships bash 3.2, which has no `mapfile`.
+while IFS= read -r line; do
+  [[ -n "$line" ]] && SKILLS+=("$line")
+done < <(node scripts/discover_skills.js)
 if [[ ${#SKILLS[@]} -eq 0 ]]; then
   echo "ci_skill_gates: no skills discovered" >&2
   exit 1

@@ -1,5 +1,6 @@
 ---
 name: topmind-wechat-post
+version: 0.1.0
 description: "公众号文章全生命周期技能：交付包、审校改写、质量三关（事实/逻辑/去AI味）、状态同步、微信内联排版与发布清单。Use when 写公众号、公众号排版、定稿、发公众号。Do NOT use for 只改错别字、小红书/知乎、纯网页发布。"
 action_category: write
 triggers:
@@ -13,10 +14,13 @@ triggers:
   - 公众号交付
   - wechat
   - mp format
-tags: [wechat, typography, formatting, publishing, markdown, write]
-author: TopMindSpace
+triggers_cn:
+  - 写公众号文章
+  - 公众号排版定稿
+  - 公众号发布清单
+author: TopMindspace
 license: MIT
-homepage: https://github.com/topmindspace/tms-skills
+homepage: https://github.com/topmindspace/tms-skills#readme
 updated: 2026-09-29
 ---
 
@@ -200,6 +204,15 @@ python3 scripts/md2wechat.py \
 ## 与 Desktop「公众号创作」
 
 可视化工作流伴面（若有）：包列表 → 改稿 → 三关 → 预览 → 导出。脚本语义以本技能为准。
+
+## 外部依赖
+
+以下技能**不在本仓库**（一般随用户侧 workbuddy 环境提供）；缺失时对应路由能力不可用，
+本仓库脚本（交付包、排版、发布清单等）功能不受影响：
+
+- `humanizer-zh`：中文去 AI 味的保真边界（「只去 AI 味不排版」路径用）。
+- `qu-aiwei-zh`：中文去 AI 味扫描定位；本仓库 `scan_ai_flavor.py` 与其同源，
+  缺失时可用仓库内脚本替代，扫描定位能力降级。
 
 ## When NOT to use
 

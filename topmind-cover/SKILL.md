@@ -1,6 +1,6 @@
 ---
 name: topmind-cover
-version: 1.0.0
+version: 0.1.0
 description: "文章封面配图生成：X 长文与公众号共用。震撼、醒目、主题突出；平台尺寸规范、风格模板、命名落盘、成图检查一次配齐。Use when 封面、封面图、头图、配图、cover。Do NOT use for 正文插图、PPT/报告封面。"
 action_category: write
 triggers:
@@ -13,8 +13,9 @@ triggers_cn:
   - 公众号封面
   - X 封面
   - 文章封面
-author: Muse
+author: TopMindspace
 license: MIT
+homepage: https://github.com/topmindspace/tms-skills#readme
 updated: 2026-09-29
 ---
 

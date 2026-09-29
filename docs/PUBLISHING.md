@@ -35,10 +35,12 @@ npm 上的 `@topmindspace/tms-skills` **2.0.0–2.1.1 已弃用**（仓库重置
 
 ## 版本策略（务必遵守）
 
-| 包 | 字段 | 规则 |
-|----|------|------|
-| 安装器 | 根 `package.json` `version` | **独立** semver |
-| 技能 | `<skill-id>/package.json` + `scripts/layout-constants.json` `version`（事实源）+ `model-schema.json` / `layoutSlots` 同值 | **独立** semver |
+**整仓同 tag**：`git tag vX.Y.Z` 的 `X.Y.Z` = 根 `package.json` 的 `version`（即安装器 version，如当前 v0.2.0）；tag 号不代表任何技能版本。**各技能 `version` 独立演进**（如 top-ppt-html 0.1.19、新技能 0.1.0），不与 tag 号绑定。
+
+| 包 | 事实源 | 规则 |
+|----|--------|------|
+| 安装器（= tag 号） | 根 `package.json` `version` | semver；随每次发版 bump，打 tag 即定值 |
+| 技能 | 各 `<skill-id>/package.json` 的 `version`，与 `SKILL.md` frontmatter `version` 同值 | 独立 semver；只随技能自身实质变更 bump |
 
 - **默认只升 patch / minor**（修 bug、加能力、改文案）。
 - **major 仅用于破坏性变更**：技能 id、CLI 名、注入标记、安装路径、不兼容模型字段。
@@ -59,7 +61,7 @@ CI/Release 细节见 [`docs/ci.md`](./ci.md)。
 ## 发布流程
 
 1. 更新 `CHANGELOG.md`。
-2. 按上表 bump 对应包的版本（多处同值）。
+2. 按上表 bump 对应包的版本（各包内部多处同值：SKILL.md frontmatter / package.json / README / CHANGELOG）。
 3. 门禁：
    ```bash
    npm run check && npm run audit && npm run privacy
@@ -79,7 +81,7 @@ CI/Release 细节见 [`docs/ci.md`](./ci.md)。
 npm publish --access public --registry https://registry.npmjs.org/
 ```
 
-Secret **`NPM_TOKEN`**（granular，scope `@topmindspace` 写权限）配置在 GitHub Actions；未配置则跳过 npm 步骤。
+Secret **`NPM_TOKEN`**（granular，scope `@topmindspace` 写权限）配置在 GitHub Actions；缺失则 Release 显式失败（静默跳过会产生"绿但没发包"的 Release，已改为显式失败）。
 
 ## 命名
 

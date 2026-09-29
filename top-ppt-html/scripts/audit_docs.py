@@ -18,6 +18,9 @@
   ⑥ 任务路由可解析性 —— extract_snippet.py 的 TASK_ROUTES 每条 (文件, 节) 必须可
      实际抽取（防「文字声明同源」漂移：路由声明的节在文件里找不到即失败；
      空节路由 = 该文件只能整读，≥20KB 的 L2 文件不允许）
+   ⑦ 反引号引用可达 —— 反引号代码引用中的 `references/*.md` / `scripts/*`
+     路径必须存在（审计 轻微-15 门禁盲区：①–⑥ 只查 [text](path) 形式，
+     `references/pan-style.md` 曾漏网；glob/占位符写法跳过）
 
 何时跑：改 `references/*`、拆分/新增规范文件、调整选型表后（与 regression.py 互补——
 后者管交付物正确性，本工具管规范自洽性）。
@@ -161,6 +164,27 @@ def main() -> int:
     if empty_routes:
         errs.append(f'任务路由空节（整读大文件，应补节号或标题关键词）：{empty_routes}')
     print(f'⑥ 任务路由可解析性：{len(ES.TASK_ROUTES)} 条路由 · 不可解析 {len(unresolved)} · 空节 {len(empty_routes)}')
+
+    # ⑦ 反引号引用可达（审计 轻微-15 门禁盲区：`references/pan-style.md` 曾漏网；
+    #    glob/占位符写法（* ? < > |）跳过；先按引用文件所在目录解析，再回落技能根）
+    bt_path = re.compile(r'(references|scripts)/([\w.\-/]+)')
+    bt_suffix = re.compile(r':\d+(?:-\d+)?$')
+    backtick_bad = 0
+    for rel in doc_files():
+        mp = ROOT / rel
+        text = mp.read_text(encoding='utf-8')
+        for span in set(re.findall(r'`([^`]+)`', text)):
+            for kind, p in bt_path.findall(span):
+                p = bt_suffix.sub('', p)
+                if not p or any(c in p for c in '*?<>|'):
+                    continue
+                tgt = mp.parent / kind / p
+                if not tgt.exists():
+                    tgt = ROOT / kind / p
+                if not tgt.exists():
+                    backtick_bad += 1
+                    errs.append(f'反引号引用不可达 {rel}: `{kind}/{p}`')
+    print(f'⑦ 反引号引用可达：异常 {backtick_bad} 处')
 
     print()
     if errs:

@@ -48,6 +48,28 @@ def main() -> None:
                     check(False, f"{rel} 悬空链接: {link}")
     check(True, "内部 md 链接可达")
 
+    # 反引号代码引用中的路径可达（审计 轻微-15 门禁盲区：之前只查 [text](path) 形式，
+    # `references/pan-style.md` 这类反引号引用曾漏网）。抓取反引号内的 references/*.md
+    # 与 scripts/* 路径并校验存在；glob/占位符写法（* ? < > |）跳过。
+    backtick_path_re = re.compile(r"(references|scripts)/([\w.\-/]+)")
+    line_suffix_re = re.compile(r":\d+(?:-\d+)?$")
+    backtick_bad = 0
+    for md in md_files:
+        text = md.read_text(encoding="utf-8")
+        rel = md.relative_to(ROOT).as_posix()
+        for span in set(re.findall(r"`([^`]+)`", text)):
+            for kind, p in backtick_path_re.findall(span):
+                p = line_suffix_re.sub("", p)
+                if not p or any(c in p for c in "*?<>|"):
+                    continue
+                target = md.parent / kind / p
+                if not target.exists():
+                    target = ROOT / kind / p
+                if not target.exists():
+                    backtick_bad += 1
+                    check(False, f"{rel} 反引号引用不可达: `{kind}/{p}`")
+    check(backtick_bad == 0, f"反引号内 references/scripts 引用可达（扫描 {len(md_files)} 个 md 文件）")
+
     if errors:
         print(f"\n[audit_docs] {NAME}: {len(errors)} 项失败")
         sys.exit(1)

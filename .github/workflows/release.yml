@@ -34,6 +34,21 @@ jobs:
       - name: Skill gates (all discovered skills)
         run: bash scripts/ci_skill_gates.sh --with-pptx
 
+      # Fail fast when the tag does not match package.json version: npm publishes
+      # the package.json version, so a skewed tag would permanently desync
+      # tag ↔ npm (and the idempotent pre-publish check would mask it).
+      - name: Verify tag matches package.json version
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          EXPECTED="v$(node -p "require('./package.json').version")"
+          if [[ "$TAG" != "$EXPECTED" ]]; then
+            echo "tag ↔ package.json version mismatch: tag=${TAG} but package.json version=${EXPECTED#v}" >&2
+            echo "Bump package.json version or re-tag before publishing." >&2
+            exit 1
+          fi
+          echo "tag matches package.json version: ${TAG}"
+
       - name: Package all skills
         run: |
           set -euo pipefail
@@ -63,14 +78,14 @@ jobs:
 
       # Publish installer package to npm (keeps npm in sync with the tag).
       # Requires repository secret NPM_TOKEN (granular token, write on @topmindspace).
-      # Skip quietly when the secret is not configured.
-      # Treat already-published / E409 / previously-staged as success so Release stays green.
+      # Fail loudly when the secret is not configured: publishing the GitHub
+      # Release while silently skipping npm would leave a green-but-incomplete release.
       - name: Publish to npm (idempotent)
         run: |
           set -euo pipefail
           if [ -z "${NODE_AUTH_TOKEN:-}" ]; then
-            echo "NPM_TOKEN not configured — skip npm publish (GitHub Release still published)."
-            exit 0
+            echo "NPM_TOKEN not configured — refusing to publish an npm-less release." >&2
+            exit 1
           fi
           VERSION="$(node -p "require('./package.json').version")"
           PKG="@topmindspace/tms-skills"
@@ -90,14 +105,17 @@ jobs:
             echo "npm publish OK: ${PKG}@${VERSION}"
             exit 0
           fi
-          # Race / prior agent publish: treat conflict as success
+          # E409 / already-published conflicts are NOT success: a new tag that hits
+          # E409 means the tag was cut without bumping package.json version.
+          # Fail loudly so the skew is visible instead of going green.
           if grep -Eqi 'E409|Cannot publish over previously published|previously staged|EPUBLISHCONFLICT|cannot publish over existing' "$PUBLISH_LOG"; then
-            echo "npm publish conflict (E409 / already staged|published) for ${PKG}@${VERSION} — treating as success."
-            exit 0
+            echo "npm publish conflict (E409 / already staged|published) for ${PKG}@${VERSION} — FAIL." >&2
+            echo "Bump package.json version and re-tag; do not reuse a tag across versions." >&2
+            exit 1
           fi
-          # Double-check registry in case view raced
+          # Double-check registry in case the failure was client-side only
           if npm view "${PKG}@${VERSION}" version >/dev/null 2>&1; then
-            echo "${PKG}@${VERSION} now visible on npm after conflict — success."
+            echo "${PKG}@${VERSION} now visible on npm after publish attempt — success."
             exit 0
           fi
           echo "npm publish failed with exit ${rc} (not an already-published conflict)." >&2
