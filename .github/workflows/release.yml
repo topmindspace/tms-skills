@@ -105,11 +105,19 @@ jobs:
             echo "npm publish OK: ${PKG}@${VERSION}"
             exit 0
           fi
-          # E409 / already-published conflicts are NOT success: a new tag that hits
-          # E409 means the tag was cut without bumping package.json version.
-          # Fail loudly so the skew is visible instead of going green.
+          # E409 / already-published conflicts: the earlier "Verify tag matches
+          # package.json version" step already guarantees this tag ==
+          # package.json version, so an E409 here means the version was published
+          # by an earlier attempt of this same release (client-side error or
+          # registry replication lag on re-run) — re-check the registry and treat
+          # it as idempotent success instead of failing.
           if grep -Eqi 'E409|Cannot publish over previously published|previously staged|EPUBLISHCONFLICT|cannot publish over existing' "$PUBLISH_LOG"; then
-            echo "npm publish conflict (E409 / already staged|published) for ${PKG}@${VERSION} — FAIL." >&2
+            echo "npm publish reported a conflict for ${PKG}@${VERSION}; re-checking registry..."
+            if npm view "${PKG}@${VERSION}" version >/dev/null 2>&1; then
+              echo "${PKG}@${VERSION} is on npm (published by an earlier attempt) — success."
+              exit 0
+            fi
+            echo "npm publish conflict for ${PKG}@${VERSION} but the version is NOT visible on npm — FAIL." >&2
             echo "Bump package.json version and re-tag; do not reuse a tag across versions." >&2
             exit 1
           fi
