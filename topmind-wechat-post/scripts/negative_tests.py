@@ -55,6 +55,38 @@ def main() -> None:
         r = run("sync-status.py", ["--set", "定稿", str(td / "nope-pkg")])
         check("sync-status 缺失包干净报错", r.returncode != 0 and "Traceback" not in r.stderr, r.stderr[:100])
 
+        # 6. md2wechat 行内图片走图片管线（复制/embed/清单/计数）
+        png = ("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk"
+               "+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==")
+        import base64 as _b64
+        (td / "a.png").write_bytes(_b64.b64decode(png))
+        (td / "inline.md").write_text(
+            "# t\n\n段落 ![行内图](a.png) 后续文字。\n", encoding="utf-8")
+        r = run("md2wechat.py", ["--input", str(td / "inline.md"),
+                                 "--out-dir", str(td / "o6"), "--slug", "t6",
+                                 "--embed-images"])
+        html = (td / "o6" / "t6-公众号版.html").read_text(encoding="utf-8")
+        manifest = (td / "o6" / "图片上传清单.md").read_text(encoding="utf-8")
+        check("md2wechat 行内图片被内嵌", r.returncode == 0 and
+              "data:image/png;base64," in html, r.stdout[:200])
+        check("md2wechat 行内图片进清单", "a.png" in manifest)
+
+        # 7. md2wechat 大写数字序号同样被剥离
+        (td / "num.md").write_text(
+            "# t\n\n## 第叁章 大写序号\n\n正文。\n", encoding="utf-8")
+        r = run("md2wechat.py", ["--input", str(td / "num.md"),
+                                 "--out-dir", str(td / "o7"), "--slug", "t7"])
+        html = (td / "o7" / "t7-公众号版.html").read_text(encoding="utf-8")
+        check("md2wechat 大写数字序号剥离",
+              "第叁章" not in html and ">01</span>" in html)
+
+        # 8. md2wechat 分隔线不触发自家合规 WARN（inline-block）
+        (td / "hr.md").write_text("# t\n\n---\n\n正文。\n", encoding="utf-8")
+        r = run("md2wechat.py", ["--input", str(td / "hr.md"),
+                                 "--out-dir", str(td / "o8"), "--slug", "t8"])
+        check("md2wechat 分隔线无 inline-block 告警",
+              "inline-block" not in r.stdout, r.stdout[:200])
+
     if fails:
         print(f"\n[negative_tests] {len(fails)} 项失败")
         sys.exit(1)

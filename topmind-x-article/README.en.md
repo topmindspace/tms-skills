@@ -23,9 +23,46 @@ python3 scripts/md2x.py <draft>.md --out <package>/X发布稿.txt
 
 ## Conversion rules
 
-The X Article editor has weak, unstable markdown support, so `md2x.py` converts to plain text per `references/x-format.md`: headings → plain text lines, horizontal rules (`---` / `***` / `___`) → blank lines, bold/italic markers removed (including `***bold-italic***`), links → `text（url）`, images → `[图N]` (image list appended at the end), tables → "item: value" lists.
+The X Article editor has weak, unstable markdown support, so `md2x.py` converts to plain text per `references/x-format.md`: headings (including `===` underline style) → plain text lines, horizontal rules (`---` / `***` / `___`, including spaced forms like `* * *`) → blank lines, bold/italic/bold-italic/strikethrough/inline-code markers removed, links → `text（url）` (both inline and reference style; parentheses allowed inside URLs), images → `[图N]` (image list appended at the end), tables → "item: value" lists, blockquotes unquoted, `\` escapes restored.
 
 Read the result through once by hand after converting.
+
+## Minimal example
+
+Input (10 lines of markdown):
+
+```markdown
+# Manus 2.0 发布了
+
+**从零重建**的 Agent，新增了 Cue 个人助手。
+
+![发布会现场](cover.png)
+
+| Token 消耗 | -23.2% |
+| 耗时 | -28.2% |
+
+详见[官方博客](https://manus.im/blog)。
+```
+
+`python3 scripts/md2x.py draft.md --out X发布稿.txt` produces:
+
+```
+Manus 2.0 发布了
+
+从零重建的 Agent，新增了 Cue 个人助手。
+
+[图1]
+
+Token 消耗：-23.2%
+耗时：-28.2%
+
+详见官方博客（https://manus.im/blog）。
+
+—— 配图清单 ——
+[图1] 发布会现场
+```
+
+Copy the whole `X发布稿.txt` → paste into the X Article editor → upload images in `[图N]` order → publish.
 
 ## Publishing
 

@@ -158,7 +158,7 @@ python3 scripts/scan_ai_flavor.py <包>/公众号稿.md   # ≥85（人话）
 ## 排版要点（写稿时）
 
 - 开头 150 字内钩子；单段 ≤110 字；列表项 ≤70 字  
-- 二级标题不手写序号（排版层自动生成）；容器：`::: stat|pull|note|tip|warn|danger|dialogue`  
+- 二级标题不手写序号（排版层自动生成；中文大写数字如"叁"同样剥离）；容器：`::: stat|pull|note|tip|warn|danger|dialogue`  
 - **`::: stat` 内必须是 `数值 | 说明` 管道行**，否则静默丢弃  
 - 评测稿：**图承担数据，正文只解读**；健康密度 **300–450 字/图**  
 - 个股用词红线：禁用 买入/推荐/目标价…；文末投资声明  
@@ -176,19 +176,21 @@ python3 scripts/md2wechat.py \
 
 1. **永远 `--embed-images`**，否则粘贴丢图（相对路径被序列化成 file://）  
 2. **图片 basename 铁律**：正文引用名 = `images/` 目标名；禁止两套同名图共处  
-3. 合规自检出现 `✗` 改生成器，不要手改 HTML  
+3. 行内图片（段落里的 `![alt](x.png)`）同样走图片管线：复制到 `images/`、进上传清单、可被内嵌  
+4. 外链默认转文末脚注上标；`--link-mode inline` 改括号注（`文字（url）`）  
+5. 合规自检出现 `✗` 改生成器，不要手改 HTML  
 
 坑清单：[`references/known-pits.md`](references/known-pits.md)。
 
 ## 主题
 
-| 文件 | 风格 | 适用 |
+| 文件 | 风格 | 适用（= 各主题 genre 声明） |
 |------|------|------|
-| `assets/themes/minimal-ink.json`（默认） | 黑白灰 + 砖红 | 深度研析 / 观点 / 随笔 |
-| `assets/themes/tech-blue.json` | 科技蓝 | AI/技术 |
-| `assets/themes/newsprint.json` | 报纸衬线 | 人文评论 |
-| `assets/themes/graphite.json` | 石墨克制 | 严肃报告 |
-| `assets/themes/amber-review.json` | 琥珀评测 | 产品评测 |
+| `assets/themes/minimal-ink.json`（默认） | 黑白灰 + 砖红 | 观点 / 深度分析 / 随笔 |
+| `assets/themes/tech-blue.json` | 科技蓝 | 教程 / 实操 / 工具测评 |
+| `assets/themes/newsprint.json` | 报纸衬线 | 复盘 / 特稿 / 行业观察 / 长文 |
+| `assets/themes/graphite.json` | 石墨克制 | 技术说明 / 专业评论 / 方法 |
+| `assets/themes/amber-review.json` | 琥珀评测 | 评测 / 模型评测 / 数据对比 |
 
 `md2wechat.py --list-themes` 看全部；`--theme genre:评测` 可按题材自动选。  
 渲染规格见 [`references/element-spec.md`](references/element-spec.md) · 主题映射见 [`references/theme-map.md`](references/theme-map.md)。

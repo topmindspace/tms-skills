@@ -1,7 +1,7 @@
 ---
 name: topmind-x-article
 version: 0.1.0
-description: "X 长文（Article）一键发布：Markdown 原稿 → 可直接粘贴的 X发布稿.txt + 封面图 + 发布清单。沉淀自实战。Use when X 长文、发 X 文章、X article、长文发 X。Do NOT use for 短推文（→ topmind-x）、公众号。"
+description: "X 长文（Article）一键发布：Markdown 原稿 → 可直接粘贴的 X发布稿.txt + 封面图 + 发布清单。沉淀自实战。Use when X 长文、发 X 文章、X article、长文发 X。Do NOT use for 短推文（→ topmind-x）、公众号（→ topmind-wechat-post）。"
 action_category: write
 triggers:
   - X 长文

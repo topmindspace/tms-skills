@@ -371,14 +371,20 @@ def render_inline(raw):
     strong = 'font-weight:600;color:%s;' % theme["text_strong"]
     em = 'font-style:normal;color:%s;' % theme["text_muted"]
 
-    # images
+    # images（行内图与独立成行图共用同一正则语义）
     def img_repl(m):
         alt, src = m.group(1), m.group(2)
+        # 行内图片同样走图片管线：本地文件解析 → 复制到 images/ → 登记清单，
+        # 否则 --embed-images 找不到文件、清单漏项、计数为 0（历史 bug：
+        # 段落里的 ![alt](x.png) 被原样保留相对路径，粘贴到公众号后整图消失）。
+        resolver = CTX.get("img_resolve")
+        if resolver and not re.match(r"^(https?:|data:|//)", src):
+            src = resolver(html.unescape(src))
         caption = ' alt="%s"' % alt if alt else ""
         return ('<img src="%s"%s style="max-width:100%%;height:auto;'
                 'border-radius:3px;vertical-align:middle;">') % (src, caption)
 
-    text = re.sub(r"!\[([^\]]*)\]\(([^)\s]+)\)", img_repl, text)
+    text = re.sub(r"!\[([^\]]*)\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)", img_repl, text)
 
     # links
     def link_repl(m):
@@ -454,12 +460,12 @@ def render_inline(raw):
 HEADING_RE = re.compile(r"^(#{1,6})\s+(.*)$")
 FENCE_RE = re.compile(r"^```(\w*)\s*$")
 HR_RE = re.compile(r"^(-{3,}|\*{3,}|_{3,})\s*$")
-IMG_ONLY_RE = re.compile(r"^!\[([^\]]*)\]\(([^)\s]+)\)\s*$")
+IMG_ONLY_RE = re.compile(r"^!\[([^\]]*)\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)\s*$")
 CAPTION_RE = re.compile(r"^\*(.+)\*\s*$")
 TABLE_SEP_RE = re.compile(r"^\|?[\s:|-]+\|[\s:|-]*$")
 CONTAINER_RE = re.compile(r"^:::+\s*(\w+)?\s*(.*)$")
 
-CN_NUM = "一二三四五六七八九十"
+CN_NUM = "一二三四五六七八九十壹贰叁肆伍陆柒捌玖拾"
 
 # 标题里手写的中文/阿拉伯序号。序号应由排版层生成（可换样式、可加引用），
 # 写进标题文本后就变成了不可编程的字符串。这里统一剥离后重新编号。
@@ -741,10 +747,13 @@ def render_table_cards(head, body, theme):
 
 
 def render_hr(theme):
-    # 宽度用百分比：公众号端 px 固定值在不同屏宽下表现不一致
-    return ('<p style="text-align:center;margin:32px 0;">'
-            '<span style="display:inline-block;width:12%%;height:2px;'
-            'background:%s;"></span></p>' % theme["accent"])
+    # 宽度用百分比：公众号端 px 固定值在不同屏宽下表现不一致。
+    # 不用 display:inline-block：audit_inline 会把它判为 WARN，而这是生成器
+    # 自己的输出、用户无从修复——自检永远带一条洗不掉的 WARN 等于没有自检。
+    # 块级 section + margin:0 auto 居中，视觉与原来完全一致。
+    return ('<section style="margin:32px 0;">'
+            '<section style="width:12%%;height:2px;background:%s;'
+            'margin:0 auto;"></section></section>' % theme["accent"])
 
 
 def render_figure(src, caption, theme, alt=""):
@@ -1105,6 +1114,11 @@ def convert(md_text, md_path, out_dir, theme, link_mode="footnote",
     CTX["footnotes"] = ctx["footnotes"]
     CTX["use_pangu"] = use_pangu
     CTX["hl_scheme"] = build_code_scheme(theme)
+    # 行内图片解析器：render_inline 里的 ![alt](src) 通过它走 resolve_image，
+    # 与独立成行的图片共享「复制到 images/ + 登记清单」管线。
+    abs_md = os.path.abspath(md_path)
+    CTX["img_resolve"] = lambda s: resolve_image(
+        s, abs_md, out_dir, ctx["assets"], ctx.get("asset_root"))
 
     body = convert_blocks(lines, md_path, out_dir, theme, ctx)
 

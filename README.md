@@ -118,7 +118,7 @@ npx @topmindspace/tms-skills install topmind-cover
 | [`topmind-x-article`](./topmind-x-article/) | **0.1.0** | X 长文一键发布：Markdown 原稿转可直接粘贴的纯文本 + 封面图 + 发布清单 |
 | [`topmind-cover`](./topmind-cover/) | **0.1.0** | 文章封面配图（X / 公众号共用）：震撼醒目主题突出；8 风格封面风格库 + 17 张双尺寸示例图，尺寸规范 + 裁剪落盘 |
 
-安装器 [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) 为 **0.3.1**（整仓同 tag 发版）。
+安装器 [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) 为 **0.3.2**（整仓同 tag 发版）。
 
 ### topmind-cover · 封面风格库
 
@@ -134,7 +134,7 @@ npx @topmindspace/tms-skills install topmind-cover
 npx @topmindspace/tms-skills list
 npx @topmindspace/tms-skills install top-ppt-html
 npx @topmindspace/tms-skills install top-ppt-html --to ./.claude/skills
-npx @topmindspace/tms-skills@0.3.1 install top-ppt-html   # 钉版本
+npx @topmindspace/tms-skills@0.3.2 install top-ppt-html   # 钉版本
 ```
 
 ```bash

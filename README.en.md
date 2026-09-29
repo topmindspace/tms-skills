@@ -120,7 +120,7 @@ See [top-ppt-html/README.md](./top-ppt-html/README.md#html-header-toolbar) and [
 | [`topmind-x-article`](./topmind-x-article/) | **0.1.0** | X long-form one-click publish: Markdown → paste-ready plain text + cover + checklist |
 | [`topmind-cover`](./topmind-cover/) | **0.1.0** | Cover art for X / WeChat: striking, theme-focused; 8-style cover style library + 17 dual-size example images, size specs + crop tooling |
 
-Installer [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) is **0.3.1** (whole-repo same-tag releases).
+Installer [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) is **0.3.2** (whole-repo same-tag releases).
 
 ### topmind-cover · Cover style library
 
@@ -136,7 +136,7 @@ Style index and the 8-grid overview are in the topmind-cover skill intro above.
 npx @topmindspace/tms-skills list
 npx @topmindspace/tms-skills install top-ppt-html
 npx @topmindspace/tms-skills install top-ppt-html --to ./.claude/skills
-npx @topmindspace/tms-skills@0.3.1 install top-ppt-html   # pin
+npx @topmindspace/tms-skills@0.3.2 install top-ppt-html   # pin
 ```
 
 ```bash

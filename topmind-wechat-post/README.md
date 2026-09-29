@@ -33,6 +33,49 @@ python3 scripts/sync-status.py --set 定稿 <包> --apply
 
 脚本纯 Python 标准库，零依赖。
 
+## 最小示例
+
+输入 `demo.md`（9 行）：
+
+    # 标题
+
+    开头钩子段落。
+
+    ## 第一章
+
+    正文文字，**重点**加粗。
+
+    ![示意图](images/a.png)
+
+```bash
+python3 scripts/md2wechat.py --input demo.md --out-dir demo --slug demo --embed-images
+```
+
+输出 `demo/demo-公众号版.html`（浏览器打开 → 点「复制正文」→ 粘贴到公众号后台）：
+
+```html
+<!-- 二级标题自动编号；"总结"类末章编号为 ∞ -->
+<h2 ...><span ...>01</span>第一章</h2>
+<!-- 图片 base64 内嵌，粘贴即带图 -->
+<img src="data:image/png;base64,iVBORw0KGgo..." ...>
+```
+
+附带 `demo/图片上传清单.md`：图片 / mermaid 图表 / 参考链接的上传与核对清单。
+
+## md2wechat 参数
+
+| 参数 | 说明 |
+|------|------|
+| `--input` / `--out-dir` / `--slug` | 必填：输入 md、输出目录、文件名标识 |
+| `--embed-images` | 图片 base64 内嵌（必加，否则粘贴丢图） |
+| `--theme` | 主题标识 / 中文名 / JSON 路径，或 `genre:题材` 按题材自动选；`--list-themes` 查看全部 |
+| `--link-mode` | `footnote`（默认，外链转文末脚注上标）/ `inline`（括号注）/ `note` |
+| `--asset-root` | 素材根目录，用于解析稿中 `../assets/` 形式的图片路径 |
+| `--no-toc` | 不自动插入前言导读 |
+| `--signature` / `--author` / `--author-bio` | 尾部签名区：`auto`（默认，有签名则不重复）/ `on` / `off`，署名与简介 |
+| `--no-pangu` | 关闭中英文自动加空格 |
+| `--render-mermaid` | 有 mmdc 时把 mermaid 渲染成 PNG |
+
 ## 三条路径
 
 - **forward**：底稿 → 公众号（审校改写）

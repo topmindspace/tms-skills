@@ -33,6 +33,49 @@ python3 scripts/sync-status.py --set 定稿 <package> --apply
 
 Scripts use Python stdlib only — zero dependencies.
 
+## Minimal example
+
+Input `demo.md` (9 lines):
+
+    # Title
+
+    Opening hook paragraph.
+
+    ## Chapter One
+
+    Body text with **emphasis**.
+
+    ![diagram](images/a.png)
+
+```bash
+python3 scripts/md2wechat.py --input demo.md --out-dir demo --slug demo --embed-images
+```
+
+Output `demo/demo-公众号版.html` (open in a browser → click "复制正文" → paste into the WeChat editor):
+
+```html
+<!-- h2 auto-numbered; closing chapters like "总结" get ∞ -->
+<h2 ...><span ...>01</span>Chapter One</h2>
+<!-- images inlined as base64, pasted along with the text -->
+<img src="data:image/png;base64,iVBORw0KGgo..." ...>
+```
+
+Also generated: `demo/图片上传清单.md` — the upload checklist for images, mermaid diagrams, and reference links.
+
+## md2wechat parameters
+
+| Flag | Description |
+|------|-------------|
+| `--input` / `--out-dir` / `--slug` | Required: input md, output dir, filename slug |
+| `--embed-images` | Inline images as base64 (mandatory, or pasted images go missing) |
+| `--theme` | Theme id / Chinese name / JSON path, or `genre:<topic>` for auto-pick; `--list-themes` shows all |
+| `--link-mode` | `footnote` (default: links → end-of-article footnotes) / `inline` (parenthesized) / `note` |
+| `--asset-root` | Asset root dir, resolves `../assets/`-style image paths in the draft |
+| `--no-toc` | Skip the auto-inserted "本文看点" reading guide |
+| `--signature` / `--author` / `--author-bio` | Closing signature: `auto` (default, skipped if the draft has one) / `on` / `off`, name and bio |
+| `--no-pangu` | Disable automatic CJK/Latin spacing |
+| `--render-mermaid` | Render mermaid to PNG when mmdc is available |
+
 ## Three paths
 
 - **forward**: draft → WeChat article (review & rewrite)
