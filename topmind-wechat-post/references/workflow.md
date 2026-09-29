@@ -86,9 +86,9 @@ python3 scripts/md2wechat.py --input <包>/公众号稿.md --out-dir <包> \
      --asset-names "00-封面.jpg=01-cover.jpg,…"   # 仓库约定 ASCII 图名
    ```
 
-   仓库图路径约定：`notes/<slug>.md` 引用 `../assets/images/<slug>/NN-name.png`。  
-   脚本只降级转换 + 写 notes + 搬图；**不自动改** README 索引 / `docs/公众号映射.md` / frontmatter（防索引漂移）。手工完成后再把 `target_file` 改实际路径。  
-3. 提醒：外链只能进「阅读原文」；图已 base64 内嵌，占位符按清单补传  
+   仓库图路径约定：`notes/<slug>.md` 引用 `../assets/images/<slug>/NN-name.png`。
+   脚本只降级转换 + 写 notes + 搬图；**不自动改** README 索引 / `docs/公众号映射.md` / frontmatter（防索引漂移）。手工完成后再把 `target_file` 改实际路径。
+3. 提醒：外链只能进「阅读原文」；图已 base64 内嵌，占位符按清单补传
 4. 需要进交付层时：`save-output` 拷贝终稿到 `88-交付/`（`YYYY-MM-DD-描述.ext`）
 
 ## Desktop

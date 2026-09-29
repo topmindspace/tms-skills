@@ -319,7 +319,7 @@ def main() -> int:
     else:
         print('  [SKIP] layout-qa 负例（scaffold 未产出 data-skel）')
 
-        ok = _pptx_notes_case() and ok
+    ok = _pptx_notes_case() and ok
     ok = _chart_data_case() and ok
     ok = _title_pattern_case() and ok
     ok = _font_scale_case() and ok

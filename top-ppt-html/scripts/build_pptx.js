@@ -58,7 +58,14 @@
  */
 
 /* eslint-disable */
-const pptxgen = require('pptxgenjs');
+let pptxgen;
+try {
+  pptxgen = require('pptxgenjs');
+} catch (e) {
+  console.error('[build_pptx] FAIL: 缺少依赖 pptxgenjs（' + (e && e.message) +
+    '）。请在技能目录执行 npm install，或设置 NODE_PATH 指向其 node_modules。');
+  process.exit(1);
+}
 const fs = require('fs');
 const path = require('path');
 
@@ -99,7 +106,18 @@ const path = require('path');
 })();
 
 /* ══════════ 版式常量单源（scripts/layout-constants.json · 两通道共用，禁止在此手写常量） ══════════ */
-const LC = JSON.parse(fs.readFileSync(path.join(__dirname, 'layout-constants.json'), 'utf-8'));
+/* 单源损坏（缺失/非 JSON）必须干净 FAIL，不得裸 SyntaxError 堆栈 */
+let LC;
+try {
+  LC = JSON.parse(fs.readFileSync(path.join(__dirname, 'layout-constants.json'), 'utf-8'));
+} catch (e) {
+  console.error('[build_pptx] FAIL: 版式常量 layout-constants.json 读取失败（' + ((e && e.message) || e) + '）。请确认技能安装完整。');
+  process.exit(1);
+}
+if (!LC || typeof LC !== 'object' || !LC.page || !LC.styles) {
+  console.error('[build_pptx] FAIL: layout-constants.json 缺关键顶层键（page/styles），疑似损坏。');
+  process.exit(1);
+}
 const STYLE_PRESETS = LC.styles;                      // 9 套风格 token（light）
 const STYLE_PRESETS_DARK = LC.stylesDark || {};       // 9 套风格 token（dark）
 const STYLE_DATA_COLORS = LC.styleDataColors || {};            // 9 套风格各自的编码色板（light）
@@ -166,9 +184,14 @@ function addIcon(s, name, x, y, size, colorHex) {
   return false;
 }
 
-const modelArg = (process.argv.find(a => a.startsWith('--model=')) || '').split('=')[1];
-let styleArg = (process.argv.find(a => a.startsWith('--style=')) || '').split('=')[1];
-let themeArg = (process.argv.find(a => a.startsWith('--theme=')) || '').split('=')[1];
+/* 取 --name=value 参数值（路径里含 '=' 时 split('=')[1] 会截断，用 slice 精确取） */
+const _argVal = (name) => {
+  const a = process.argv.find(x => x.startsWith(name + '='));
+  return a ? a.slice(name.length + 1) : undefined;
+};
+const modelArg = _argVal('--model');
+let styleArg = _argVal('--style');
+let themeArg = _argVal('--theme');
 let STYLE;   // 在内容模型加载后确定（模型可带默认 style）
 let THEME = 'light';   // 亮/暗主题（--theme= 覆盖 > 模型 theme > 默认 light）
 let MODEL_DIR = null;  // 模型文件所在目录（素材图片相对路径以此为锚）
@@ -339,6 +362,10 @@ if (modelArg) {
   MODEL_DIR = path.dirname(path.resolve(modelArg));   // 素材图片相对路径锚点
   if (CONTENT.style && !styleArg) styleArg = CONTENT.style;   // 模型里的风格作为默认
 } else {
+  /* 未传 --model：按内嵌示例生成演示 PPTX。必须出声——静默产出会让人误以为是真实报告
+     （读模型失败时本脚本选择硬中断，此处同理不得静默）。 */
+  console.warn('[build_pptx] 警告：未传 --model=<模型.json>，将按内嵌示例内容生成演示 PPTX（非真实报告内容）。');
+  console.warn('  真实交付请先跑 python scripts/extract_model.py <报告.html>，再用 --model=<报告.model.json> 重跑。');
 CONTENT = {
   title: '让想法被看见',
   subtitle: 'TopPPT HTML 报告生成示例 · 16:9 可编辑 PPTX',
@@ -394,6 +421,16 @@ CONTENT = {
 
 THEME = (themeArg === 'dark' || themeArg === 'light') ? themeArg
   : (CONTENT.theme === 'dark' ? 'dark' : 'light');
+/* 模型形状早校验：缺 sections/closing 时后面收尾页会以 TypeError 裸崩（堆栈不可读）。
+   这里给干净 FAIL（schema 顶层必填：title / sections:array / closing.title / closing.points:array）。 */
+if (!Array.isArray(CONTENT.sections) || !CONTENT.sections.length) {
+  console.error('[build_pptx] FAIL: 模型缺少 sections 数组（' + (modelArg || '内嵌示例') + '）：无法生成章节页。');
+  process.exit(1);
+}
+if (!CONTENT.closing || typeof CONTENT.closing !== 'object' || Array.isArray(CONTENT.closing)) {
+  console.error('[build_pptx] FAIL: 模型缺少 closing 对象（收尾页必填：closing.title / closing.points）。');
+  process.exit(1);
+}
 STYLE = (THEME === 'dark' ? (STYLE_PRESETS_DARK[styleArg] || STYLE_PRESETS[styleArg])
                           : STYLE_PRESETS[styleArg]) || STYLE_PRESETS['business-blue'];
 MODE_NAME = CONTENT.mode || 'presentation';
@@ -466,6 +503,38 @@ function assertNoOverlap(tag, a, b) {
 /* 双形态载荷判定：[[t,d]…] 数组 vs [{t,d,accent}…] 记录。
    typeof [] === 'object'，绝不能用 typeof 区分——否则数组形态的 t/d 被读成 undefined 静默丢字。 */
 function isRec(v) { return !!v && typeof v === 'object' && !Array.isArray(v); }
+/* 条目归一化：与 HTML 侧 render_from_model 同口径（数组 | 字典 | 纯字符串）。
+   PPTX 分支此前多处只认数组——字典条目会落成 "undefined" 文本，字符串会被按字符切片。
+   pointKV: [k,v] | {k|t, v|d} | str（对齐 pts_list）
+   metricKV: [v,k] | {v|value, k}（对齐 metrics_row）
+   bulletKV: [k,a,t] | {k,a,t}（对齐 r_bullet；缺省保持 undefined 以便调用方判空）
+   phaseKV: [label,name,desc,state] | {label,name,d,s}（对齐 r_timeline）
+   paraKV: [title,text] | str（对齐 r_twocol；str 为无加粗标题的正文段） */
+function pointKV(p) {
+  if (Array.isArray(p)) return [String(p[0] == null ? '' : p[0]), String(p[1] == null ? '' : p[1])];
+  if (isRec(p)) return [String(p.k || p.t || ''), String(p.v || p.d || '')];
+  return ['', String(p == null ? '' : p)];
+}
+function metricKV(m) {
+  if (Array.isArray(m)) return [String(m[0] == null ? '' : m[0]), String(m[1] == null ? '' : m[1])];
+  if (isRec(m)) return [String(m.v || m.value || ''), String(m.k || '')];
+  return [String(m == null ? '' : m), ''];
+}
+function bulletKV(it) {
+  if (Array.isArray(it)) return [it[0], it[1], it[2]];
+  if (isRec(it)) return [it.k || '', it.a, it.t];
+  return [String(it == null ? '' : it), undefined, undefined];
+}
+function phaseKV(ph) {
+  if (Array.isArray(ph)) return [ph[0] || '', ph[1] || '', ph[2] || '', ph[3] || ''];
+  if (isRec(ph)) return [ph.label || '', ph.name || '', ph.d || '', ph.s || ''];
+  return [String(ph == null ? '' : ph), '', '', ''];
+}
+function paraKV(p) {
+  if (Array.isArray(p)) return [p[0] || '', p[1] || ''];
+  if (isRec(p)) return [p.title || '', p.text || p.d || ''];
+  return ['', String(p == null ? '' : p)];
+}
 function soWhatBar(s, text) {
   const R = REGIONS.regionOf('exhibit', 'annotation') ||
     { x: MX, y: PT.exhibit.soWhatY, w: CW, h: 0.62 };
@@ -721,13 +790,22 @@ function chartBottom(hasSoWhat, hasFootnote) {
  * chart.series（可选）：[{name, values}…] 多系列（dualline / stack 用） */
 function chartSeries(c) {
   const labels = (c.labels || []).map(String);
+  /* 非数值警告：Number('x') → NaN 会导致图表数据为空；提醒用户检查模型（不中断构建） */
+  const warnBad = (vals, where) => {
+    const bad = (vals || []).filter(v => typeof v !== 'number' || !isFinite(v));
+    if (bad.length) console.warn(`[build_pptx] 警告：${where} 含 ${bad.length} 个非数值（${JSON.stringify(bad.slice(0, 3))}），图表该系列数据将为空`);
+  };
   if (Array.isArray(c.series) && c.series.length) {
-    return c.series.map((se, i) => ({
-      name: se.name || ('系列' + (i + 1)),
-      labels: labels,
-      values: (se.values || []).map(Number),
-    }));
+    return c.series.map((se, i) => {
+      warnBad(se.values, `series[${i}]${se.name ? '(' + se.name + ')' : ''}`);
+      return {
+        name: se.name || ('系列' + (i + 1)),
+        labels: labels,
+        values: (se.values || []).map(Number),
+      };
+    });
   }
+  warnBad(c.values, 'chart.values');
   return [{ name: '数值', labels: labels, values: (c.values || []).map(Number) }];
 }
 /* ══ 图表登记（单源 scripts/layout-constants.json · charts.registry）══
@@ -1834,7 +1912,7 @@ CONTENT.sections.forEach((sec) => {
     const M = PT.metrics;
     const reg = REGIONS.regionOf('metrics', 'primary') ||
       { x: MX, y: M.bandY, w: CW, h: M.cardH };
-    const ms = sec.metrics || [];
+    const ms = (sec.metrics || []).map(metricKV);
     const n = Math.max(1, ms.length);
     const g = cols(reg.w, n, M.gap);
     const mw = Math.min(M.maxW, g.w);
@@ -1877,7 +1955,7 @@ CONTENT.sections.forEach((sec) => {
     const kCap = Math.max(1, Math.floor(kAvail / K.metricRowH));
     const kRows = Math.min(kmets.length, kCap);
     const kRowH = fitRowH(kAvail, kRows, K.metricRowH, 0.42);
-    kmets.slice(0, kRows).forEach((m, i) => {
+    kmets.slice(0, kRows).map(metricKV).forEach((m, i) => {
       const ky = mreg.y + i * kRowH;
       s.addText(m[0], { x: mreg.x, y: ky, w: mreg.w, h: Math.min(0.55, kRowH * 0.62),
         fontFace: STYLE.fontDisplay, fontSize: sz(22), bold: true, color: STYLE.accent });
@@ -1891,9 +1969,7 @@ CONTENT.sections.forEach((sec) => {
     const kpY0 = mreg.y + kRows * kRowH + 0.12;
     const kpCap = Math.max(0, Math.floor((kpiBottom - kpY0) / kpRowH));
     kpts.slice(0, kpCap).forEach((p, i) => {
-      const kk = Array.isArray(p) ? String(p[0] || '') : String((p && p.t) || '');
-      const vv = Array.isArray(p) ? String(p[1] || '')
-        : (p && typeof p === 'object' ? String(p.d || '') : String(p == null ? '' : p));
+      const kv = pointKV(p), kk = kv[0], vv = kv[1];
       const ky = kpY0 + i * kpRowH;
       s.addShape('rect', { x: mreg.x, y: ky + kpRowH / 2 - 0.06, w: 0.12, h: 0.12,
         fill: { color: STYLE.accent }, line: { type: 'none' } });
@@ -1918,7 +1994,7 @@ CONTENT.sections.forEach((sec) => {
       fill: { color: STYLE.soft }, line: { type: 'none' } });
     [{ x: lreg.x, d: sec.left || {} }, { x: rx2, d: sec.right || {} }].forEach((sd) => {
       const isRight = sd.x === rx2;
-      const pts = sd.d.points || [];
+      const pts = (sd.d.points || []).map(pointKV);
       /* 行高按面板可用高度自适应 */
       const avail = cph - C2.titleH - 0.34;
       const rowH = fitRowH(avail, pts.length, C2.rowH, 0.34);
@@ -2103,7 +2179,7 @@ CONTENT.sections.forEach((sec) => {
     const B = PT.bullet;
     const breg = REGIONS.regionOf('bullet', 'primary', { bottom: bodyBottom }) ||
       { x: MX, y: B.y, w: CW, h: bodyBottom - B.y };
-    const items = sec.items || [];
+    const items = (sec.items || []).map(bulletKV);
     const n = Math.max(1, items.length);
     const availH = breg.h;
     const rowH = fitRowH(availH, n, B.rowH, 0.26);
@@ -2214,7 +2290,7 @@ CONTENT.sections.forEach((sec) => {
     const T = PT.timeline;
     const treg = REGIONS.regionOf('timeline', 'primary') ||
       { x: MX, y: T.labelY, w: CW, h: T.descY + T.descH - T.labelY };
-    const ps = sec.phases || [];
+    const ps = (sec.phases || []).map(phaseKV);
     const n = Math.max(1, ps.length);
     const stepW = (treg.w - 1.0) / n;
     s.addShape('line', { x: treg.x + 0.2, y: T.axisY, w: treg.w - 0.4, h: 0.02, line: { color: STYLE.line, width: 1.5 } });
@@ -2245,8 +2321,7 @@ CONTENT.sections.forEach((sec) => {
       const sx = reg.x + cw + 0.28;
       const rowH = Math.min(0.72, (reg.h - 0.1) / Math.max(1, pts.length));
       pts.slice(0, 6).forEach((p, i) => {
-        const k = Array.isArray(p) ? String(p[0] || '') : String((p && p.t) || '');
-        const v = Array.isArray(p) ? String(p[1] || '') : String((p && p.d) || '');
+        const kv = pointKV(p), k = kv[0], v = kv[1];
         const y = reg.y + i * rowH;
         s.addShape('rect', { x: sx, y: y + 0.12, w: 0.08, h: 0.08,
           fill: { color: STYLE.accent }, line: { type: 'none' } });
@@ -2262,7 +2337,7 @@ CONTENT.sections.forEach((sec) => {
       chartBlock(s, c, cx, reg.y, cw, Math.max(1.5, reg.h), dcols);
     }
   } else if (type === 'twocol' || type === 'threecol') {
-    const ps = sec.paragraphs || [];
+    const ps = (sec.paragraphs || []).map(paraKV);
     const nCol = (type === 'threecol') ? 3 : 2;
     const gap = (type === 'threecol') ? PT.research.col3Gap : PT.twocol.colGap;
     /* R3：多栏均分必须用版心全宽。regionOf('twocol','primary') 返回的是「单栏宽」，
@@ -2287,7 +2362,10 @@ CONTENT.sections.forEach((sec) => {
         valign: 'top', lineSpacing: sz(fz * 1.5), paraSpaceBefore: sz(7) });
     });
   } else if (type === 'halftable') {
-    const yH = sec.lead ? PT.common.bodyYWithLead : PT.research.denseTableY;
+    let yH = sec.lead ? PT.common.bodyYWithLead : PT.research.denseTableY;
+    /* 徽标占位：exhibitNo 徽标占 CONTENT_TOP-0.06 起 0.3 高；bodyY 已含 +0.42 让位，
+       表格/图顶取 max 不得压入徽标（否则 Exhibit 编号与表头叠印） */
+    if (exBadge) yH = Math.max(yH, bodyY);
     const lwH = CW * PT.research.halfTableW;
     if (sec.table && sec.table.head) {
       addTable(s, sec.table, MX, yH, lwH, bodyBottom - yH,
@@ -2368,7 +2446,12 @@ CONTENT.sections.forEach((sec) => {
     const cdC = PT.cards;
     const creg = REGIONS.regionOf('cards', 'primary', { bottom: bodyBottom }) ||
       { x: MX, y: cdC.startY, w: CW, h: bodyBottom - cdC.startY };
-    const cds = sec.cards || [];
+    const cds = (sec.cards || []).map(cd =>
+      /* 与 r_cards 同口径：{title,points,icon} 字典 | [标题, 描述] 数组 | 纯字符串标题 */
+      isRec(cd) ? cd
+        : (Array.isArray(cd)
+          ? { title: cd[0] || '', points: cd.length > 1 ? [['', cd[1]]] : [] }
+          : { title: String(cd == null ? '' : cd), points: [] }));
     const c = Math.min(sec.columns || 3, cds.length || 1);
     const r = Math.ceil((cds.length || 1) / c);
     const gw = (creg.w - (c - 1) * cdC.gap) / c;
@@ -2381,7 +2464,9 @@ CONTENT.sections.forEach((sec) => {
         return k && v ? ('· ' + k + '　' + v) : ('· ' + (k || v));
       }
       if (pt && typeof pt === 'object') {
-        return '· ' + String(pt.t || '') + (pt.d ? '　' + String(pt.d) : '');
+        const t = String(pt.k || pt.t || '');
+        const d = String(pt.v || pt.d || '');
+        return '· ' + t + (d ? '　' + d : '');
       }
       return '· ' + String(pt == null ? '' : pt);
     };
@@ -2401,7 +2486,7 @@ CONTENT.sections.forEach((sec) => {
       const ico = 0.18;
       const icoName = cd.icon || ICON_LIB.pickIconName(cd.title || '', i);
       addIcon(s, icoName, x + 0.18, y + 0.2, ico, STYLE.accent);
-      s.addText(cd.title, { x: x + 0.18 + ico + 0.1, y: y + 0.14, w: gw - 0.36 - ico - 0.1, h: cdC.titleH, fontFace: STYLE.font,
+      s.addText(cd.title || '', { x: x + 0.18 + ico + 0.1, y: y + 0.14, w: gw - 0.36 - ico - 0.1, h: cdC.titleH, fontFace: STYLE.font,
         fontSize: sz(15), bold: true, color: STYLE.ink, fit: 'shrink' });
       /* points 兼容：[[k,v]…] | [str…] | [{t,d}…]（scaffold v9 契约 {title, points:[[k,v]]}） */
       const ptLines = (cd.points || []).map(cardPtText);
@@ -2423,7 +2508,7 @@ CONTENT.sections.forEach((sec) => {
     const lt = (sec.left && sec.left.type) || 'points';
     /* 要点区渲染（左右两区共用；v8 起 right.type='points' 也可用——修正 v7 只在 schema 声明却未实现的问题） */
     const drawPoints = (el, x, w) => {
-      const pts = (el && el.points) || [];
+      const pts = ((el && el.points) || []).map(pointKV);
       const ly0 = bodyY, availP = bodyBottom - ly0;
       const rowH = fitRowH(availP, pts.length, SP.rowH, 0.3);
       const fzB = fitFont(pts.map(p => (p[0] || '') + (p[1] || '')), w - 0.4, availP, { max: 14, gapFactor: 0.6 });
@@ -2498,9 +2583,12 @@ CONTENT.sections.forEach((sec) => {
       const nw = Math.min(D.nodeMaxW, (availW - (nn - 1) * D.nodeGap) / nn);
       nodes.forEach((nd, ni) => {
         const x = MX + D.layerBarW + 0.2 + ni * (nw + D.nodeGap);
-        const acc = isRec(nd) && nd.accent;
-        const ntt = isRec(nd) ? nd.t : nd;
-        const nds = isRec(nd) ? (nd.d || '') : '';
+        /* 节点三形态：{t,d,accent} 字典 | [标题, 注解] 数组 | 纯字符串
+           （scaffold_report 发射数组形态；不归一化则 addText 收数组直接抛 TypeError） */
+        const _nd = Array.isArray(nd) ? { t: nd[0], d: nd[1] } : nd;
+        const acc = isRec(_nd) && _nd.accent;
+        const ntt = String(isRec(_nd) ? (_nd.t || '') : (_nd == null ? '' : _nd));
+        const nds = String(isRec(_nd) ? (_nd.d || '') : '');
         s.addShape('roundRect', { x, y, w: nw, h: lh, rectRadius: 0.06,
           fill: { color: acc ? STYLE.soft : STYLE.surface }, line: { color: STYLE.line, width: 0.75 } });
         /* 节点内标题/注解：注解底对齐会「浮回」标题上（R1）。改为标题顶对齐 + 注解钳在标题下边；
@@ -2583,7 +2671,7 @@ CONTENT.sections.forEach((sec) => {
   } else {
     /* points（默认）：要点列表 + 可选右侧指标列（文本区与指标列严格分区，不重叠） */
     const P = PT.points;
-    const pts = sec.points || [];
+    const pts = (sec.points || []).map(pointKV);
     const hasMetrics = !!(sec.metrics && sec.metrics.length);
     /* 指标列最多 3 个，列宽按剩余空间收敛，保证文本区不被侵占（原重叠缺陷） */
     const nM = hasMetrics ? Math.min(sec.metrics.length, 3) : 0;
@@ -2608,7 +2696,7 @@ CONTENT.sections.forEach((sec) => {
     if (hasMetrics) {
       const gx = PW - MX - nM * mw;
       const vSize = nM >= 3 ? sz(28) : sz(34);
-      sec.metrics.slice(0, nM).forEach((m, i) => {
+      sec.metrics.slice(0, nM).map(metricKV).forEach((m, i) => {
         const x = gx + i * mw;
         s.addText(m[0], { x, y: P.metricY, w: mw - 0.2, h: P.metricValH, fontFace: STYLE.fontDisplay,
           fontSize: vSize, bold: true, color: STYLE.accent });
@@ -2640,8 +2728,14 @@ CONTENT.sections.forEach((sec) => {
   if (_infoRows && _infoRows.length && infoDataTableMode(sec) === 'notes') {
     _notes.push('数据表（' + type + '）：\n' + _infoRows.map(r => r.join(' | ')).join('\n'));
   }
-  if (sec.steps) _notes.push('步骤：' + sec.steps.map(st => (isRec(st) ? st.t : st[0]) || '').join(' → '));
-  if (sec.items) _notes.push('达成对比：' + sec.items.map(it => it[0] + ' ' + it[1] + (it[2] != null ? '/' + it[2] : '')).join('；'));
+  if (sec.steps) _notes.push('步骤：' + sec.steps.map(st => {
+    const t = isRec(st) ? st.t : (Array.isArray(st) ? st[0] : st);
+    return t || '';
+  }).join(' → '));
+  if (sec.items) _notes.push('达成对比：' + sec.items.map(it => {
+    const b = bulletKV(it);
+    return String(b[0] || '') + (b[1] == null ? '' : ' ' + b[1]) + (b[2] == null ? '' : '/' + b[2]);
+  }).join('；'));
   if (sec.levels) _notes.push('层级：' + sec.levels.map(l => (isRec(l) ? l.t : l[0]) || '').join(' → '));
   if (sec.soWhat) _notes.push('结论：' + sec.soWhat);
   if (sec.layoutPreset) _notes.push('布局骨架：' + sec.layoutPreset);
@@ -2706,4 +2800,8 @@ pptx.writeFile({ fileName: out }).then(() => {
   if (OVERLAP_PREEMIT.length) {
     console.warn('[build_pptx] PREEMIT_OVERLAP 共 ' + OVERLAP_PREEMIT.length + ' 处（发射前几何自检，详见上方 warn）——请先修区域分配再交付。');
   }
+}).catch((e) => {
+  /* 写盘失败（无权限/磁盘满/路径非法）必须干净报错，不得 unhandled rejection 裸堆栈 */
+  console.error('[build_pptx] FAIL: 写入 PPTX 失败 ' + out + '：' + (e && e.message));
+  process.exit(1);
 });

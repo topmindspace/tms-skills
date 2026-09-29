@@ -4,7 +4,7 @@
 
 Turn a Markdown draft into a "copy → paste → publish" X long-form (Article) package.
 
-- Version: **v0.1.0** (same tag as `@topmindspace/tms-skills@0.3.3`)
+- Version: **v0.1.0** (same tag as `@topmindspace/tms-skills@0.3.5`)
 
 ## Install
 
@@ -25,8 +25,7 @@ python3 scripts/md2x.py <draft>.md --out <package>/X发布稿.txt
 
 ## Conversion rules
 
-The X Article editor has weak, unstable markdown support, so `md2x.py` converts to plain text per `references/x-format.md`: headings (including `===` underline style) → plain text lines, horizontal rules (`---` / `***` / `___`, including spaced forms like `* * *`) → blank lines, bold/italic/bold-italic/strikethrough/inline-code markers removed, links → `text（url）` (both inline and reference style; parentheses allowed inside URLs), images → `[图N]` (image list appended at the end), tables → "label：value" lists
-(Chinese colon `：`, values joined by `，`), blockquotes unquoted, `\` escapes restored.
+The X Article editor has weak, unstable markdown support, so `md2x.py` converts to plain text per `references/x-format.md`: headings → plain text lines, horizontal rules → blank lines, emphasis markers removed, links → `text（url）`, images → `[图N]` (image list appended at the end), tables → "label：value" lists, blockquotes unquoted, `\` escapes restored.
 
 Read the result through once by hand after converting.
 

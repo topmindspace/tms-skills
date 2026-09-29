@@ -4,7 +4,7 @@
 
 Full lifecycle for WeChat articles: delivery package, review & rewrite, three quality gates, status sync, WeChat inline typography, and publish checklist.
 
-- Version: **v0.1.0** (same tag as `@topmindspace/tms-skills@0.3.3`)
+- Version: **v0.1.0** (same tag as `@topmindspace/tms-skills@0.3.5`)
 
 ## Install
 
@@ -37,7 +37,7 @@ Scripts use Python stdlib only — zero dependencies.
 
 ## Minimal example
 
-Input `demo.md` (9 lines):
+Input `demo.md`:
 
     # Title
 
@@ -101,7 +101,7 @@ Facts (first-hand sources) / logic (structural consistency) / copy (de-AI-flavor
 The following skills live **outside this repo** (usually provided by the user's local workbuddy environment). Missing ones degrade or disable the corresponding capability; all scripts in this repo still work fully:
 
 - `humanizer-zh`: fidelity boundaries for Chinese de-AI-flavor; without it the "de-AI-flavor only, no typesetting" path is unavailable.
-- `qu-aiwei-zh`: Chinese de-AI-flavor scan targeting; `scripts/scan_ai_flavor.py` shares its origin and can substitute when missing (scan targeting degrades).
+- `qu-aiwei-zh`: Chinese de-AI-flavor scan targeting; `scripts/scan_ai_flavor.py` shares its origin and can substitute when missing.
 
 ## Development
 

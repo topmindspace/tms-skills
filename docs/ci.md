@@ -43,16 +43,13 @@ npm run check && npm run audit && npm run privacy
 
 冒烟失败时 stderr 先打 **错误码 / 页码 / 短消息**，完整 JSON 在 `$TMPDIR/top-ppt-html-smoke/*.validate.json`。
 
-## npm publish 幂等
+## npm publish（显式失败，防假绿）
 
 Release 的 publish 步骤：
 
-1. 无 `NPM_TOKEN` → 跳过（exit 0；GitHub Release 仍成功）
-2. `npm view pkg@version` 已存在 → 跳过（exit 0）
-3. `npm publish` 返回 **E409 / previously staged|published** → 视为成功（exit 0）
-4. 其它错误 → 失败
-
-因此「agent 机器已抢先 publish、CI 再跑」不会把 Release job 打红。
+1. 无 `NPM_TOKEN` → **显式失败**（拒绝发无 npm 包的 Release）
+2. `npm publish` 返回 **E409 / 版本冲突** → **显式失败**（说明打 tag 前没 bump 版本；禁止复用 tag 号）
+3. 其它错误 → 失败
 
 ## 重跑
 

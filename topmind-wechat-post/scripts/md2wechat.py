@@ -217,7 +217,10 @@ def highlight(code, lang, scheme=None):
     if not rules:
         return html.escape(code, quote=False)
     palette = scheme or CTX.get("hl_scheme") or HIGHLIGHT
-    pattern = re.compile("|".join("(?P<%s>%s)" % (name, pat) for name, pat in rules), re.S)
+    pattern = _HL_PATTERN_CACHE.get(key)
+    if pattern is None:
+        pattern = re.compile("|".join("(?P<%s>%s)" % (name, pat) for name, pat in rules), re.S)
+        _HL_PATTERN_CACHE[key] = pattern
     out = []
     pos = 0
     for m in pattern.finditer(code):
@@ -335,6 +338,22 @@ HAN_RE = re.compile("[%s]" % HAN)
 PANGU_A = re.compile(r"([%s])([A-Za-z0-9])" % HAN)
 PANGU_B = re.compile(r"([A-Za-z0-9])([%s])" % HAN)
 
+# render_inline() 的行内模式：预编译在模块级，避免每行重复走 re 缓存查找
+# （666k 行级调用 × 10 个模式时，re.sub 的字符串模式查找是可观开销）。
+INLINE_CODE_RE = re.compile(r"`([^`]+)`")
+INLINE_IMG_RE = re.compile(r"!\[([^\]]*)\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
+INLINE_LINK_RE = re.compile(r"\[([^\]]+)\]\(([^)\s]+)\)")
+INLINE_BADGE_RE = re.compile(r"\[!([^\]]+)\]")
+INLINE_HL_RE = re.compile(r"==([^=]+)==")
+INLINE_UNDER_RE = re.compile(r"\+\+([^+]+)\+\+")
+INLINE_U_RE = re.compile(r"&lt;u&gt;(.+?)&lt;/u&gt;")
+INLINE_MARK_RE = re.compile(r"~~([^~]+)~~")
+INLINE_STRONG_RE = re.compile(r"\*\*([^*]+)\*\*")
+INLINE_EM_RE = re.compile(r"(?<![*\w])\*([^*\n]+)\*(?!\*)")
+
+# highlight() 的语言联合模式缓存：同一语言的多段代码块只编译一次
+_HL_PATTERN_CACHE = {}
+
 
 def pangu(text):
     text = PANGU_A.sub(r"\1 \2", text)
@@ -363,7 +382,7 @@ def render_inline(raw):
         return CODE_TOKEN % (len(spans) - 1)
 
     text = esc(raw)
-    text = re.sub(r"`([^`]+)`", lambda m: stash(m.group(1)), text)
+    text = INLINE_CODE_RE.sub(lambda m: stash(m.group(1)), text)
 
     if use_pangu:
         text = pangu(text)
@@ -384,15 +403,24 @@ def render_inline(raw):
         return ('<img src="%s"%s style="max-width:100%%;height:auto;'
                 'border-radius:3px;vertical-align:middle;">') % (src, caption)
 
-    text = re.sub(r"!\[([^\]]*)\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)", img_repl, text)
+    text = INLINE_IMG_RE.sub(img_repl, text)
 
     # links
     def link_repl(m):
         label, url = m.group(1), m.group(2)
         if link_mode == "footnote" and footnotes is not None:
-            if url not in [f["url"] for f in footnotes]:
+            # url→序号字典：原写法每次链接都扫全表两次（O(n²)），长文链接多时明显变慢
+            fidx = CTX.get("footnote_idx")
+            if fidx is not None and url in fidx:
+                idx = fidx[url]
+            elif fidx is not None:
                 footnotes.append({"url": url, "label": label})
-            idx = [f["url"] for f in footnotes].index(url) + 1
+                idx = len(footnotes)
+                fidx[url] = idx
+            else:  # 外部直接调 render_inline 且未初始化索引时，走原来的线性查找
+                if url not in [f["url"] for f in footnotes]:
+                    footnotes.append({"url": url, "label": label})
+                idx = [f["url"] for f in footnotes].index(url) + 1
             return ('%s<sup style="font-size:11px;color:%s;'
                     'padding-left:1px;">[%d]</sup>'
                     % (label, theme["accent"], idx))
@@ -402,13 +430,12 @@ def render_inline(raw):
         return ('<span style="font-size:13px;color:%s;word-break:break-all;">'
                 '%s（%s）</span>' % (theme["text_light"], label, url))
 
-    text = re.sub(r"\[([^\]]+)\]\(([^)\s]+)\)", link_repl, text)
+    text = INLINE_LINK_RE.sub(link_repl, text)
 
     # badges: [!文本]
     # 不用 display:inline-block：公众号对非常规 display 值支持不稳定，
     # 徽章是纯行内元素，padding 足够撑开视觉。
-    text = re.sub(
-        r"\[!([^\]]+)\]",
+    text = INLINE_BADGE_RE.sub(
         r'<span style="font-size:11px;line-height:1.6;'
         r'color:' + theme["accent"] + r';background:' + theme["accent_soft"] + r';'
         r'padding:1px 6px;border-radius:2px;margin:0 2px;'
@@ -417,8 +444,7 @@ def render_inline(raw):
     )
 
     # ==高亮== before bold so inner markup still works
-    text = re.sub(
-        r"==([^=]+)==",
+    text = INLINE_HL_RE.sub(
         r'<strong style="font-weight:600;color:' + theme["text_strong"] + r';'
         r'background:' + theme["accent_soft"] + r';padding:1px 3px;'
         r'border-radius:2px;">\1</strong>',
@@ -430,20 +456,19 @@ def render_inline(raw):
     underline = ('<span style="border-bottom:2px solid %s;font-weight:600;'
                  'color:%s;">\\1</span>'
                  % (theme["accent_light"], theme["text_strong"]))
-    text = re.sub(r"\+\+([^+]+)\+\+", underline, text)
-    text = re.sub(r"&lt;u&gt;(.+?)&lt;/u&gt;", underline, text)
+    text = INLINE_UNDER_RE.sub(underline, text)
+    text = INLINE_U_RE.sub(underline, text)
 
     # ~~荧光笔~~：半高亮。用纯色浅底，不用 linear-gradient
     # （渐变在公众号会被静默丢弃，退化成无底）。
-    text = re.sub(
-        r"~~([^~]+)~~",
+    text = INLINE_MARK_RE.sub(
         r'<span style="background:%s;font-weight:600;color:%s;">\1</span>'
         % (theme["accent_soft"], theme["text_strong"]),
         text,
     )
 
-    text = re.sub(r"\*\*([^*]+)\*\*", r'<strong style="%s">\1</strong>' % strong, text)
-    text = re.sub(r"(?<![*\w])\*([^*\n]+)\*(?!\*)", r'<em style="%s">\1</em>' % em, text)
+    text = INLINE_STRONG_RE.sub(r'<strong style="%s">\1</strong>' % strong, text)
+    text = INLINE_EM_RE.sub(r'<em style="%s">\1</em>' % em, text)
 
     for idx, code in enumerate(spans):
         text = text.replace(
@@ -1112,6 +1137,7 @@ def convert(md_text, md_path, out_dir, theme, link_mode="footnote",
     CTX["theme"] = theme
     CTX["link_mode"] = link_mode
     CTX["footnotes"] = ctx["footnotes"]
+    CTX["footnote_idx"] = {}
     CTX["use_pangu"] = use_pangu
     CTX["hl_scheme"] = build_code_scheme(theme)
     # 行内图片解析器：render_inline 里的 ![alt](src) 通过它走 resolve_image，
@@ -1342,6 +1368,26 @@ def build_notice(embedded, n_images):
     return head + tail
 
 
+# audit_inline 的值级检查：原来是 8 次全正文 re.search（re.I 下每次都扫完整 MB 级
+# body，大正文里 audit_inline 能占近一半耗时）。合并为一次单遍扫描：命中哪个分支
+# 报哪条，收集命中的分支序号后按原列表顺序输出——与原来逐条 search 的结果完全一致。
+_AUDIT_VALUE_PATTERNS = [
+    ("linear-gradient", "ERROR", "linear-gradient（渐变被静默丢弃，退化成无背景。改纯色）"),
+    ("box-shadow", "ERROR", "box-shadow（阴影被丢弃）"),
+    ("rgba\\(|hsla\\(", "ERROR", "rgba()/hsla() 颜色（透明度不被支持，改纯色十六进制）"),
+    ("var\\(--", "ERROR", "CSS 变量（不支持，值必须写死）"),
+    ("@media|@keyframes", "ERROR", "@media/@keyframes（媒体查询与动画不被支持）"),
+    ("\\sclass=", "ERROR", "class 属性（公众号会剥离，样式必须内联）"),
+    ("\\sid=", "WARN", "id 属性（正文里无意义，可能被剥离）"),
+    ("<img[^>]*width=\"", "WARN", "<img> 上的 width 属性（公众号不保证保留，宽度用内联 style）"),
+]
+_AUDIT_VALUE_RE = re.compile(
+    "|".join("(?P<g%d>%s)" % (i, pat)
+             for i, (pat, _lv, _msg) in enumerate(_AUDIT_VALUE_PATTERNS)),
+    re.I,
+)
+
+
 def audit_inline(body):
     """正文的平台合规自检，返回 [(级别, 说明)]，空列表即通过。
 
@@ -1401,18 +1447,15 @@ def audit_inline(body):
             elif prop == "border-radius":
                 add("WARN", "border-radius（圆角可能被丢弃，降级为直角；属可接受的优雅降级，勿依赖圆角做视觉区分）")
 
-    for pat, lv, msg in [
-        (r"linear-gradient", "ERROR", "linear-gradient（渐变被静默丢弃，退化成无背景。改纯色）"),
-        (r"box-shadow", "ERROR", "box-shadow（阴影被丢弃）"),
-        (r"rgba\(|hsla\(", "ERROR", "rgba()/hsla() 颜色（透明度不被支持，改纯色十六进制）"),
-        (r"var\(--", "ERROR", "CSS 变量（不支持，值必须写死）"),
-        (r"@media|@keyframes", "ERROR", "@media/@keyframes（媒体查询与动画不被支持）"),
-        (r"\sclass=", "ERROR", "class 属性（公众号会剥离，样式必须内联）"),
-        (r"\sid=", "WARN", "id 属性（正文里无意义，可能被剥离）"),
-        (r"<img[^>]*width=\"", "WARN", "<img> 上的 width 属性（公众号不保证保留，宽度用内联 style）"),
-    ]:
-        if re.search(pat, body, re.I):
-            add(lv, msg)
+    hit = set()
+    for m in _AUDIT_VALUE_RE.finditer(body):
+        for i in range(len(_AUDIT_VALUE_PATTERNS)):
+            if m.group("g%d" % i) is not None:
+                hit.add(i)
+                break
+    for i in sorted(hit):
+        _pat, lv, msg = _AUDIT_VALUE_PATTERNS[i]
+        add(lv, msg)
 
     # ---- 图片宽度：小图被拉伸是高频问题
     for m in re.finditer(r'<img[^>]*style="([^"]*)"', body):
@@ -1430,6 +1473,22 @@ def audit_inline(body):
     # ERROR 在前
     out.sort(key=lambda x: 0 if x[0] == "ERROR" else 1)
     return out
+
+
+def atomic_write(path, text):
+    """原子写文件：先写临时文件再 rename，写一半失败（磁盘满/断电）时
+    不会留下半截产物——要么是旧文件，要么是没有文件，绝不残缺。"""
+    tmp = path + ".tmp"
+    try:
+        with open(tmp, "w", encoding="utf-8") as fh:
+            fh.write(text)
+        os.replace(tmp, path)
+    except BaseException:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+        raise
 
 
 def write_manifest(out_dir, slug, title, assets, diagrams, theme, footnotes,
@@ -1493,8 +1552,7 @@ def write_manifest(out_dir, slug, title, assets, diagrams, theme, footnotes,
                     theme.get("h2_style", "number"),
                     theme.get("code_scheme", "mono")))
     path = os.path.join(out_dir, "图片上传清单.md")
-    with open(path, "w", encoding="utf-8") as fh:
-        fh.write("\n".join(lines))
+    atomic_write(path, "\n".join(lines))
     return path
 
 
@@ -1543,8 +1601,13 @@ def main():
         sys.exit("错误：找不到输入文件 %s" % args.input)
 
     theme = load_theme(args.theme)
-    with open(args.input, encoding="utf-8") as fh:
-        md_text = fh.read()
+    try:
+        with open(args.input, encoding="utf-8") as fh:
+            md_text = fh.read()
+    except UnicodeDecodeError:
+        sys.exit("错误：输入文件不是有效的 UTF-8 编码 %s" % args.input)
+    except OSError as e:
+        sys.exit("错误：无法读取输入文件 %s（%s）" % (args.input, e))
 
     os.makedirs(args.out_dir, exist_ok=True)
     body, assets, diagrams, footnotes = convert(
@@ -1581,8 +1644,7 @@ def main():
                             embed_stats["count"] if embed_stats else len(assets)),
     )
     html_path = os.path.join(args.out_dir, "%s-公众号版.html" % args.slug)
-    with open(html_path, "w", encoding="utf-8") as fh:
-        fh.write(page)
+    atomic_write(html_path, page)
 
     manifest = write_manifest(args.out_dir, args.slug, title, assets, diagrams,
                               theme, footnotes, embed_stats is not None)

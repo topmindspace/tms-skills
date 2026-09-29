@@ -17,6 +17,8 @@
 npx @topmindspace/tms-skills install top-ppt-html
 ```
 
+在线体验：[落地页](https://topmindspace.github.io/tms-skills/) · [完整演示文稿](https://topmindspace.github.io/tms-skills/showcase.html) · [风格画廊](https://topmindspace.github.io/tms-skills/style-gallery.html)；黄金样张见 [`top-ppt-html/assets/examples/`](./top-ppt-html/assets/examples/)。
+
 ### topmind-wechat-post · 公众号创作
 
 公众号文章全生命周期：交付包、审校改写、质量三关（事实 / 逻辑 / 去 AI 味）、微信内联排版（图片必内嵌）、发布清单与状态同步。脚本纯 Python 标准库，零依赖。
@@ -35,30 +37,15 @@ npx @topmindspace/tms-skills install topmind-x-article
 
 ### topmind-cover · 封面配图生成
 
-X 长文与公众号共用的封面图：震撼、醒目、主题突出。内置 **8 种封面风格库**（爆款干货 / 巨字宣言 / 品牌发布 / 教程步骤 / IP 趣味 / 资讯快报 / 极简留白 / 杂志编辑，含适用场景、配色故事、抽象设计原则、中英 prompt 配方）+ **17 张双尺寸示例图**（`assets/examples/`，随包发布）：**选风格 → 看示例 → 按配方组 prompt** 三步出图，`crop-cover.py` 一键裁出双平台尺寸（X 1200×675、公众号 900×383）。
+X 长文与公众号共用的封面图：震撼、醒目、主题突出。**选风格 → 看示例 → 按配方组 prompt** 三步出图，`crop-cover.py` 一键裁出双平台尺寸（X 1200×675、公众号 900×383）。8 种风格索引与配方见 [`references/cover-styles.md`](./topmind-cover/references/cover-styles.md)。
 
 ```bash
 npx @topmindspace/tms-skills install topmind-cover
 ```
 
-**封面风格样张**（8 宫格总览；单风格大图见 `topmind-cover/assets/examples/<风格>.png`，配方见 [`references/cover-styles.md`](./topmind-cover/references/cover-styles.md)）：
-
 <p align="center">
   <img src="https://github.com/topmindspace/tms-skills/raw/main/topmind-cover/assets/examples/overview.png" alt="topmind-cover · 8 封面风格总览" width="960" />
 </p>
-
-| 风格 | 适用场景 |
-|------|----------|
-| 爆款干货 `gan-huo` | 干货清单、评测、盘点、实测筛选；"我替你试完了/筛完了"类第一人称实测文默认选它 |
-| 巨字宣言 `big-type` | 观点评论、深度长文、产品/版本发布宣言；"一句话立场"类文章默认选它 |
-| 品牌发布 `brand-launch` | 产品发布、版本更新、官方最佳实践/白皮书；有明确品牌主体的内容首选 |
-| 教程步骤 `tutorial-steps` | 教程、上手指南、分步实操、保姆级攻略 |
-| IP 趣味 `ip-fun` | 实战案例、数据战报、复盘、系列连载（上/下篇） |
-| 资讯快报 `news-flash` | 资讯、快讯、热点解读、人物专访预告、"祛魅/揭秘"类选题 |
-| 极简留白 `minimal` | 随笔、书评、轻观点、生活感悟；公众号"轻阅读"类文章 |
-| 杂志编辑 `magazine` | 深度访谈、人物特写、商业分析、年度盘点；需要"质感/信任感"时用它 |
-
-> **原创声明**：16 张示例图均为原创设计，仅用于演示 8 种风格的抽象设计原则（标题是视觉重心、信息分层、留白呼吸感、数字与关键词的强调手法），不临摹任何第三方封面的版式与配色；图中标题、数字、品牌、署名均为虚构演示内容，版式与配色亦不得与第三方封面构成实质相似——只学原则，不学版式。
 
 > 让 idea 飞，好想法被看见。
 
@@ -68,49 +55,6 @@ npx @topmindspace/tms-skills install topmind-cover
 
 > **警告**：不要安装 `@topmindspace/tms-skills@^2`（2.0.0–2.1.1 已弃用）。当前线 **0.2.x**（`latest`）。
 
-## 一眼看到工艺
-
-### 主题总览（Gate 0）
-
-<p align="center">
-  <img src="top-ppt-html/assets/theme-overview.png" alt="演示模式 · business-blue 主题总览" width="900" /><br/>
-  <sub>演示 · business-blue（默认）· 另见 <a href="./top-ppt-html/assets/style-gallery.html">style-gallery</a> · <a href="./top-ppt-html/assets/theme-overview-research.png">研究总览</a> · <a href="./top-ppt-html/assets/theme-overview-architecture.png">架构总览</a></sub>
-</p>
-
-### 风格封面
-
-| 演示 · business-blue | 研究 · mckinsey | 架构 · graphite-dark |
-|:---:|:---:|:---:|
-| ![bizblue](docs/showcase/presentation-business-blue/bizblue-cover.png) | ![mckinsey](docs/showcase/research-mckinsey/mckinsey-cover.png) | ![graphite](docs/showcase/architecture-graphite-dark/graphite-cover.png) |
-
-### 产品 Showcase（Mode A · 双交付叙事 · 多图 · Header 工具栏）
-
-| 定位 | 双交付 | 图表 | Header 工具栏 |
-|:---:|:---:|:---:|:---:|
-| ![pos](docs/showcase/topmind-showcase/showcase-s1.png) | ![split](docs/showcase/topmind-showcase/showcase-s3.png) | ![charts](docs/showcase/topmind-showcase/showcase-s5.png) | ![toolbar](docs/showcase/topmind-showcase/showcase-s11.png) |
-
-**在线体验**
-
-- 落地页：[topmindspace.github.io/tms-skills/](https://topmindspace.github.io/tms-skills/)
-- 完整演示文稿：[showcase.html](https://topmindspace.github.io/tms-skills/showcase.html)
-- 风格画廊：[style-gallery.html](https://topmindspace.github.io/tms-skills/style-gallery.html)
-- 仓库内交互画廊：[top-ppt-html/assets/style-gallery.html](./top-ppt-html/assets/style-gallery.html)
-- 仓库内 Showcase：[top-ppt-html/assets/examples/2026-09-26-topmind-tms-skills-showcase.html](./top-ppt-html/assets/examples/2026-09-26-topmind-tms-skills-showcase.html)
-- 更多截图：[docs/showcase/](./docs/showcase/)
-
-### HTML Header 工具栏（打开即用）
-
-| 控件 | 快捷键 | 做什么 |
-|------|--------|--------|
-| 亮暗主题 | **T** | 浅/深切换，按文件记忆，同步 `REPORT_MODEL.theme` |
-| 风格选择 | 9 套 | 九风格实时换肤；交付前写回 `REPORT_MODEL.style` |
-| 预览 PPTX | **P** | 页序列预览 + 可复制精导提示词 |
-| PPT 生成指引 | **H** | 双通道与环境说明 |
-| 全屏 | **F** | 沉浸演示 |
-| 收起工具栏 | **B** | 折叠为迷你条 |
-
-详见 [top-ppt-html/README.md](./top-ppt-html/README.md#html-header-工具栏) · [SKILL.md 交付物](./top-ppt-html/SKILL.md)。
-
 ## 技能一览
 
 | 技能 | 版本 | 做什么 |
@@ -118,15 +62,11 @@ npx @topmindspace/tms-skills install topmind-cover
 | [`top-ppt-html`](./top-ppt-html/) | **0.1.19** | 正式商务演示：HTML 可翻页 + 16:9 可编辑 PPTX；双交付 · MD3 密度克制；三模式 × 九风格；strict 0/0 |
 | [`topmind-wechat-post`](./topmind-wechat-post/) | **0.1.0** | 公众号文章全生命周期：交付包、审校改写、质量三关、微信内联排版与发布清单 |
 | [`topmind-x-article`](./topmind-x-article/) | **0.1.0** | X 长文一键发布：Markdown 原稿转可直接粘贴的纯文本 + 封面图 + 发布清单 |
-| [`topmind-cover`](./topmind-cover/) | **0.1.0** | 文章封面配图（X / 公众号共用）：震撼醒目主题突出；8 风格封面风格库 + 17 张双尺寸示例图，尺寸规范 + 裁剪落盘 |
+| [`topmind-cover`](./topmind-cover/) | **0.1.0** | 文章封面配图（X / 公众号共用）：震撼醒目主题突出；8 风格封面风格库 + 17 张双尺寸示例图 |
 
-安装器 [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) 为 **0.3.4**（整仓同 tag 发版）。
+安装器 [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) 为 **0.3.5**（整仓同 tag 发版）。
 
-### topmind-cover · 封面风格库
-
-风格索引与 8 宫格总览样张见上文 topmind-cover 技能介绍处。
-
-**三步出图**：① 按题材从 8 风格选 1 → ② 看 [`topmind-cover/assets/examples/`](./topmind-cover/assets/examples/) 对应示例图 → ③ 按 [`references/cover-styles.md`](./topmind-cover/references/cover-styles.md) 该风格的 prompt 配方组 prompt。17 张示例图（8 风格 × 1200×675 主图 + 900×383 公众号中央裁剪版 + `overview.png` 8 宫格总览，约 8.9MB）随 npm 包发布；**安全区铁律**：标题字与关键主体必须落在画面中央垂直 60% 安全区内；**原创铁律**：版式与配色不得与第三方封面构成实质相似，只学原则不学版式，样张标题/数字/品牌均为虚构演示。
+> SKILL.md frontmatter 除标准 `name`/`description` 外，本仓库扩展了 `action_category` / `triggers` / `triggers_cn` / `updated` 字段供安装器与路由使用。
 
 ## 安装
 
@@ -136,7 +76,7 @@ npx @topmindspace/tms-skills install topmind-cover
 npx @topmindspace/tms-skills list
 npx @topmindspace/tms-skills install top-ppt-html
 npx @topmindspace/tms-skills install top-ppt-html --to ./.claude/skills
-npx @topmindspace/tms-skills@0.3.4 install top-ppt-html   # 钉版本
+npx @topmindspace/tms-skills@0.3.5 install top-ppt-html   # 钉版本
 ```
 
 ```bash
@@ -147,15 +87,6 @@ npx github:topmindspace/tms-skills install top-ppt-html
 默认探测：`./.agents` → `./.claude` → `./.cursor` → `./.codex` → `./.mimocode`，再用户级 `~/.claude` 等；也可用 `--to`。不要 `npm install top-ppt-html`（技能 id 不是独立包）。
 
 PPTX 精导需在技能目录 `npm install`（pptxgenjs）。HTML 生成仅 Python 标准库。
-
-## 黄金样张
-
-| 模式 | 文件 |
-|------|------|
-| A 演示 | [`2026-09-09-presentation-business-blue`](./top-ppt-html/assets/examples/2026-09-09-presentation-business-blue.html) |
-| B 研究 | [`2026-09-09-research-mckinsey`](./top-ppt-html/assets/examples/2026-09-09-research-mckinsey.html) |
-| C 架构 | [`2026-09-09-architecture-graphite-dark`](./top-ppt-html/assets/examples/2026-09-09-architecture-graphite-dark.html) |
-| 产品 Showcase | [`2026-09-26-topmind-tms-skills-showcase`](./top-ppt-html/assets/examples/2026-09-26-topmind-tms-skills-showcase.html)（双交付叙事 · 5 种图表 · Header 工具栏） |
 
 ## 仓库结构
 
@@ -178,7 +109,6 @@ tms-skills/
 
 ```bash
 npm run check && npm run audit && npm run privacy
-# PPTX 冒烟（含 McKinsey）：bash scripts/ci_skill_gates.sh --with-pptx
 ```
 
 详见 [docs/PUBLISHING.md](./docs/PUBLISHING.md) · [docs/ci.md](./docs/ci.md)。

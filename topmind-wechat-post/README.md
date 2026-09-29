@@ -4,7 +4,7 @@
 
 公众号文章全生命周期：交付包、审校改写、质量三关、状态同步、微信内联排版与发布清单。
 
-- 版本：**v0.1.0**（与 `@topmindspace/tms-skills@0.3.3` 同 tag）
+- 版本：**v0.1.0**（与 `@topmindspace/tms-skills@0.3.5` 同 tag）
 
 ## 安装
 
@@ -37,7 +37,7 @@ python3 scripts/sync-status.py --set 定稿 <包> --apply
 
 ## 最小示例
 
-输入 `demo.md`（9 行）：
+输入 `demo.md`：
 
     # 标题
 
@@ -101,8 +101,7 @@ python3 scripts/md2wechat.py --input demo.md --out-dir demo --slug demo --embed-
 环境提供）。缺失时对应能力降级/不可用，不影响本仓库脚本的全部功能：
 
 - `humanizer-zh`：中文去 AI 味的保真边界；缺失时「只去 AI 味不排版」路径不可用。
-- `qu-aiwei-zh`：中文去 AI 味扫描定位；`scripts/scan_ai_flavor.py` 与其同源，
-  缺失时可用仓库内脚本替代，扫描定位能力降级。
+- `qu-aiwei-zh`：中文去 AI 味扫描定位；`scripts/scan_ai_flavor.py` 与其同源，缺失时可用仓库内脚本替代。
 
 ## 开发
 

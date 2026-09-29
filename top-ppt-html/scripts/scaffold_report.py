@@ -930,11 +930,47 @@ def main() -> int:
     t = tpl_path.read_text(encoding='utf-8')
 
     style = args.style or TPL_DEFAULT_STYLE[mode]
+    # 风格早校验：未知风格现在拦下（干净报错），而不是生成一份后续 validate 才判 FAIL 的 HTML
+    _lc_styles = None
+    try:
+        _lc = json.loads((ROOT / 'scripts' / 'layout-constants.json').read_text(encoding='utf-8'))
+        _lc_styles = sorted(k for k in (_lc.get('styles') or {}) if not str(k).startswith('$'))
+    except (OSError, ValueError):
+        _lc_styles = None  # 单源读不到时不拦（校验门禁兜底）
+    if _lc_styles and style not in _lc_styles:
+        print(f'错误：未知风格 {style!r}（可选：{" / ".join(_lc_styles)}）')
+        return 2
     theme = args.theme or ('dark' if style == 'graphite-dark' else 'light')
-    n = args.sections if args.sections else {'presentation': 8, 'research': 10, 'architecture': 3}[mode]
+    n = args.sections if args.sections is not None else {'presentation': 8, 'research': 10, 'architecture': 3}[mode]
+    if n < 0:
+        print(f'错误：--sections 必须 ≥ 0（得到 {n}）')
+        return 2
     plan = None
     if args.plan:
-        plan = json.loads(Path(args.plan).read_text(encoding='utf-8'))
+        plan_path = Path(args.plan)
+        try:
+            plan_text = plan_path.read_text(encoding='utf-8')
+        except FileNotFoundError:
+            print(f'错误：--plan 文件不存在 {plan_path}')
+            return 2
+        except UnicodeDecodeError as e:
+            print(f'错误：--plan 不是合法 UTF-8 {plan_path}: {e}')
+            return 2
+        except OSError as e:
+            print(f'错误：无法读取 --plan {plan_path}: {e}')
+            return 2
+        try:
+            plan = json.loads(plan_text)
+        except json.JSONDecodeError as e:
+            print(f'错误：--plan 不是合法 JSON {plan_path}: {e}')
+            return 2
+        if not isinstance(plan, list):
+            print(f'错误：--plan 根节点必须是数组（得到 {type(plan).__name__}）')
+            return 2
+        bad_items = [k for k, it in enumerate(plan) if not isinstance(it, dict)]
+        if bad_items:
+            print(f'错误：--plan 第 {", ".join(str(k + 1) for k in bad_items)} 项不是对象（每项应为 {{"type","eyebrow","title"}}）')
+            return 2
         n = len(plan)
     pages = build_plan(mode, n, plan, preset=args.preset)
 
@@ -1053,7 +1089,11 @@ def main() -> int:
 
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(t, encoding='utf-8')
+    try:
+        out.write_text(t, encoding='utf-8')
+    except OSError as e:
+        print(f'错误：输出写入失败 {out}（{e}）', file=sys.stderr)
+        return 1
     print(f'已生成骨架：{out}  {len(t)} 字符')
     print(f'  模式 {mode} · 风格 {style} · 主题 {theme} · 内容页 {len(pages)}'
           f'（{"含" if show_agenda else "省略"} Agenda'

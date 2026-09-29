@@ -121,8 +121,16 @@ def main() -> int:
     if not QUERIES.exists():
         print(f'MISSING {QUERIES}')
         return 1
-    data = json.loads(QUERIES.read_text(encoding='utf-8'))
-    desc = load_description()
+    try:
+        data = json.loads(QUERIES.read_text(encoding='utf-8'))
+    except (OSError, json.JSONDecodeError, UnicodeDecodeError) as e:
+        print(f'错误：无法解析 {QUERIES}: {e}')
+        return 2
+    try:
+        desc = load_description()
+    except (OSError, SystemExit) as e:
+        print(f'错误：{e}')
+        return 2
     rows, fails, total = evaluate(desc, data)
     n_pos = sum(1 for r in rows if r['expect'] == 'hit')
     n_neg = sum(1 for r in rows if r['expect'] == 'miss')

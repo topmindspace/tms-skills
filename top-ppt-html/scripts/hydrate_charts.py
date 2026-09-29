@@ -7,12 +7,12 @@ Used after render_from_model.py — follows extract_snippet chart patterns
 """
 from __future__ import annotations
 
-import json
 import re
 import sys
 from pathlib import Path
 
-MODEL_RE = re.compile(r'window\.REPORT_MODEL = (\{[\s\S]*?\});')
+from render_from_model import extract_model_span
+
 PLACEHOLDER_SVG_RE = re.compile(
     r'<svg class="chart" data-chart="([^"]+)" viewBox="0 0 560 220">\s*'
     r'<!--[\s\S]*?-->\s*'
@@ -357,12 +357,30 @@ def main() -> int:
         print('usage: _hydrate_charts.py <report.html>')
         return 2
     path = Path(sys.argv[1])
-    html = path.read_text(encoding='utf-8')
-    m = MODEL_RE.search(html)
-    if not m:
+    try:
+        html = path.read_text(encoding='utf-8')
+    except FileNotFoundError:
+        print(f'FAIL: 文件不存在 {path}')
+        return 1
+    except UnicodeDecodeError as e:
+        print(f'FAIL: 文件不是合法 UTF-8 {path}（{e}）')
+        return 1
+    except OSError as e:
+        print(f'FAIL: 读取失败 {path}（{e}）')
+        return 1
+    # 括号感知抽取（模型字符串含 `};` 时正则会提前截断；非法 JSON 走干净 FAIL）
+    try:
+        span = extract_model_span(html)
+    except SystemExit as e:
+        print(f'FAIL: {e}')
+        return 1
+    if not span:
         print('FAIL: no REPORT_MODEL')
         return 1
-    model = json.loads(m.group(1))
+    model = span[2]
+    if not isinstance(model, dict):
+        print(f'FAIL: REPORT_MODEL 根节点必须是对象（得到 {type(model).__name__}）')
+        return 1
     try:
         new_html, n_ph, used, total = hydrate(html, model)
     except ChartDataError as e:

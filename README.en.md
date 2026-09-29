@@ -19,6 +19,8 @@ Built for **demo reports / formal business decks**: **HTML + PPT dual delivery**
 npx @topmindspace/tms-skills install top-ppt-html
 ```
 
+Live: [landing](https://topmindspace.github.io/tms-skills/) · [full deck](https://topmindspace.github.io/tms-skills/showcase.html) · [style gallery](https://topmindspace.github.io/tms-skills/style-gallery.html); golden examples in [`top-ppt-html/assets/examples/`](./top-ppt-html/assets/examples/).
+
 ### topmind-wechat-post · WeChat article authoring
 
 Full lifecycle for WeChat articles: delivery package, review & rewrite, three quality gates (facts / logic / de-AI-flavor), WeChat inline typography (images must be embedded), publish checklist and status sync. Python stdlib only — zero dependencies.
@@ -37,30 +39,15 @@ npx @topmindspace/tms-skills install topmind-x-article
 
 ### topmind-cover · Cover art generation
 
-Shared cover art for X long-form and WeChat: striking, eye-catching, theme-focused. Built-in **8-style cover style library** (viral dry-goods / giant-type manifesto / brand launch / tutorial steps / fun IP / news flash / minimalist / editorial magazine — each with use cases, palette stories, abstract design principles, Chinese+English prompt recipes) + **17 dual-size example images** (`assets/examples/`, shipped with the package): **pick a style → check the example → compose the prompt from the recipe**, then one-click crop to both platform sizes with `crop-cover.py` (X 1200×675, WeChat 900×383).
+Shared cover art for X long-form and WeChat: striking, eye-catching, theme-focused. **Pick a style → check the example → compose the prompt from the recipe**, then one-click crop to both platform sizes with `crop-cover.py` (X 1200×675, WeChat 900×383). 8-style index and recipes: [`references/cover-styles.md`](./topmind-cover/references/cover-styles.md).
 
 ```bash
 npx @topmindspace/tms-skills install topmind-cover
 ```
 
-**Style gallery** (8-style overview; full-size per-style shots in `topmind-cover/assets/examples/<style>.png`, recipes in [`references/cover-styles.md`](./topmind-cover/references/cover-styles.md)):
-
 <p align="center">
   <img src="https://github.com/topmindspace/tms-skills/raw/main/topmind-cover/assets/examples/overview.png" alt="topmind-cover · 8 cover-style overview" width="960" />
 </p>
-
-| Style | Best for |
-|-------|----------|
-| Viral dry-goods `gan-huo` | Tested picks, reviews, roundups; default for first-person "I tried it all for you" posts |
-| Giant-type manifesto `big-type` | Opinion pieces, deep essays, launch manifestos; default for one-sentence-stance pieces |
-| Brand launch `brand-launch` | Product launches, version updates, official best practices / whitepapers; first choice when a brand is the subject |
-| Tutorial steps `tutorial-steps` | Tutorials, onboarding guides, step-by-step walkthroughs, beginner-proof recipes |
-| Fun IP `ip-fun` | Case studies, data recaps, retrospectives, series (part 1 / part 2) |
-| News flash `news-flash` | News, flashes, hot-topic explainers, interview teasers, "myth-busting" angles |
-| Minimal `minimal` | Essays, book reviews, light takes, lifestyle musings; WeChat "light reading" pieces |
-| Editorial magazine `magazine` | In-depth interviews, profiles, business analysis, year-in-review; when "craft / trust" matters |
-
-> **Originality note**: the 16 example images are original designs demonstrating only the 8 styles' abstract design principles (title as visual anchor, information hierarchy, breathing whitespace, number/keyword emphasis) — no third-party cover's layout or palette is copied; all titles, numbers, brands, and bylines in them are fictional placeholders, and layouts/palettes must not be substantially similar to any third-party cover: learn the principles, not the layouts.
 
 > Let ideas fly — make good thinking visible.
 
@@ -70,49 +57,6 @@ npx @topmindspace/tms-skills install topmind-cover
 
 > **Warning**: do not install `@topmindspace/tms-skills@^2` (2.0.0–2.1.1 deprecated). Current line is **0.2.x** (`latest`).
 
-## Craft at a glance
-
-### Theme overview (Gate 0)
-
-<p align="center">
-  <img src="top-ppt-html/assets/theme-overview.png" alt="Presentation mode · business-blue theme overview" width="900" /><br/>
-  <sub>Presentation · business-blue (default) · also <a href="./top-ppt-html/assets/style-gallery.html">style-gallery</a> · <a href="./top-ppt-html/assets/theme-overview-research.png">research overview</a> · <a href="./top-ppt-html/assets/theme-overview-architecture.png">architecture overview</a></sub>
-</p>
-
-### Style covers
-
-| Presentation · business-blue | Research · mckinsey | Architecture · graphite-dark |
-|:---:|:---:|:---:|
-| ![bizblue](docs/showcase/presentation-business-blue/bizblue-cover.png) | ![mckinsey](docs/showcase/research-mckinsey/mckinsey-cover.png) | ![graphite](docs/showcase/architecture-graphite-dark/graphite-cover.png) |
-
-### Product showcase (Mode A · dual-delivery narrative · multi-chart · header toolbar)
-
-| Positioning | Dual delivery | Charts | Header toolbar |
-|:---:|:---:|:---:|:---:|
-| ![pos](docs/showcase/topmind-showcase/showcase-s1.png) | ![split](docs/showcase/topmind-showcase/showcase-s3.png) | ![charts](docs/showcase/topmind-showcase/showcase-s5.png) | ![toolbar](docs/showcase/topmind-showcase/showcase-s11.png) |
-
-**Live**
-
-- Landing: [topmindspace.github.io/tms-skills/](https://topmindspace.github.io/tms-skills/)
-- Full deck: [showcase.html](https://topmindspace.github.io/tms-skills/showcase.html)
-- Style gallery: [style-gallery.html](https://topmindspace.github.io/tms-skills/style-gallery.html)
-- In-repo gallery: [top-ppt-html/assets/style-gallery.html](./top-ppt-html/assets/style-gallery.html)
-- Showcase HTML: [top-ppt-html/assets/examples/2026-09-26-topmind-tms-skills-showcase.html](./top-ppt-html/assets/examples/2026-09-26-topmind-tms-skills-showcase.html)
-- More shots: [docs/showcase/](./docs/showcase/)
-
-### HTML header toolbar (ready when you open the file)
-
-| Control | Shortcut | Behavior |
-|---------|----------|----------|
-| Theme toggle | **T** | Light / dark; per-file memory; syncs `REPORT_MODEL.theme` |
-| Style picker | 9 styles | Live visual skins; write back `REPORT_MODEL.style` before deliver |
-| PPTX preview | **P** | WYSIWYG page sequence + copyable agent prompt |
-| Generation guide | **H** | Dual-channel + environment notes |
-| Fullscreen | **F** | Immersive present mode |
-| Collapse toolbar | **B** | Mini bar (brand + expand); remembers per file |
-
-See [top-ppt-html/README.md](./top-ppt-html/README.md#html-header-toolbar) and [SKILL.md](./top-ppt-html/SKILL.md).
-
 ## Skills
 
 | Skill | Version | What it does |
@@ -120,15 +64,9 @@ See [top-ppt-html/README.md](./top-ppt-html/README.md#html-header-toolbar) and [
 | [`top-ppt-html`](./top-ppt-html/) | **0.1.19** | Formal business decks: paginated HTML + editable 16:9 PPTX; dual delivery · MD3-inspired density; 3 modes × 9 styles; strict 0/0 |
 | [`topmind-wechat-post`](./topmind-wechat-post/) | **0.1.0** | WeChat article lifecycle: package, review, 3 quality gates, inline typography & publish checklist |
 | [`topmind-x-article`](./topmind-x-article/) | **0.1.0** | X long-form one-click publish: Markdown → paste-ready plain text + cover + checklist |
-| [`topmind-cover`](./topmind-cover/) | **0.1.0** | Cover art for X / WeChat: striking, theme-focused; 8-style cover style library + 17 dual-size example images, size specs + crop tooling |
+| [`topmind-cover`](./topmind-cover/) | **0.1.0** | Cover art for X / WeChat: striking, theme-focused; 8-style cover style library + 17 dual-size example images |
 
-Installer [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) is **0.3.4** (whole-repo same-tag releases).
-
-### topmind-cover · Cover style library
-
-Style index and the 8-grid overview are in the topmind-cover skill intro above.
-
-**Three steps to a cover**: ① pick 1 of 8 styles by topic → ② check the matching example in [`topmind-cover/assets/examples/`](./topmind-cover/assets/examples/) → ③ compose the prompt from that style's recipe in [`references/cover-styles.md`](./topmind-cover/references/cover-styles.md). 17 example images (8 styles × 1200×675 master + 900×383 WeChat center-crop + `overview.png` 8-grid overview, ~8.9MB) ship with the npm package; **safe-zone rule**: title text and key subject must stay inside the central vertical 60% safe zone.
+Installer [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) is **0.3.5** (whole-repo same-tag releases).
 
 ## Install
 
@@ -138,7 +76,7 @@ Style index and the 8-grid overview are in the topmind-cover skill intro above.
 npx @topmindspace/tms-skills list
 npx @topmindspace/tms-skills install top-ppt-html
 npx @topmindspace/tms-skills install top-ppt-html --to ./.claude/skills
-npx @topmindspace/tms-skills@0.3.4 install top-ppt-html   # pin
+npx @topmindspace/tms-skills@0.3.5 install top-ppt-html   # pin
 ```
 
 ```bash
@@ -149,15 +87,6 @@ npx github:topmindspace/tms-skills install top-ppt-html
 Default probe order: `./.agents` → `./.claude` → `./.cursor` → `./.codex` → `./.mimocode`, then user-level `~/.claude`, etc. Or pass `--to`. Do not `npm install top-ppt-html` (skill id is not a standalone package).
 
 PPTX export needs `npm install` in the skill folder (pptxgenjs). HTML generation uses Python stdlib only.
-
-## Golden examples
-
-| Mode | File |
-|------|------|
-| A Presentation | [`2026-09-09-presentation-business-blue`](./top-ppt-html/assets/examples/2026-09-09-presentation-business-blue.html) |
-| B Research | [`2026-09-09-research-mckinsey`](./top-ppt-html/assets/examples/2026-09-09-research-mckinsey.html) |
-| C Architecture | [`2026-09-09-architecture-graphite-dark`](./top-ppt-html/assets/examples/2026-09-09-architecture-graphite-dark.html) |
-| Product showcase | [`2026-09-26-topmind-tms-skills-showcase`](./top-ppt-html/assets/examples/2026-09-26-topmind-tms-skills-showcase.html) (dual-delivery narrative · 5 chart types · toolbar page) |
 
 ## Repo layout
 
@@ -180,7 +109,6 @@ tms-skills/
 
 ```bash
 npm run check && npm run audit && npm run privacy
-# PPTX smoke (incl. McKinsey): bash scripts/ci_skill_gates.sh --with-pptx
 ```
 
 See [docs/PUBLISHING.md](./docs/PUBLISHING.md) · [docs/ci.md](./docs/ci.md).

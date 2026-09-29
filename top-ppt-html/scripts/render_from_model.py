@@ -38,7 +38,43 @@ IMAGE_SPEC = LC.get('imageSpec') or {}
 
 CONTENT_RE = re.compile(
     r'(<!-- __TOPPPT_CONTENT_START__ -->)[\s\S]*?(<!-- __TOPPPT_CONTENT_END__ -->)')
-MODEL_RE = re.compile(r'window\.REPORT_MODEL = \{[\s\S]*?\};')
+MODEL_RE = re.compile(r'window\.REPORT_MODEL\s*=\s*')
+
+
+def _strict_decoder():
+    """标准 JSON 解码器：拒绝 NaN/Infinity（与 Node JSON.parse 同口径）。"""
+    def _reject_const(x):
+        raise ValueError(f'非法 JSON 常量 {x}')
+    return json.JSONDecoder(parse_constant=_reject_const)
+
+
+def extract_model_span(txt: str):
+    """括号感知抽取 window.REPORT_MODEL：返回 (start, end, model)。
+
+    start/end 是 JSON 文本在 txt 中的起止下标（含首尾花括号，不含末尾分号）。
+    用 JSONDecoder.raw_decode 而非正则 `\\{[\\s\\S]*?\\}`——模型字符串里若含 `};`
+   （如标题含代码片段），正则会提前截断导致解析失败或 --inplace 写坏文件。
+    """
+    m = MODEL_RE.search(txt)
+    if not m:
+        return None
+    try:
+        model, end = _strict_decoder().raw_decode(txt, m.end())
+    except json.JSONDecodeError as e:
+        raise SystemExit(f'REPORT_MODEL 不是合法 JSON: {e}（必须双引号/无尾逗号/无注释）')
+    except ValueError as e:
+        raise SystemExit(f'REPORT_MODEL 不是合法 JSON: {e}（必须双引号/无尾逗号/无注释）')
+    return m.start(), end, model
+
+
+def replace_model_json(txt: str, model: dict) -> str:
+    """把 txt 内 REPORT_MODEL 的 JSON 原子替换为 model（起止下标精确定位，不误伤正文）。"""
+    span = extract_model_span(txt)
+    if not span:
+        raise SystemExit('未找到 window.REPORT_MODEL')
+    start, end, _ = span
+    return (txt[:start] + 'window.REPORT_MODEL = '
+            + json.dumps(model, ensure_ascii=False, indent=2) + ';' + txt[end:])
 
 
 def esc(s) -> str:
@@ -508,6 +544,12 @@ def r_diagram(i, sec):
             if isinstance(nd, dict):
                 nds.append(f'          <div class="arch__node"><div class="arch__nt">{esc(nd.get("t") or "")}</div>'
                            f'<div class="arch__nd">{esc(nd.get("d") or "")}</div></div>')
+            elif isinstance(nd, (list, tuple)):
+                # [标题, 注解] 数组形态（scaffold_report 发射；不处理会原样打出 "['a', 'b']"）
+                t = nd[0] if len(nd) > 0 else ""
+                d = nd[1] if len(nd) > 1 else ""
+                nds.append(f'          <div class="arch__node"><div class="arch__nt">{esc(t)}</div>'
+                           f'<div class="arch__nd">{esc(d)}</div></div>')
             else:
                 nds.append(f'          <div class="arch__node"><div class="arch__nt">{esc(nd)}</div></div>')
         rows.append(
@@ -838,13 +880,30 @@ def render_body(model: dict) -> str:
 
 
 def load_model(path: Path) -> dict:
-    txt = path.read_text(encoding='utf-8')
+    try:
+        txt = path.read_text(encoding='utf-8')
+    except FileNotFoundError:
+        raise SystemExit(f'模型文件不存在: {path}')
+    except UnicodeDecodeError as e:
+        raise SystemExit(f'模型文件不是合法 UTF-8: {path}（{e}）')
+    except OSError as e:
+        raise SystemExit(f'模型文件读取失败: {path}（{e}）')
     if path.suffix.lower() == '.json':
-        return json.loads(txt)
-    m = re.search(r'window\.REPORT_MODEL\s*=\s*(\{[\s\S]*?\})\s*;', txt)
-    if not m:
+        try:
+            model = _strict_decoder().decode(txt)
+        except json.JSONDecodeError as e:
+            raise SystemExit(f'模型不是合法 JSON: {path}（{e}）')
+        except ValueError as e:
+            raise SystemExit(f'模型不是合法 JSON: {path}（{e}）')
+        if not isinstance(model, dict):
+            raise SystemExit(f'模型根节点必须是对象: {path}（得到 {type(model).__name__}）')
+        return model
+    span = extract_model_span(txt)
+    if not span:
         raise SystemExit('未找到 window.REPORT_MODEL')
-    return json.loads(m.group(1))
+    if not isinstance(span[2], dict):
+        raise SystemExit(f'REPORT_MODEL 根节点必须是对象（得到 {type(span[2]).__name__}）')
+    return span[2]
 
 
 def _strip_refs_nav(html: str, body: str) -> str:
@@ -879,11 +938,14 @@ def main() -> int:
             return 2
         t = CONTENT_RE.sub(
             r'\1\n' + body.replace('\\', '\\\\') + r'\n\2', t, count=1)
-        # 同步模型（确保与渲染源一致）
-        t = MODEL_RE.sub('window.REPORT_MODEL = ' +
-                         json.dumps(model, ensure_ascii=False, indent=2) + ';', t, count=1)
+        # 同步模型（确保与渲染源一致；span 精确定位，模型字符串含 `};` 也不写坏）
+        t = replace_model_json(t, model)
         t = _strip_refs_nav(t, body)
-        src.write_text(t, encoding='utf-8')
+        try:
+            src.write_text(t, encoding='utf-8')
+        except OSError as e:
+            print(f'错误：--inplace 写回失败 {src}（{e}）', file=sys.stderr)
+            return 1
         print(f'已按模型重渲染正文：{src}（{len(body)} 字符）')
         print(f'  下一步: python scripts/validate_report.py "{src}" --strict')
         return 0
@@ -899,11 +961,14 @@ def main() -> int:
         print('错误：模板缺少 CONTENT 标记', file=sys.stderr)
         return 2
     t = CONTENT_RE.sub(r'\1\n' + body.replace('\\', '\\\\') + r'\n\2', t, count=1)
-    t = MODEL_RE.sub('window.REPORT_MODEL = ' +
-                     json.dumps(model, ensure_ascii=False, indent=2) + ';', t, count=1)
+    t = replace_model_json(t, model)
     t = _strip_refs_nav(t, body)
     out = Path(args.out or (src.with_suffix('.html')))
-    out.write_text(t, encoding='utf-8')
+    try:
+        out.write_text(t, encoding='utf-8')
+    except OSError as e:
+        print(f'错误：输出写入失败 {out}（{e}）', file=sys.stderr)
+        return 1
     print(f'已从模型生成：{out}  sections={len(model.get("sections") or [])}')
     print(f'  下一步: python scripts/validate_report.py "{out}" --strict')
     return 0

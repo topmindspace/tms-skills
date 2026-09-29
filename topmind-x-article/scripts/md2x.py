@@ -143,27 +143,40 @@ def _replace_links(s, defs):
         url = defs.get(label)
         return f"{m.group(1)}（{url}）" if url else m.group(0)
 
-    s = re.sub(r"(?<!\!)\[([^\]]+)\]\[([^\]]*)\]", _ref, s)
+    s = _INLINE_REF2_RE.sub(_ref, s)
 
     # 3) 快捷引用 [文字]（仅当 label 有定义时才转，避免误伤普通方括号）
     def _shortcut(m):
         url = defs.get(m.group(1).strip().lower())
         return f"{m.group(1)}（{url}）" if url else m.group(0)
 
-    return re.sub(r"(?<!\!)\[([^\]]+)\]", _shortcut, s)
+    return _INLINE_REF1_RE.sub(_shortcut, s)
+
+
+# _inline() 的行内模式：预编译在模块级，避免每行重复走 re 缓存查找
+_INLINE_BI_RE = re.compile(r"\*\*\*(.+?)\*\*\*")   # 粗斜体
+_INLINE_B_RE = re.compile(r"\*\*(.+?)\*\*")         # 加粗
+_INLINE_BU_RE = re.compile(r"__(.+?)__")
+_INLINE_I_RE = re.compile(r"\*(.+?)\*")            # 斜体
+_INLINE_CODE_RE = re.compile(r"`(.+?)`")           # 行内代码
+_INLINE_DEL_RE = re.compile(r"~~(.+?)~~")           # 删除线
+_INLINE_TASK0_RE = re.compile(r"^(\s*)- \[ \]\s+")
+_INLINE_TASK1_RE = re.compile(r"^(\s*)- \[x\]\s+", re.I)
+_INLINE_REF2_RE = re.compile(r"(?<!\!)\[([^\]]+)\]\[([^\]]*)\]")
+_INLINE_REF1_RE = re.compile(r"(?<!\!)\[([^\]]+)\]")
 
 
 def _inline(s, defs):
     """行内标记剥离（用于正文行、标题文本、表格单元格）。"""
-    s = re.sub(r"\*\*\*(.+?)\*\*\*", r"\1", s)  # 粗斜体
-    s = re.sub(r"\*\*(.+?)\*\*", r"\1", s)      # 加粗
-    s = re.sub(r"__(.+?)__", r"\1", s)
-    s = re.sub(r"\*(.+?)\*", r"\1", s)          # 斜体
-    s = re.sub(r"`(.+?)`", r"\1", s)            # 行内代码
-    s = re.sub(r"~~(.+?)~~", r"\1", s)          # 删除线
-    s = _replace_links(s, defs)                 # 链接（行内式/引用式）
-    s = re.sub(r"^(\s*)- \[ \]\s+", r"\1- ", s)  # 任务列表
-    s = re.sub(r"^(\s*)- \[x\]\s+", r"\1- ", s, flags=re.I)
+    s = _INLINE_BI_RE.sub(r"\1", s)  # 粗斜体
+    s = _INLINE_B_RE.sub(r"\1", s)    # 加粗
+    s = _INLINE_BU_RE.sub(r"\1", s)
+    s = _INLINE_I_RE.sub(r"\1", s)    # 斜体
+    s = _INLINE_CODE_RE.sub(r"\1", s)  # 行内代码
+    s = _INLINE_DEL_RE.sub(r"\1", s)  # 删除线
+    s = _replace_links(s, defs)       # 链接（行内式/引用式）
+    s = _INLINE_TASK0_RE.sub(r"\1- ", s)  # 任务列表
+    s = _INLINE_TASK1_RE.sub(r"\1- ", s)
     return s
 
 
@@ -269,7 +282,12 @@ def main() -> None:
     inp = Path(args.input)
     if not inp.is_file():
         sys.exit(f"错误：找不到输入文件 {inp}")
-    md = inp.read_text(encoding="utf-8-sig")
+    try:
+        md = inp.read_text(encoding="utf-8-sig")
+    except UnicodeDecodeError:
+        sys.exit(f"错误：输入文件不是有效的 UTF-8 编码 {inp}")
+    except OSError as e:
+        sys.exit(f"错误：无法读取输入文件 {inp}（{e}）")
     text, images = convert(md)
 
     out = Path(args.out)

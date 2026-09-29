@@ -1,3 +1,54 @@
+## [0.3.5] - 2026-09-29
+
+> **本版备发中**（未 push、未打 tag、npm 无此版本）。
+> 根包 0.3.4 → **0.3.5**（patch）；4 个技能 `version` 保持不动（top-ppt-html 0.1.19，其余 0.1.0）。
+> 注：0.3.2、0.3.3、0.3.4 均未发布，全部内容已并入本版。
+
+### 性能实测与优化（第七轮 Worker 4）
+
+- **实测基线**（中等规模真实输入）：`md2x.py` 300KB/8814 行 0.33s；`md2wechat.py` 218KB/3219 行/
+  80 图 0.42s（`--embed-images` 0.47s）；`crop-cover.py` 4000×2250 主图 1.79s；
+  安装器 `install`/`list` 均 <0.5s（含 7.9MB 的 top-ppt-html）。
+- **修 5 处 low-hanging fruit**（输出逐字节一致，已 diff 验证，无行为改动）：
+  - `md2wechat.py audit_inline()`：8 次全正文 `re.search` 合并为一次预编译单遍扫描
+    （原为大正文耗时的 ~47%，cProfile 实测）；
+  - `md2wechat.py render_inline()`：10 个行内模式预编译到模块级
+    （原每行 10 次 `re` 字符串模式缓存查找，666k 行调用时 667 万次）；
+  - `md2wechat.py highlight()`：语言联合正则按语言缓存（原每代码块重编译一次）；
+  - `md2wechat.py link_repl()`：脚注 url→序号改字典索引（原每链接两次全表扫描，O(n²)→O(n)）；
+  - `md2x.py _inline()`：同理预编译全部行内模式。
+- **实测提升**（交错对比，user CPU 时间）：md2wechat 11MB 输入 13.8s → 10.0s（-27%）；
+  md2x 49MB 输入 62.5s → 42.2s（-32%）；300KB 输入 md2x 0.33s → 0.29s。
+  crop-cover（PIL 解码/resize 主导）与安装器（node 启动 + 文件拷贝主导）无冗余工作，未改动。
+
+### 可靠性矩阵（第七轮 Worker 4：三个技能 + 安装器）
+
+- **修 2 个明确 bug**：
+  - `md2x.py` / `md2wechat.py` 非法 UTF-8 输入原抛 `UnicodeDecodeError` Traceback，
+    现干净报错（非零退出、无 Traceback）；读取期 `OSError`（如权限不足）同理。
+  - `md2wechat.py` 交付物写入改原子写（临时文件 + `os.replace`）：磁盘满等中途失败时
+    不再留下半截 HTML/清单（实测大文件写盘失败曾留下截断 HTML）。
+- 矩阵其余项全部干净（非零退出、无 Traceback、无半截输出）：空文件、49MB 超大文件、
+  特殊字符文件名（空格/引号/中文）、图片缺失（含 `--embed-images` 的"未内嵌"提示）、
+  非图片/0 字节/缺失输入、缺 Pillow 干净提示、非法 skill id、装进技能源目录树被拒、
+  未知命令/缺参数。
+- 安装器经确认零网络调用（纯 `fs`/`path`），本地安装天然离线可用；断网仅影响
+  `npx github:` 拉取，属 npm 侧报错，非本仓库代码路径。
+
+### 发版准备 0.3.5
+
+- 根 `package.json` 0.3.4 → **0.3.5**；9 处版本引用同步（根 README 中英钉版本示例、
+  `docs/PUBLISHING.md` 当前线与版本策略、6 份技能 README 的"同 tag"行）；4 技能各自
+  `version` 不动。
+- 待办：`top-ppt-html/README{,.en}.md` 的 3 处 `@0.3.4` 引用由其审核 worker 同步
+  （本轮未动 `top-ppt-html/` 目录）。
+
+### 全门禁（第七轮 Worker 4，改完后跑）
+
+- `ci_privacy_scan.py` PASS（200 文件）；`sync_npm_files.js --check` PASS；
+  `ci_skill_gates.sh --with-pptx` 全绿；4 技能 `negative_tests.py` 全部通过；
+  `run_skill_gates.js versions` PASS；`test_install_guards.js` 全部通过。
+
 ## [0.3.4] - 2026-09-29
 
 > **本版备发中**（未 push、未打 tag、npm 无此版本）。

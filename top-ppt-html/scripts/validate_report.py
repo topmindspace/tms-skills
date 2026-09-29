@@ -915,7 +915,11 @@ def _check_v9_hard_gates(txt, chk, model):
                 ctype = 'donut'
             if ctype not in skew_types:
                 continue
-            vals = [float(v) for v in (ch.get('values') or []) if v is not None]
+            try:
+                vals = [float(v) for v in (ch.get('values') or []) if v is not None]
+            except (TypeError, ValueError):
+                skew_hits.append(f"第{si}章 {ctype} values 含非数值（图表数据非法，无法判定占比）")
+                continue
             vals = [v for v in vals if v >= 0]
             if len(vals) < 2:
                 continue
@@ -1635,7 +1639,14 @@ def main():
     if not path.exists():
         print(f"文件不存在: {path}")
         return 2
-    txt = path.read_text(encoding='utf-8')
+    try:
+        txt = path.read_text(encoding='utf-8')
+    except UnicodeDecodeError as e:
+        print(f"文件不是合法 UTF-8: {path}（{e}）")
+        return 2
+    except OSError as e:
+        print(f"无法读取文件: {path}（{e}）")
+        return 2
 
     v = Struct()
     v.feed(txt)

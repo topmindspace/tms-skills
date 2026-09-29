@@ -273,7 +273,7 @@ def main() -> int:
         lock_cls = (SPEC.get('ratioCssClass') or {}).get(args.layout) or f'media--r{ratio_class(w, h)}'
         html_bits.append(
             f'<figure class="media {lock_cls}{fit_cls} rv">\n'
-            f'  <img src="{url if len(url) < 400 else url[:60] + "…（见 images-snippets.html 全文）"}" '
+            f'  <img src="{url}" '
             f'alt="{src.stem}">\n'
             f'  <figcaption class="media__cap--below">图：{src.stem}（{w}×{h} · {ratio_label(w, h)}）</figcaption>\n'
             f'</figure>')

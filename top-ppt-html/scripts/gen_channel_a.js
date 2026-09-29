@@ -195,20 +195,65 @@ function zipStore(files) {
    --model=<file> [--out=<dir>]：对任意模型跑 A 通道，供回归探针（split 组合页）与
    cross_verify.py 复用同一套「预览即交付」双裁判。 */
 const argv = process.argv.slice(2);
-const modelArg = (argv.find((a) => a.startsWith('--model=')) || '').split('=')[1];
-const outArg = (argv.find((a) => a.startsWith('--out=')) || '').split('=')[1];
+/* 取 --name=value 参数值（路径里含 '=' 时 split('=')[1] 会截断，用 slice 精确取） */
+const _argVal = (name) => {
+  const a = argv.find((x) => x.startsWith(name + '='));
+  return a ? a.slice(name.length + 1) : undefined;
+};
+const modelArg = _argVal('--model');
+const outArg = _argVal('--out');
 const OUT_DIR = outArg ? path.resolve(outArg) : OUT;
-fs.mkdirSync(OUT_DIR, { recursive: true });
+/* 输出目录延迟到首次成功写盘前再建：模型读取失败时不留下空目录（原子性） */
+let outDirReady = false;
+function ensureOutDir() {
+  if (outDirReady) return;
+  try {
+    fs.mkdirSync(OUT_DIR, { recursive: true });
+  } catch (e) {
+    console.error('[gen_channel_a] FAIL: 无法创建输出目录 ' + OUT_DIR + '：' + (e && e.message));
+    process.exit(1);
+  }
+  outDirReady = true;
+}
 
-const jobs = modelArg
-  ? [[path.resolve(modelArg), path.basename(modelArg).replace(/\.model\.json$/, '.pptx')]]
-  : fs.readdirSync(EX).filter((f) => f.endsWith('.model.json')).sort()
-      .map((f) => [path.join(EX, f), f.replace('.model.json', '.pptx')]);
+let jobs;
+try {
+  jobs = modelArg
+    ? [[path.resolve(modelArg), path.basename(modelArg).replace(/\.model\.json$/, '.pptx')]]
+    : fs.readdirSync(EX).filter((f) => f.endsWith('.model.json')).sort()
+        .map((f) => [path.join(EX, f), f.replace('.model.json', '.pptx')]);
+} catch (e) {
+  console.error('[gen_channel_a] FAIL: 无法列出模型目录 ' + (modelArg || EX) + '：' + (e && e.message));
+  process.exit(1);
+}
 
+let failed = 0;
 for (const [src, name] of jobs) {
-  const model = JSON.parse(fs.readFileSync(src, 'utf-8'));
-  const bytes = buildPptx(model);
+  let model;
+  try {
+    model = JSON.parse(fs.readFileSync(src, 'utf-8'));
+  } catch (e) {
+    console.error('[gen_channel_a] FAIL: 模型读取失败 ' + src + '：' + (e && e.message));
+    failed++;
+    continue;
+  }
+  let bytes;
+  try {
+    bytes = buildPptx(model);
+  } catch (e) {
+    console.error('[gen_channel_a] FAIL: A 通道组装失败 ' + src + '：' + (e && e.message));
+    failed++;
+    continue;
+  }
   const out = path.join(OUT_DIR, name);
-  fs.writeFileSync(out, Buffer.from(bytes));
+  try {
+    ensureOutDir();
+    fs.writeFileSync(out, Buffer.from(bytes));
+  } catch (e) {
+    console.error('[gen_channel_a] FAIL: 写入失败 ' + out + '：' + (e && e.message));
+    failed++;
+    continue;
+  }
   console.log('A-channel:', path.basename(out), Math.round(bytes.length / 1024) + 'KB');
 }
+process.exit(failed ? 1 : 0);

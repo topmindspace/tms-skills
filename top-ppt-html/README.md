@@ -9,16 +9,8 @@
 
 **让 idea 飞，好想法被看见。** 为**演示报告 / 正式商务演示**而生的高品质演示文稿技能：**HTML + PPT 双交付**——日常用可翻页 HTML 等同幻灯片；需要时再导出**版式保真可编辑 PPTX**。参考 **MD3**：合适信息密度、克制文字/图形/颜色。核心工艺是版式、排版、色彩与内容组织——不是 gadget 堆砌。
 
-### 为什么还是 top-ppt-html
-
-市面 PPT 技能很多。本技能主场是**正式商务演示**：直观、美观大气、风格多样、**高保真可编辑 PPTX**（图表带数据可标注）；产出即上台。
-
-<p align="center">
-  <img src="assets/showcase/showcase-cover.png" alt="TopMind × tms-skills showcase cover" width="720" />
-</p>
-
 - 技能标识：`top-ppt-html`；品牌名：**TopPPT HTML**
-- 版本：**v0.1.19**（与 `@topmindspace/tms-skills@0.3.4` 同 tag）
+- 版本：**v0.1.19**（与 `@topmindspace/tms-skills@0.3.5` 同 tag）
 - **智能体入口**：`SKILL.md` → `references/playbook.md`（L1）→ L2 按需
 - **人类维护者**：本 README（安装 / 命令 / 目录）；勿把本文件当生成规范
 
@@ -29,16 +21,6 @@
   <sub>演示 · business-blue（默认）· 另见 <a href="./assets/style-gallery.html">style-gallery</a> · <a href="./assets/theme-overview-research.png">研究</a> · <a href="./assets/theme-overview-architecture.png">架构</a></sub>
 </p>
 
-### 风格 × 模式一览
-
-| business-blue · 演示 | mckinsey · 研究 | graphite-dark · 架构 |
-|:---:|:---:|:---:|
-| ![bb](assets/showcase/style-business-blue-cover.png) | ![mk](assets/showcase/style-mckinsey-cover.png) | ![gr](assets/showcase/style-graphite-cover.png) |
-
-| 定位 | 双交付 | 图表 | Header 工具栏 |
-|:---:|:---:|:---:|:---:|
-| ![pos](assets/showcase/showcase-positioning.png) | ![sp](assets/showcase/showcase-split.png) | ![ch](assets/showcase/showcase-charts.png) | ![tb](assets/showcase/showcase-toolbar.png) |
-
 **在线体验** · [落地页](https://topmindspace.github.io/tms-skills/) · [Showcase 演示文稿](https://topmindspace.github.io/tms-skills/showcase.html) · [风格画廊](https://topmindspace.github.io/tms-skills/style-gallery.html)
 
 - 交互画廊（仓库内）：[`assets/style-gallery.html`](./assets/style-gallery.html)
@@ -46,6 +28,7 @@
 - 仓库级大图集：[`docs/showcase/`](../docs/showcase/)（不进技能 zip）
 
 ## 一、技能简介（人类速览）
+
 | 维度 | 能力 |
 |------|------|
 | 产出 | **双交付**：日常 HTML 可翻页演示 + 按需 16:9 可编辑 PPTX；亮暗双主题 · **Header 工具栏 T/P/H/F/B + 9 风格** |
@@ -94,18 +77,6 @@ git clone https://github.com/topmindspace/tms-skills.git
 node tms-skills/bin/tms-skills.js install top-ppt-html
 ```
 
-> **GitHub 更新不会自动进 npm。** 日常可钉 npm 版本；要最新技能用 GitHub 直装，或等 maintainer 打 tag 发版。
->
-
-### 触发词回归（维护者）
-
-```bash
-python3 scripts/check_triggers.py          # keyword/heuristic vs SKILL description
-# 扩展：编辑 evals/trigger-queries.json（how_to_extend）
-```
-
-`package_skill.py --check` 会自动跑 trigger coverage。
-
 > 「找不到这个包」→ 换 GitHub 直装，或 `--registry https://registry.npmjs.org/`（镜像索引可能滞后）。不要 `npm install top-ppt-html`（技能 id 不是独立 npm 包）。
 
 也可将本目录（或 GitHub Release 附件 `top-ppt-html.zip` 解压结果）复制到智能体技能目录，目录名保持 `top-ppt-html`。技能识别面为 `SKILL.md`（frontmatter 的 `name` / `description` 即触发描述）。
@@ -115,10 +86,9 @@ python3 scripts/check_triggers.py          # keyword/heuristic vs SKILL descript
 ```bash
 cd top-ppt-html
 npm install                  # 依 package.json 安装 pptxgenjs（^4）
-# 或：npm install pptxgenjs ／ 把 NODE_PATH 指向任意已含 pptxgenjs 的 node_modules
 ```
 
-脚本会自动探测 Node 与 node_modules（`TOP_PPT_NODE_EXE` / `TOP_PPT_NODE_PATH` 环境变量 > `PATH` > 常见托管目录），不绑定任何机器的固定路径。参考图刷新（可选，非交付依赖）另需 playwright：`npm install playwright && npx playwright install chromium`。
+脚本会自动探测 Node 与 node_modules（`TOP_PPT_NODE_EXE` / `TOP_PPT_NODE_PATH` 环境变量 > `PATH` > 常见托管目录），不绑定任何机器的固定路径。参考图刷新（可选，非交付依赖）另需 playwright。
 
 ### 最小示例（复制即跑 · 约 3 分钟）
 
@@ -152,51 +122,26 @@ python3 scripts/validate_pptx.py report.pptx --strict --model=report.model.json
 →（用户要 PPTX 时 · **仅 B 通道**）extract_model.py → build_pptx.js --model → validate_pptx.py --strict 0/0
 ```
 
-**渐进式披露三档**（详见 `SKILL.md` 阶段路由表）：`L0` = `SKILL.md`（路由 + 门禁 + 铁律，加载即用）；`L1` = `references/playbook.md`（**唯一常读入口**：模式契约 / 页型选型 / 组合版式矩阵 / 图表选型决策树 / 内容规则 / 配色 / 校验命令）；`L2` = 深度规范，**只在命中条件时读、读完即停**；**取码必须 `extract_snippet.py`**（整读大 L2 = FAIL）；`components.md`/`charts.md` 为逻辑索引，自动路由到物理拆分文件。
+渐进式披露：`L0` = `SKILL.md`（路由 + 门禁 + 铁律）；`L1` = `references/playbook.md`（唯一常读入口）；`L2` = 深度规范，**只在命中条件时读、读完即停**；取码必须 `extract_snippet.py`（整读大 L2 = FAIL）。
 
 ## 三、目录结构
 
 ```
 top-ppt-html/
-├─ SKILL.md                     # 智能体入口：触发描述 + 工作流 + 铁律        ┐
-├─ README.md                    # 本文件：人类视角的简介/开发/打包           │
-├─ package.json                 # Node 依赖（pptxgenjs）与常用命令            │ 进包
-├─ assets/                      #                                           │ 且
-│  ├─ templates/                #   三份模式模板（presentation/research/architecture）  │ 入库
-│  │                            #   + engine.css / ui.js（公共引擎/UI，sync_runtime 注入源）
-│  ├─ examples/                 #   3 黄金样张 + showcase（HTML+model）                          │
-│  ├─ pptx-export.js            #   PPTX 预览运行时（含常量/schema 注入块）   │
-│  ├─ style-gallery.html        #   风格 × 模式 × 亮暗主题交互画廊            │
-│  ├─ theme-overview*.png       #   3 张主题参考图（整体=演示 / 研究 / 架构）  │
-│  └─ showcase/                 #   README 用精简截图（完整集见 docs/showcase） │
-├─ references/                  # 规范（L1 常读 1 篇 + L2 按需；components/charts 已按族拆分）│  ├─ playbook.md               #   ★ L1 唯一常读入口：模式/页型/组合/图表/配色/校验 │
-│  ├─ components.md             #   逻辑索引（§ 路由到下列物理文件）              │
-│  ├─ components-atoms.md       #   §1–§15c 结构组件                              │
-│  ├─ layouts-research.md       #   §36–§36f research 锁定版式                    │
-│  ├─ layouts-architecture.md   #   §37–§38b architecture 版式                    │
-│  ├─ layouts-combo.md          #   §32–§34/§39–§50 组合与选型表 §46              │
-│  ├─ charts.md                 #   逻辑索引（图表 § 路由）                       │
-│  ├─ charts-basic.md           #   §16–§35 基础图表代码                          │
-│  ├─ charts-extended.md        #   §52–§70 advanced（意图命中才读，禁预读）        │
-│  ├─ charts-discipline.md      #   §64/§66 误用与多样性纪律                      │
-│  ├─ infographics.md           #   铁律与边界（逻辑入口）；代码已拆分见下两行          │
-│  ├─ infographics-stats.md     #   统计图形族 §1–§6 / §71–§77                        │
-│  ├─ infographics-structure.md #   结构图形族 §78–§82                                │
-│  ├─ page-type-matrix.md     #   L2 意图→页型穷举（playbook §三 速记）                 │
-│  ├─ chart-decision-tree.md  #   L2 图表决策表+误用（playbook §五 摘要）               │
-│  ├─ illustration-layout.md  #   L2 插画/配图 brief                                   │
-│  └─ …（modes / styles / design-system / content-rules / icons / default-surface /     │
-│        outline-design / pptx-export / high-fidelity / failure-modes / tech-design；  │
-│        归档见 ../docs/archive/refs/）                                                   │
-├─ evals/                       # Eval 框架（结果/过程/风格/效率四类目标）    │
-│  ├─ prompts.csv               #   14 条 prompt（显式/隐式/上下文/负对照）   │
-│  ├─ rubric.schema.json        #   风格目标结构化评分契约                    │
-│  ├─ run_evals.py              #   确定性检查 + 效率度量 + rubric 落地       │
-│  └─ trace.example.json        #   过程/效率 trace 示例（轮次/工具调用/读取量）│
-├─ scripts/                     # 生成/校验/回归/维护工具（见下表）          ┘
-├─ .gitignore                   # 出库规则（dist/依赖/缓存/本地状态/临时脚本）
-├─ dist/                        # 构建与回归产物 + 分发包 zip + 发布清单  ← 不进包、不入库
-└─ （本地状态目录）                      # IDE / 智能体本地状态                  ← 不进包、不入库
+├─ SKILL.md                     # 智能体入口：触发描述 + 工作流 + 铁律
+├─ README.md                    # 本文件：人类视角的简介/开发/打包
+├─ package.json                 # Node 依赖（pptxgenjs）与常用命令
+├─ assets/                      # 模板 + 引擎/UI + 示例 + 主题参考图
+│  ├─ templates/                #   三份模式模板（presentation/research/architecture）
+│  ├─ examples/                 #   3 黄金样张 + showcase（HTML+model）
+│  ├─ style-gallery.html        #   风格 × 模式 × 亮暗主题交互画廊
+│  └─ theme-overview*.png       #   3 张主题参考图（Gate 0）
+├─ references/                  # 规范（L1 常读 1 篇 + L2 按需；components/charts 已按族拆分）
+│  └─ playbook.md               #   ★ L1 唯一常读入口
+├─ evals/                       # Eval 框架（结果/过程/风格/效率四类目标）
+├─ scripts/                     # 生成/校验/回归/维护工具（见下表）
+├─ .gitignore                   # 出库规则
+└─ dist/                        # 构建与回归产物 + 分发包 zip + 发布清单  ← 不进包、不入库
 ```
 
 ---
@@ -225,22 +170,6 @@ python scripts/audit_skill.py && python scripts/audit_docs.py
 python scripts/audit_styles.py && python scripts/audit_css.py
 python scripts/negative_tests.py
 python scripts/check_triggers.py
-# 可选第三方：npx --yes skills-ref@0.1.5 validate .
 ```
 
-## 目录要点
-
-| 路径 | 用途 |
-|------|------|
-| `SKILL.md` | L0 路由（约 16KB）；智能体唯一入口 |
-| `references/playbook.md` | L1 决策层（Mode / 路径 / V1–V4 / 组合 / 多样性摘要 / 命令 / 路由） |
-| `references/page-type-matrix.md` | L2 页型穷举表 |
-| `references/chart-decision-tree.md` | L2 图表决策树 + 七种误用 |
-| `references/default-surface.md` | Mode A L1.5：12 页型 + 核图 8 + V1–V4 |
-| `references/presentation-craft.md` | Mode A L1.5 工艺（反截断 / 大气正式） |
-| `assets/examples/` | 3 份黄金样张（每模式 1）+ TopMind showcase |
-| `evals/trigger-queries.json` | description 触发正/负例；`check_triggers.py` |
-| `../docs/archive/` | 历史规范 / 旧示例 |
-
-风格画廊与主题参考图：`assets/theme-overview*.png`（Gate 0）。完整规范索引见 playbook §十。
-
+完整规范索引见 playbook §十。

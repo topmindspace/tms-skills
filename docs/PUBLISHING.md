@@ -12,7 +12,7 @@
 - 包：<https://www.npmjs.com/package/@topmindspace/tms-skills>
 - 仓库：<https://github.com/topmindspace/tms-skills>
 
-当前线：安装器 **0.3.4** · 技能 top-ppt-html **0.1.19** · topmind-wechat-post / topmind-x-article / topmind-cover **0.1.0**（整仓同 tag 发版；见 CHANGELOG）。
+当前线：安装器 **0.3.5** · 技能 top-ppt-html **0.1.19** · topmind-wechat-post / topmind-x-article / topmind-cover **0.1.0**（整仓同 tag 发版；见 CHANGELOG）。
 
 
 ## npm 2.x 弃用说明（仓库重置）
@@ -35,7 +35,7 @@ npm 上的 `@topmindspace/tms-skills` **2.0.0–2.1.1 已弃用**（仓库重置
 
 ## 版本策略（务必遵守）
 
-**整仓同 tag**：`git tag vX.Y.Z` 的 `X.Y.Z` = 根 `package.json` 的 `version`（即安装器 version，如当前 v0.3.4）；tag 号不代表任何技能版本。**各技能 `version` 独立演进**（如 top-ppt-html 0.1.19、新技能 0.1.0），不与 tag 号绑定。
+**整仓同 tag**：`git tag vX.Y.Z` 的 `X.Y.Z` = 根 `package.json` 的 `version`（即安装器 version，如当前 v0.3.5）；tag 号不代表任何技能版本。**各技能 `version` 独立演进**（如 top-ppt-html 0.1.19、新技能 0.1.0），不与 tag 号绑定。
 
 | 包 | 事实源 | 规则 |
 |----|--------|------|
@@ -73,14 +73,9 @@ CI/Release 细节见 [`docs/ci.md`](./ci.md)。
    git push origin main --tags
    ```
 
-   > **推送方式（2026-09-29 起）**：SSH 隧道已被代理墙掐断（`ssh.github.com:443` 与 22 端口的
-   > CONNECT 均被 reset），改走 **HTTPS + PAT Basic 认证**推送：
-   > ```bash
-   > git -c "http.extraHeader=Authorization: Basic <base64(x-access-token:PAT)>" \
-   >   push https://github.com/topmindspace/tms-skills.git main
-   > ```
-   > 注意：① GitHub git 接口不认 `Bearer`，只认 Basic；② origin 是 SSH 地址时必须显式给 HTTPS URL；
-   > ③ PAT 为一次性 fine-grained token（仅本仓 Contents 读写），用完即弃，**不入库、不写进文档**。
+   > **推送（2026-09-29 起）**：SSH 隧道被代理墙掐断，改走 **HTTPS + PAT Basic 认证**：
+   > `git -c "http.extraHeader=Authorization: Basic <base64(x-access-token:PAT)>" push https://github.com/topmindspace/tms-skills.git main`
+   > 坑：GitHub git 接口不认 `Bearer` 只认 Basic；origin 是 SSH 地址时必须显式给 HTTPS URL；PAT 一次性，用完即弃不入库。
 
    Release workflow（`.github/workflows/release.yml`）按序执行：
    - **tag ↔ `package.json` 交叉校验**：`vX.Y.Z` 必须等于根 `package.json` 的 `version`，不一致直接失败
@@ -147,9 +142,7 @@ npm run privacy
 
 | 现象 | 处理 |
 |------|------|
-| `ENEEDAUTH` | `npm login --registry https://registry.npmjs.org/` |
-| `403` 2FA | granular token 或 `--otp` |
+| `ENEEDAUTH` / `403` 2FA | `npm login --registry https://registry.npmjs.org/`，granular token 或 `--otp` |
 | `403` cannot publish over version | 已存在 → bump |
-| Public 但 registry 404 | 索引延迟 / 指定官方 registry |
-| 发到镜像站 | publish 只用 `registry.npmjs.org` |
+| Public 但 registry 404 | 索引延迟 / 指定官方 registry；publish 只用 `registry.npmjs.org` |
 | tag 后 npm 未发 | 查 Actions 与 `NPM_TOKEN` |

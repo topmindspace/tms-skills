@@ -9,16 +9,8 @@
 
 **Let ideas fly — make good thinking visible.** A high-craft skill for **demo reports / formal business presentations**: **HTML + PPT dual delivery** — day-to-day, present with paginated HTML like slides; export **layout-faithful editable PPTX** when needed. **MD3-inspired**: fitting information density, restrained type / shapes / color. Core craft is layout, typography, color, and content structure — not gadget soup.
 
-### Why top-ppt-html
-
-Plenty of PPT skills exist. This one is for **formal business presenting**: clear, atmospheric, multi-style, **high-fidelity editable PPTX** (charts carry annotatable data) — stage-ready output.
-
-<p align="center">
-  <img src="assets/showcase/showcase-cover.png" alt="TopMind × tms-skills showcase cover" width="720" />
-</p>
-
 - Skill id: `top-ppt-html`; brand: **TopPPT HTML**
-- Version: **v0.1.19** (same tag as `@topmindspace/tms-skills@0.3.4`)
+- Version: **v0.1.19** (same tag as `@topmindspace/tms-skills@0.3.5`)
 - **Agent entry**: `SKILL.md` → `references/playbook.md` (L1) → L2 on demand
 - **Human maintainers**: this README (install / commands / layout); do not treat it as the generation spec
 
@@ -28,16 +20,6 @@ Plenty of PPT skills exist. This one is for **formal business presenting**: clea
   <img src="assets/theme-overview.png" alt="Presentation · business-blue" width="860" /><br/>
   <sub>Presentation · business-blue (default) · also <a href="./assets/style-gallery.html">style-gallery</a> · <a href="./assets/theme-overview-research.png">research</a> · <a href="./assets/theme-overview-architecture.png">architecture</a></sub>
 </p>
-
-### Style × mode
-
-| business-blue · Presentation | mckinsey · Research | graphite-dark · Architecture |
-|:---:|:---:|:---:|
-| ![bb](assets/showcase/style-business-blue-cover.png) | ![mk](assets/showcase/style-mckinsey-cover.png) | ![gr](assets/showcase/style-graphite-cover.png) |
-
-| Positioning | Dual delivery | Charts | Header toolbar |
-|:---:|:---:|:---:|:---:|
-| ![pos](assets/showcase/showcase-positioning.png) | ![sp](assets/showcase/showcase-split.png) | ![ch](assets/showcase/showcase-charts.png) | ![tb](assets/showcase/showcase-toolbar.png) |
 
 **Live** · [Landing](https://topmindspace.github.io/tms-skills/) · [Showcase deck](https://topmindspace.github.io/tms-skills/showcase.html) · [Style gallery](https://topmindspace.github.io/tms-skills/style-gallery.html)
 
@@ -73,7 +55,7 @@ Also: arrow-key paging; **Esc** closes modals. After style/theme change, re-run 
 
 ```bash
 npx @topmindspace/tms-skills install top-ppt-html
-npx @topmindspace/tms-skills@0.3.4 install top-ppt-html
+npx @topmindspace/tms-skills@0.3.5 install top-ppt-html
 npx github:topmindspace/tms-skills install top-ppt-html
 ```
 

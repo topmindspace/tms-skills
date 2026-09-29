@@ -111,19 +111,30 @@ def main():
     if not path.exists():
         print(f"文件不存在: {path}")
         return 2
-    txt = path.read_text(encoding='utf-8')
+    try:
+        txt = path.read_text(encoding='utf-8')
+    except UnicodeDecodeError as e:
+        print(f"文件不是合法 UTF-8: {path}（{e}）")
+        return 2
+    except OSError as e:
+        print(f"文件读取失败: {path}（{e}）")
+        return 2
 
-    m = re.search(r'window\.REPORT_MODEL\s*=\s*(\{[\s\S]*?\})\s*;', txt)
+    # 括号感知抽取：模型字符串含 `};` 时正则 `\{[\s\S]*?\}` 会提前截断；
+    # 与 validate_report._extract_model 同口径（JSONDecoder.raw_decode）。
+    m = re.search(r'window\.REPORT_MODEL\s*=\s*', txt)
     if not m:
         print("未找到 window.REPORT_MODEL —— 报告未内嵌内容模型。")
         print("请按 references/pptx-export.md 在报告 <script> 中补齐模型后再抽取。")
         return 1
-    raw = m.group(1)
     try:
-        model = json.loads(raw)
+        model, _end = json.JSONDecoder().raw_decode(txt, m.end())
     except json.JSONDecodeError as e:
         print(f"REPORT_MODEL 不是合法 JSON: {e}")
         print("注意：模型必须是严格 JSON（双引号、无尾逗号、无注释）。")
+        return 1
+    if not isinstance(model, dict):
+        print("REPORT_MODEL 根节点必须是 JSON 对象。")
         return 1
 
     # 模型字符串字段净化：禁止把 HTML 标签当纯文本写入（cite 只允许 [n]）。
@@ -207,7 +218,7 @@ def main():
     plain = re.sub(r'<[^>]+>', ' ', txt)
     secs = model.get('sections') or []
     miss_titles = [str(s.get('title'))[:14] for s in secs
-                   if s.get('title') and str(s.get('title')) not in plain]
+                   if isinstance(s, dict) and s.get('title') and str(s.get('title')) not in plain]
     if miss_titles:
         issues.append(f"{len(miss_titles)} 个章节标题未在正文出现: {miss_titles[:3]}")
     n_ag = len(model.get('agenda') or [])

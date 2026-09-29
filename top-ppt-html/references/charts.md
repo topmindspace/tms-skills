@@ -20,18 +20,3 @@
 | §64、§66 | `charts-discipline.md` | **默认先读**（误用/多样性） |
 | §16–§31、§29b、§35 等 | `charts-basic.md` | 核图与常规图代码 |
 | §52–§70（除纪律节） | `charts-extended.md` | advanced / 意图命中 |
-
-# 图表全库（纯 SVG · `data-chart` 标记）
-
-复制即用。类名依赖 `design-system.md` token；版式见 `components.md`；复杂信息图见 `infographics.md`。
-
-**约定**：图表 svg 一律 `class="chart" data-chart="类型"`（**36 种登记**：donut / multidonut / pie / radar / gauge / rose / bar / stack / stackline / waterfall / line / dualline / area / scatter / bubble / funnel / gantt / hbar / vsbar / treemap / progress / sparkline / sankey / slope / dumbbell / lollipop / marimekko / dotplot / bulletchart / waffle / boxplot / pareto / radialbar / streamgraph / candlestick / network）。事实源 = `scripts/layout-constants.json` → `charts`（`types` + `minSize`）。
-
-> **编号说明**：跨文件唯一稳定编号（§1–§77）。图表 §16–§31、§29b、§35、§52–§70。  
-> **六类信息图**（sankey / treemap / boxplot / network / marimekko / streamgraph）**不是** `chart.type`——专属页型见 `infographics.md`。
-
----
-
-# 第一部分 · 基础图表（核图优先）
-
-> 单维对比 / 趋势 / 占比 / 分布；多系列配色见 §29b。Mode A 默认从核图 8 起选。

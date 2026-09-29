@@ -418,6 +418,13 @@ def annotation_band_overlap_check(
     def _text(el: ET.Element) -> str:
         return (text_content(el) or "").strip()
 
+    def _has_txbody(el: ET.Element) -> bool:
+        # 命名空间无关：是否存在 p:txBody 后代（文本框）
+        for d in el.iter():
+            if isinstance(d.tag, str) and d.tag.rsplit("}", 1)[-1] == "txBody":
+                return True
+        return False
+
     def _is_chrome_or_bg(y: int, cy: int, cx: int) -> bool:
         if (cx * cy) / slide_area >= full_bleed_area and y <= int(0.05 * 914400):
             return True
@@ -501,7 +508,9 @@ def annotation_band_overlap_check(
         overlap = min(bottom, band_bot) - band_top
         if overlap < min_overlap:
             continue
-        if has_annotation or overlap >= severe_overlap:
+        # 无注释页文本框底框到 contentBottom 是引擎有意为之（框内无墨水侵入注释带），
+        # severe 安全网仅对非文本形状保留（feedback gate 用例 3：无 txBody 形状仍触发）。
+        if has_annotation or (overlap >= severe_overlap and not _has_txbody(el)):
             out.append(issue(
                 "ANNOTATION_BAND_OVERLAP",
                 f"主内容侵入注释带（元素底边 {bottom/914400:.2f}in 越过注释带顶 "

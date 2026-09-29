@@ -298,7 +298,11 @@ def build_schema_block(ms: dict) -> str:
 
 
 def inject(path: Path, pat: re.Pattern, repl: str, label: str) -> bool:
-    src = path.read_text(encoding='utf-8')
+    try:
+        src = path.read_text(encoding='utf-8')
+    except OSError as e:
+        print(f'错误: 无法读取 {path.name}: {e}')
+        return False
     if not pat.search(src):
         print(f'错误: {path.name} 缺少 {label} 标记块')
         return False
@@ -310,15 +314,39 @@ def main() -> int:
     if not LC.exists():
         print(f'错误: 找不到 {LC}')
         return 2
-    lc = json.loads(LC.read_text(encoding='utf-8'))
+    try:
+        lc = json.loads(LC.read_text(encoding='utf-8'))
+    except UnicodeDecodeError as e:
+        print(f'错误: {LC.name} 不是合法 UTF-8: {e}')
+        return 2
+    except json.JSONDecodeError as e:
+        print(f'错误: {LC.name} 不是合法 JSON: {e}')
+        return 2
+    except OSError as e:
+        print(f'错误: 无法读取 {LC}: {e}')
+        return 2
     if not MS.exists():
         print(f'错误: 找不到 {MS}（DSL schema 单源）')
         return 2
-    ms = json.loads(MS.read_text(encoding='utf-8'))
+    try:
+        ms = json.loads(MS.read_text(encoding='utf-8'))
+    except UnicodeDecodeError as e:
+        print(f'错误: {MS.name} 不是合法 UTF-8: {e}')
+        return 2
+    except json.JSONDecodeError as e:
+        print(f'错误: {MS.name} 不是合法 JSON: {e}')
+        return 2
+    except OSError as e:
+        print(f'错误: 无法读取 {MS}: {e}')
+        return 2
     ok = True
 
     # ① 重新生成 pptx-export.js 常量块 + schema 块
-    src = PE.read_text(encoding='utf-8')
+    try:
+        src = PE.read_text(encoding='utf-8')
+    except OSError as e:
+        print(f'错误: 无法读取 {PE}: {e}')
+        return 1
     if not CONST_PAT.search(src):
         print('错误: assets/pptx-export.js 缺少 __TOPPPT_CONSTANTS__ 标记块')
         return 1

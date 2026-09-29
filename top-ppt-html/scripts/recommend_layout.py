@@ -350,15 +350,38 @@ def main() -> int:
 
     if args.stdin:
         raw = sys.stdin.read()
-        data = json.loads(raw) if raw.strip() else {}
+        try:
+            data = json.loads(raw) if raw.strip() else {}
+        except json.JSONDecodeError as e:
+            print(f'错误：--stdin 不是合法 JSON: {e}')
+            return 2
+        if not isinstance(data, dict):
+            print('错误：--stdin 根节点必须是对象')
+            return 2
         mode = mode or data.get('mode')
         intents = intents or list(data.get('intents') or [])
         pages = pages if pages is not None else data.get('pages')
         model = data.get('model') or data if 'sections' in data else None
 
     if args.from_model:
-        model = json.loads(Path(args.from_model).read_text(encoding='utf-8'))
-        mode = mode or model.get('mode')
+        try:
+            model = json.loads(Path(args.from_model).read_text(encoding='utf-8'))
+        except FileNotFoundError:
+            print(f'错误：--from-model 文件不存在 {args.from_model}')
+            return 2
+        except UnicodeDecodeError as e:
+            print(f'错误：--from-model 不是合法 UTF-8 {args.from_model}: {e}')
+            return 2
+        except OSError as e:
+            print(f'错误：无法读取 --from-model {args.from_model}: {e}')
+            return 2
+        except json.JSONDecodeError as e:
+            print(f'错误：--from-model 不是合法 JSON {args.from_model}: {e}')
+            return 2
+        mode = mode or (model.get('mode') if isinstance(model, dict) else None)
+        if model is not None and not isinstance(model, dict):
+            print(f'错误：--from-model 根节点必须是对象（得到 {type(model).__name__}）')
+            return 2
 
     if not mode:
         ap.error('--mode is required (or provide via --from-model/--stdin)')

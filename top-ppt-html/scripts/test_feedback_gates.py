@@ -172,6 +172,29 @@ def test_annotation_band_fires_when_note_present() -> None:
     )
 
 
+def test_annotation_band_textbox_to_content_bottom_no_note() -> None:
+    """Text box framed to contentBottom (6.9) with no annotation is engine-intent
+    (empty frame, no ink invasion) — severe safety net must not fire (cf. 3c)."""
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        f'<p:sp xmlns:a="{NS["a"]}" xmlns:p="{NS["p"]}">'
+        "<p:spPr><a:xfrm>"
+        f'<a:off x="{int(0.6 * EMU)}" y="{int(2.35 * EMU)}"/>'
+        f'<a:ext cx="{int(6 * EMU)}" cy="{int(4.55 * EMU)}"/>'
+        "</a:xfrm></p:spPr>"
+        "<p:txBody><a:p><a:r><a:t>发现要点</a:t></a:r></a:p></p:txBody>"
+        "</p:sp>"
+    )
+    el = ET.fromstring(xml)
+    issues = V.annotation_band_overlap_check([el], 1, int(7.5 * EMU))
+    codes = [i["code"] for i in issues]
+    ok(
+        "3e textbox to 6.90 without annotation does not fire",
+        "ANNOTATION_BAND_OVERLAP" not in codes,
+        f"codes={codes}",
+    )
+
+
 def test_font_size_h2_17_allowed() -> None:
     """modeTypeScale h2=17 must be on the allowed set (cover/display whitelist)."""
     xml = (
@@ -425,6 +448,7 @@ def main() -> int:
     test_annotation_band_ignores_full_bleed_bg()
     test_annotation_band_allows_content_without_note()
     test_annotation_band_fires_when_note_present()
+    test_annotation_band_textbox_to_content_bottom_no_note()
     test_annotation_band_reports_all_invaders()
     test_annotation_band_so_what_band_top()
     test_element_overlap()

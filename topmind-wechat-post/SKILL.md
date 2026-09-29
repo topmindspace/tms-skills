@@ -1,17 +1,20 @@
 ---
 name: topmind-wechat-post
 version: 0.1.0
-description: "管一篇公众号文章从选题/底稿到发布的完整生命周期：交付包搭建、审校改写、质量三关（事实/逻辑/去AI味）、状态同步、微信内联排版与发布清单。Use when 写公众号、公众号排版、公众号定稿、发公众号。Do NOT use for 只改错别字、小红书/知乎、纯网页发布。"
+description: "管一篇公众号文章从选题/底稿到发布的完整生命周期：交付包搭建、审校改写、质量三关（事实/逻辑/去AI味）、状态同步、微信内联排版与发布清单。Use when 写公众号、公众号排版、公众号定稿、发公众号。Do NOT use for 只改错别字、小红书/知乎、纯网页发布、封面配图（→topmind-cover）、X 长文（→topmind-x-article）。"
 action_category: write
 triggers:
   - 公众号
   - 微信排版
+  - 微信编辑器
   - 公众号排版
   - 公众号稿
   - 排版这篇文章
+  - 粘贴到公众号
   - 定稿
   - 发公众号
   - 公众号交付
+  - 状态同步
   - wechat
   - mp format
 triggers_cn:
@@ -26,7 +29,7 @@ updated: 2026-09-29
 
 # topmind-wechat-post · 公众号创作技能
 
-**公众号专用写作技能**。管一篇公众号文章从选题/底稿到发布清单的完整生命周期。
+管一篇公众号文章从选题/底稿到发布清单的完整生命周期。
 
 ```
 选题/底稿 → 创作 → 质量三关 → 定稿(状态+目录) → 排版 → 发布清单 →（可选）回推 notes
@@ -52,18 +55,17 @@ export TOPMIND_WORKSPACE=/path/to/workspace   # 推荐
 python3 scripts/new-article.py --slug demo --title "标题" --direction reverse
 python3 scripts/lint-wechat.py --input <包>/公众号稿.md --fix
 python3 scripts/scan_ai_flavor.py <包>/公众号稿.md          # 目标 ≥85
-python3 scripts/md2wechat.py --input <包>/公众号稿.md --out-dir <包> --slug demo \
-  --asset-root <素材根> --embed-images
+python3 scripts/md2wechat.py --input <包>/公众号稿.md --out-dir <包> --slug demo --embed-images
 python3 scripts/sync-status.py --set 定稿 <包> --apply
 ```
 
-细节见 [`references/workflow.md`](references/workflow.md) · [`references/known-pits.md`](references/known-pits.md)。
+细节见 `references/workflow.md` · `references/known-pits.md`。
 
 ## 路径默认
 
 | 用途 | 解析 |
 |------|------|
-| 交付包根 | `--base` → `TOPMIND_WECHAT_BASE` → `{ws}/40-创作/2026-公众号` 或 `{ws}/20-专题/2026-公众号` |
+| 交付包根 | `--base` → `TOPMIND_WECHAT_BASE` → `{ws}/40-创作/<当年>-公众号`（如 2026-公众号）或 `{ws}/20-专题/<当年>-公众号` |
 | 工作区 | `TOPMIND_WORKSPACE` |
 | 底稿/回推 | `--topstream` → `TOPSTREAM_ROOT` → 可选；不存在则跳过 notes 校验 |
 | 终稿交付 | 可 `save-output` 拷贝到 role:delivery（`88-交付/`），包仍留在创作类专题 |
@@ -88,12 +90,8 @@ python3 scripts/sync-status.py --set 定稿 <包> --apply
 
 ### 站外拉取（转载整合 / 在线精选站）
 
-源不在本工作区、也不在 topstream `notes/` 时，**仍落 `reverse` + `target_file: pending`**。  
+源不在本工作区、也不在 topstream `notes/` 时，**仍落 `reverse` + `target_file: pending`**。
 **不要用 `forward`**：它要求 `source_file` 以 `notes/` 开头且文件真实存在，站外源必然过不了 `sync-mapping.py`。
-
-```bash
-python3 scripts/new-article.py --slug <中文短名> --title "<标题>" --direction reverse
-```
 
 取源坑（RSC 载荷、图片 hash 映射、`md5` 去重、截图裁切）见 `references/workflow.md`「站外拉取取源注意」；差异与口径写进包内 `README.md`。
 
@@ -131,16 +129,14 @@ python3 scripts/sync-status.py --set 定稿 <包> --apply
 
 ### 关 1 · 事实
 
-- 承重数字回**一手来源**；厂商口径 / 据报道 分开写  
-- 查不到一手来源的传闻**删**  
-- 改稿续写：正文已有数字**回源重核**（上一轮文本最不可信）  
-- 多口径（主轮/复跑）显式拆开；表格从数据源生成，禁止手抄  
-- 外部工具改过的稿：**先核数字再动文字**；「比值对但绝对值错」= 全段重核  
+- 承重数字回**一手来源**；厂商口径 / 据报道 分开写；查不到一手来源的传闻**删**
+- 改稿续写：正文已有数字**回源重核**（上一轮文本最不可信）
+- 多口径显式拆开；表格从数据源生成，禁止手抄
+- 外部工具改过的稿：**先核数字再动文字**；「比值对但绝对值错」= 全段重核
 
 ### 关 2 · 逻辑
 
-- 单边结论旁配反方证据  
-- 结构前后一致；同一事实多处同值  
+- 单边结论旁配反方证据；结构前后一致；同一事实多处同值
 
 ### 关 3 · 文字（去 AI 味）
 
@@ -153,17 +149,17 @@ python3 scripts/scan_ai_flavor.py <包>/公众号稿.md   # ≥85（人话）
 - **口语化 ≠ 有人味**：删社交垫词（元叙述、空转过渡、姿态句）  
 - 判据：**这句话删掉之后，读者少知道了什么？**  
 
-详见 [`references/writing-quality.md`](references/writing-quality.md)。
+详见 `references/writing-quality.md`。
 
 ## 排版要点（写稿时）
 
-- 开头 150 字内钩子；单段 ≤110 字；列表项 ≤70 字  
-- 二级标题不手写序号（排版层自动生成；中文大写数字如"叁"同样剥离）；容器：`::: stat|pull|note|tip|warn|danger|dialogue`  
-- **`::: stat` 内必须是 `数值 | 说明` 管道行**，否则静默丢弃  
-- 评测稿：**图承担数据，正文只解读**；健康密度 **300–450 字/图**  
-- 个股用词红线：禁用 买入/推荐/目标价…；文末投资声明  
+- 开头 150 字内钩子；单段 ≤110 字；列表项 ≤70 字
+- 二级标题不手写序号（排版层自动生成）；容器：`::: stat|pull|note|tip|warn|danger|dialogue`
+- **`::: stat` 内必须是 `数值 | 说明` 管道行**，否则静默丢弃
+- 评测稿：**图承担数据，正文只解读**；健康密度 **300–450 字/图**
+- 个股用词红线：禁用 买入/推荐/目标价…；文末投资声明
 
-更多：[`references/typography-rules.md`](references/typography-rules.md) · [`references/wechat-constraints.md`](references/wechat-constraints.md)。
+更多：`references/typography-rules.md` · `references/wechat-constraints.md`。
 
 ## 排版与导出（必读）
 
@@ -180,7 +176,7 @@ python3 scripts/md2wechat.py \
 4. 外链三种形态：默认 `footnote`（正文上标 `[n]` + 文末「参考链接」）；`--link-mode inline`（文字正常、URL 灰小字）；`--link-mode note`（整块灰小字，标签与 URL 同降）  
 5. 合规自检出现 `✗` 改生成器，不要手改 HTML  
 
-坑清单：[`references/known-pits.md`](references/known-pits.md)。
+坑清单：`references/known-pits.md`。
 
 ## 主题
 
@@ -192,10 +188,10 @@ python3 scripts/md2wechat.py \
 | `assets/themes/graphite.json` | 石墨克制 | 技术说明 / 专业评论 / 方法 / 原理 |
 | `assets/themes/amber-review.json` | 琥珀评测 | 评测 / 模型评测 / 数据对比 / 榜单 / 速览 |
 
-`md2wechat.py --list-themes` 看全部；`--theme genre:评测` 可按题材自动选。  
-渲染规格见 [`references/element-spec.md`](references/element-spec.md) · 主题映射见 [`references/theme-map.md`](references/theme-map.md)。
+`md2wechat.py --list-themes` 看全部；`--theme genre:评测` 可按题材自动选。
+渲染规格见 `references/element-spec.md` · 主题映射见 `references/theme-map.md`。
 
-**平台红线速查**（详见 [`references/wechat-constraints.md`](references/wechat-constraints.md)）：禁 `div`/`pre`/`h1`/`figure`/`thead`/flex/float/gradient/shadow；表格 `table-layout` 不写 fixed；列数 ≥4 转卡片。
+**平台红线速查**（详见 `references/wechat-constraints.md`）：禁 `div`/`pre`/`h1`/`figure`/`thead`/flex/float/gradient/shadow；表格 `table-layout` 不写 fixed；列数 ≥4 转卡片。
 
 ## 与 Desktop「公众号创作」
 
@@ -204,7 +200,7 @@ python3 scripts/md2wechat.py \
 ## 外部依赖
 
 以下技能**不在本仓库**（一般随用户侧 workbuddy 环境提供）；缺失时对应路由能力不可用，
-本仓库脚本（交付包、排版、发布清单等）功能不受影响：
+本仓库脚本功能不受影响：
 
 - `humanizer-zh`：中文去 AI 味的保真边界（「只去 AI 味不排版」路径用）。
 - `qu-aiwei-zh`：中文去 AI 味扫描定位；本仓库 `scan_ai_flavor.py` 与其同源，
