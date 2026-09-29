@@ -143,7 +143,7 @@ LANG_RULES = {
     ],
     "yaml": [
         ("comment", r"#[^\n]*"),
-        ("key", r"(?m)^\s*[\w.\-/]+(?=\s*:)"),
+        ("key", r"^\s*[\w.\-/]+(?=\s*:)"),
         ("string", r'"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\''),
         ("keyword", r"\b(?:true|false|null|yes|no|on|off)\b"),
         ("number", r"\b\d+\.?\d*\b"),
@@ -157,9 +157,9 @@ LANG_RULES = {
         ("op", r"[=<>!*/+\-]+"),
     ],
     "diff": [
-        ("meta", r"(?m)^@@[^\n]*|^---[^\n]*|^\+\+\+[^\n]*"),
-        ("add", r"(?m)^\+[^\n]*"),
-        ("del", r"(?m)^-[^\n]*"),
+        ("meta", r"^@@[^\n]*|^---[^\n]*|^\+\+\+[^\n]*"),
+        ("add", r"^\+[^\n]*"),
+        ("del", r"^-[^\n]*"),
     ],
     "html": [
         ("comment", r"<!--[\s\S]*?-->"),
@@ -219,7 +219,10 @@ def highlight(code, lang, scheme=None):
     palette = scheme or CTX.get("hl_scheme") or HIGHLIGHT
     pattern = _HL_PATTERN_CACHE.get(key)
     if pattern is None:
-        pattern = re.compile("|".join("(?P<%s>%s)" % (name, pat) for name, pat in rules), re.S)
+        # (?m) 不能写进单个分支：拼成 alternation 后它就不在表达式开头了，
+        # Python 会报 "global flags not at the start"（历史 crash：```yaml / ```diff
+        # 代码块直接 Traceback）。MULTILINE 在编译期统一加，分支里只留 ^。
+        pattern = re.compile("|".join("(?P<%s>%s)" % (name, pat) for name, pat in rules), re.S | re.M)
         _HL_PATTERN_CACHE[key] = pattern
     out = []
     pos = 0
@@ -294,8 +297,12 @@ def load_theme(spec):
     path = resolve_theme(spec)
     if not path:
         return base
-    with open(path, encoding="utf-8") as fh:
-        data = json.load(fh)
+    try:
+        with open(path, encoding="utf-8") as fh:
+            data = json.load(fh)
+    except (OSError, ValueError) as e:
+        # ValueError 覆盖 json.JSONDecodeError：坏掉的主题文件给干净报错，不抛 Traceback
+        sys.exit("错误：主题文件无法解析 %s（%s）" % (path, e))
     accent = data.get("accent", base["accent"])
     # 主色派生字段必须按「本主题」的主色重算，不能继承默认主题的值：
     # 默认主题的 accent_light / mark_bg 是砖红系，继承过来会让蓝色或灰色主题里
@@ -341,8 +348,67 @@ PANGU_B = re.compile(r"([A-Za-z0-9])([%s])" % HAN)
 # render_inline() 的行内模式：预编译在模块级，避免每行重复走 re 缓存查找
 # （666k 行级调用 × 10 个模式时，re.sub 的字符串模式查找是可观开销）。
 INLINE_CODE_RE = re.compile(r"`([^`]+)`")
-INLINE_IMG_RE = re.compile(r"!\[([^\]]*)\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
-INLINE_LINK_RE = re.compile(r"\[([^\]]+)\]\(([^)\s]+)\)")
+
+
+def _parse_paren(s, j):
+    """s[j] == '(' 时找与之匹配的 ')'（括号可嵌套：URL 里允许出现平衡括号，如维基链接）。
+
+    返回 (括号内文本, 右括号之后的位置)；括号不平衡返回 None。
+    """
+    depth = 0
+    k, n = j, len(s)
+    while k < n:
+        c = s[k]
+        if c == "(":
+            depth += 1
+        elif c == ")":
+            depth -= 1
+            if depth == 0:
+                return s[j + 1:k], k + 1
+        k += 1
+    return None
+
+
+# `(url)` / `(url "title")` / `(url 'title')` / `(url (title))` → url（title 丢弃）。
+_URL_TITLE_RE = re.compile(r'^(\S+?)(?:\s+(?:"[^"]*"|\'[^\']*\'|\([^()]*\)))?\s*$')
+
+
+def _split_url_title(inner):
+    """把链接/图片括号内的 `url "title"` 拆出 url（title 丢弃）。
+
+    裸 url 不得含空白：含裸空白时返回 ""（调用方保留原文，
+    与旧正则 `[^)\\s]+` 的行为一致，不静默吞掉）。
+    """
+    m = _URL_TITLE_RE.match(inner.strip())
+    return m.group(1) if m else ""
+
+
+def _scan_md_links(text, img, repl):
+    """扫描替换行内图片/链接，url 括号支持嵌套、可带 "title"。
+
+    img=True 扫 ![alt](src)，False 扫 [label](url)；repl(文本, url) -> 替换串。
+    括号不平衡、url 为空、url 含裸空白时保留原文（旧正则同样认不出这些写法，
+    保留原文比截断 URL 更安全——历史 bug：`![a](img(1).png)` 被截成 `img(1`，
+    文件明明存在却被记成缺失；`[维基](…/猫_(动物))` 的 URL 被截断、正文多个 `)`）。
+    """
+    open_tok = "![" if img else "["
+    skip = len(open_tok)
+    res = []
+    i, n = 0, len(text)
+    while i < n:
+        if text.startswith(open_tok, i):
+            k = text.find("]", i + skip)
+            if k != -1 and k + 1 < n and text[k + 1] == "(":
+                parsed = _parse_paren(text, k + 1)
+                if parsed:
+                    url = _split_url_title(parsed[0])
+                    if url:
+                        res.append(repl(text[i + skip:k], url))
+                        i = parsed[1]
+                        continue
+        res.append(text[i])
+        i += 1
+    return "".join(res)
 INLINE_BADGE_RE = re.compile(r"\[!([^\]]+)\]")
 INLINE_HL_RE = re.compile(r"==([^=]+)==")
 INLINE_UNDER_RE = re.compile(r"\+\+([^+]+)\+\+")
@@ -390,9 +456,8 @@ def render_inline(raw):
     strong = 'font-weight:600;color:%s;' % theme["text_strong"]
     em = 'font-style:normal;color:%s;' % theme["text_muted"]
 
-    # images（行内图与独立成行图共用同一正则语义）
-    def img_repl(m):
-        alt, src = m.group(1), m.group(2)
+    # images（行内图与独立成行图共用同一括号语义）
+    def img_repl(alt, src):
         # 行内图片同样走图片管线：本地文件解析 → 复制到 images/ → 登记清单，
         # 否则 --embed-images 找不到文件、清单漏项、计数为 0（历史 bug：
         # 段落里的 ![alt](x.png) 被原样保留相对路径，粘贴到公众号后整图消失）。
@@ -403,11 +468,13 @@ def render_inline(raw):
         return ('<img src="%s"%s style="max-width:100%%;height:auto;'
                 'border-radius:3px;vertical-align:middle;">') % (src, caption)
 
-    text = INLINE_IMG_RE.sub(img_repl, text)
+    text = _scan_md_links(text, True, img_repl)
 
     # links
-    def link_repl(m):
-        label, url = m.group(1), m.group(2)
+    def link_repl(label, url):
+        # 入口处已 esc()：先还原，插入点与脚注登记处再按需转义。
+        # 否则脚注列表里 URL 的 & 会被 esc 两次、显示成 &amp;（历史 bug）。
+        label, url = html.unescape(label), html.unescape(url)
         if link_mode == "footnote" and footnotes is not None:
             # url→序号字典：原写法每次链接都扫全表两次（O(n²)），长文链接多时明显变慢
             fidx = CTX.get("footnote_idx")
@@ -423,14 +490,14 @@ def render_inline(raw):
                 idx = [f["url"] for f in footnotes].index(url) + 1
             return ('%s<sup style="font-size:11px;color:%s;'
                     'padding-left:1px;">[%d]</sup>'
-                    % (label, theme["accent"], idx))
+                    % (esc(label), theme["accent"], idx))
         if link_mode == "inline":
             return ('%s<span style="font-size:13px;color:%s;">（%s）</span>'
-                    % (label, theme["text_light"], url))
+                    % (esc(label), theme["text_light"], esc(url)))
         return ('<span style="font-size:13px;color:%s;word-break:break-all;">'
-                '%s（%s）</span>' % (theme["text_light"], label, url))
+                '%s（%s）</span>' % (theme["text_light"], esc(label), esc(url)))
 
-    text = INLINE_LINK_RE.sub(link_repl, text)
+    text = _scan_md_links(text, False, link_repl)
 
     # badges: [!文本]
     # 不用 display:inline-block：公众号对非常规 display 值支持不稳定，
@@ -483,9 +550,33 @@ def render_inline(raw):
 # ---------------------------------------------------------------- blocks
 
 HEADING_RE = re.compile(r"^(#{1,6})\s+(.*)$")
-FENCE_RE = re.compile(r"^```(\w*)\s*$")
+# 围栏反引号数 >= 3：```` 开栏只能由 >= 4 反引号闭合（CommonMark），
+# 否则 markdown 示例代码里的内层 ``` 会把外层栏提前"闭合"，造成静默错排。
+FENCE_RE = re.compile(r"^(`{3,})(\w*)\s*$")
 HR_RE = re.compile(r"^(-{3,}|\*{3,}|_{3,})\s*$")
-IMG_ONLY_RE = re.compile(r"^!\[([^\]]*)\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)\s*$")
+
+
+def match_img_only(line):
+    """独立成行图片：![alt](src) 独占一行（src 括号可嵌套、可带 title）。
+
+    返回 (alt, src)，不是独立成行图片返回 None。
+    与行内图片共用同一括号语义（_parse_paren + _split_url_title）。
+    """
+    if not line.startswith("!["):
+        return None
+    k = line.find("]", 2)
+    if k == -1:
+        return None
+    j = k + 1
+    if j >= len(line) or line[j] != "(":
+        return None
+    parsed = _parse_paren(line, j)
+    if not parsed:
+        return None
+    src = _split_url_title(parsed[0])
+    if not src or line[parsed[1]:].strip():
+        return None
+    return line[2:k], src
 CAPTION_RE = re.compile(r"^\*(.+)\*\s*$")
 TABLE_SEP_RE = re.compile(r"^\|?[\s:|-]+\|[\s:|-]*$")
 CONTAINER_RE = re.compile(r"^:::+\s*(\w+)?\s*(.*)$")
@@ -1008,10 +1099,20 @@ def convert_blocks(lines, md_path, out_dir, theme, ctx):
 
         m = FENCE_RE.match(stripped)
         if m:
-            lang = m.group(1)
+            open_len = len(m.group(1))
+            lang = m.group(2)
             i += 1
             buf = []
-            while i < n and not lines[i].strip().startswith("```"):
+            while i < n:
+                s2 = lines[i].strip()
+                k = 0
+                while k < len(s2) and s2[k] == "`":
+                    k += 1
+                # 闭合栏：反引号数 >= 开栏数且后面无其它字符（闭合栏可比开栏长）。
+                # 带信息串的 ```python 不是闭合栏，是栏内代码——旧写法按
+                # startswith("```") 判闭合，会把栏提前关掉。
+                if k >= open_len and not s2[k:].strip():
+                    break
                 buf.append(lines[i])
                 i += 1
             i += 1
@@ -1086,7 +1187,7 @@ def convert_blocks(lines, md_path, out_dir, theme, ctx):
             out.append(block_html)
             continue
 
-        m = IMG_ONLY_RE.match(stripped)
+        m = match_img_only(stripped)
         if m:
             caption = None
             if i + 1 < n:
@@ -1094,9 +1195,9 @@ def convert_blocks(lines, md_path, out_dir, theme, ctx):
                 if cm:
                     caption = cm.group(1)
                     i += 1
-            src = resolve_image(m.group(2), md_path, out_dir,
+            src = resolve_image(m[1], md_path, out_dir,
                                 ctx["assets"], ctx["asset_root"])
-            out.append(render_figure(src, caption, theme, alt=m.group(1)))
+            out.append(render_figure(src, caption, theme, alt=m[0]))
             i += 1
             continue
 
@@ -1107,7 +1208,7 @@ def convert_blocks(lines, md_path, out_dir, theme, ctx):
             if (not cur or HEADING_RE.match(cur) or HR_RE.match(cur)
                     or CONTAINER_RE.match(cur) or cur.startswith(">")
                     or cur.startswith("|") or is_list_item(lines[i])
-                    or IMG_ONLY_RE.match(cur) or FENCE_RE.match(cur)):
+                    or match_img_only(cur) or FENCE_RE.match(cur)):
                 break
             buf.append(cur)
             i += 1
@@ -1603,6 +1704,8 @@ def main():
     if missing:
         sys.exit("缺少必填参数：%s" % "、".join(missing))
 
+    if os.path.isdir(args.input):
+        sys.exit("错误：输入是目录不是文件 %s" % args.input)
     if not os.path.isfile(args.input):
         sys.exit("错误：找不到输入文件 %s" % args.input)
 

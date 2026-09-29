@@ -287,6 +287,189 @@ function main() {
     }
   }
 
+  // 13. install --to 经 .. 穿越归一化后 == 技能源目录 → 拒绝，源完好
+  {
+    const env = makeEnv();
+    try {
+      const r = runCli(env, ['install', 'testskill', '--to', path.join(env.tmp, 'out', '..', 'testskill')]);
+      const o = out(r);
+      ok(r.status !== 0, 'case13: --to 经 .. 归一化==源目录被拒绝（exit 非 0）');
+      ok(fs.existsSync(path.join(env.skill, 'SKILL.md')), 'case13: 源目录未被删除');
+      ok(/own directory tree|Refusing/i.test(o) && noTraceback(o), 'case13: 报错友好无 Traceback');
+    } finally {
+      destroy(env);
+    }
+  }
+
+  // 14. uninstall --to 经 .. 穿越到包外 → 不误杀（守卫放行，报未安装）
+  {
+    const env = makeEnv();
+    try {
+      const r = runCli(env, ['uninstall', 'testskill', '--to', path.join(env.tmp, 'evil', '..', '..', 'tms-outside-' + path.basename(env.tmp))]);
+      const o = out(r);
+      ok(r.status !== 0, 'case14: --to 经 .. 到包外 exit 非 0');
+      ok(/Nothing to uninstall/.test(o), 'case14: 守卫未误杀（报未安装而非拒绝）');
+      ok(noTraceback(o), 'case14: 无 Traceback');
+    } finally {
+      destroy(env);
+    }
+  }
+
+  // 15. install --to 指向技能目录内部的子目录 → 拒绝（防递归复制），源完好无垃圾
+  {
+    const env = makeEnv();
+    try {
+      const sub = path.join(env.skill, 'subdir');
+      const r = runCli(env, ['install', 'testskill', '--to', sub]);
+      const o = out(r);
+      ok(r.status !== 0, 'case15: --to=技能内子目录被拒绝（exit 非 0）');
+      ok(fs.existsSync(path.join(env.skill, 'SKILL.md')), 'case15: 源目录未被删除');
+      ok(!fs.existsSync(path.join(sub, 'testskill')), 'case15: 未留下递归复制垃圾');
+      ok(/own directory tree|Refusing/i.test(o) && noTraceback(o), 'case15: 报错友好无 Traceback');
+    } finally {
+      destroy(env);
+    }
+  }
+
+  // 16. install --to 指向包根本身（dest == 技能源目录）→ 拒绝，源完好
+  {
+    const env = makeEnv();
+    try {
+      const r = runCli(env, ['install', 'testskill', '--to', env.tmp]); // dest == src
+      const o = out(r);
+      ok(r.status !== 0, 'case16: --to=包根（dest==源）install 被拒绝（exit 非 0）');
+      ok(fs.existsSync(path.join(env.skill, 'SKILL.md')), 'case16: 源目录未被删除');
+      ok(/own directory tree|Refusing/i.test(o) && noTraceback(o), 'case16: 报错友好无 Traceback');
+    } finally {
+      destroy(env);
+    }
+  }
+
+  // 17. install --to 经符号链接（带不存在的尾巴）指向技能目录内 → 拒绝，源完好
+  //     覆盖 realOrResolved() 的"最深存在祖先解析+拼回尾巴"分支
+  {
+    const env = makeEnv();
+    try {
+      const link = path.join(env.tmp, 'linkskill');
+      try {
+        fs.symlinkSync(env.skill, link, 'dir');
+      } catch (e) {
+        ok(false, 'case17: 创建符号链接失败（' + e.message + '），跳过本用例');
+      }
+      if (fs.existsSync(link)) {
+        const r = runCli(env, ['install', 'testskill', '--to', path.join(link, 'nonexistent-tail')]);
+        const o = out(r);
+        ok(r.status !== 0, 'case17: 链接+不存在尾巴指技能内被拒绝（exit 非 0）');
+        ok(fs.existsSync(path.join(env.skill, 'SKILL.md')), 'case17: 源目录未被删除');
+        ok(noTraceback(o), 'case17: 无 Traceback');
+      }
+    } finally {
+      destroy(env);
+    }
+  }
+
+  // 18. install --to 为包内文件的硬链接 → 干净失败（fail-closed），源完好
+  //     硬链接是"另一条路径"，守卫按路径比对放行是正确的；mkdirSync 遇到文件走"无法创建目录"分支
+  {
+    const env = makeEnv();
+    try {
+      const hl = path.join(env.tmp, 'hlfile');
+      try {
+        fs.linkSync(path.join(env.skill, 'SKILL.md'), hl);
+      } catch (e) {
+        ok(false, 'case18: 创建硬链接失败（' + e.message + '），跳过本用例');
+      }
+      if (fs.existsSync(hl)) {
+        const r = runCli(env, ['install', 'testskill', '--to', hl]);
+        const o = out(r);
+        ok(r.status !== 0, 'case18: --to=包内文件硬链接 install 被拒绝（exit 非 0）');
+        ok(fs.existsSync(path.join(env.skill, 'SKILL.md')), 'case18: 源目录未被删除');
+        ok(/Cannot create install directory/.test(o) && noTraceback(o), 'case18: 报错友好无 Traceback');
+      }
+    } finally {
+      destroy(env);
+    }
+  }
+
+  // 19. uninstall --to 经符号链接直接 == 技能源目录 → 拒绝，源完好
+  {
+    const env = makeEnv();
+    try {
+      const link = path.join(env.tmp, 'linkskilldir');
+      try {
+        fs.symlinkSync(env.skill, link, 'dir');
+      } catch (e) {
+        ok(false, 'case19: 创建符号链接失败（' + e.message + '），跳过本用例');
+      }
+      if (fs.existsSync(link)) {
+        const r = runCli(env, ['uninstall', 'testskill', '--to', link]); // dest 经链接 == src
+        const o = out(r);
+        ok(r.status !== 0, 'case19: --to 经链接==源目录 uninstall 被拒绝（exit 非 0）');
+        ok(fs.existsSync(path.join(env.skill, 'SKILL.md')), 'case19: 源目录未被删除');
+        ok(/own directory tree|Refusing/i.test(o) && noTraceback(o), 'case19: 报错友好无 Traceback');
+      }
+    } finally {
+      destroy(env);
+    }
+  }
+
+  // 20. install 侧 skill id 路径穿越 → 拒绝
+  {
+    const env = makeEnv();
+    try {
+      const r = runCli(env, ['install', '../evil', '--to', path.join(env.tmp, 'out')]);
+      const o = out(r);
+      ok(r.status !== 0, 'case20: install 非法 skill id 被拒绝（exit 非 0）');
+      ok(/Invalid skill id/.test(o) && noTraceback(o), 'case20: 报错友好无 Traceback');
+    } finally {
+      destroy(env);
+    }
+  }
+
+  // 21. install --to 相对路径（cwd 在包内）指向技能自身 → 拒绝
+  {
+    const env = makeEnv();
+    try {
+      const r = runCli(env, ['install', 'testskill', '--to', 'testskill']); // 相对路径，cwd=env.tmp
+      const o = out(r);
+      ok(r.status !== 0, 'case21: 相对路径 --to==源目录被拒绝（exit 非 0）');
+      ok(fs.existsSync(path.join(env.skill, 'SKILL.md')), 'case21: 源目录未被删除');
+      ok(/own directory tree|Refusing/i.test(o) && noTraceback(o), 'case21: 报错友好无 Traceback');
+    } finally {
+      destroy(env);
+    }
+  }
+
+  // 22. install --force 时 dest 是指向包外的符号链接 → 只删链接本身，不跟随删目标
+  {
+    const env = makeEnv();
+    try {
+      const outside = path.join(env.tmp, 'realdir');
+      fs.mkdirSync(outside, { recursive: true });
+      fs.writeFileSync(path.join(outside, 'keep.txt'), 'keep');
+      const to = path.join(env.tmp, 't');
+      fs.mkdirSync(to, { recursive: true });
+      let linked = false;
+      try {
+        fs.symlinkSync(outside, path.join(to, 'testskill'), 'dir');
+        linked = true;
+      } catch (e) {
+        ok(false, 'case22: 创建符号链接失败（' + e.message + '），跳过本用例');
+      }
+      if (linked) {
+        const r = runCli(env, ['install', 'testskill', '--to', to, '--force']);
+        const o = out(r);
+        const destStat = fs.lstatSync(path.join(to, 'testskill'));
+        ok(r.status === 0, 'case22: install --force 成功（exit 0）');
+        ok(fs.existsSync(path.join(outside, 'keep.txt')), 'case22: 链接目标目录完好（未被跟随删除）');
+        ok(destStat.isDirectory() && !destStat.isSymbolicLink(), 'case22: dest 已是真实目录（链接被替换）');
+        ok(noTraceback(o), 'case22: 无 Traceback');
+      }
+    } finally {
+      destroy(env);
+    }
+  }
+
   console.log(failures ? `\n[test_installer_cli] ${failures} 项失败` : '\n[test_installer_cli] 全部通过');
   process.exit(failures ? 1 : 0);
 }

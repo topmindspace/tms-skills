@@ -193,6 +193,7 @@ def convert(md: str):
     defs = {}
     out_lines = []
     in_code = False
+    fence_len = 0
 
     md, esc_store = _protect_escapes(md)
     md = _strip_frontmatter(md)
@@ -209,9 +210,23 @@ def convert(md: str):
     for raw in body:
         line = raw.rstrip()
 
-        # 代码块：先处理围栏，块内行原样缩进（分割线规则不进代码块）
-        if line.strip().startswith("```"):
-            in_code = not in_code
+        # 代码块：先处理围栏，块内行原样缩进（分割线规则不进代码块）。
+        # 围栏反引号数 >= 3：```` 开栏只能由 >= 4 反引号闭合（CommonMark），
+        # 否则 markdown 示例里的内层 ``` 会把外层栏提前"闭合"，造成静默错排。
+        stripped = line.strip()
+        if stripped.startswith("```"):
+            k = 0
+            while k < len(stripped) and stripped[k] == "`":
+                k += 1
+            if not in_code:
+                in_code = True
+                fence_len = k
+            elif k >= fence_len and not stripped[k:].strip():
+                in_code = False
+                fence_len = 0
+            else:
+                # 栏内误写的短栏 / 带信息串的栏是代码内容，不是闭合栏
+                out_lines.append("    " + line)
             continue
         if in_code:
             out_lines.append("    " + line)

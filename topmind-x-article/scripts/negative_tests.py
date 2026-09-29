@@ -64,6 +64,23 @@ def main() -> None:
         out = (td / "o6.txt").read_text(encoding="utf-8") if (td / "o6.txt").exists() else ""
         check("正常输入含配图清单", r.returncode == 0 and "[图1]" in out)
 
+        # 7. 嵌套围栏：```` 开栏不被内层 ``` 提前闭合（内层栏是代码内容）
+        (td / "nest.md").write_text(
+            "# t\n\n````markdown\n外层\n```python\nprint(1)\n```\n结束\n````\n",
+            encoding="utf-8")
+        r = run([str(td / "nest.md"), "--out", str(td / "o7.txt")])
+        out = (td / "o7.txt").read_text(encoding="utf-8") if (td / "o7.txt").exists() else ""
+        check("嵌套围栏不提前闭合",
+              r.returncode == 0 and "    ```python" in out and "print(1)" in out)
+
+        # 8. 括号 URL 链接不断裂（与 md2wechat 对齐的守卫）
+        (td / "paren.md").write_text(
+            "# t\n\n[维基](https://zh.wikipedia.org/wiki/猫_(动物))\n", encoding="utf-8")
+        r = run([str(td / "paren.md"), "--out", str(td / "o8.txt")])
+        out = (td / "o8.txt").read_text(encoding="utf-8") if (td / "o8.txt").exists() else ""
+        check("括号 URL 不截断",
+              r.returncode == 0 and "猫_(动物)" in out)
+
     if fails:
         print(f"\n[negative_tests] {len(fails)} 项失败")
         sys.exit(1)

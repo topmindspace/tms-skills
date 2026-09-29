@@ -4,6 +4,7 @@
 > 根包 0.4.0 → **0.4.1**（patch）；技能版本：top-ppt-html 0.2.0 → **0.2.1**（修技能数据 bug 则 patch）、
 > topmind-cover 保持 0.2.0（仅换样张图+描述文案，无功能变更）、topmind-wechat-post / topmind-x-article 保持 0.1.0。
 > 本轮是第十三轮集成轮（A 文档抛光 + B 示例与描述 + C 新代码复审），改动最小、无新功能。
+> 另含第十四轮集成轮（wechat-post/x-article 真 bug 修复 + installer 测试扩展）：**不 bump 版本**，全部并入 0.4.1。
 
 ### 安装器 bug 修复（高危 · Worker C 复审发现）
 
@@ -28,6 +29,26 @@
   `white-clean-alt-wechat.png`（900×383）新增落盘并纳入 git；示例目录 README 计数同步为 26 张
 - 4 处 description 更新（cover package.json + SKILL frontmatter 加「11 种风格模板」；ppt-html package.json + SKILL frontmatter 加「48 图标 + 弹性版式」）；overview alt 文案 8→11
 - cover 安装文案复核：`list` 输出已准确，未动安装器
+
+### 第十四轮集成（Worker A/B/C）——不 bump 版本，全部并入 0.4.1
+
+- **topmind-wechat-post 修 6 真 bug**（`scripts/md2wechat.py`，Worker A 专审发现）：
+  - yaml/diff 代码块高亮正则在分支内误用 `(?m)` → `re.error` 崩溃（编译期统一 `re.M|re.S`，分支内去掉）
+  - URL 含平衡括号被截断 → 新增括号嵌套匹配扫描器替代旧正则
+  - `[文字](url "title")` 带 title 链接认不出 → 链接解析支持 title
+  - 脚注 URL 的 `&` 被转义两次 → 修正转义顺序
+  - 坏主题 JSON 的 Traceback → 干净报错；目录当输入的报错文案修正
+  - 嵌套围栏被提前闭合 → 围栏匹配支持嵌套
+  - `scripts/negative_tests.py` 新增 6 个 case，15/15 绿
+- **topmind-x-article 修嵌套围栏**（`scripts/md2x.py`，Worker A 专审发现）；
+  `scripts/negative_tests.py` 新增 2 个 case，8/8 绿
+- **installer 回归测试扩展**（Worker C）：`scripts/test_installer_cli.js` 新增 case13–22，
+  覆盖 symlink 守卫纵深（realpath 归一化）与 installer 回归，72 断言全绿；`bin/` 未动，无真实绕过
+- **分发体积与性能**（Worker B）：无真问题。0.4.1 tarball 解包 29.1MB（0.3.9 18.4MB，
+  +10.7MB 系封面示例画廊预期增量）；top10 大文件全合法素材；48 图标 PNG 最大 27.4KB 无异常；
+  install 耗时 0.3s 不需优化；`sync_npm_files.js --check` 通过
+- 技能版本号保持：wechat-post / x-article 保持 0.1.0（纯 bug 修复按技能版本规则不 bump）；
+  cover 保持 0.2.0、ppt-html 保持 0.2.1、根包保持 0.4.1
 
 ## [0.4.0] - 2026-09-29
 
