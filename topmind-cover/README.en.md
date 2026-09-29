@@ -12,7 +12,7 @@ A reusable skill for generating cover art for X long-form posts and WeChat artic
   <img src="https://github.com/topmindspace/tms-skills/raw/main/topmind-cover/assets/examples/overview.png" alt="topmind-cover · 11 cover-style overview" width="960" />
 </p>
 
-11 styles (clean white / background blur / paper collage / news flash / giant-type manifesto / tutorial steps / minimalist / editorial magazine / viral dry-goods / brand launch / fun IP, light-first ordering): use cases, palette stories, abstract design principles, and Chinese+English prompt recipes in [`references/cover-styles.md`](./references/cover-styles.md); full-size per-style shots in [`assets/examples/`](./assets/examples/).
+11 styles (clean white / background blur / paper collage / news flash / giant-type manifesto / tutorial steps / minimalist / editorial magazine / viral dry-goods / brand launch / fun IP, light-first ordering): use cases, palette stories, abstract design principles, and Chinese+English prompt recipes in [`references/cover-styles.md`](./references/cover-styles.md); full-size per-style shots in [`assets/examples/`](./assets/examples/). Prefer writing your own prompts and sending them straight to an image model (bypassing the skill)? See [`references/cover-prompts.md`](./references/cover-prompts.md) — a copy-paste prompt compendium plus cross-platform viral-cover research.
 
 ## Install
 
