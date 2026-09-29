@@ -64,11 +64,11 @@ NAME = 'top-ppt-html'                       # 技能全名 = 分发包顶层目�
 OUT = ROOT / 'dist' / f'{NAME}.zip'
 MANIFEST = ROOT / 'dist' / f'{NAME}.manifest.json'
 DESC_LIMIT = 1024
-# 版本唯一事实源 = layout-constants.json `version`（v8.3 起 frontmatter 不携带非标 version 键，
-# manifest 版本一律取 LC；frontmatter 若显式声明则以其为准——但不鼓励）
+# 版本唯一事实源 = SKILL.md frontmatter `version`（须与 package.json version 一致，见 --check 比对）；
+# 回退读 package.json。注意：layout-constants.json 的 `version` 是版式常量版本（0.1），不是技能版本，禁止用作技能版本。
 try:
     VERSION = str(json.loads(
-        (ROOT / 'scripts' / 'layout-constants.json').read_text(encoding='utf-8')).get('version') or '0.0')
+        (ROOT / 'package.json').read_text(encoding='utf-8')).get('version') or '0.0')
 except (OSError, json.JSONDecodeError):
     VERSION = '0.0'
 

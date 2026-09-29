@@ -101,6 +101,8 @@ function copyDir(src, dest) {
     } else if (entry.isFile()) {
       if (entry.name.endsWith('.pyc')) continue;
       fs.copyFileSync(s, d);
+    } else {
+      console.warn(`warning: skipping non-regular file: ${s}`);
     }
   }
 }
@@ -126,17 +128,19 @@ function install(skillId, targetRoot, { force = false } = {}) {
   console.log(`Installed ${skillId}`);
   console.log(`  from ${src}`);
   console.log(`  to   ${dest}`);
-  console.log('');
-  console.log('Optional (PPTX export only):');
-  console.log(`  cd "${dest}" && npm install`);
+  if (skillId === 'top-ppt-html') {
+    console.log('');
+    console.log('Optional (PPTX export only):');
+    console.log(`  cd "${dest}" && npm install`);
+  }
 }
 
 function usageText() {
   return `tms-skills — install TopMindspace agent skills
 
 Usage:
-  tms-skills list
-  tms-skills install <skill-id> [--to <dir>] [--force|-f]
+  tms-skills list|ls
+  tms-skills install <skill-id> [--to|-t <dir>] [--force|-f]
   tms-skills help
 
 Examples (npm recommended when published):

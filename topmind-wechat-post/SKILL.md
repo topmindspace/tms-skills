@@ -1,6 +1,7 @@
 ---
 name: topmind-wechat-post
 description: "公众号文章全生命周期技能：交付包、审校改写、质量三关（事实/逻辑/去AI味）、状态同步、微信内联排版与发布清单。Use when 写公众号、公众号排版、定稿、发公众号。Do NOT use for 只改错别字、小红书/知乎、纯网页发布。"
+action_category: write
 triggers:
   - 公众号
   - 微信排版

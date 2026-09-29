@@ -25,7 +25,7 @@
   <img src="docs/assets/tms-skills-banner.png" alt="tms-skills · top-ppt-html — formal business presentations" width="960" />
 </p>
 
-> **警告**：不要安装 `@topmindspace/tms-skills@^2`（2.0.0–2.1.1 已弃用）。当前线 **0.1.x**（`latest`）。
+> **警告**：不要安装 `@topmindspace/tms-skills@^2`（2.0.0–2.1.1 已弃用）。当前线 **0.2.x**（`latest`）。
 
 ## 一眼看到工艺
 
@@ -89,7 +89,7 @@
 npx @topmindspace/tms-skills list
 npx @topmindspace/tms-skills install top-ppt-html
 npx @topmindspace/tms-skills install top-ppt-html --to ./.claude/skills
-npx @topmindspace/tms-skills@0.1.19 install top-ppt-html   # 钉版本
+npx @topmindspace/tms-skills@0.2.0 install top-ppt-html   # 钉版本
 ```
 
 ```bash

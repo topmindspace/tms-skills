@@ -58,5 +58,5 @@ updated: 2026-09-29
 ## When NOT to use
 
 - 280 字短推文 → `topmind-x`
-- 公众号 → `topmind-wechat`
+- 公众号 → `topmind-wechat-post`
 - 只想存档不发布 → `topmind-capture`

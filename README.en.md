@@ -27,7 +27,7 @@ Plenty of PPT skills exist — some lean gadgety, some dump consulting density b
   <img src="docs/assets/tms-skills-banner.png" alt="tms-skills · top-ppt-html — formal business presentations" width="960" />
 </p>
 
-> **Warning**: do not install `@topmindspace/tms-skills@^2` (2.0.0–2.1.1 deprecated). Current line is **0.1.x** (`latest`).
+> **Warning**: do not install `@topmindspace/tms-skills@^2` (2.0.0–2.1.1 deprecated). Current line is **0.2.x** (`latest`).
 
 ## Craft at a glance
 
@@ -70,7 +70,7 @@ Plenty of PPT skills exist — some lean gadgety, some dump consulting density b
 | Fullscreen | **F** | Immersive present mode |
 | Collapse toolbar | **B** | Mini bar (brand + expand); remembers per file |
 
-See [top-ppt-html/README.md](./top-ppt-html/README.md) and [SKILL.md](./top-ppt-html/SKILL.md).
+See [top-ppt-html/README.md](./top-ppt-html/README.md#html-header-toolbar) and [SKILL.md](./top-ppt-html/SKILL.md).
 
 ## Skills
 

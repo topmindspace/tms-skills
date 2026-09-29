@@ -17,7 +17,7 @@
 
 ## npm 2.x 弃用说明（仓库重置）
 
-npm 上的 `@topmindspace/tms-skills` **2.0.0–2.1.1 已弃用**（仓库重置前的过时线）；**不要安装 `^2`**。当前线是 **0.1.x**（`latest` 指向 0.1.x）。
+npm 上的 `@topmindspace/tms-skills` **2.0.0–2.1.1 已弃用**（仓库重置前的过时线）；**不要安装 `^2`**。当前线是 **0.2.x**（`latest` 指向 0.2.x）。
 
 若需重写弃用文案，维护者可在已 `npm login` 的机器上执行 `bash scripts/deprecate-npm-2x.sh`（one-shot `@2.x` + verify）。
 

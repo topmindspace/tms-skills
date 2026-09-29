@@ -18,7 +18,7 @@
 </p>
 
 - 技能标识：`top-ppt-html`；品牌名：**TopPPT HTML**
-- 版本：**v0.1.19**（与 `@topmindspace/tms-skills@0.1.19` 同 tag）
+- 版本：**v0.1.19**（与 `@topmindspace/tms-skills@0.2.0` 同 tag）
 - **智能体入口**：`SKILL.md` → `references/playbook.md`（L1）→ L2 按需
 - **人类维护者**：本 README（安装 / 命令 / 目录）；勿把本文件当生成规范
 
@@ -170,7 +170,7 @@ top-ppt-html/
 │  ├─ illustration-layout.md  #   L2 插画/配图 brief                                   │
 │  └─ …（modes / styles / design-system / content-rules / icons / default-surface /     │
 │        outline-design / pptx-export / high-fidelity / failure-modes / tech-design；  │
-│        归档见 docs/archive/refs/）                                                   │
+│        归档见 ../docs/archive/refs/）                                                   │
 ├─ evals/                       # Eval 框架（结果/过程/风格/效率四类目标）    │
 │  ├─ prompts.csv               #   14 条 prompt（显式/隐式/上下文/负对照）   │
 │  ├─ rubric.schema.json        #   风格目标结构化评分契约                    │
@@ -223,7 +223,7 @@ python scripts/check_triggers.py
 | `references/presentation-craft.md` | Mode A L1.5 工艺（反截断 / 大气正式） |
 | `assets/examples/` | 3 份黄金样张（每模式 1）+ TopMind showcase |
 | `evals/trigger-queries.json` | description 触发正/负例；`check_triggers.py` |
-| `docs/archive/` | 历史规范 / 旧示例 |
+| `../docs/archive/` | 历史规范 / 旧示例 |
 
 风格画廊与主题参考图：`assets/theme-overview*.png`（Gate 0）。完整规范索引见 playbook §十。
 

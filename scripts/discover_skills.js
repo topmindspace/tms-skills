@@ -28,4 +28,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = { discoverSkills, INFRA_DIRS, ROOT };
+module.exports = { discoverSkills, ROOT };
