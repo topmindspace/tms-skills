@@ -37,7 +37,7 @@ npx @topmindspace/tms-skills install topmind-x-article
 
 ### topmind-cover · Cover art generation
 
-Shared cover art for X long-form and WeChat: striking, eye-catching, theme-focused. Compose prompts from the `references/cover-styles.md` style templates, then one-click crop to both platform sizes with `crop-cover.py` (X 1200×675, WeChat 900×383).
+Shared cover art for X long-form and WeChat: striking, eye-catching, theme-focused. Built-in **6-style cover style library** (bold poster / futuristic tech / editorial magazine / minimalist / guochao illustration / cyber glitch art — each with use cases, hex palettes, font suggestions, Chinese+English prompt recipes) + **12 dual-size example images** (`assets/examples/`, shipped with the package): **pick a style → check the example → compose the prompt from the recipe**, then one-click crop to both platform sizes with `crop-cover.py` (X 1200×675, WeChat 900×383).
 
 ```bash
 npx @topmindspace/tms-skills install topmind-cover
@@ -101,9 +101,22 @@ See [top-ppt-html/README.md](./top-ppt-html/README.md#html-header-toolbar) and [
 | [`top-ppt-html`](./top-ppt-html/) | **0.1.19** | Formal business decks: paginated HTML + editable 16:9 PPTX; dual delivery · MD3-inspired density; 3 modes × 9 styles; strict 0/0 |
 | [`topmind-wechat-post`](./topmind-wechat-post/) | **0.1.0** | WeChat article lifecycle: package, review, 3 quality gates, inline typography & publish checklist |
 | [`topmind-x-article`](./topmind-x-article/) | **0.1.0** | X long-form one-click publish: Markdown → paste-ready plain text + cover + checklist |
-| [`topmind-cover`](./topmind-cover/) | **0.1.0** | Cover art for X / WeChat: striking, theme-focused; size specs + style templates + crop tooling |
+| [`topmind-cover`](./topmind-cover/) | **0.1.0** | Cover art for X / WeChat: striking, theme-focused; 6-style cover style library + 12 dual-size example images, size specs + crop tooling |
 
-Installer [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) is **0.2.0** (whole-repo same-tag releases).
+Installer [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) is **0.3.0** (whole-repo same-tag releases).
+
+### topmind-cover · Cover style library
+
+| Style | In one line | Typical topics |
+|-------|-------------|----------------|
+| Bold poster `big-poster` | One-sentence stance, maximum impact | Opinion pieces, hot takes |
+| Futuristic tech `tech-future` | Neon blue / electric violet on deep navy | AI / LLMs / agents |
+| Editorial magazine `magazine` | Restrained, premium, trustworthy | In-depth interviews, profiles |
+| Minimalist `minimal` | Vast negative space, room to breathe | Essays, book reviews, light takes |
+| Guochao illustration `guochao` | Vermilion / dark teal / gold, cultural punch | Trad culture, festivals, heritage |
+| Cyber glitch art `cyber-glitch` | RGB channel-split, digital-decay aesthetic | Net culture, cyberpunk |
+
+**Three steps to a cover**: ① pick 1 of 6 styles by topic → ② check the matching example in [`topmind-cover/assets/examples/`](./topmind-cover/assets/examples/) → ③ compose the prompt from that style's recipe in [`references/cover-styles.md`](./topmind-cover/references/cover-styles.md). 12 example images (6 styles × 1200×675 master + 900×383 WeChat center-crop, ~6.4MB) ship with the npm package; **safe-zone rule**: title text and key subject must stay inside the central vertical 60% safe zone.
 
 ## Install
 
@@ -113,7 +126,7 @@ Installer [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspa
 npx @topmindspace/tms-skills list
 npx @topmindspace/tms-skills install top-ppt-html
 npx @topmindspace/tms-skills install top-ppt-html --to ./.claude/skills
-npx @topmindspace/tms-skills@0.2.0 install top-ppt-html   # pin
+npx @topmindspace/tms-skills@0.3.0 install top-ppt-html   # pin
 ```
 
 ```bash

@@ -1,14 +1,16 @@
 ---
 name: topmind-cover
 version: 0.1.0
-description: "文章封面配图生成：X 长文与公众号共用。震撼、醒目、主题突出；平台尺寸规范、风格模板、命名落盘、成图检查一次配齐。Use when 封面、封面图、头图、配图、cover。Do NOT use for 正文插图、PPT/报告封面。"
+description: "文章封面配图生成：X 长文与公众号共用。震撼、醒目、主题突出；平台尺寸规范、风格模板、命名落盘、成图检查全流程覆盖。Use when 封面、封面图、头图、配图、cover。Do NOT use for 正文插图、PPT/报告封面。"
 action_category: write
 triggers:
   - 封面
   - 封面图
   - 头图
   - 配图
+  - 缩略图
   - cover
+  - thumbnail
 triggers_cn:
   - 公众号封面
   - X 封面
@@ -38,16 +40,25 @@ updated: 2026-09-29
 
 ## 工作流
 
-1. **输入**：文章标题、3 个主题关键词、平台（`x` / `wechat` / `both`，默认 both）、风格（默认按题材自动选，见 `references/cover-styles.md`）。
-2. **组 prompt**：`[风格模板] + 主体描述 + 大标题字（≤10 字，直接用文章标题或其压缩版）+ 横构图16:9 + 四周留白8%`。标题字必须在 prompt 里逐字写明，防 AI 自造错别字。
+0. **选风格（三步，必做）**：
+   ① 按题材从 `references/cover-styles.md` 选 1 种风格（6 选 1）；
+   ② 看 `assets/examples/<style>.png` 示例图，确认视觉语言符合预期；
+   ③ 按该风格的 prompt 配方组 prompt（把 `{TITLE}` 换成实际标题）。
+   示例清单见 `assets/examples/README.md`。
+1. **输入**：文章标题、3 个主题关键词、平台（`x` / `wechat` / `both`，默认 both）、
+   风格（默认按题材自动选，见 `references/cover-styles.md`）。
+   平台只影响生成 prompt 的侧重；裁剪落盘永远产出双尺寸。
+2. **组 prompt**：按 `references/cover-styles.md` 对应风格的配方组装
+   （标题 ≤10 字逐字写明，防 AI 自造错别字）。
 3. **生成**：`media.generate_image`，`name` 用 `<slug>-cover`。
 4. **检查**（必做，肉眼看一遍）：
    - 标题字逐字正确，无错别字、无多字少字
    - 主体完整不被裁切，画面不杂乱
    - 一眼能说出主题；说不出就重生成
+   - 900×383 版复查：标题字、关键主体不被中央裁剪裁掉（见风格库"安全区铁律"）
 5. **裁剪落盘**：
    ```bash
-   python3 scripts/crop-cover.py <主图> --slug <slug> --out-dir <包>/images/
+   python3 scripts/crop-cover.py <主图> --out-dir <包>/images/
    ```
    产出 `00-封面.png`（1200×675，X/公众号共用主文件）与 `00-封面-公众号.png`（900×383）。
    公众号包规约：正文引用 `images/00-封面.png`，`图片上传清单.md` 登记两版。
@@ -57,8 +68,14 @@ updated: 2026-09-29
 
 - 一图一主题；主体占画面 40% 以上，居中或三分法
 - 大标题 ≤10 字，高对比（暗底亮字 / 亮底深字）
-- 四周 8% 安全边距，标题不贴边
+- 四周 8% 安全边距，标题不贴边；标题字另须满足中央垂直 60% 安全区（见风格库"安全区铁律"）
 - 忌：元素堆砌、小字密排、多主体打架、标题字错误
+
+## 外部依赖 / 规约来源
+
+- "公众号包规约"（正文引用 `images/00-封面.png`、`图片上传清单.md` 登记两版）
+  来自用户侧 workbuddy 环境，仓库内无此文件；缺失时仍按固定命名落盘，
+  不阻塞核心流程。
 
 ## When NOT to use
 

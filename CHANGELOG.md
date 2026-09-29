@@ -1,3 +1,36 @@
+## [0.3.0] - 2026-09-29
+
+> 根包 0.2.0 → **0.3.0**（minor，新功能）；4 个技能 `version` 保持不动（top-ppt-html 0.1.19，其余 0.1.0）。
+> 整仓同 tag 发版，技能 `version` 独立演进（见 docs/PUBLISHING.md）。
+
+### topmind-cover：封面风格库 + 12 张示例图（新功能）
+
+- `references/cover-styles.md` 扩为 **6 种风格库**：震撼大字报（`big-poster`）/ 科技未来感（`tech-future`）/
+  杂志编辑风（`magazine`）/ 极简留白（`minimal`）/ 国潮插画（`guochao`）/ 赛博故障艺术（`cyber-glitch`），
+  每种含适用场景、配色 hex、字体建议、中英 prompt 配方、避坑。
+- `assets/examples/` 新增 **12 张示例图**（6 风格 × 1200×675 主图 + 900×383 公众号中央裁剪版，共约 6.4MB），
+  附 `assets/examples/README.md`（清单 + 安全区说明 + 复用声明），随 npm 包发布。
+- SKILL.md 工作流新增"**步骤 0 选风格**"（三步必做：按题材 6 选 1 → 看示例图 → 按配方组 prompt）。
+- 标题**中央垂直 60% 安全区**上升为设计铁律（风格库新增"安全区铁律"章节）：标题字与关键主体
+  上下各预留 13%+，否则 900×383 中央裁剪会切掉标题。
+
+### 最佳实践整改
+
+- top-ppt-html / topmind-wechat-post 的 SKILL.md `description` 改**第三人称**（降误触发）；
+  topmind-cover `description` 同步微调（"一次配齐"→"全流程覆盖"），`triggers` 新增 `缩略图` / `thumbnail`。
+- topmind-wechat-post：站外取源坑与回推命令串收敛到 `references/workflow.md`，SKILL.md 只留索引；
+  新增跨技能路由索引（封面配图 → topmind-cover，X 长文 → topmind-x-article）；
+  二级标题序号由排版层自动生成（不再手写）。
+- 各技能 README（中/英）与 SKILL.md 对齐：cover 新增风格库与示例图章节、用法改"步骤 0 选风格"；
+  x-article 转换规则补"分隔线→空行"。
+
+### bug 修复
+
+- topmind-x-article `scripts/md2x.py`：`---` / `***` / `___` 分隔线转**空行**（原逻辑误当 frontmatter 吞掉）；
+  `***粗斜体***` 先去三重星号再处理 `**` / `__` / `*`，不再残留星号。
+- topmind-cover `scripts/crop-cover.py`：移除 `--slug` 悬空参数
+  （用法与文档统一：`crop-cover.py <主图> --out-dir <包>/images/`）。
+
 ## [0.2.0] - 2026-09-29
 
 ### 新增三个写作/配图技能

@@ -43,6 +43,18 @@ Scripts use Python stdlib only — zero dependencies.
 
 Facts (first-hand sources) / logic (structural consistency) / copy (de-AI-flavor ≥ 85).
 
+## Related skills
+
+- Cover art → `topmind-cover` (shared X long-form / WeChat cover)
+- X long-form → `topmind-x-article` (Markdown draft → one-click X publish package)
+
+## External dependencies
+
+The following skills live **outside this repo** (usually provided by the user's local workbuddy environment). Missing ones degrade or disable the corresponding capability; all scripts in this repo still work fully:
+
+- `humanizer-zh`: fidelity boundaries for Chinese de-AI-flavor; without it the "de-AI-flavor only, no typesetting" path is unavailable.
+- `qu-aiwei-zh`: Chinese de-AI-flavor scan targeting; `scripts/scan_ai_flavor.py` shares its origin and can substitute when missing (scan targeting degrades).
+
 ## Development
 
 ```bash

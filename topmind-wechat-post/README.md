@@ -43,6 +43,11 @@ python3 scripts/sync-status.py --set 定稿 <包> --apply
 
 事实（一手来源）/ 逻辑（结构一致）/ 文字（去 AI 味 ≥85）。
 
+## 相关技能
+
+- 封面配图 → `topmind-cover`（X 长文 / 公众号共用封面）
+- X 长文 → `topmind-x-article`（Markdown 原稿一键转 X 发布包）
+
 ## 外部依赖
 
 本技能工作流会路由到以下**仓库外**技能（不含于本仓库，一般随用户侧 workbuddy

@@ -1,7 +1,7 @@
 ---
 name: topmind-wechat-post
 version: 0.1.0
-description: "公众号文章全生命周期技能：交付包、审校改写、质量三关（事实/逻辑/去AI味）、状态同步、微信内联排版与发布清单。Use when 写公众号、公众号排版、定稿、发公众号。Do NOT use for 只改错别字、小红书/知乎、纯网页发布。"
+description: "管一篇公众号文章从选题/底稿到发布的完整生命周期：交付包搭建、审校改写、质量三关（事实/逻辑/去AI味）、状态同步、微信内联排版与发布清单。Use when 写公众号、公众号排版、公众号定稿、发公众号。Do NOT use for 只改错别字、小红书/知乎、纯网页发布。"
 action_category: write
 triggers:
   - 公众号
@@ -95,15 +95,9 @@ python3 scripts/sync-status.py --set 定稿 <包> --apply
 python3 scripts/new-article.py --slug <中文短名> --title "<标题>" --direction reverse
 ```
 
-取源坑（Next.js 站点）：正文在 RSC 载荷里，优先 `GET /api/notes/<id>`；图片在 `/api/uploads/<hash>`，记 hash→本地名映射；同图双 hash 用 `md5` 去重。差异与口径写进包内 `README.md`。
+取源坑（RSC 载荷、图片 hash 映射、`md5` 去重、截图裁切）见 `references/workflow.md`「站外拉取取源注意」；差异与口径写进包内 `README.md`。
 
-**回推纪律**：notes 保持纯 Markdown。`::: 容器` / 徽章 / `==高亮==` 只进公众号稿。回推**务必带 `--assets`**（否则 GitHub 上 `images/` 死链）：
-
-```bash
-python3 scripts/push-to-topstream.py <包> --target notes/xxx.md --assets          # dry-run
-python3 scripts/push-to-topstream.py <包> --target notes/xxx.md --assets --apply \
-  --asset-names "00-封面.jpg=01-cover.jpg,…"
-```
+**回推纪律**：notes 保持纯 Markdown（`:::` 容器 / 徽章 / `==高亮==` 只进公众号稿）；回推**务必带 `--assets`**（否则 GitHub 上 `images/` 死链）。命令串见 `references/workflow.md`「收尾」。
 
 ## 交付包与状态
 
@@ -164,7 +158,7 @@ python3 scripts/scan_ai_flavor.py <包>/公众号稿.md   # ≥85（人话）
 ## 排版要点（写稿时）
 
 - 开头 150 字内钩子；单段 ≤110 字；列表项 ≤70 字  
-- 二级标题序号化；容器：`::: stat|pull|note|tip|warn|danger|dialogue`  
+- 二级标题不手写序号（排版层自动生成）；容器：`::: stat|pull|note|tip|warn|danger|dialogue`  
 - **`::: stat` 内必须是 `数值 | 说明` 管道行**，否则静默丢弃  
 - 评测稿：**图承担数据，正文只解读**；健康密度 **300–450 字/图**  
 - 个股用词红线：禁用 买入/推荐/目标价…；文末投资声明  
@@ -219,4 +213,5 @@ python3 scripts/md2wechat.py \
 - 只想改几个句子 → 直接编辑  
 - 小红书 / 知乎 / 掘金 → 平台约束不同  
 - 通用长文交付 → 不在本技能范围
+- 封面配图 → `topmind-cover`；X 长文 → `topmind-x-article`
 - 只去 AI 味不排版 → 中文走 `humanizer-zh`（先立保真边界）+ `qu-aiwei-zh`（再扫描定位）；英文走 `humanizer`

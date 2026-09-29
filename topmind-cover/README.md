@@ -12,16 +12,25 @@ npx @topmindspace/tms-skills install topmind-cover
 
 ## 用法
 
-1. 输入文章标题 + 3 个主题关键词 + 平台（x / wechat / both）
-2. 按 `references/cover-styles.md` 选风格模板组 prompt（标题字逐字写进 prompt）
-3. 用 agent 的图片生成能力出图（横构图 16:9，四周留白 8%）
-4. 肉眼检查：标题字逐字正确、主体完整、一眼能说出主题
-5. 裁剪落盘：
+0. **选风格（三步，必做）**：按题材从 `references/cover-styles.md` 选 1 种风格（6 选 1）
+   → 看 `assets/examples/<风格>.png` 示例图，确认视觉语言符合预期
+   → 按该风格的 prompt 配方组 prompt（把 `{TITLE}` 换成实际标题）。
+1. 输入文章标题 + 3 个主题关键词 + 平台（x / wechat / both，默认 both）。
+2. 用 agent 的图片生成能力出图（横构图 16:9，四周留白 8%）。
+3. 肉眼检查（必做）：标题字逐字正确、主体完整、一眼能说出主题；标题字与关键主体
+   落在中央垂直 60% 安全区内（900×383 中央裁剪不切字）。
+4. 裁剪落盘：
 
 ```bash
-python3 scripts/crop-cover.py <主图> --slug <slug> --out-dir <包>/images/
+python3 scripts/crop-cover.py <主图> --out-dir <包>/images/
 # 产出 00-封面.png (1200×675) + 00-封面-公众号.png (900×383，中央裁剪)
 ```
+
+## 风格库与示例图
+
+- **风格库** `references/cover-styles.md`：6 种风格（震撼大字报 / 科技未来感 / 杂志编辑风 / 极简留白 / 国潮插画 / 赛博故障艺术），每种含适用场景、配色 hex、字体建议、中英 prompt 配方、避坑。
+- **示例图** [assets/examples/](./assets/examples/)：12 张（6 风格 × 1200×675 主图 + 900×383 公众号中央裁剪版，约 6.4MB），随包发布，可直接拿去用/改（清单 + 安全区说明 + 复用声明见 [assets/examples/README.md](./assets/examples/README.md)）。
+- **安全区铁律**：标题字与关键主体必须落在画面中央垂直 60% 安全区内（上下各预留 13%+ 不放标题字），否则公众号中央裁剪会切掉标题。
 
 ## 尺寸
 

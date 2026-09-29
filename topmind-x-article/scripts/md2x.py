@@ -28,8 +28,9 @@ def convert(md: str):
     for raw in md.splitlines():
         line = raw.rstrip()
 
-        # frontmatter 直接跳过
-        if line.strip() == "---":
+        # 分割线 → 空行（frontmatter 已在 main() 去除，这里只剩正文分隔线）
+        if re.match(r"^(\*{3,}|-{3,}|_{3,})\s*$", line):
+            out_lines.append("")
             continue
 
         # 代码块：去围栏，内容缩进保留
@@ -69,7 +70,8 @@ def convert(md: str):
             out_lines.append(f"{label}：{rest}" if rest else label)
             continue
 
-        # 行内标记剥离
+        # 行内标记剥离（先 *** 再 ** 再 *，防残留）
+        line = re.sub(r"\*\*\*(.+?)\*\*\*", r"\1", line)  # 粗斜体
         line = re.sub(r"\*\*(.+?)\*\*", r"\1", line)      # 加粗
         line = re.sub(r"__(.+?)__", r"\1", line)
         line = re.sub(r"\*(.+?)\*", r"\1", line)          # 斜体

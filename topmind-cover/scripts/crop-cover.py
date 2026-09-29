@@ -2,7 +2,7 @@
 """封面图裁剪：从 16:9 主图中央裁出公众号 2.35:1 版，并统一落盘命名。
 
 用法：
-    python3 crop-cover.py <主图路径> --slug <slug> --out-dir <包>/images/
+    python3 crop-cover.py <主图路径> --out-dir <包>/images/
 
 产出：
     <out-dir>/00-封面.png          1200x675  (X / 公众号共用主文件)
@@ -26,7 +26,6 @@ TARGETS = {
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("src", help="16:9 主图路径")
-    ap.add_argument("--slug", default="cover")
     ap.add_argument("--out-dir", required=True)
     args = ap.parse_args()
 
