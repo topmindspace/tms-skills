@@ -54,7 +54,7 @@ def main() -> None:
             check("正常图片产出双尺寸", r.returncode == 0 and got_a and got_b, r.stderr[:100])
             if got_a:
                 w, h = Image.open(td / "o3" / "00-封面.png").size
-                check("主图 1200×675", (w, h) == (1200, 675), f"实 {w}×{h}")
+                check("主图 1500×600", (w, h) == (1500, 600), f"实 {w}×{h}")
             if got_b:
                 w, h = Image.open(td / "o3" / "00-封面-公众号.png").size
                 check("公众号图 900×383", (w, h) == (900, 383), f"实 {w}×{h}")

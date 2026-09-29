@@ -38,7 +38,7 @@ updated: 2026-09-29
 1. **转 HTML**（一键复制的核心，首选）：
    ```bash
    python3 scripts/md2x-html.py <原稿>.md --out <包>/X长文.html \
-     --images <图1> <图2> ... [--cover cover-1200x675.png]
+     --images <图1> <图2> ... [--cover cover-1500x600.png]
    ```
    单文件 HTML：内联样式 + 配图 base64 内嵌。浏览器打开后点页顶
    「一键复制全文」，富文本（含格式）进剪贴板，去 X 文章编辑器粘贴。
@@ -57,7 +57,7 @@ updated: 2026-09-29
    规则见 `references/x-format.md`。HTML 复制异常时的备用入口。
    转完**通读一遍**：X 不渲染 markdown，标记剥离后断句、emphasis 全靠文字本身，
    读不顺就回原稿改。
-3. **封面图**：调 `topmind-cover`，平台选 `x`，得 1200×675 主图。
+3. **封面图**：调 `topmind-cover`，平台选 `x`，得 1500×600 主图。
 4. **发布清单**：按 `references/publish-checklist.md` 逐项过。
 5. **发布**：用户在 X Article 编辑器粘贴全文、上传封面与配图（按 `[图N]` 编号），
    人工点发布。**API 不发长文**（topmind-x 的 xurl 只覆盖短推文）。
@@ -70,7 +70,7 @@ updated: 2026-09-29
 ├── 原稿.md            # 输入（或复用既有原稿）
 ├── X长文.html         # 首选复制入口：浏览器打开，一键复制全文
 ├── X发布稿.txt        # 纯文本兜底入口
-├── cover-1200x675.png # 封面（topmind-cover 产出，X 编辑器单独上传）
+├── cover-1500x600.png # 封面（topmind-cover 产出，X 编辑器单独上传）
 └── 发布清单.md        # 本次发布 checklist（含时间、链接）
 ```
 

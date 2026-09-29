@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""封面图裁剪：从 16:9 主图中央裁出公众号 2.35:1 版，并统一落盘命名。
+"""封面图裁剪：从 5:2 主图中央裁出公众号 2.35:1 版，并统一落盘命名。
 
 用法：
     python3 crop-cover.py <主图路径> --out-dir <包>/images/
 
 产出：
-    <out-dir>/00-封面.png          1200x675  (X / 公众号共用主文件)
+    <out-dir>/00-封面.png          1500x600  (X / 公众号共用主文件)
     <out-dir>/00-封面-公众号.png   900x383   (公众号封面大图，中央裁剪)
 """
 import argparse
@@ -18,14 +18,14 @@ except ImportError:
     sys.exit("需要 Pillow：pip install pillow")
 
 TARGETS = {
-    "00-封面.png": (1200, 675),
+    "00-封面.png": (1500, 600),
     "00-封面-公众号.png": (900, 383),
 }
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("src", help="16:9 主图路径")
+    ap.add_argument("src", help="5:2 主图路径")
     ap.add_argument("--out-dir", required=True)
     args = ap.parse_args()
 
@@ -44,8 +44,8 @@ def main() -> None:
         sys.exit(f"错误：无法读取图片 {src}（{e}）")
     w, h = img.size
 
-    # 先按 16:9 中央裁一块基准
-    base_ratio = 16 / 9
+    # 先按 5:2 中央裁一块基准
+    base_ratio = 5 / 2
     if w / h > base_ratio:
         cw, ch = int(h * base_ratio), h
     else:
