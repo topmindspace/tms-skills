@@ -12,12 +12,12 @@
 - 包：<https://www.npmjs.com/package/@topmindspace/tms-skills>
 - 仓库：<https://github.com/topmindspace/tms-skills>
 
-当前线：安装器 **0.3.7** · 技能 top-ppt-html **0.1.19** · topmind-wechat-post / topmind-x-article / topmind-cover **0.1.0**（整仓同 tag 发版；见 CHANGELOG）。
+当前线：安装器 **0.3.8** · 技能 top-ppt-html **0.1.19** · topmind-wechat-post / topmind-x-article / topmind-cover **0.1.0**（整仓同 tag 发版；见 CHANGELOG）。
 
 
 ## npm 2.x 弃用说明（仓库重置）
 
-npm 上的 `@topmindspace/tms-skills` **2.0.0–2.1.1 已弃用**（仓库重置前的过时线）；**不要安装 `^2`**。当前线是 **0.3.x**（`latest` 指向 0.3.1）。
+npm 上的 `@topmindspace/tms-skills` **2.0.0–2.1.1 已弃用**（仓库重置前的过时线）；**不要安装 `^2`**。当前线是 **0.3.x**（`latest` 指向 0.3.6）。
 
 若需重写弃用文案，维护者可在已 `npm login` 的机器上执行 `bash scripts/deprecate-npm-2x.sh`（one-shot `@2.x` + verify）。
 
@@ -35,7 +35,7 @@ npm 上的 `@topmindspace/tms-skills` **2.0.0–2.1.1 已弃用**（仓库重置
 
 ## 版本策略（务必遵守）
 
-**整仓同 tag**：`git tag vX.Y.Z` 的 `X.Y.Z` = 根 `package.json` 的 `version`（即安装器 version，如当前 v0.3.7）；tag 号不代表任何技能版本。**各技能 `version` 独立演进**（如 top-ppt-html 0.1.19、新技能 0.1.0），不与 tag 号绑定。
+**整仓同 tag**：`git tag vX.Y.Z` 的 `X.Y.Z` = 根 `package.json` 的 `version`（即安装器 version，如当前 v0.3.8）；tag 号不代表任何技能版本。**各技能 `version` 独立演进**（如 top-ppt-html 0.1.19、新技能 0.1.0），不与 tag 号绑定。
 
 | 包 | 事实源 | 规则 |
 |----|--------|------|

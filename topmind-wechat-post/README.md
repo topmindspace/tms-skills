@@ -4,7 +4,7 @@
 
 公众号文章全生命周期：交付包、审校改写、质量三关、状态同步、微信内联排版与发布清单。
 
-- 版本：**v0.1.0**（与 `@topmindspace/tms-skills@0.3.7` 同 tag）
+- 版本：**v0.1.0**（与 `@topmindspace/tms-skills@0.3.8` 同 tag）
 
 ## 安装
 
@@ -59,7 +59,7 @@ python3 scripts/md2wechat.py --input demo.md --out-dir demo --slug demo --embed-
 
 ```html
 <!-- 二级标题自动编号；"总结"类末章编号为 ∞ -->
-<h2 ...><span ...>01</span>第一章</h2>
+<h2 ...><span ...>1</span>第一章</h2>
 <!-- 图片 base64 内嵌，粘贴即带图 -->
 <img src="data:image/png;base64,iVBORw0KGgo..." ...>
 ```

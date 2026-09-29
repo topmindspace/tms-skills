@@ -53,7 +53,7 @@ npx @topmindspace/tms-skills install topmind-cover
   <img src="docs/assets/tms-skills-banner.png" alt="tms-skills · top-ppt-html — formal business presentations" width="960" />
 </p>
 
-> **警告**：不要安装 `@topmindspace/tms-skills@^2`（2.0.0–2.1.1 已弃用）。当前线 **0.2.x**（`latest`）。
+> **警告**：不要安装 `@topmindspace/tms-skills@^2`（2.0.0–2.1.1 已弃用）。当前线 **0.3.x**（`latest`）。
 
 ## 技能一览
 
@@ -62,9 +62,9 @@ npx @topmindspace/tms-skills install topmind-cover
 | [`top-ppt-html`](./top-ppt-html/) | **0.1.19** | 正式商务演示：HTML 可翻页 + 16:9 可编辑 PPTX；双交付 · MD3 密度克制；三模式 × 九风格；strict 0/0 |
 | [`topmind-wechat-post`](./topmind-wechat-post/) | **0.1.0** | 公众号文章全生命周期：交付包、审校改写、质量三关、微信内联排版与发布清单 |
 | [`topmind-x-article`](./topmind-x-article/) | **0.1.0** | X 长文一键发布：Markdown 原稿转可直接粘贴的纯文本 + 封面图 + 发布清单 |
-| [`topmind-cover`](./topmind-cover/) | **0.1.0** | 文章封面配图（X / 公众号共用）：震撼醒目主题突出；8 风格封面风格库 + 17 张双尺寸示例图 |
+| [`topmind-cover`](./topmind-cover/) | **0.1.0** | 文章封面配图（X / 公众号共用）：震撼醒目主题突出；8 风格封面风格库 + 16 张双尺寸示例图 + 1 张风格总览图 |
 
-安装器 [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) 为 **0.3.7**（整仓同 tag 发版）。
+安装器 [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) 为 **0.3.8**（整仓同 tag 发版）。
 
 > SKILL.md frontmatter 除标准 `name`/`description` 外，本仓库扩展了 `action_category` / `triggers` / `triggers_cn` / `updated` 字段供安装器与路由使用。
 
@@ -76,7 +76,7 @@ npx @topmindspace/tms-skills install topmind-cover
 npx @topmindspace/tms-skills list
 npx @topmindspace/tms-skills install top-ppt-html
 npx @topmindspace/tms-skills install top-ppt-html --to ./.claude/skills
-npx @topmindspace/tms-skills@0.3.7 install top-ppt-html   # 钉版本
+npx @topmindspace/tms-skills@0.3.8 install top-ppt-html   # 钉版本
 ```
 
 ```bash

@@ -4,7 +4,7 @@
 
 Turn a Markdown draft into a "copy → paste → publish" X long-form (Article) package.
 
-- Version: **v0.1.0** (same tag as `@topmindspace/tms-skills@0.3.7`)
+- Version: **v0.1.0** (same tag as `@topmindspace/tms-skills@0.3.8`)
 
 ## Install
 

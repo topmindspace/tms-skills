@@ -10,7 +10,7 @@
 **Let ideas fly — make good thinking visible.** A high-craft skill for **demo reports / formal business presentations**: **HTML + PPT dual delivery** — day-to-day, present with paginated HTML like slides; export **layout-faithful editable PPTX** when needed. **MD3-inspired**: fitting information density, restrained type / shapes / color. Core craft is layout, typography, color, and content structure — not gadget soup.
 
 - Skill id: `top-ppt-html`; brand: **TopPPT HTML**
-- Version: **v0.1.19** (same tag as `@topmindspace/tms-skills@0.3.7`)
+- Version: **v0.1.19** (same tag as `@topmindspace/tms-skills@0.3.8`)
 - **Agent entry**: `SKILL.md` → `references/playbook.md` (L1) → L2 on demand
 - **Human maintainers**: this README (install / commands / layout); do not treat it as the generation spec
 
@@ -55,7 +55,7 @@ Also: arrow-key paging; **Esc** closes modals. After style/theme change, re-run 
 
 ```bash
 npx @topmindspace/tms-skills install top-ppt-html
-npx @topmindspace/tms-skills@0.3.7 install top-ppt-html
+npx @topmindspace/tms-skills@0.3.8 install top-ppt-html
 npx github:topmindspace/tms-skills install top-ppt-html
 ```
 

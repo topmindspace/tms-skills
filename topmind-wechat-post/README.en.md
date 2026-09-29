@@ -4,7 +4,7 @@
 
 Full lifecycle for WeChat articles: delivery package, review & rewrite, three quality gates, status sync, WeChat inline typography, and publish checklist.
 
-- Version: **v0.1.0** (same tag as `@topmindspace/tms-skills@0.3.7`)
+- Version: **v0.1.0** (same tag as `@topmindspace/tms-skills@0.3.8`)
 
 ## Install
 
@@ -60,7 +60,7 @@ Output `demo/demo-公众号版.html` (open in a browser → click "复制正文"
 
 ```html
 <!-- h2 auto-numbered; closing chapters like "总结" get ∞ -->
-<h2 ...><span ...>01</span>Chapter One</h2>
+<h2 ...><span ...>1</span>Chapter One</h2>
 <!-- images inlined as base64, pasted along with the text -->
 <img src="data:image/png;base64,iVBORw0KGgo..." ...>
 ```

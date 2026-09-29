@@ -335,6 +335,13 @@ function fitRowH(avail, n, pref, floor) {
   return Math.max(lo, Math.min(pref, avail / Math.max(1, n)));
 }
 
+/* Exhibit 徽标文本：纯编号补 "Exhibit " 前缀（HTML 为 `Exhibit {no}` + CSS uppercase，视觉同 "EXHIBIT 1"）；
+   调用方已带前缀的不重复 */
+function exhibitBadge(no) {
+  const t = String(no == null ? '' : no).trim();
+  if (!t) return t;
+  return /^exhibit[\s\-:]*/i.test(t) ? t.toUpperCase() : ('EXHIBIT ' + t.toUpperCase());
+}
 /* ══════════ 内容模型 ══════════
  * 从 --model=<file.json> 读取（推荐：由 extract_model.py 从 HTML 报告抽取，
  * 保证 PPTX 与页面同源）；未提供时使用下方内嵌 CONTENT 示例。 */
@@ -835,13 +842,30 @@ function dataTableRows(c) {
 function dataTableText(c) { return dataTableRows(c).map(r => r.join(' | ')).join('\n'); }
 
 /* 原生图表基础选项（位置由调用点附加） */
+/* 数据标签小数位：按模型数值实际小数位（上限 2 位）生成 format code。
+   原 '0"单位"' 会把 1.2 显示成 1（像素级数值失真）；无单位且无小数时保持 General。 */
+function chartDecimals(c) {
+  let d = 0;
+  const scan = (v) => {
+    if (typeof v === 'number' && isFinite(v)) {
+      const s = String(v), i = s.indexOf('.');
+      if (i >= 0) d = Math.max(d, Math.min(2, s.length - i - 1));
+    }
+  };
+  (c.values || []).forEach(scan);
+  (c.series || []).forEach(se => (se.values || []).forEach(scan));
+  (c.points || []).forEach(p => { if (Array.isArray(p)) p.forEach(scan); else scan(p); });
+  (c.start || []).forEach(scan); (c.target || []).forEach(scan);
+  return d;
+}
 function chartBaseOpts(c, colors, multi, kind) {
   const isLine = (kind === 'line' || kind === 'area');
+  const _dec = chartDecimals(c), _ds = _dec ? '.' + '0'.repeat(_dec) : '';
   const opts = {
     showValue: !isLine && !multi,
     dataLabelPosition: 'outEnd',
     dataLabelColor: STYLE.body, dataLabelFontSize: sz(11.5), dataLabelFontFace: STYLE.font,
-    dataLabelFormatCode: c.unit ? '0"' + c.unit + '"' : 'General',
+    dataLabelFormatCode: c.unit ? '0' + _ds + '"' + c.unit + '"' : (_dec ? '0' + _ds : 'General'),
     catAxisLabelColor: STYLE.faint, catAxisLabelFontSize: sz(10.5), catAxisLabelFontFace: STYLE.font,
     valAxisHidden: true, valAxisLineShow: false, catAxisLineShow: false,
     catGridLine: { style: 'none' }, valGridLine: { style: 'none' },
@@ -919,7 +943,19 @@ function nativeChart(s, c, x, y, w, h, dcols) {
   }
   const ctype = kind === 'line' ? pptx.ChartType.line
     : kind === 'area' ? pptx.ChartType.area : pptx.ChartType.bar;
-  chartTry(s, ctype, chartSeries(c), opts, c);
+  let cdata = chartSeries(c);
+  if (t === 'hbar') {
+    /* 条形图（barDir=bar）类目轴自下而上绘制：反转数据使首项居顶，
+       与 HTML svg-hbar 及 A 通道 hbarRows 同序（标签-数值配对不变） */
+    cdata = cdata.map(se => ({ name: se.name,
+      labels: (se.labels || []).slice().reverse(), values: (se.values || []).slice().reverse() }));
+    /* 单系列时颜色按数据点分配：颜色跟随数据走，与 A 通道 dcols[j%5] 同归属 */
+    if (!multi && colors && colors.length) {
+      const _n = Math.max(1, (cdata[0].values || []).length);
+      opts.chartColors = (cdata[0].values || []).map((_, i) => colors[(_n - 1 - i) % colors.length]);
+    }
+  }
+  chartTry(s, ctype, cdata, opts, c);
 }
 /* 散点（X/Y 双系列）/ 气泡（{x,y,w} 单系列）；labels 解析为 x，values 为 y */
 function xyChart(s, c, pos, kind, colors) {
@@ -1440,10 +1476,14 @@ function ribbonRects(s, pts, color) {
     const ca = (a[1] + a[2]) / 2, cb = (b[1] + b[2]) / 2;
     const dx = b[0] - a[0], dy = cb - ca;
     const len = Math.sqrt(dx * dx + dy * dy);
-    const th = Math.max(0.02, ((a[2] - a[1]) + (b[2] - b[1])) / 2);
+    /* 厚度取绝对值：sankey 按 [x,上,下]、streamgraph 按 [x,下,上] 传参（y 向下），
+       符号不应影响厚度（原 (a[2]-a[1]) 在 streamgraph 为负 → th 恒 0.02，流带变细线） */
+    const th = Math.max(0.02, Math.abs(((a[1] - a[2]) + (b[1] - b[2])) / 2));
     const ang = Math.atan2(dy, dx) * 180 / Math.PI;
-    s.addShape('rect', { x: (a[0] + b[0]) / 2 - len / 2, y: (ca + cb) / 2 - th / 2,
-      w: Math.max(0.02, len), h: th, rotate: Math.round(ang * 10) / 10,
+    /* 相邻 quad 沿走向微叠 0.02in：消除拼接处的抗锯齿发丝缝（streamgraph/sankey 像素级瑕疵） */
+    const ov = 0.02;
+    s.addShape('rect', { x: (a[0] + b[0]) / 2 - len / 2 - ov, y: (ca + cb) / 2 - th / 2,
+      w: Math.max(0.02, len) + ov * 2, h: th, rotate: Math.round(ang * 10) / 10,
       fill: { color: color }, line: { type: 'none' } });
   }
 }
@@ -1461,7 +1501,8 @@ function infoTableRows(sec) {
   if (t === 'network') return [['节点', '名称']].concat((sec.nodes || []).map(n => [String(n[0]), String(n[1])]));
   if (t === 'marimekko') {
     const head = ['列', '总量' + u].concat((sec.legend || []).map(String));
-    return [head].concat((sec.cols || []).map((c, i) => [String(c[0]), String(c[1])].concat(((sec.cells || [])[i] || []).map(String))));
+    return [head].concat((sec.cols || []).map((c, i) => [String(c[0]), String(c[1])]
+      .concat(marimekkoSegs((sec.cells || [])[i], 99).map(sg => sg.label != null ? sg.label + ' ' + sg.value : String(sg.value)))));
   }
   if (t === 'streamgraph') {
     return [['系列'].concat((sec.labels || []).map(String))]
@@ -1627,7 +1668,11 @@ function infoBoxplot(s, sec, y0, y1) {
       fontFace: STYLE.font, fontSize: sz(10.5), color: STYLE.body });
     s.addText(String(md) + (sec.unit || ''), { x: cx - step / 2, y: yFor(md) - 0.42, w: step, h: 0.26, align: 'center',
       fontFace: STYLE.font, fontSize: sz(10), bold: true, color: STYLE.accent });
-    s.addText(String(mn) + (sec.unit || ''), { x: cx - step / 2, y: yFor(mn) + 0.03, w: step, h: 0.24, align: 'center',
+    /* min 标签默认在须线帽下方；mn 贴轴时会被组标签带（P.y1-0.42 起）压住 →
+       翻到帽上方，同时避开箱体下沿（几何铁律②：禁叠印） */
+    let mnY = yFor(mn) + 0.03;
+    if (mnY + 0.24 > P.y1 - 0.42) mnY = Math.min(yFor(mn) - 0.28, yFor(q1) - 0.30);
+    s.addText(String(mn) + (sec.unit || ''), { x: cx - step / 2, y: mnY, w: step, h: 0.24, align: 'center',
       fontFace: STYLE.font, fontSize: sz(9.5), color: STYLE.faint });
     s.addText(String(mx) + (sec.unit || ''), { x: cx - step / 2, y: yFor(mx) - 0.28, w: step, h: 0.24, align: 'center',
       fontFace: STYLE.font, fontSize: sz(9.5), color: STYLE.faint });
@@ -1670,6 +1715,15 @@ function infoNetwork(s, sec, y0, y1) {
         align: outward ? 'left' : 'right', valign: 'middle', fontFace: STYLE.font, fontSize: sz(10), color: STYLE.body });
   });
 }
+/* marimekko 单元格归一化：裸数值 [70,25,5] 或 [标签,数值] 对 [["<50ms",70],…]
+   （与 cols/flows/groups 的 [标签,值] 惯例一致）；非数值 → 0，零值段过滤 */
+function marimekkoSegs(arr, maxSegs) {
+  return ((arr || []).slice(0, maxSegs == null ? 99 : maxSegs)).map(el => {
+    const pair = Array.isArray(el);
+    const v = Number(pair ? el[1] : el);
+    return { label: pair ? String(el[0]) : null, value: isFinite(v) ? v : 0 };
+  }).filter(sg => sg.value > 0);
+}
 /* 马赛克图：列宽按列总量、列高按 100% 构成的双重编码 */
 function infoMarimekko(s, sec, y0, y1) {
   const G = PT.marimekko;
@@ -1690,14 +1744,17 @@ function infoMarimekko(s, sec, y0, y1) {
   let cx0 = MX;
   cols.forEach((c, i) => {
     const cw = Math.max(0.2, (Number(c[1]) || 0) / total * availW);
-    const shares = (cells[i] || []).map(Number).slice(0, G.maxSegs);
-    const sum = shares.reduce((a, b) => a + b, 0) || 1;
+    const segs = marimekkoSegs(cells[i], G.maxSegs);
+    const sum = segs.reduce((a, sg) => a + sg.value, 0) || 1;
     let cy0 = P.y0;
-    shares.forEach((v, k) => {
+    segs.forEach((sg, k) => {
+      const v = sg.value;
       const sh = Math.max(0.02, v / sum * plotH);
       s.addShape('rect', { x: cx0, y: cy0, w: cw, h: sh,
         fill: { color: palette[k % palette.length] }, line: { color: STYLE.bg, width: 0.75 } });
-      s.addText(String(v) + (sec.unit || ''), { x: cx0, y: cy0 + sh / 2 - 0.13, w: cw, h: 0.26, align: 'center',
+      /* 有标签用标签（"<50ms"），裸数值沿用旧行为（值 + 单位） */
+      const segLabel = sg.label != null ? sg.label : (String(v) + (sec.unit || ''));
+      s.addText(segLabel, { x: cx0, y: cy0 + sh / 2 - 0.13, w: cw, h: 0.26, align: 'center',
         fontFace: STYLE.font, fontSize: sz(10), bold: true, fit: 'shrink',
         color: k === 0 ? STYLE.onAccent : STYLE.ink });
       cy0 += sh;
@@ -1792,9 +1849,41 @@ function addTable(s, tbl, x, y, w, availH, opts) {
   const dense = rowH < 0.42;
   const headSz = sz(dense ? 11 : 13), bodySz = sz(dense ? 10 : 12.5);
   const hRowH = Math.min(headRowH, Math.max(hardFloor, rowH * 1.15));
+  /* 内容高度预估：逐格用 estTextH 估算，超出行高则全表收字号 ——
+     禁依赖 fit:'shrink' 或渲染引擎自动撑高（PowerPoint/LibreOffice 会按内容增高行，压住脚注） */
+  const ncolsT = Math.max(head.length, 1, ...rowsIn.map(r => r.length));
+  const effColW = (Array.isArray(tbl.colW) && tbl.colW.length >= ncolsT) ? tbl.colW.slice(0, ncolsT)
+    : Array.from({ length: ncolsT }, () => w / ncolsT);
+  const cellPadIn = (dense ? 2 : 5) / 72;
+  const fitCellSz = (text, cw, availHh, maxSz) => fitFont([String(text == null ? '' : text)],
+    Math.max(0.5, cw - cellPadIn * 2), Math.max(0.2, availHh - cellPadIn * 2),
+    { max: maxSz, maxShrinkSteps: 6 });
+  let bodySzF = bodySz, headSzF = headSz;
+  rowsIn.forEach(r => r.forEach((c, j) => {
+    const f = fitCellSz(c, effColW[j] != null ? effColW[j] : effColW[0], rowH, bodySz);
+    if (f < bodySzF) bodySzF = f;
+  }));
+  head.forEach((h, j) => {
+    const f = fitCellSz(h, effColW[j] != null ? effColW[j] : effColW[0], hRowH, headSz);
+    if (f < headSzF) headSzF = f;
+  });
+  /* 字号触底仍装不下 → 显式告警（内容超承载，建议拆页/精简；行高不再自动撑高） */
+  const stillOver = (text, cw, availHh, f) =>
+    estTextH(String(text == null ? '' : text), Math.max(0.5, cw - cellPadIn * 2), f, TM_LINE) >
+    Math.max(0.2, availHh - cellPadIn * 2);
+  let overCells = 0;
+  rowsIn.forEach(r => r.forEach((c, j) => {
+    if (stillOver(c, effColW[j] != null ? effColW[j] : effColW[0], rowH, bodySzF)) overCells++;
+  }));
+  head.forEach((h, j) => {
+    if (stillOver(h, effColW[j] != null ? effColW[j] : effColW[0], hRowH, headSzF)) overCells++;
+  });
+  if (overCells > 0 && typeof console !== 'undefined')
+    console.warn(`addTable: ${overCells} 个单元格在字号下限（正文 ${bodySzF}pt/表头 ${headSzF}pt）仍超出分配行高 —— ` +
+      '内容超承载，建议拆页/精简文案（行高已锁定，防压脚注）');
   const rows = [head.map(h => ({ text: h, options: { bold: true, color: STYLE.onAccent,
-      fill: { color: STYLE.accent }, fontSize: headSz, fontFace: STYLE.font, valign: 'middle' } }))]
-    .concat(rowsIn.map(r => r.map(c => ({ text: String(c), options: { fontSize: bodySz,
+      fill: { color: STYLE.accent }, fontSize: headSzF, fontFace: STYLE.font, valign: 'middle' } }))]
+    .concat(rowsIn.map(r => r.map(c => ({ text: String(c), options: { fontSize: bodySzF,
       color: STYLE.body, fontFace: STYLE.font, valign: 'middle', fill: { color: STYLE.bg } } }))));
   /* rowH 数组：表头略高、正文均分剩余（pptxgenjs 支持逐行 rowH） */
   const rowHeights = [hRowH].concat(rowsIn.map(() => rowH));
@@ -1885,7 +1974,7 @@ CONTENT.sections.forEach((sec) => {
 
   /* 正文区起点 / 终点（含 lead 与 so-what / 来源行 / 待核实条占位） */
   /* 非 exhibit 页型也可带 Exhibit 编号（帧头徽标；正文区下移让位，避免与主图重叠） */
-  const exBadge = (type !== 'exhibit' && sec.exhibitNo) ? String(sec.exhibitNo).toUpperCase() : null;
+  const exBadge = (type !== 'exhibit' && sec.exhibitNo) ? exhibitBadge(sec.exhibitNo) : null;
   const bodyY0 = sec.lead ? PT.common.bodyYWithLead : CONTENT_TOP;
   const bodyY = exBadge ? bodyY0 + 0.42 : bodyY0;
   if (exBadge) {
@@ -1896,7 +1985,7 @@ CONTENT.sections.forEach((sec) => {
   const _F = PT.flagbar || { hdH: 0.26, rowH: 0.24, maxRows: 3, gap: 0.12 };
   const flagH = flagItems.length
     ? (_F.hdH + Math.min(_F.maxRows, flagItems.length) * _F.rowH + 0.06) : 0;
-  let bodyBottom = chartBottom(!!sec.soWhat, !!sec.footnote);
+  let bodyBottom = chartBottom(!!sec.soWhat, !!(sec.footnote || sec.note));
   let flagY = 0;
   if (flagH) {
     /* 待核实条底对齐 contentBottom；与来源行 / so-what 同页时上移让位（不重叠） */
@@ -1943,7 +2032,7 @@ CONTENT.sections.forEach((sec) => {
     /* R6：竖分隔线高度取原设计值与注释带感知下界的较小者——写死 3.1 会在
        so-what/来源行并存时越过注释带顶（ANNOTATION_BAND_OVERLAP），而无注释时
        不得比原设计更长（回归：smoke business-blue fixture slide 7）。 */
-    const kpiBottom = chartBottom(!!sec.soWhat, !!sec.footnote) - 0.05;
+    const kpiBottom = chartBottom(!!sec.soWhat, !!(sec.footnote || sec.note)) - 0.05;
     s.addShape('rect', { x: kdivX, y: K.heroY + 0.15, w: 0.025,
       h: Math.min(3.1, Math.max(0.6, kpiBottom - (K.heroY + 0.15))),
       fill: { color: STYLE.line }, line: { type: 'none' } });
@@ -1952,9 +2041,15 @@ CONTENT.sections.forEach((sec) => {
       { x: kdivX + 0.35, y: K.metricY0, w: CW * (1 - K.dividerX) - 0.5, h: CONTENT_BOTTOM - K.metricY0 };
     const kAvail = Math.max(0.8, kpiBottom - mreg.y);
     const kmets = sec.metrics || [];
-    const kCap = Math.max(1, Math.floor(kAvail / K.metricRowH));
+    /* 容量按最小允许行高判断，行高按全部指标自适应压缩 ——
+       原 kCap 用默认行高先截断，导致第 N+1 个指标被静默丢弃（禁静默丢数据） */
+    const K_MINROWH = 0.42;
+    const kCap = Math.max(1, Math.floor(kAvail / K_MINROWH));
     const kRows = Math.min(kmets.length, kCap);
-    const kRowH = fitRowH(kAvail, kRows, K.metricRowH, 0.42);
+    if (kRows < kmets.length)
+      console.warn(`[build_pptx] 警告：KPI 页「${sec.title || ''}」支撑指标 ${kmets.length} 个超出容量（${kAvail.toFixed(2)}in），` +
+        `仅渲染前 ${kRows} 个 —— 建议拆页`);
+    const kRowH = fitRowH(kAvail, kRows, K.metricRowH, K_MINROWH);
     kmets.slice(0, kRows).map(metricKV).forEach((m, i) => {
       const ky = mreg.y + i * kRowH;
       s.addText(m[0], { x: mreg.x, y: ky, w: mreg.w, h: Math.min(0.55, kRowH * 0.62),
@@ -1963,11 +2058,13 @@ CONTENT.sections.forEach((sec) => {
         h: Math.max(0.24, kRowH - Math.min(0.55, kRowH * 0.62)), fontFace: STYLE.font,
         fontSize: sz(10.5), color: STYLE.faint });
     });
-    /* 要点：指标行下方续排，k/v 双色（与 bar 侧栏同口径）；无位则静默舍去 */
+    /* 要点：指标行下方续排，k/v 双色（与 bar 侧栏同口径）；容量不足时显式告警（禁静默丢数据） */
     const kpts = (sec.points || []).filter(Boolean);
     const kpRowH = 0.5;
     const kpY0 = mreg.y + kRows * kRowH + 0.12;
     const kpCap = Math.max(0, Math.floor((kpiBottom - kpY0) / kpRowH));
+    if (kpts.length > kpCap)
+      console.warn(`[build_pptx] 警告：KPI 页「${sec.title || ''}」要点 ${kpts.length} 条超出容量，仅渲染前 ${kpCap} 条 —— 建议拆页`);
     kpts.slice(0, kpCap).forEach((p, i) => {
       const kv = pointKV(p), kk = kv[0], vv = kv[1];
       const ky = kpY0 + i * kpRowH;
@@ -2225,10 +2322,24 @@ CONTENT.sections.forEach((sec) => {
       s.addShape('roundRect', { x, y, w, h: rowH, rectRadius: 0.07,
         fill: { color: acc ? STYLE.soft : STYLE.surface },
         line: acc ? { type: 'none' } : { color: STYLE.line, width: 0.75 } });
-      s.addText(lt, { x: x + 0.22, y, w: Math.min(P.labelW, w - 0.44), h: rowH, valign: 'middle',
-        fontFace: STYLE.font, fontSize: sz(13.5), bold: true, color: acc ? STYLE.accent : STYLE.ink });
-      if (ld) s.addText(ld, { x: x + 0.22 + Math.min(P.labelW, w - 0.44), y, w: w - 0.44 - Math.min(P.labelW, w - 0.44), h: rowH,
-        valign: 'middle', fontFace: STYLE.font, fontSize: sz(11), color: STYLE.faint });
+      /* 标题列宽按层内宽比例分配（labelFrac≈0.3）；顶层窄时固定 3.2in 会把说明压成竖列叠印 →
+         改为标题上、说明下的单框混排（与 HTML .pyr__t/.pyr__d 同语义） */
+      const lwP = Math.min(P.labelW, (w - 0.44) * (P.labelFrac == null ? 0.32 : P.labelFrac));
+      const descW = w - 0.44 - lwP;
+      /* 窄层判定：说明列 < 1.2in，或标题在标题列内放不下单行（会中部换行）→
+         标题上、说明下单框混排（与 HTML 窄屏 .pyr__lvl 单列同语义） */
+      const narrowP = descW < 1.2 || (ld && estLines(lt, lwP, 13.5) > 1) || (!ld && estLines(lt, w - 0.44, 13.5) > 1);
+      if (narrowP) {
+        s.addText(lt, { x: x + 0.22, y: y + 0.03, w: w - 0.44, h: 0.30, valign: 'middle',
+          fontFace: STYLE.font, fontSize: sz(12.5), bold: true, color: acc ? STYLE.accent : STYLE.ink, fit: 'shrink' });
+        s.addText(ld, { x: x + 0.22, y: y + 0.33, w: w - 0.44, h: Math.max(0.2, rowH - 0.36), valign: 'middle',
+          fontFace: STYLE.font, fontSize: sz(10.5), color: STYLE.faint, fit: 'shrink' });
+      } else {
+        s.addText(lt, { x: x + 0.22, y, w: lwP, h: rowH, valign: 'middle',
+          fontFace: STYLE.font, fontSize: sz(13.5), bold: true, color: acc ? STYLE.accent : STYLE.ink, fit: 'shrink' });
+        if (ld) s.addText(ld, { x: x + 0.22 + lwP, y, w: descW, h: rowH,
+          valign: 'middle', fontFace: STYLE.font, fontSize: sz(11), color: STYLE.faint, fit: 'shrink' });
+      }
     });
   } else if (type === 'steps') {
     /* 步骤条：N 步横排 + 箭头；超 maxPerRow 折行；groups 分组标签 */
@@ -2644,12 +2755,12 @@ CONTENT.sections.forEach((sec) => {
     const reg = REGIONS.regionOf('exhibit', 'primary', { withNote: !!(sec.soWhat || sec.footnote) })
       || { x: MX, y: PT.exhibit.chartY, w: CW, h: PT.exhibit.chartH };
     if (sec.exhibitNo) {
-      s.addText(String(sec.exhibitNo).toUpperCase(), { x: MX, y: PT.exhibit.badgeY, w: CW, h: 0.35,
+      s.addText(exhibitBadge(sec.exhibitNo), { x: MX, y: PT.exhibit.badgeY, w: CW, h: 0.35,
         fontFace: STYLE.font, fontSize: sz(11.5), bold: true, color: STYLE.accent, charSpacing: 2 });
     }
     if (ec.labels && ec.values) {
       const edcols = ec.colors || dataColors(styleArg);
-      const h = Math.max(1.2, chartBottom(!!sec.soWhat, !!sec.footnote) - reg.y - 0.05);
+      const h = Math.max(1.2, chartBottom(!!sec.soWhat, !!(sec.footnote || sec.note)) - reg.y - 0.05);
       if (ec.type === 'hbar') {
         chartBlock(s, ec, reg.x, reg.y, reg.w, h, edcols);
       } else {

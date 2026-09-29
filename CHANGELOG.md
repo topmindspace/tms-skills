@@ -1,5 +1,39 @@
+## [0.3.8] - 2026-09-29
+
+> **本版备发**（tag v0.3.8 待打；npm 待发布；commit = 本轮审计报告落盘时的 `git log` 首条）。
+> 注：0.3.7 未发布，全部内容已并入本版。
+> 根包 0.3.6 → **0.3.8**（patch）；4 个技能 `version` 保持不动（top-ppt-html 0.1.19，其余 0.1.0）。
+> 本轮只动 top-ppt-html + 文档：渲染产出目检修复（A）+ PPTX 双引擎保真修复 11 bug（B）+ 文档修正（C）。
+
+### 模板 footer 修复（第十轮 Worker A：渲染产出目检）
+
+- `top-ppt-html/assets/templates/{presentation,research,architecture}.html`：`<footer>` 移出 `__TOPPPT_CONTENT_START__`/`__TOPPPT_CONTENT_END__` 标记之外——此前自动渲染取 content 区间时会连带删除页脚，目检确认已修复。
+
+### PPTX 双引擎保真修复（第十轮 Worker B：PPTX 实检，11 bug 全部像素复验）
+
+- `top-ppt-html/scripts/build_pptx.js` + `assets/pptx-export.js`（双端同规则）：
+  - 图表数据标签小数位：按模型数值实际小数位（上限 2 位）生成 format code，修复小数标签被截断
+  - hbar 条形图：类目轴自下而上绘制，反转数据使首项居顶；单系列颜色按数据点分配（跟随数据归属，与 A 通道一致）
+  - streamgraph 退化：相邻 ribbon quad 沿走向微叠 0.02in，消除拼接处抗锯齿发丝缝
+  - boxplot：min 标签默认移到须线帽下方，不再被组标签带压住叠印
+  - marimekko：单元格归一化兼容裸数值或 `[标签,数值]` 对（裸数值沿用旧行为），修复 NaN 崩坏
+  - pyramid：标题列宽按层内宽比例（labelFrac≈0.3）分配，顶层窄时改单框混排，修复窄层标题/说明叠印
+  - KPI：第 4 个起的支撑指标不再静默截断——容量按最小允许行高计算、行高按全部指标自适应压缩，超容显式告警
+  - donut 图例：百分比列 x（`donut.legendPctX` 5.3 → 10.8）右移，修复图例数值被圆环覆盖
+  - table：内容高度逐格预估、超高全表收字号，字号触底仍装不下则显式告警（不再撑高行压脚注）
+  - exhibit 徽标：纯编号自动补 `Exhibit ` 前缀（与 HTML 视觉一致），已带前缀的不重复
+  - sankey/streamgraph note：note 与 footnote 均参与 `chartBottom` 结算，修复 note 重叠
+- `top-ppt-html/scripts/layout-constants.json`：`donut.legendPctX` 5.3 → 10.8（单源），已由 `sync_runtime.py` 同步至 `pptx-export.js`、画廊、`templates/*.html`、示例的内联副本与 `__TOPPPT_RUNTIME_SHA__` 戳
+
+### 文档修正（第十轮 Worker C）
+
+- 根 README（中英）：当前线 0.2.x → 0.3.x；`topmind-cover` "17 张双尺寸" → "16 张双尺寸 + 1 张风格总览图"
+- `docs/PUBLISHING.md`：`latest` 指向 0.3.1 → 0.3.6
+- `topmind-wechat-post/README`（中英）：二级标题编号示例 `01` → `1`
+
 ## [0.3.7] - 2026-09-29
 
+> **本版未发布**（未打 tag、未推 npm；0.3.7 全部内容已并入 0.3.8）。
 > 根包 0.3.6 → **0.3.7**（patch）；4 个技能 `version` 保持不动（top-ppt-html 0.1.19，其余 0.1.0）。
 > 本轮只动 topmind-cover：文字排印与装饰系统（第九轮）。
 
