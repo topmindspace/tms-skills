@@ -95,9 +95,18 @@ def kp(k, v) -> str:
     return f'<li><strong>{k}。</strong>{v}</li>' if k else f'<li>{v}</li>'
 
 
-def open_sec(i: int, ptype: str, extra: str = '') -> str:
+def sec_anchor(i: int, sec: dict) -> str:
+    """页锚点 id：模型 anchor 优先，否则 s{i}（agenda 链接与 open_sec 同源，禁各写一份）。"""
+    a = str((sec or {}).get('anchor') or '').strip()
+    if re.fullmatch(r'[A-Za-z][A-Za-z0-9_-]*', a):
+        return a
+    return f's{i}'
+
+
+def open_sec(i: int, ptype: str, extra: str = '', sec: dict = None) -> str:
     skel = PAGE_TO_PRESET.get(ptype, 'P4')
-    return (f'<section class="band" id="s{i}" data-skel="{skel}" '
+    sid = sec_anchor(i, sec)
+    return (f'<section class="band" id="{sid}" data-skel="{skel}" '
             f'data-page-type="{ptype}"{extra}>')
 
 
@@ -118,10 +127,17 @@ def sowhat(sec: dict) -> str:
 
 
 def footnote(sec: dict) -> str:
+    # footnote 与 note 共用来源行（与 build_pptx 注释带同口径：两者都不丢）
     t = sec.get('footnote')
-    if not t:
+    n = sec.get('note')
+    parts = []
+    if t:
+        parts.append(cite(t))
+    if n and n != t:
+        parts.append(f'注：{cite(n)}')
+    if not parts:
         return ''
-    return f'    <div class="footnote">{cite(t)}</div>\n'
+    return f'    <div class="footnote">{" ".join(parts)}</div>\n'
 
 
 def flags_block(sec: dict) -> str:
@@ -134,55 +150,49 @@ def flags_block(sec: dict) -> str:
 
 
 def wrap(i: int, ptype: str, body: str, sec: dict, extra: str = '') -> str:
-    return (f'{open_sec(i, ptype, extra)}\n  <div class="wrap">\n'
+    return (f'{open_sec(i, ptype, extra, sec)}\n  <div class="wrap">\n'
             f'{shead(sec)}\n{body}{sowhat(sec)}{footnote(sec)}{flags_block(sec)}'
             f'  </div>\n</section>')
 
 
-# ── 语义图标库（高频取码 · 与 references/icons.md 同源；PPTX 侧由 accent 方块路标对应）──
-_SVG_OPEN = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" '
-             'stroke-linecap="round" stroke-linejoin="round">')
-ICONS: dict[str, str] = {
-    '增长': _SVG_OPEN + '<path d="M22 7l-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg>',
-    '下降': _SVG_OPEN + '<path d="M22 17l-8.5-8.5-5 5L2 7"/><path d="M16 17h6v-6"/></svg>',
-    '数据': _SVG_OPEN + '<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/></svg>',
-    '图表': _SVG_OPEN + '<path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6" rx="1"/><rect x="12" y="8" width="3" height="10" rx="1"/><rect x="17" y="4" width="3" height="14" rx="1"/></svg>',
-    '趋势': _SVG_OPEN + '<path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/><path d="M15 7h4v4"/></svg>',
-    '占比': _SVG_OPEN + '<path d="M21.2 15.9A10 10 0 1 1 8 2.8"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>',
-    '表格': _SVG_OPEN + '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>',
-    '效率': _SVG_OPEN + '<path d="M12 15l3.5-5.5"/><path d="M20.2 15a8.5 8.5 0 1 0-16.4 0"/></svg>',
-    '成果': _SVG_OPEN + '<circle cx="12" cy="8" r="6"/><path d="M15.5 13 17 22l-5-3-5 3 1.5-9"/></svg>',
-    '安全': _SVG_OPEN + '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>',
-    '权限': _SVG_OPEN + '<rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
-    '检查': _SVG_OPEN + '<circle cx="12" cy="12" r="10"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg>',
-    '风险': _SVG_OPEN + '<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>',
-    '团队': _SVG_OPEN + '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
-    '流程': _SVG_OPEN + '<circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/></svg>',
-    '计划': _SVG_OPEN + '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
-    '智能': _SVG_OPEN + '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9zM9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M1 15h3M20 9h3M20 15h3"/></svg>',
-    '洞察': _SVG_OPEN + '<circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>',
-    '工具': _SVG_OPEN + '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>',
-    '清单': _SVG_OPEN + '<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>',
-}
+# ── 语义图标库（单源：assets/icons/ + index.json；与 icon_lib.js / PPTX 真导出同源）──
+_ICON_DIR = Path(__file__).resolve().parent.parent / 'assets' / 'icons'
+_ICON_INDEX: dict = {}
+try:
+    _ICON_INDEX = json.loads((_ICON_DIR / 'index.json').read_text(encoding='utf-8'))
+except OSError:
+    _ICON_INDEX = {}
+
+
+def _load_icons() -> 'dict[str, str]':
+    out: dict[str, str] = {}
+    for name in (_ICON_INDEX.get('icons') or {}):
+        try:
+            out[name] = (_ICON_DIR / f'{name}.svg').read_text(encoding='utf-8').strip()
+        except OSError:
+            continue
+    return out
+
+
+ICONS: dict[str, str] = _load_icons()
 _ICONS_ORDER = list(ICONS.keys())
+_ICON_DEFAULTS = [n for n in (_ICON_INDEX.get('defaults') or []) if n in ICONS] or _ICONS_ORDER
 
 
 def pick_icon(title: str = '', idx: int = 0) -> str:
-    """按标题语义挑图标；未命中则按序轮换（保持同屏同家族、不堆砌）。"""
-    t = str(title or '')
-    for key, svg in ICONS.items():
-        if key in t:
-            return svg
-    return ICONS[_ICONS_ORDER[idx % len(_ICONS_ORDER)]]
+    """按标题语义挑图标 SVG；未命中则在默认表内轮换（选不出用默认，不盲目轮换全量）。"""
+    return ICONS[pick_icon_name(title, idx)]
 
 
 def pick_icon_name(title: str = '', idx: int = 0) -> str:
-    """图标名（与 icon_lib.js / PPTX 真导出同名）。"""
+    """图标名（与 icon_lib.js / PPTX 真导出同名；关键词来自 index.json）。"""
     t = str(title or '')
-    for key in ICONS:
-        if key in t:
+    meta = _ICON_INDEX.get('icons') or {}
+    for key in _ICONS_ORDER:
+        kws = (meta.get(key) or {}).get('keywords') or [key]
+        if any(kw and kw in t for kw in kws):
             return key
-    return _ICONS_ORDER[idx % len(_ICONS_ORDER)]
+    return _ICON_DEFAULTS[idx % len(_ICON_DEFAULTS)]
 
 
 def card_head(title: str, idx: int = 0, icon_name: str | None = None) -> str:
@@ -253,16 +263,23 @@ def r_metrics(i, sec):
 
 
 def r_kpi(i, sec):
+    # 大数指标页：hero 大数字 + 支撑指标行（metrics，可选）+ 要点；三者缺一不丢其余
     hero = sec.get('hero') or []
     val = hero[0] if hero else ''
     lab = hero[1] if len(hero) > 1 else ''
     delta = hero[2] if len(hero) > 2 else ''
+    left = ''
+    if val or lab:
+        left = (
+            '      <div class="stack gap-3"><div class="t-metric" style="color:var(--accent)">'
+            f'{esc(val)}</div>'
+            f'<div class="t-h3">{esc(lab)}</div>'
+            + (f'<div class="t-sm" style="color:var(--accent);font-weight:600">{esc(delta)}</div>' if delta else '')
+            + '</div>\n')
+    mets = metrics_row(sec.get('metrics')) if sec.get('metrics') else ''
     body = (
         '    <div class="grid g-hero rv a-c">\n'
-        f'      <div class="stack gap-3"><div class="t-metric" style="color:var(--accent)">{esc(val)}</div>'
-        f'<div class="t-h3">{esc(lab)}</div>'
-        + (f'<div class="t-sm" style="color:var(--accent);font-weight:600">{esc(delta)}</div>' if delta else '')
-        + '</div>\n'
+        + left + mets
         + '      <div class="grid g-2">\n'
         + pts_list(sec.get('points') or [['支撑', '一句话。']])
         + '\n      </div>\n    </div>\n')
@@ -339,14 +356,20 @@ def r_exhibit(i, sec):
 
 def r_twocol(i, sec):
     paras = sec.get('paragraphs') or []
+    variant = sec.get('variant') or ''
     cols = []
-    for p in paras:
+    for pi, p in enumerate(paras):
         if isinstance(p, (list, tuple)) and len(p) >= 2:
             cols.append(f'      <p class="t-body"><strong>{esc(p[0])}。</strong>{cite(p[1])}</p>')
         else:
             cols.append(f'      <p class="t-body">{cite(p)}</p>')
+    # 变体 2-col-feature：首栏为特性栏（复用 .card 语义：加粗标题 + accent 左线）
+    extra = ''
+    if variant == '2-col-feature' and cols:
+        cols[0] = cols[0].replace('class="t-body"', 'class="t-body col--feature"', 1)
+        extra = ' data-variant="2-col-feature"'
     body = '    <div class="cols-2 rv">\n' + '\n'.join(cols) + '\n    </div>\n'
-    return wrap(i, 'twocol', body, sec)
+    return wrap(i, 'twocol', body, sec, extra)
 
 
 def r_threecol(i, sec):
@@ -365,11 +388,16 @@ def r_threecol(i, sec):
 
 def r_cards(i, sec):
     cards = sec.get('cards') or []
+    variant = sec.get('variant') or ''
     n = int(sec.get('columns') or min(3, max(1, len(cards))))
     cls = {1: 'g-2', 2: 'g-2', 3: 'g-3', 4: 'g-4'}.get(n, 'g-3')
     # 纯卡片栅格强制等高（g-2--equal / g-3--equal），与 CSS / layout-grammar「同行卡片 stretch」一致
     if cls in ('g-2', 'g-3', 'g-4'):
         cls = cls + '--equal'
+    extra = ''
+    if variant == 'bento-grid':
+        # 变体 bento-grid：首卡跨 2 列（.card--lead），复用 .card 组件
+        cls, extra = 'g-bento', ' data-variant="bento-grid"'
     blocks = []
     for ci, cd in enumerate(cards):
         if isinstance(cd, dict):
@@ -380,11 +408,12 @@ def r_cards(i, sec):
             title, points, icon_name = cd[0], [['', cd[1]]], None
         else:
             title, points, icon_name = (cd or ''), [], None
+        lead_cls = ' card--lead' if (variant == 'bento-grid' and ci == 0) else ''
         blocks.append(
-            f'      <div class="card">{card_head(str(title), ci, icon_name)}\n'
+            f'      <div class="card{lead_cls}">{card_head(str(title), ci, icon_name)}\n'
             f'        {pts_list(points)}</div>')
     body = f'    <div class="grid {cls} rv">\n' + '\n'.join(blocks) + '\n    </div>\n'
-    return wrap(i, 'cards', body, sec)
+    return wrap(i, 'cards', body, sec, extra)
 
 
 def r_split(i, sec):
@@ -519,6 +548,9 @@ def r_image(i, sec):
         else:
             grid_cls = f'media-grid media-grid--{min(4, max(2, n))}'
         media = f'    <div class="{grid_cls} rv">\n' + '\n'.join(cells) + '\n    </div>\n'
+        # 组 caption（图编号）：多图版式同样渲染，与 PPTX img.caption 同口径（此前仅单图分支渲染）
+        if cap:
+            media += f'    <p class="media__src">{cite(cap)}</p>\n'
     else:
         src = im.get('src') or ''
         ph = bool(im.get('placeholder')) or not src
@@ -589,23 +621,32 @@ def r_lane(i, sec):
 
 def r_timeline(i, sec):
     items = []
+    variant = sec.get('variant') or ''
     for ph in (sec.get('phases') or []):
         if isinstance(ph, (list, tuple)):
             lab, name, desc = (list(ph) + ['', '', ''])[:3]
             state = ph[3] if len(ph) > 3 else ''
+            icon_name = ph[4] if len(ph) > 4 else ''
         else:
             lab, name, desc, state = ph.get('label', ''), ph.get('name', ''), ph.get('d', ''), ph.get('s', '')
+            icon_name = ph.get('icon', '')
         cls = 'tl__i'
         if state == 'done':
             cls += ' tl__i--done'
         elif state == 'now':
             cls += ' tl__i--now'
+        # 变体 timeline：节点图标（icon:<name>，无图标回落圆点）
+        dot = '<div class="tl__d"></div>'
+        if variant == 'timeline' and icon_name and icon_name in ICONS:
+            dot = (f'<div class="tl__ico" data-icon="{esc(icon_name)}">'
+                   f'{ICONS[icon_name]}</div>')
         items.append(
-            f'        <div class="{cls}"><div class="tl__d"></div>'
+            f'        <div class="{cls}">{dot}'
             f'<div class="tl__l">{esc(lab)}</div><div class="tl__t">{esc(name)}</div>'
             f'<p class="t-body">{cite(desc)}</p></div>')
     body = '    <div class="fig rv"><div class="tl">\n' + '\n'.join(items) + '\n    </div></div>\n'
-    return wrap(i, 'timeline', body, sec)
+    extra = ' data-variant="timeline"' if variant == 'timeline' else ''
+    return wrap(i, 'timeline', body, sec, extra)
 
 
 def r_steps(i, sec):
@@ -675,18 +716,34 @@ def r_pyramid(i, sec):
 
 
 def r_halftable(i, sec):
-    """半表半图：g-half 左表右图（校验 TYPE_FEATURE.halftable）。"""
+    """半表半图：g-half 左表右图（校验 TYPE_FEATURE.halftable）。
+    research 模式带 exhibitNo 时：右图按 Exhibit 规范加编号徽标与来源行，表侧不丢
+    （此前 research 统一走 r_exhibit 会静默丢弃 table——内容覆盖率门禁捕获）。"""
     tbl = sec.get('table') or {}
     ch = sec.get('chart') or {}
     head = tbl.get('head') or []
     rows = tbl.get('rows') or []
     th = ''.join(f'<th>{esc(h)}</th>' for h in head)
     trs = ''.join('<tr>' + ''.join(f'<td>{cite(c)}</td>' for c in row) + '</tr>' for row in rows)
+    no = sec.get('exhibitNo')
+    if no:
+        fig = (
+            '      <div class="fig"><div class="exhibit rv">\n'
+            f'        <div class="exhibit__hd"><span class="exhibit__no">Exhibit {esc(no)}</span>'
+            f'<span class="exhibit__t">{esc(sec.get("title") or "")}</span></div>\n'
+            f'{chart_svg(ch, i)}'
+            f'        <div class="exhibit__src">{cite(sec.get("footnote") or "来源：待补")}</div>\n'
+            '      </div></div>\n')
+        sec = dict(sec)
+        sec.pop('footnote', None)  # 已进来源行，避免 wrap 再渲染一次
+    else:
+        fig = (
+            f'      <div class="fig"><div class="fig__cap">{esc(ch.get("cap") or "互证图")}</div>\n'
+            f'{chart_svg(ch, i)}      </div>\n')
     body = (
         '    <div class="grid g-half g-2 rv a-start">\n'
         f'      <div class="tbl-wrap"><table><thead><tr>{th}</tr></thead><tbody>{trs}</tbody></table></div>\n'
-        f'      <div class="fig"><div class="fig__cap">{esc(ch.get("cap") or "互证图")}</div>\n'
-        f'{chart_svg(ch, i)}      </div>\n'
+        f'{fig}'
         '    </div>\n')
     return wrap(i, 'halftable', body, sec)
 
@@ -800,8 +857,10 @@ def render_body(model: dict) -> str:
             title = ag[1] if isinstance(ag, (list, tuple)) and len(ag) > 1 else ''
             desc = ag[2] if isinstance(ag, (list, tuple)) and len(ag) > 2 else ''
             href_i = chapter_first.get(str(num).zfill(2)) or chapter_first.get(str(num)) or gi
+            # 锚点与 open_sec 同源：该页有 anchor 则链到命名锚点
+            href_id = sec_anchor(href_i, secs[href_i - 1] if 0 < href_i <= len(secs) else {})
             lis.append(
-                f'      <li class="agenda__i"><a class="agenda__a" href="#s{href_i}">'
+                f'      <li class="agenda__i"><a class="agenda__a" href="#{href_id}">'
                 f'<span class="agenda__n">{esc(num)}</span>'
                 f'<span><span class="agenda__t">{esc(title)}</span>'
                 f'<div class="agenda__d">{esc(desc)}</div></span></a></li>')
@@ -822,7 +881,9 @@ def render_body(model: dict) -> str:
             sec = dict(sec)
             sec['exhibitNo'] = ex_n
         fn = RENDERERS.get(t, r_points)
-        if is_research_exhibit:
+        if is_research_exhibit and t != 'halftable':
+            # halftable 在 research 下仍走 r_halftable（表+图），仅借 exhibitNo 加 Exhibit 徽标；
+            # 统一走 r_exhibit 会静默丢弃 table（内容覆盖率门禁捕获，0.2.0 修）。
             fn = r_exhibit
         try:
             parts.append(fn(i, sec))

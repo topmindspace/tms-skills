@@ -31,6 +31,8 @@ import re
 import json
 import base64
 import hashlib
+import html as _html
+import unicodedata
 from typing import Optional
 from html.parser import HTMLParser
 from pathlib import Path
@@ -369,6 +371,155 @@ def _check_bands(txt, chk, mode="presentation"):
                 bad_grids += 1
     chk("混排栅格（图+卡）显式对齐（a-start/a-c 或 align-items）", bad_grids == 0,
         f"{bad_grids} 处未对齐" if bad_grids else "", level="WARN")
+
+
+def _icon_pack_names():
+    """图标包合法名集合（assets/icons/index.json）；读不到时返回 None（跳过存在性检查）。"""
+    try:
+        idx = json.loads((Path(__file__).resolve().parent.parent / 'assets' / 'icons'
+                          / 'index.json').read_text(encoding='utf-8'))
+        return set((idx.get('icons') or {}).keys())
+    except OSError:
+        return None
+
+
+def _check_icon_refs(txt, chk):
+    """图标引用存在性：data-icon / icon: 标记引用了包外图标 → WARN（不 FAIL）。"""
+    names = _icon_pack_names()
+    if names is None:
+        return
+    # 只扫渲染正文：去掉 script/style/注释与嵌入模型 JSON，避免代码与文档示例误报
+    body = re.sub(r'<script[\s\S]*?</script>', '', txt, flags=re.I)
+    body = re.sub(r'<style[\s\S]*?</style>', '', body, flags=re.I)
+    body = re.sub(r'<!--[\s\S]*?-->', '', body)
+    body = re.sub(r'window\.REPORT_MODEL\s*=\s*\{[\s\S]*?\n\};', '', body)
+    refs = set(re.findall(r'data-icon="([^"]+)"', body))
+    refs |= set(re.findall(r'icon:([\u4e00-\u9fa5A-Za-z0-9_-]+)', body))
+    # 排除 hydrate 占位与 CSS 类名噪声：只看真实引用上下文
+    bad = sorted(r for r in refs if r not in names and not r.startswith('{{'))
+    chk("图标引用存在（assets/icons 包内）", not bad,
+        f"未知图标: {', '.join(bad[:6])}{'…' if len(bad) > 6 else ''}（{len(bad)} 个）" if bad else "",
+        level="WARN")
+
+
+# ── 内容覆盖率（0.2.0）：版式不得以丢文字为代价美化 ──
+# 口径：REPORT_MODEL 可见文本串（去重、归一化）有多少字符能在渲染后 HTML 可见文本中找到；
+# <95% → WARN（只报告，不 FAIL；长串按 8 字窗口部分计分，避免数字重排/截断误杀）。
+_COV_SKIP_KEYS = {
+    # 元字段（不渲染为正文）
+    "style", "theme", "mode", "type", "variant", "icon", "color", "colors",
+    "src", "href", "id", "layout", "datatable", "dataTable", "font", "fontface",
+    "exhibitno", "exhibitNo", "columns", "max", "min", "unit", "ratio", "fit",
+    "align", "width", "height", "placeholder", "alt", "target", "rel", "dir",
+    "lang", "charset", "defer", "async", "media",
+    "hint",  # 搭建期给智能体的指令（如 image.hint），不是读者正文
+}
+_COV_URL_RE = re.compile(r'^(https?://|www\.|data:|#)', re.I)
+_COV_COLOR_RE = re.compile(r'^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$')
+# 纯小写 ASCII 标识符（无空格/CJK/大写）：渲染器语义 flag（如 "focus"），不是正文
+_COV_FLAG_RE = re.compile(r'^[a-z][a-z0-9_-]*$')
+# 信息图页型（r_info 故意留"按 infographics 规格绘制"占位、PPTX 走形状通道）：
+# 其 chart 数据子树不计入覆盖率（数据在模型与 PPTX 中完整，仅 HTML 待定制信息图）
+_COV_INFO_TYPES = {'sankey', 'treemap', 'boxplot', 'network', 'marimekko', 'streamgraph'}
+_COV_INFO_DATA_KEYS = {'chart', 'labels', 'values', 'groups', 'nodes', 'links', 'edges', 'data',
+                       'series', 'dataset', 'cols', 'rows', 'cells'}
+_COV_MIN_RATIO = 0.95  # 覆盖率下限（layout-constants qualityGates.contentCoverage 可覆写）
+
+
+def _norm_cov(s: str) -> str:
+    s = unicodedata.normalize('NFKC', s)
+    s = re.sub(r'(?<=\d),(?=\d)', '', s)  # 千分位 1,000 → 1000（中文逗号保留）
+    s = re.sub(r'\s+', '', s)
+    # 标点不计入：内容在、标点异（： vs 无、（） vs 无）不算丢失；比的是信息不是排印
+    s = ''.join(c for c in s if not unicodedata.category(c).startswith('P'))
+    return s
+
+
+def _model_cov_strings(model) -> list:
+    """从 REPORT_MODEL 递归抽取候选正文串（去重、保序）。"""
+    out, seen = [], set()
+
+    def walk(node, skip_sub=False):
+        if isinstance(node, dict):
+            # 信息图页型：chart 数据子树是故意占位（r_info），不计入
+            info_data = isinstance(node.get('type'), str) and node.get('type').lower() in _COV_INFO_TYPES
+            for k, v in node.items():
+                kl = str(k).lower()
+                if kl in _COV_SKIP_KEYS or str(k).startswith('data-'):
+                    continue
+                if info_data and kl in _COV_INFO_DATA_KEYS:
+                    continue
+                walk(v)
+        elif isinstance(node, (list, tuple)):
+            for v in node:
+                walk(v)
+        elif isinstance(node, str):
+            t = node.strip()
+            if len(t) < 4 or _COV_URL_RE.match(t) or _COV_COLOR_RE.match(t):
+                return
+            if _COV_FLAG_RE.match(t):
+                return  # 渲染器语义 flag（如 focus），非正文
+            if t not in seen:
+                seen.add(t)
+                out.append(t)
+
+    walk(model)
+    return out
+
+
+def _visible_cov_text(txt: str) -> str:
+    """渲染后可见文本：剔 script（含 REPORT_MODEL JSON 本体）/style/注释/标签后归一化。"""
+    t = re.sub(r'<script[\s\S]*?</script>', '', txt, flags=re.I)
+    t = re.sub(r'<style[\s\S]*?</style>', '', t, flags=re.I)
+    t = re.sub(r'<!--[\s\S]*?-->', '', t)
+    t = re.sub(r'<[^>]+>', '', t)
+    return _norm_cov(_html.unescape(t))
+
+
+def _cov_credit(cand: str, rendered: str) -> float:
+    """候选串的字符计分：整串命中按全长；否则按 8 字窗口命中率折算。"""
+    n = _norm_cov(cand)
+    if not n:
+        return 0.0
+    if n in rendered:
+        return float(len(n))
+    if len(n) <= 12:
+        return 0.0
+    win, hits, total = 8, 0, 0
+    for i in range(0, len(n), win):
+        total += 1
+        if n[i:i + win] in rendered:
+            hits += 1
+    return len(n) * hits / total if total else 0.0
+
+
+def _check_content_coverage(txt, chk, model) -> None:
+    """模型文本 → 渲染文本覆盖率（只 WARN）。"""
+    if not isinstance(model, dict):
+        return
+    try:
+        min_ratio = float((load_constants().get("qualityGates") or {}).get("contentCoverage")
+                          or _COV_MIN_RATIO)
+    except Exception:
+        min_ratio = _COV_MIN_RATIO
+    cands = _model_cov_strings(model)
+    if not cands:
+        return
+    rendered = _visible_cov_text(txt)
+    total = sum(len(_norm_cov(c)) for c in cands)
+    if not total:
+        return
+    miss = []
+    got = 0.0
+    for c in cands:
+        cr = _cov_credit(c, rendered)
+        got += cr
+        if cr < len(_norm_cov(c)) * 0.5:
+            miss.append(c[:24])
+    ratio = got / total
+    chk(f"内容覆盖率（模型文本→渲染文本 ≥{min_ratio:.0%}）", ratio >= min_ratio,
+        f"覆盖率 {ratio:.1%}（{len(cands)} 串），疑似丢失: {'；'.join(miss[:3])}" if ratio < min_ratio else "",
+        level="WARN")
 
 
 def _check_icons(txt, chk):
@@ -1801,8 +1952,10 @@ def main():
     _check_mode_layouts(txt, chk, mode)
     if mode != 'architecture':
         _check_icons(txt, chk)
+        _check_icon_refs(txt, chk)
     _check_pptx_export(txt, chk)
     model = _check_model_consistency(txt, chk, mode, style)
+    _check_content_coverage(txt, chk, model)
     _check_type_features(txt, chk, model)
     _check_exhibits(txt, chk, mode)
     _check_research_extras(txt, chk, mode)

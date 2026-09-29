@@ -4,9 +4,9 @@
 > **取码**：本节「高频取码」或 `python scripts/extract_snippet.py --task icons`。  
 > **完整 SVG 枚举**（60+）：`../docs/archive/refs/icons-catalog.md`（生成默认**不**预读；仅当高频未覆盖语义时按名查阅）。
 
-全部 24×24、描边（stroke 1.8，圆角线帽），`currentColor` 随主题变色。
+全部 24×24、描边（stroke 1.8，圆角线帽），`currentColor` 随主题变色。共 **48** 个，单源 `assets/icons/`（`*.svg` HTML 内联 + `*.png` 512px 预渲染供 PPTX），`index.json` 为关键词→图标映射 + 默认表。校验：`python scripts/check_icons.py`。
 
-> **PPTX 通道（真导出）**：图标名写入模型 `cards[].icon`（或 HTML `data-icon`），`build_pptx.js` 经 `icon_lib.js` + sharp 栅格化为 PNG 嵌入，与 HTML 同名同语义。`objectName` 前缀 `icon:`，`validate_pptx` 单独计数（`icon_pictures`），**不进** `pictures=0` 内容图门禁。缺资产时回落 accent 小方块路标。图标名取值 = 本文件高频取码键（增长/下降/数据/图表/趋势/占比/表格/效率/成果/安全/权限/检查/风险/团队/流程/计划/智能/洞察/工具/清单）。
+> **PPTX 通道（真导出）**：图标名写入模型 `cards[].icon`（或 HTML `data-icon` / hydrate 标记 `<i data-icon="名"></i>`），`build_pptx.js` 经 `icon_lib.js` 取 PNG 嵌入（优先 `icon-assets.json` 的 accent 着色版 → 回落 `assets/icons/*.png` 512px 预渲染 → 最后才回落 accent 小方块路标），与 HTML 同名同语义。`objectName` 前缀 `icon:`，`validate_pptx` 单独计数（`icon_pictures`），**不进** `pictures=0` 内容图门禁。图标名取值 = `assets/icons/index.json` 的键（48 个）。
 
 ## 使用准则（先读再用）
 
@@ -19,7 +19,9 @@
 3. **有限密度**：演示 3–8 / 研究 2–4 / 架构主图内 0；超过即噪音。
 4. **位置克制**：只走四正当位置（卡头 / 关键列表 / 指标角标 / 提示条）；**Agenda 大编号、表格单元格、图表内部、正文行内**一律不用。
 5. **一致性 > 个性**：同类信息复用同一语义图标（如「风险」全篇都用警告），不要每页换隐喻。
-6. **可导出意识**：卡片头写 `data-icon` / 模型 `cards[].icon`，PPTX 真导出同名 PNG；缺省按标题语义自动挑选（`icon_lib.pickIconName`）。
+6. **可导出意识**：卡片头写 `data-icon` / 模型 `cards[].icon`，PPTX 真导出同名 PNG；缺省按标题语义自动挑选（`icon_lib.pickIconName`：关键词命中，选不出用默认表轮换）。
+
+**选型铁律**：按内容选图标，选不出用默认；只在必须/有必要用图标的场景使用（四正当位置），不要为装饰而堆图标。
 
 违反时：先减数量，再统一家族，最后才考虑换布局——不要靠堆图标补「空旷」。
 
@@ -77,18 +79,23 @@
 | 口径/规则 | 文档/报告、检查/对勾 |
 | 组织/分工 | 用户/团队、架构/层级 |
 | 流程/血缘 | 分支/流程、循环/飞轮 |
-| 计划/路线 | 日历/计划、罗盘/方向 |
-| 智能/Agent | 芯片/AI、机器人/Agent |
-| 洞察/分析 | 搜索/洞察、灯泡/洞察 |
-| 建设/工具 | 扳手/工具 |
+| 计划/路线 | 日历/计划、罗盘/方向、旗帜/里程碑 |
+| 智能/Agent | 芯片/AI、火箭/发射 |
+| 洞察/分析 | 搜索/洞察、灯泡/创意 |
+| 建设/工具 | 扳手/工具、齿轮/设置 |
 | 图表语义 | 柱状图、趋势/折线、环形/占比、表格/网格 |
-| 布局 | 拼贴 / 布局 |
+| 沟通/联系 | 对话、邮件、手机、定位/地点 |
+| 财务/资源 | 纸币/财务、时钟/时间 |
+| 动作 | 右箭头、下载、上传、分享、链接 |
+| 标记 | 五角星、书签、信息/提示、对勾 |
 | 清单/条目 | 清单/条目 |
-| 待核实 | 信息（或归档目录「待核实」） |
+| 待核实 | 信息 |
 
-选型顺序：**语义表 → 高频取码 →**（未覆盖时）归档目录按名复制。
+选型顺序：**语义表 → index.json 关键词 → 高频取码**；命中不了用**默认表**（信息/检查/数据/图表/目标/团队/工具）轮换。
 
-## 高频取码（压缩 SVG · 20）
+## 高频取码（压缩 SVG · 20，与 assets/icons/ 同源）
+
+> 完整 48 见 `assets/icons/index.json`（关键词→图标映射 + 默认表）；归档旧目录 `../docs/archive/refs/icons-catalog.md` 仅备查。
 
 **数据库**
 ```html
@@ -157,12 +164,12 @@
 
 **用户/团队**
 ```html
-<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
 ```
 
 **架构/层级**
 ```html
-<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="16" y="16" width="6" height="6" rx="1"/><path d="M12 8v4M5 16v-2a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2"/></svg>
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="16" y="16" width="6" height="6" rx="1"/><path d="M12 8v4M5 12h14M5 12v4M19 12v4"/></svg>
 ```
 
 **分支/流程**
@@ -182,14 +189,10 @@
 
 **文档/报告**
 ```html
-<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>
 ```
 
 **搜索/洞察**
 ```html
-<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
 ```
-
----
-
-> 包内 `icons.md` 保持 REQUIRED（语义 + 禁区 + 尺寸 + 高频码）。完整枚举见 `../docs/archive/refs/icons-catalog.md`；默认生成**不**预读归档。

@@ -51,6 +51,8 @@ jobs:
           test -f "$OUT/${SKILLS[0]}/SKILL.md"
       - name: Installer negative tests (--force guards)
         run: node scripts/test_install_guards.js
+      - name: Installer CLI tests (install/uninstall)
+        run: node scripts/test_installer_cli.js
       - name: Skill version consistency (frontmatter vs package.json)
         run: node scripts/run_skill_gates.js versions
 

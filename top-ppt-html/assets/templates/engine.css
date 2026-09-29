@@ -318,6 +318,18 @@ border-color:color-mix(in srgb,var(--accent-on) 20%,transparent);color:var(--acc
 .g-mosaic{grid-template-columns:repeat(3,minmax(0,1fr));
 grid-template-areas:"hero hero hero" "a b c";grid-auto-rows:auto}
 .g-mosaic__hero{grid-area:hero}.g-mosaic__a{grid-area:a}
+/* ── 版式变体（0.2.0 · layoutVariants 注册表）：复用既有组件 ──
+   g-bento：Bento 拼贴卡（3 列；首卡 .card--lead 跨 2 列，主结论优先）
+   tl__ico：图标时间线节点图标（替代 .tl__d 圆点，16–20px，currentColor）
+   col--feature：双栏特性栏（加粗首行 + accent 左线，复用 .card 语义） */
+.g-bento{grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch}
+.grid.g-bento>.card{align-self:stretch}
+.grid.g-bento>.card--lead{grid-column:span 2}
+@media (max-width:1180px){.grid.g-bento>.card--lead{grid-column:span 1}}
+.tl__ico{position:absolute;left:-33px;top:2px;width:22px;height:22px;color:var(--accent)}
+.tl__ico svg{width:22px;height:22px;display:block}
+.cols-2>.col--feature{border-left:3px solid var(--accent);padding-left:14px}
+.cols-2>.col--feature strong{font-size:1.06em}
 .g-mosaic__b{grid-area:b}.g-mosaic__c{grid-area:c}
 .g-hero-full{grid-template-columns:repeat(3,minmax(0,1fr));
 grid-template-areas:"main main main" "s1 s2 s3"}

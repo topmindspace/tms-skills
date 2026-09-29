@@ -4,15 +4,15 @@
 
 为 X 长文和公众号文章生成封面图的可复用技能。目标：**震撼、醒目、主题突出**。
 
-- 版本：**v0.1.0**（与 `@topmindspace/tms-skills@0.3.9` 同 tag）
+- 版本：**v0.2.0**（与 `@topmindspace/tms-skills@0.4.0` 同 tag）
 
 ## 风格样张
 
 <p align="center">
-  <img src="https://github.com/topmindspace/tms-skills/raw/main/topmind-cover/assets/examples/overview.png" alt="topmind-cover · 8 封面风格总览" width="960" />
+  <img src="https://github.com/topmindspace/tms-skills/raw/main/topmind-cover/assets/examples/overview.png" alt="topmind-cover · 11 封面风格总览" width="960" />
 </p>
 
-8 种风格（爆款干货 / 巨字宣言 / 品牌发布 / 教程步骤 / IP 趣味 / 资讯快报 / 极简留白 / 杂志编辑）：适用场景、配色故事、抽象设计原则、中英 prompt 配方见 [`references/cover-styles.md`](./references/cover-styles.md)；单风格大图在 [`assets/examples/`](./assets/examples/)。
+11 种风格（白色清新 / 背景虚化 / 纸感拼贴 / 资讯快报 / 巨字宣言 / 教程步骤 / 极简留白 / 杂志编辑 / 爆款干货 / 品牌发布 / IP 趣味，浅色优先排序）：适用场景、配色故事、抽象设计原则、中英 prompt 配方见 [`references/cover-styles.md`](./references/cover-styles.md)；单风格大图在 [`assets/examples/`](./assets/examples/)。
 
 ## 安装
 
@@ -22,7 +22,7 @@ npx @topmindspace/tms-skills install topmind-cover
 
 ## 用法
 
-0. **选风格**：按题材从 `references/cover-styles.md` 选 1 种（8 选 1）→ 看示例图确认视觉语言。
+0. **选风格**：按题材从 `references/cover-styles.md` 选 1 种（11 选 1，浅色优先）→ 看示例图确认视觉语言。
 1. **标题提炼**：先定标题文案（一般 ≤10 字），用该风格章节的标题写法规范；不满意重写，不先画图。
 2. **构图简报**：一句话 brief（主题/受众/情绪/视觉隐喻/配色方向），组 prompt 前先写。
 3. 输入文章标题 + 3 个主题关键词 + 平台（x / wechat / both，默认 both）。

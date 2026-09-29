@@ -63,7 +63,8 @@
       "legend": [
         "当前建设焦点",
         "已有能力"
-      ]
+      ],
+      "anchor": "arch1"
     },
     {
       "type": "lane",
@@ -100,7 +101,8 @@
             "回写记忆"
           ]
         ]
-      ]
+      ],
+      "anchor": "arch2"
     },
     {
       "type": "lane",
@@ -164,5 +166,13 @@
       ]
     ]
   },
-  "theme": "dark"
+  "theme": "dark",
+  "refs": [
+    {
+      "name": "企业智能体平台架构白皮书（内部）",
+      "time": "2026-08",
+      "caliber": "分层与节点命名依据",
+      "url": "https://example.com/agent-platform-whitepaper"
+    }
+  ]
 }

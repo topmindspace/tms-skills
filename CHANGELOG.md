@@ -1,3 +1,30 @@
+## [0.4.0] - 2026-09-29
+
+> **本版备发**（tag v0.4.0 待打；npm 待发布；commit = 本轮审计报告落盘时的 `git log` 首条）。
+> 根包 0.3.9 → **0.4.0**（minor，本轮是功能轮）；技能版本：top-ppt-html 0.1.19 → **0.2.0**、topmind-cover 0.1.0 → **0.2.0**、topmind-wechat-post / topmind-x-article 保持 0.1.0。
+> 本轮是"对标业界+浅色封面+图标包版式"的功能轮（第十二轮）。
+
+### 安装器（Worker A）
+
+- 新增 `uninstall <id> [--to]` 命令：卸载已安装技能，`--to` 指向文件/缺目录时干净报错 exit 1
+- `install` 已装版本感知：已装同版本拒绝安装并给出三行摘要（当前版本/来源/提示 uninstall 或覆盖），不再静默覆盖
+- `scripts/test_installer_cli.js`：10 用例 38 断言，覆盖 install/uninstall/list/负向输入
+- `--help` 更新、根 README.md/README.en.md 安装章节重写（`github:` 口径、钉版本示例同步 0.4.0）
+- `.github/workflows/ci.yml` 新增 "Installer CLI tests" step
+
+### topmind-cover 0.2.0（Worker B）
+
+- 新增 3 个浅色风格：`white-clean`（排第一，标题冲击目标 1/3 字高）、`bg-blur`（背景虚化突出前景）、`paper-collage`（纸拼贴质感）
+- `cover-styles.md` 11 风格重排为浅色优先；`impact-language.md` 补条目；SKILL.md 新增"直出/讨论"决策流
+- 6 张新风格样张 + `overview.png` 重建；`references/ref-white-clean-1/2.png` 新增参考图
+
+### top-ppt-html 0.2.0（Worker C）
+
+- 内置原创图标包 `assets/icons/`：48 SVG + 48 PNG + `index.json` 映射，7 个默认图标兜底；`scripts/check_icons.py`（`--strict`）做图标一致性门禁；`references/icons.md` 文档化
+- 3 种 layout variant：bento-grid / timeline / 2-col-feature（`references/layout-variants.md`）；`references/style-pack.md` 风格包文档化
+- `validate_report.py` 新增内容覆盖率检查（<95% WARN）；随门禁修复 6 个真实丢字 bug
+- `scripts/layout-constants.json` 加 adaptiveText 弹性文本规则；HTML/PPTX 弹性适配减少溢出截断
+
 ## [0.3.9] - 2026-09-29
 
 > **本版备发**（tag v0.3.9 待打；npm 待发布；commit = 本轮审计报告落盘时的 `git log` 首条）。

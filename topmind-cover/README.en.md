@@ -4,15 +4,15 @@
 
 A reusable skill for generating cover art for X long-form posts and WeChat articles. Goal: **striking, eye-catching, theme-focused**.
 
-- Version: **v0.1.0** (same tag as `@topmindspace/tms-skills@0.3.9`)
+- Version: **v0.2.0** (same tag as `@topmindspace/tms-skills@0.4.0`)
 
 ## Style gallery
 
 <p align="center">
-  <img src="https://github.com/topmindspace/tms-skills/raw/main/topmind-cover/assets/examples/overview.png" alt="topmind-cover · 8 cover-style overview" width="960" />
+  <img src="https://github.com/topmindspace/tms-skills/raw/main/topmind-cover/assets/examples/overview.png" alt="topmind-cover · 11 cover-style overview" width="960" />
 </p>
 
-8 styles (viral dry-goods / giant-type manifesto / brand launch / tutorial steps / fun IP / news flash / minimalist / editorial magazine): use cases, palette stories, abstract design principles, and Chinese+English prompt recipes in [`references/cover-styles.md`](./references/cover-styles.md); full-size per-style shots in [`assets/examples/`](./assets/examples/).
+11 styles (clean white / background blur / paper collage / news flash / giant-type manifesto / tutorial steps / minimalist / editorial magazine / viral dry-goods / brand launch / fun IP, light-first ordering): use cases, palette stories, abstract design principles, and Chinese+English prompt recipes in [`references/cover-styles.md`](./references/cover-styles.md); full-size per-style shots in [`assets/examples/`](./assets/examples/).
 
 ## Install
 
@@ -22,7 +22,7 @@ npx @topmindspace/tms-skills install topmind-cover
 
 ## Usage
 
-0. **Pick a style**: choose 1 of 8 styles from `references/cover-styles.md` by topic → check the example image to confirm the visual language.
+0. **Pick a style**: choose 1 of 11 styles from `references/cover-styles.md` by topic (light-first) → check the example image to confirm the visual language.
 1. **Refine the title**: lock the title copy first (usually ≤ 10 chars) using that style's title rules; rewrite until it lands — no drawing yet.
 2. **Composition brief**: one-sentence brief (theme / audience / mood / visual metaphor / palette direction) before composing the prompt.
 3. Input: article title + 3 theme keywords + platform (x / wechat / both, default both).

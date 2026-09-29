@@ -159,15 +159,22 @@ function _normColor(c) {
   if (/^[0-9a-f]{3}$/.test(v)) v = '#' + v;
   return v;
 }
-/** 取图标 PNG data URI；无缓存时按名挑色兜底（accent → 首色 → null） */
+/** 取图标 PNG data URI；无缓存时按名挑色兜底（accent → 首色 → 包内 512px PNG → null） */
 function iconPng(name, colorHex) {
   const n = name && ICON_ASSETS.icons[name] ? name : ICON_LIB.pickIconName(name, 0);
   const bag = ICON_ASSETS.icons[n];
-  if (!bag) return null;
-  const want = _normColor(colorHex);
-  if (bag[want]) return bag[want];
-  const keys = Object.keys(bag);
-  return bag[keys[0]] || null;
+  if (bag) {
+    const want = _normColor(colorHex);
+    if (bag[want]) return bag[want];
+    const keys = Object.keys(bag);
+    if (keys.length) return bag[keys[0]];
+  }
+  // 无 sharp / 无预生成资产时的可靠回落：包内 512px 预渲染 PNG（python-pptx/pptxgenjs 均可直接嵌入）
+  try {
+    const p = ICON_LIB.iconPngPath(n);
+    if (p) return 'data:image/png;base64,' + fs.readFileSync(p).toString('base64');
+  } catch (e) { /* 继续回落 accent 方块 */ }
+  return null;
 }
 /** 在指定盒内嵌图标（真导出）；无图标资产时回落 accent 小方块（可扫读路标） */
 function addIcon(s, name, x, y, size, colorHex) {
@@ -275,6 +282,30 @@ const FS_POLICY = (function () {
   }
 })();
 const FONT_LADDER = FS_POLICY.ladder;
+/* 弹性文本单源（containers.adaptiveText · 0.2.0）：长标题/长列表/长表格单元格的降级规则。
+   调用处只读 AT_* 与下列 helper，禁止手写字号/行距/阈值 magic number。 */
+const AT = (LC.containers && LC.containers.adaptiveText) || {};
+const AT_TITLE = AT.title || {}, AT_LIST = AT.list || {}, AT_TABLE = AT.table || {};
+/* 标题字号上限：按字符数（CJK=1，拉丁/数字≈0.5，与 estLines 同口径）分档 */
+function titleMaxFor(text) {
+  const s = String(text == null ? '' : text);
+  let units = 0;
+  for (const ch of s) units += /[\x00-\xff]/.test(ch) ? 0.5 : 1;
+  if (units >= (AT_TITLE.xlongChars != null ? AT_TITLE.xlongChars : 44)) return AT_TITLE.xlongMax || 20;
+  if (units >= (AT_TITLE.longChars != null ? AT_TITLE.longChars : 28)) return AT_TITLE.longMax || 24;
+  return AT_TITLE.base || 30;
+}
+/* 列表密集度：条目数达标 → 收紧字号上限/段间距/行距 */
+function listFitOpts(n) {
+  const dense = n >= (AT_LIST.denseItems != null ? AT_LIST.denseItems : 6);
+  return {
+    dense,
+    max: dense ? (AT_LIST.denseMax || 12) : (AT_LIST.max || 14),
+    gapFactor: dense ? (AT_LIST.denseGapFactor != null ? AT_LIST.denseGapFactor : 0.25)
+                     : (AT_LIST.gapFactor != null ? AT_LIST.gapFactor : 0.5),
+    lineFactor: dense ? (AT_LIST.denseLineFactor || 1.3) : (AT_LIST.lineFactor || 1.45),
+  };
+}
 /* 缩字号触底记录：触底 = 内容量超出该版式承载力，是「该拆页/换组合」的信号，不得无声无息 */
 const SHRINK_FLOOR_HITS = [];
 function modeFloorPt() {
@@ -470,9 +501,10 @@ function head(s, eyebrow, title, lead) {
   };
   if (eyebrow) s.addText(eyebrow, { x: H.x, y: H.y, w: H.w, h: 0.4, fontFace: STYLE.font,
     fontSize: sz(13), bold: true, color: STYLE.accent, charSpacing: 2 });
-  /* 主标题自适应：过长时缩一档，避免压到分隔线 */
+  /* 主标题自适应（adaptiveText.title 单源）：先按字符数分档定上限，再按高度验算降一档，避免压到分隔线 */
   const titleH = eyebrow ? (H.ruleY - H.titleY - 0.06) : 1.6 - 0.6;
-  const tSize = estTextH(title, CW, sz(30), 1.25) > titleH ? sz(24) : sz(30);
+  const tMax = titleMaxFor(title);
+  const tSize = sz(estTextH(title, CW, sz(tMax), 1.25) > titleH ? Math.min(tMax, AT_TITLE.step1 || 24) : tMax);
   s.addText(title, { x: H.x, y: eyebrow ? H.titleY : 0.6, w: H.w, h: Math.max(0.6, titleH),
     fontFace: STYLE.fontDisplay, fontSize: tSize, bold: true, color: STYLE.ink, fit: 'shrink' });
   s.addShape('rect', { x: H.x, y: eyebrow ? H.ruleY : 1.6, w: 0.9, h: 0.045, fill: { color: STYLE.accent }, line: { type: 'none' } });
@@ -515,7 +547,7 @@ function isRec(v) { return !!v && typeof v === 'object' && !Array.isArray(v); }
    pointKV: [k,v] | {k|t, v|d} | str（对齐 pts_list）
    metricKV: [v,k] | {v|value, k}（对齐 metrics_row）
    bulletKV: [k,a,t] | {k,a,t}（对齐 r_bullet；缺省保持 undefined 以便调用方判空）
-   phaseKV: [label,name,desc,state] | {label,name,d,s}（对齐 r_timeline）
+   phaseKV: [label,name,desc,state,icon?] | {label,name,d,s,icon?}（对齐 r_timeline；icon 为变体 timeline 节点图标）
    paraKV: [title,text] | str（对齐 r_twocol；str 为无加粗标题的正文段） */
 function pointKV(p) {
   if (Array.isArray(p)) return [String(p[0] == null ? '' : p[0]), String(p[1] == null ? '' : p[1])];
@@ -533,9 +565,10 @@ function bulletKV(it) {
   return [String(it == null ? '' : it), undefined, undefined];
 }
 function phaseKV(ph) {
-  if (Array.isArray(ph)) return [ph[0] || '', ph[1] || '', ph[2] || '', ph[3] || ''];
-  if (isRec(ph)) return [ph.label || '', ph.name || '', ph.d || '', ph.s || ''];
-  return [String(ph == null ? '' : ph), '', '', ''];
+  // 第 5 元 = icon（变体 timeline 的节点图标；缺省 ''，渲染回落圆点）
+  if (Array.isArray(ph)) return [ph[0] || '', ph[1] || '', ph[2] || '', ph[3] || '', ph[4] || ''];
+  if (isRec(ph)) return [ph.label || '', ph.name || '', ph.d || '', ph.s || '', ph.icon || ''];
+  return [String(ph == null ? '' : ph), '', '', '', ''];
 }
 function paraKV(p) {
   if (Array.isArray(p)) return [p[0] || '', p[1] || ''];
@@ -1836,7 +1869,7 @@ function addTable(s, tbl, x, y, w, availH, opts) {
   const minRowH = opts.minRowH != null ? opts.minRowH : PT.table.rowHMin;
   const headRowH = opts.headRowH != null ? opts.headRowH : (PT.table.headRowH || minRowH);
   /* 行数超过容量时优先压行高到 hardFloor，仍放不下则整体缩放到 availH（禁溢出） */
-  const hardFloor = Math.min(minRowH, 0.22);
+  const hardFloor = Math.min(minRowH, AT_TABLE.rowFloorIn != null ? AT_TABLE.rowFloorIn : 0.22);
   const ideal = availH / Math.max(1, n);
   let rowH = Math.min(maxRowH, Math.max(hardFloor, ideal));
   if (n * rowH > availH + 0.01) {
@@ -1847,7 +1880,8 @@ function addTable(s, tbl, x, y, w, availH, opts) {
   }
   /* 行多则同步收字号（research 密排允许更小；句子单元格仍走语义字号门禁） */
   const dense = rowH < 0.42;
-  const headSz = sz(dense ? 11 : 13), bodySz = sz(dense ? 10 : 12.5);
+  const headSz = sz(dense ? 11 : Math.min(13, AT_TABLE.headMax || 12));
+  const bodySz = sz(dense ? 10 : Math.min(12.5, AT_TABLE.cellMax || 13));
   const hRowH = Math.min(headRowH, Math.max(hardFloor, rowH * 1.15));
   /* 内容高度预估：逐格用 estTextH 估算，超出行高则全表收字号 ——
      禁依赖 fit:'shrink' 或渲染引擎自动撑高（PowerPoint/LibreOffice 会按内容增高行，压住脚注） */
@@ -1855,9 +1889,11 @@ function addTable(s, tbl, x, y, w, availH, opts) {
   const effColW = (Array.isArray(tbl.colW) && tbl.colW.length >= ncolsT) ? tbl.colW.slice(0, ncolsT)
     : Array.from({ length: ncolsT }, () => w / ncolsT);
   const cellPadIn = (dense ? 2 : 5) / 72;
+  /* 长表格单元格适配（adaptiveText.table 单源）：逐格估算，超出行高则全表收字号；
+     floor 取模式下限与表格下限之大者——表格不得突破模式可读性底线 */
   const fitCellSz = (text, cw, availHh, maxSz) => fitFont([String(text == null ? '' : text)],
     Math.max(0.5, cw - cellPadIn * 2), Math.max(0.2, availHh - cellPadIn * 2),
-    { max: maxSz, maxShrinkSteps: 6 });
+    { max: maxSz, maxShrinkSteps: 6, floor: Math.max(modeFloorPt(), AT_TABLE.cellFloor || 0) });
   let bodySzF = bodySz, headSzF = headSz;
   rowsIn.forEach(r => r.forEach((c, j) => {
     const f = fitCellSz(c, effColW[j] != null ? effColW[j] : effColW[0], rowH, bodySz);
@@ -2408,8 +2444,14 @@ CONTENT.sections.forEach((sec) => {
     ps.forEach((p, i) => {
       const x = treg.x + 0.2 + i * stepW;
       const on = p[3] === 'done' || p[3] === 'now';
-      s.addShape('ellipse', { x: x - T.dotR / 2, y: T.dotY, w: T.dotR, h: T.dotR,
-        fill: { color: on ? STYLE.accent : STYLE.line }, line: { type: 'none' } });
+      // 变体 timeline：节点图标（icon:<name>）；无图标回落圆点
+      const wantIcon = (sec.variant === 'timeline') && p[4];
+      if (wantIcon) {
+        addIcon(s, p[4], x - 0.13, T.dotY - 0.06, 0.26, on ? STYLE.accent : STYLE.body);
+      } else {
+        s.addShape('ellipse', { x: x - T.dotR / 2, y: T.dotY, w: T.dotR, h: T.dotR,
+          fill: { color: on ? STYLE.accent : STYLE.line }, line: { type: 'none' } });
+      }
       s.addText(p[0], { x: x - 0.1, y: T.labelY, w: stepW - 0.2, h: 0.4, fontFace: STYLE.font,
         fontSize: sz(12), bold: true, color: STYLE.accent, charSpacing: 1 });
       s.addText(p[1], { x: x - 0.1, y: T.nameY, w: stepW - 0.2, h: 0.5, fontFace: STYLE.fontDisplay,
@@ -2465,11 +2507,25 @@ CONTENT.sections.forEach((sec) => {
     const fz = fitFont(items.length ? items : ['x'.repeat(longest)], g.w, availH, { max: 13.5, gapFactor: 1.2 });
     groups.forEach((col, ci) => {
       if (!col.length) return;
+      const colX = treg.x + ci * g.step;
+      // 变体 2-col-feature：首栏特性栏（accent 左线 + 标题放大一档）
+      const isFeature = (sec.variant === '2-col-feature') && ci === 0 && nCol === 2;
+      const fx = isFeature ? colX + 0.14 : colX;
+      const fw = isFeature ? g.w - 0.14 : g.w;
+      if (isFeature) {
+        // 特性栏 accent 左线：高度按首段实际文本估算（不用整栏 availH，避免无墨水区压进注释带触发 severe 门禁）
+        const p0 = col[0] || ['', ''];
+        const barH = Math.min(availH,
+          estTextH(p0[0] + '　', fw, sz(fz + 1), 1.5) +
+          estTextH(p0[1] || '', fw, sz(fz - 1), 1.5) + sz(7) / 72 + 0.06);
+        s.addShape('rect', { x: colX, y: treg.y, w: 0.045, h: Math.max(0.2, barH),
+          fill: { color: STYLE.accent }, line: { type: 'none' }, objectName: 'feature:bar' });
+      }
       const runs = col.map(p => ([
-        { text: p[0] + '　', options: { fontSize: sz(fz), bold: true, color: STYLE.ink } },
+        { text: p[0] + '　', options: { fontSize: sz(isFeature ? fz + 1 : fz), bold: true, color: STYLE.ink } },
         { text: p[1] + '\n', options: { fontSize: sz(fz - 1), color: STYLE.body, breakLine: true } },
       ])).flat();
-      s.addText(runs, { x: treg.x + ci * g.step, y: treg.y, w: g.w, h: availH, fontFace: STYLE.font,
+      s.addText(runs, { x: fx, y: treg.y, w: fw, h: availH, fontFace: STYLE.font,
         valign: 'top', lineSpacing: sz(fz * 1.5), paraSpaceBefore: sz(7) });
     });
   } else if (type === 'halftable') {
@@ -2563,8 +2619,10 @@ CONTENT.sections.forEach((sec) => {
         : (Array.isArray(cd)
           ? { title: cd[0] || '', points: cd.length > 1 ? [['', cd[1]]] : [] }
           : { title: String(cd == null ? '' : cd), points: [] }));
-    const c = Math.min(sec.columns || 3, cds.length || 1);
-    const r = Math.ceil((cds.length || 1) / c);
+    const isBento = (sec.variant === 'bento-grid') && cds.length >= 3;
+    const c = isBento ? 3 : Math.min(sec.columns || 3, cds.length || 1);
+    // bento-grid：首卡占 2 个槽位（跨 2 列），其余顺排；槽位数 = 卡数 + 1
+    const r = isBento ? Math.ceil((cds.length + 1) / c) : Math.ceil((cds.length || 1) / c);
     const gw = (creg.w - (c - 1) * cdC.gap) / c;
     const gh = fitRowH(creg.h - (r - 1) * cdC.gap, r, cdC.maxH, 0.6);
     /* points 文本归一化（scaffold v9 契约 {title, points:[[k,v]]} 兼容三种形态） */
@@ -2589,21 +2647,28 @@ CONTENT.sections.forEach((sec) => {
         { max: 12, lineFactor: 1.5, gapFactor: 0 }))) : 12;
     const ptsFz = sz(ptsFzB);
     cds.forEach((cd, i) => {
-      const col = i % c, row = Math.floor(i / c);
+      let col = i % c, row = Math.floor(i / c), span = 1;
+      if (isBento) {
+        // 首卡跨 2 列：槽位 = i===0 ? [0,1] : i+1
+        const slot = i === 0 ? 0 : i + 1;
+        if (i === 0) span = 2;
+        col = slot % c; row = Math.floor(slot / c);
+      }
+      const cw = span * gw + (span - 1) * cdC.gap;
       const x = creg.x + col * (gw + cdC.gap), y = creg.y + row * (gh + cdC.gap);
-      s.addShape('roundRect', { x, y, w: gw, h: gh, rectRadius: 0.08,
+      s.addShape('roundRect', { x, y, w: cw, h: gh, rectRadius: 0.08,
         fill: { color: STYLE.surface }, line: { color: STYLE.line, width: 0.75 } });
       /* 卡片头路标：真导出语义图标（SVG→PNG），与 HTML .card__ico 同源；无资产时回落 accent 方块 */
       const ico = 0.18;
       const icoName = cd.icon || ICON_LIB.pickIconName(cd.title || '', i);
       addIcon(s, icoName, x + 0.18, y + 0.2, ico, STYLE.accent);
-      s.addText(cd.title || '', { x: x + 0.18 + ico + 0.1, y: y + 0.14, w: gw - 0.36 - ico - 0.1, h: cdC.titleH, fontFace: STYLE.font,
+      s.addText(cd.title || '', { x: x + 0.18 + ico + 0.1, y: y + 0.14, w: cw - 0.36 - ico - 0.1, h: cdC.titleH, fontFace: STYLE.font,
         fontSize: sz(15), bold: true, color: STYLE.ink, fit: 'shrink' });
       /* points 兼容：[[k,v]…] | [str…] | [{t,d}…]（scaffold v9 契约 {title, points:[[k,v]]}） */
       const ptLines = (cd.points || []).map(cardPtText);
       s.addText(ptLines.map(t => ({ text: t + '\n',
           options: { fontSize: ptsFz, color: STYLE.body, fontFace: STYLE.font, breakLine: true } })),
-        { x: x + 0.18, y: y + 0.14 + cdC.titleH + 0.06, w: gw - 0.36, h: ptsBoxH,
+        { x: x + 0.18, y: y + 0.14 + cdC.titleH + 0.06, w: cw - 0.36, h: ptsBoxH,
           fontFace: STYLE.font, valign: 'top', lineSpacing: ptsFz * 1.5 });
     });
   } else if (type === 'split') {
@@ -2792,8 +2857,10 @@ CONTENT.sections.forEach((sec) => {
       : CW - 0.4;
     const avail = bodyBottom - bodyY;
     const rowH = fitRowH(avail, pts.length, P.rowH, 0.3);
+    /* 长列表收紧（adaptiveText.list 单源）：条目多时降字号上限/段间距/行距，仍装不下由 fitFont 阶梯下探 */
+    const _lo = listFitOpts(pts.length);
     const fzB = fitFont(pts.map(p => (p[0] || '') + (p[1] || '')), textW - 0.32, avail,
-      { max: 15, gapFactor: 0.55 });
+      { max: Math.min(15, _lo.max), gapFactor: _lo.gapFactor, lineFactor: _lo.lineFactor });
     const fz = sz(fzB), fzSm = sz(snapFont(fzB - 1));
     pts.forEach((p, i) => {
       const y = bodyY + i * rowH;

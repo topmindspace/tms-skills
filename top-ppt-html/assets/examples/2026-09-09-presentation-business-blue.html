@@ -342,6 +342,18 @@ border-color:color-mix(in srgb,var(--accent-on) 20%,transparent);color:var(--acc
 .g-mosaic{grid-template-columns:repeat(3,minmax(0,1fr));
 grid-template-areas:"hero hero hero" "a b c";grid-auto-rows:auto}
 .g-mosaic__hero{grid-area:hero}.g-mosaic__a{grid-area:a}
+/* ── 版式变体（0.2.0 · layoutVariants 注册表）：复用既有组件 ──
+   g-bento：Bento 拼贴卡（3 列；首卡 .card--lead 跨 2 列，主结论优先）
+   tl__ico：图标时间线节点图标（替代 .tl__d 圆点，16–20px，currentColor）
+   col--feature：双栏特性栏（加粗首行 + accent 左线，复用 .card 语义） */
+.g-bento{grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch}
+.grid.g-bento>.card{align-self:stretch}
+.grid.g-bento>.card--lead{grid-column:span 2}
+@media (max-width:1180px){.grid.g-bento>.card--lead{grid-column:span 1}}
+.tl__ico{position:absolute;left:-33px;top:2px;width:22px;height:22px;color:var(--accent)}
+.tl__ico svg{width:22px;height:22px;display:block}
+.cols-2>.col--feature{border-left:3px solid var(--accent);padding-left:14px}
+.cols-2>.col--feature strong{font-size:1.06em}
 .g-mosaic__b{grid-area:b}.g-mosaic__c{grid-area:c}
 .g-hero-full{grid-template-columns:repeat(3,minmax(0,1fr));
 grid-template-areas:"main main main" "s1 s2 s3"}
@@ -2079,331 +2091,11 @@ if(e.isIntersecting){e.target.classList.add('in');o.unobserve(e.target)}})},
    两通道共用：① header"预览/导出 PPTX"（页面直导，导出前自检）② extract_model.py → build_pptx.js --model（智能体精导）
    必须是严格 JSON（双引号、无尾逗号、无注释）。mode 固定为 presentation（与 data-mode 一致，生成时锁定）。
    页型：points / metrics / table / timeline / bar / cards / split / diagram。 */
-window.REPORT_MODEL = {
-  "mode": "presentation",
-  "style": "business-blue",
-  "title": "AI 智能体：从工具到同事",
-  "subtitle": "从工具到同事 · 台上宣讲版",
-  "meta": "宣讲材料 · 2026-09-09",
-  "agenda": [
-    [
-      "01",
-      "范式跃迁",
-      "从 Chatbot 到 Autonomous Agent"
-    ],
-    [
-      "02",
-      "形态与边界",
-      "三类形态与能力边界"
-    ],
-    [
-      "03",
-      "落地路径",
-      "采纳率四季度爬升"
-    ],
-    [
-      "04",
-      "参考资料",
-      "数据来源与口径说明"
-    ]
-  ],
-  "sections": [
-    {
-      "type": "points",
-      "eyebrow": "01 · 范式跃迁",
-      "title": "范式跃迁：智能体的本质是目标驱动的自主执行",
-      "points": [
-        [
-          "从工具到同事",
-          "人从执行者变成目标设定者与审核者"
-        ],
-        [
-          "试点率过六成",
-          "61% 企业已进入试点，规模化不足两成"
-        ],
-        [
-          "护栏先行",
-          "权限与审计内嵌，高风险动作人工确认"
-        ]
-      ],
-      "metrics": [
-        [
-          "61%",
-          "2025 企业试点率[1]"
-        ],
-        [
-          "18%",
-          "规模化运行占比[2]"
-        ]
-      ]
-    },
-    {
-      "type": "table",
-      "eyebrow": "02 · 形态与边界",
-      "title": "三类形态能力边界分明，同事级智能体尚在早期",
-      "table": {
-        "head": [
-          "能力",
-          "2026 现状",
-          "跃迁目标"
-        ],
-        "rows": [
-          [
-            "任务自主性",
-            "单点工具为主，人逐步驱动",
-            "目标驱动，端到端"
-          ],
-          [
-            "工具生态",
-            "连接数少、缺乏统一编排",
-            "统一编排，千级工具"
-          ],
-          [
-            "记忆与规划",
-            "会话级记忆，无长期规划",
-            "任务级记忆，多步规划"
-          ],
-          [
-            "安全治理",
-            "事后审计、无回退",
-            "护栏内运行，全程可回退"
-          ]
-        ]
-      }
-    },
-    {
-      "type": "bar",
-      "eyebrow": "03 · 落地路径",
-      "title": "企业智能体采纳率：四个季度四步走至 60%",
-      "chart": {
-        "labels": [
-          "2026Q3",
-          "Q4",
-          "2027Q1",
-          "Q2"
-        ],
-        "values": [
-          30,
-          45,
-          55,
-          60
-        ],
-        "max": 100,
-        "unit": "%"
-      },
-      "note": "口径：试点及以上的企业占比[1]"
-    },
-    {
-      "type": "comparison",
-      "eyebrow": "03 · 落地路径",
-      "title": "从试点到规模化：两条路径的分野",
-      "left": {
-        "title": "堆场景路径 · 现状",
-        "points": [
-          [
-            "接入慢",
-            "每场景重复对接工具与权限"
-          ],
-          [
-            "治理弱",
-            "事后审计，回退靠人工"
-          ],
-          [
-            "易回退",
-            "23 家中 19 家半年内退回试点"
-          ]
-        ]
-      },
-      "right": {
-        "title": "平台化路径 · 目标",
-        "points": [
-          [
-            "接入快",
-            "统一编排，接入成本降一个量级"
-          ],
-          [
-            "治理内嵌",
-            "权限、审计、回退进平台层"
-          ],
-          [
-            "可放量",
-            "先行 9 家全部穿越分水岭"
-          ]
-        ]
-      },
-      "verdict": "平台化不是可选项，而是规模化穿越分水岭的唯一共同路径。"
-    },
-    {
-      "type": "kpi",
-      "eyebrow": "04 · 落地路径",
-      "title": "六成企业已越过 PoC，规模化不足两成",
-      "hero": [
-        "61%",
-        "2025 企业智能体试点率",
-        "+6pt vs 2024"
-      ],
-      "metrics": [
-        [
-          "18%",
-          "规模化运行占比，3 场景以上"
-        ],
-        [
-          "9 家",
-          "规模化成功企业，全部先建平台层"
-        ],
-        [
-          "60%",
-          "2027Q2 采纳率目标"
-        ]
-      ]
-    },
-    {
-      "type": "donut",
-      "eyebrow": "04 · 落地路径",
-      "title": "试点企业分布：过六成跨越 PoC",
-      "chart": {
-        "labels": [
-          "已规模化",
-          "试点中",
-          "观望"
-        ],
-        "values": [
-          18,
-          43,
-          39
-        ],
-        "unit": "%",
-        "centerLabel": "企业占比"
-      },
-      "note": "口径：试点及以上 = 61%；N=42 深度访谈 + 行业抽样[1]"
-    },
-    {
-      "type": "quote",
-      "eyebrow": "03 · 关键判断",
-      "title": "规模化瓶颈不在模型，而在治理与集成",
-      "quote": "穿越分水岭的钥匙是平台化，不是更大的模型。",
-      "author": "企业智能体发展调研 · 42 家深度访谈"
-    },
-    {
-      "type": "steps",
-      "eyebrow": "05 · 落地节奏",
-      "title": "四步走：从单场景试点到平台化放量",
-      "steps": [
-        [
-          "选场景",
-          "客服 / 研发 / 数据三类高价值场景先跑通"
-        ],
-        [
-          "建平台",
-          "三层解耦 + 统一编排，接入成本降一个量级"
-        ],
-        {
-          "t": "立治理",
-          "d": "权限、审计、回退进平台层，高风险动作人工确认",
-          "accent": true
-        },
-        [
-          "放量复制",
-          "同一套护栏复制到新场景，无需重建"
-        ]
-      ],
-      "footnote": "口径：先行 9 家规模化企业的共同路径[2]"
-    },
-    {
-      "type": "bullet",
-      "eyebrow": "06 · 目标对照",
-      "title": "四项能力对照目标：治理与集成缺口最大",
-      "items": [
-        [
-          "场景覆盖",
-          61,
-          80
-        ],
-        [
-          "治理就绪",
-          34,
-          75
-        ],
-        [
-          "工具集成",
-          42,
-          70
-        ],
-        [
-          "规模化运行",
-          18,
-          60
-        ]
-      ],
-      "unit": "%",
-      "max": 100,
-      "footnote": "口径：能力就绪度 = 自评「已具备且稳定运行」的企业占比；目标取 2027Q2[2]"
-    },
-    {
-      "type": "cards",
-      "eyebrow": "06 · 能力地图",
-      "title": "平台化三件套：编排、记忆、治理缺一不可",
-      "cards": [
-        {
-          "title": "统一编排",
-          "points": [
-            "工具连接：千级工具统一注册与调用",
-            "任务拆解：多步规划与失败重试"
-          ]
-        },
-        {
-          "title": "长期记忆",
-          "points": [
-            "任务记忆：跨会话保留目标与进度",
-            "偏好学习：组织口径与风格沉淀"
-          ]
-        },
-        {
-          "title": "护栏治理",
-          "points": [
-            "权限分级：高风险动作人工确认",
-            "全程可回退：审计与回滚内嵌平台层"
-          ]
-        }
-      ],
-      "columns": 3,
-      "footnote": "口径：先行 9 家规模化企业的共同能力底座[2]"
-    },
-    {
-      "type": "image",
-      "eyebrow": "07 · 场景实拍",
-      "title": "客服智能体工作台：会话、工具调用与人工接管同屏",
-      "image": {
-        "placeholder": true,
-        "layout": "full",
-        "caption": "图 1：客服智能体工作台（占位示例；交付前替换为真实截图）",
-        "hint": "建议 2400×800px（3:1）真实截图；把 image.placeholder 改为 image.src 即可"
-      }
-    }
-  ],
-  "closing": {
-    "title": "让智能体真正干活起来",
-    "points": [
-      [
-        "选场景",
-        "客服 / 研发 / 数据三类高价值场景"
-      ],
-      [
-        "建平台",
-        "三层解耦 + 统一编排 + 护栏"
-      ],
-      [
-        "立治理",
-        "权限、审计、回退全闭环"
-      ]
-    ]
-  },
-  "theme": "light"
-};
+window.REPORT_MODEL = {"mode": "presentation", "style": "business-blue", "title": "AI 智能体：从工具到同事", "meta": "2026 · 演示汇报", "agenda": [["01", "范式跃迁", "从 Chatbot 到 Autonomous Agent"], ["02", "形态与边界", "三类形态与能力边界"], ["03", "落地路径", "采纳率四季度爬升"], ["04", "参考资料", "数据来源与口径说明"]], "sections": [{"type": "points", "eyebrow": "01 · 范式跃迁", "title": "范式跃迁：智能体的本质是目标驱动的自主执行", "points": [["从工具到同事", "人从执行者变成目标设定者与审核者"], ["试点率过六成", "61% 企业已进入试点，规模化不足两成"], ["护栏先行", "权限与审计内嵌，高风险动作人工确认"]], "metrics": [["61%", "企业试点率"], ["18%", "规模化运行占比[2]"]]}, {"type": "table", "eyebrow": "02 · 形态与边界", "title": "三类形态能力边界分明，同事级智能体尚在早期", "table": {"head": ["能力", "2026 现状", "跃迁目标"], "rows": [["任务自主性", "单点工具为主，人逐步驱动", "目标驱动，端到端"], ["工具生态", "连接数少、缺乏统一编排", "统一编排，千级工具"], ["记忆与规划", "会话级记忆，无长期规划", "任务级记忆，多步规划"], ["安全治理", "事后审计、无回退", "护栏内运行，全程可回退"]]}}, {"type": "bar", "eyebrow": "03 · 落地路径", "title": "企业智能体采纳率：四个季度四步走至 60%", "chart": {"labels": ["2026Q3", "Q4", "2027Q1", "Q2"], "values": [30, 45, 55, 60], "max": 100, "unit": "%"}, "note": "口径：试点及以上的企业占比[1]"}, {"type": "comparison", "eyebrow": "03 · 落地路径", "title": "从试点到规模化：两条路径的分野", "left": {"title": "堆场景路径 · 现状", "points": [["接入慢", "每场景重复对接工具与权限"], ["治理弱", "事后审计，回退靠人工"], ["易回退", "23 家中 19 家半年内退回试点"]]}, "right": {"title": "平台化路径 · 目标", "points": [["接入快", "统一编排，接入成本降一个量级"], ["治理内嵌", "权限、审计、回退进平台层"], ["可放量", "先行 9 家全部穿越分水岭"]]}, "verdict": "平台化不是可选项，而是规模化穿越分水岭的唯一共同路径。"}, {"type": "kpi", "eyebrow": "04 · 落地路径", "title": "六成企业已越过 PoC，规模化不足两成", "hero": ["61%", "2025 企业智能体试点率", "+6pt vs 2024"], "metrics": [["18%", "规模化运行占比，3 场景以上"], ["9 家", "规模化成功企业，全部先建平台层"], ["60%", "2027Q2 采纳率目标"]]}, {"type": "donut", "eyebrow": "04 · 落地路径", "title": "试点企业分布：过六成跨越 PoC", "chart": {"labels": ["已规模化", "试点中", "观望"], "values": [18, 43, 39], "unit": "%", "centerLabel": "企业占比"}, "note": "口径：试点及以上 = 61%；N=42 深度访谈 + 行业抽样[1]"}, {"type": "quote", "eyebrow": "03 · 关键判断", "title": "规模化瓶颈不在模型，而在治理与集成", "quote": "穿越分水岭的钥匙是平台化，不是更大的模型。", "author": "企业智能体发展调研 · 42 家深度访谈"}, {"type": "steps", "eyebrow": "05 · 落地节奏", "title": "四步走：从单场景试点到平台化放量", "steps": [["选场景", "客服 / 研发 / 数据三类高价值场景先跑通"], ["建平台", "三层解耦 + 统一编排，接入成本降一个量级"], {"t": "立治理", "d": "权限、审计、回退进平台层，高风险动作人工确认", "accent": true}, ["放量复制", "同一套护栏复制到新场景，无需重建"]], "footnote": "口径：先行 9 家规模化企业的共同路径[2]"}, {"type": "bullet", "eyebrow": "06 · 目标对照", "title": "四项能力对照目标：治理与集成缺口最大", "items": [["场景覆盖", 61, 80], ["治理就绪", 34, 75], ["工具集成", 42, 70], ["规模化运行", 18, 60]], "unit": "%", "max": 100, "footnote": "口径：能力就绪度 = 自评「已具备且稳定运行」的企业占比；目标取 2027Q2[2]"}, {"type": "cards", "eyebrow": "06 · 能力地图", "title": "平台化三件套：编排、记忆、治理缺一不可", "cards": [{"title": "统一编排", "points": ["工具连接：千级工具统一注册与调用", "任务拆解：多步规划与失败重试"]}, {"title": "长期记忆", "points": ["任务记忆：跨会话保留目标与进度", "偏好学习：组织口径与风格沉淀"]}, {"title": "护栏治理", "points": ["权限分级：高风险动作人工确认", "全程可回退：审计与回滚内嵌平台层"]}], "columns": 3, "footnote": "口径：先行 9 家规模化企业的共同能力底座[2]"}, {"type": "image", "eyebrow": "07 · 场景实拍", "title": "客服智能体工作台：会话、工具调用与人工接管同屏", "image": {"placeholder": true, "layout": "full", "caption": "图 1：客服智能体工作台（占位示例；交付前替换为真实截图）", "hint": "建议 2400×800px（3:1）真实截图；把 image.placeholder 改为 image.src 即可"}}], "closing": {"title": "让智能体真正干活起来", "points": [["选场景", "客服 / 研发 / 数据三类高价值场景"], ["建平台", "三层解耦 + 统一编排 + 护栏"], ["立治理", "权限、审计、回退全闭环"]]}, "theme": "light"};
 
 /* __TOPPPT_RUNTIME_START__ */
 /* ══ PPTX 导出运行时（assets/pptx-export.js 的内联副本 · 由 scripts/sync_runtime.py 注入，禁止手改） ══ */
-/* __TOPPPT_RUNTIME_SHA__:a4c909346759fe9c */
+/* __TOPPPT_RUNTIME_SHA__:2b37cd7a4f5f3174 */
 /* ═══════════════════════════════════════════════════════════════════════════
  * TopPPT HTML· 浏览器端 PPTX 预览运行时
  * 零依赖、随报告单文件分发；OOXML 序列化器（仅供预览，页面不导出文件）。
@@ -2485,7 +2177,7 @@ var STYLE_DATA_COLORS = {"business-blue":["1a73e8","3526bb","21a199","b77148","9
 var STYLE_DATA_COLORS_DARK = {"business-blue":["8ab4f8","7966e0","88e7e5","d4ad91","cbce83"],"apple-mono":["f5f5f7","2997ff","2dd4bf","ff9f0a","bf5af2"],"mckinsey":["7fb2e5","6f6bdb","8ce3d8","d1a694","cbc586"],"brand-red":["ff5a66","e09e66","e788cb","91d4c2","83b4ce"],"warm-sand":["d9b36a","c2d571","df9391","97b5ce","8e89c7"],"deep-teal":["4fc3b0","7aaecd","97d8a4","c99cac","c29c8f"],"graphite-dark":["4da3ff","6c66e0","88e7dc","d4a691","cec983"],"indigo-violet":["a5a4f0","a967e0","89c3e7","d3c792","aece83"],"spectrum":["8ba0f8","9066e0","88d6e7","d4ba91","bdce83"]};
 var GRID = {"columns":12,"gutter":0.16,"colW":0.8644,"x":[0.6,1.6244,2.6488,3.6732,4.6976,5.722,6.7464,7.7708,8.7952,9.8196,10.844,11.8684,12.733],"y":[2.35,3.27,4.19,5.11,6.03,6.9],"safe":{"top":0.4,"bottom":0.4,"left":0.6,"right":0.6}};
 var TYPO = {"levels":[{"id":"C0","name":"封面/章节幕标题","role":"coverTitle","usage":"封面主标题、章节幕标题"},{"id":"T1","name":"页码/章节徽章","role":"caption","usage":"页码徽章、章节编号"},{"id":"T2","name":"页面主标题/结论标题","role":"h1","usage":"每页顶部结论句（research 行动标题）"},{"id":"T3","name":"副标题/语境说明","role":"lead","usage":"主标题下方导语"},{"id":"T4","name":"模块标题/图表标题","role":"h2","usage":"卡片标题、图表标题、面板标题"},{"id":"T5","name":"证据编号/轻量标签","role":"micro","usage":"Exhibit 编号、状态标签"},{"id":"T6","name":"证据块标题/小节标题","role":"h2","usage":"分栏小标题、证据块标题"},{"id":"T7","name":"正文解释段落","role":"body","usage":"证据解释、管理解读正文、表格正文"},{"id":"T8","name":"结论条文字","role":"body","usage":"结论条、核心结论框"},{"id":"T9","name":"结论条标签（可选·默认隐藏）","role":"caption","usage":"结论条可选标签（默认不显示）"},{"id":"T10","name":"结论条正文/业务含义","role":"body","usage":"结论条正文、行动含义、表格行动项"},{"id":"T11","name":"图表轴/图例/刻度/微标签","role":"micro","usage":"坐标轴、图例、刻度、单位（禁用于表格正文与完整短句）"},{"id":"T12","name":"图表数据标签","role":"caption","usage":"折线点值、柱形标签、百分比标注"},{"id":"T13","name":"关键 KPI 大数字","role":"h1","usage":"KPI 大数字、hero 数值"},{"id":"T14","name":"注释/口径/来源/页脚","role":"micro","usage":"footnote、来源行、页脚、小页码"}],"tableSemanticRule":{"body":["T7","T10"],"microAllowed":["T11"],"microForbiddenFor":["表格正文","行动项","风险项","解释句","建议句","长项目符号","完整短句"]}};
-var CONT = {"pad":{"card":0.18,"panel":0.2,"cell":0.08,"band":0.16,"soWhat":0.16,"kpi":0.18,"chart":0.1,"head":0.05,"footer":0.05,"node":0.06},"minPad":0.06,"textMetrics":{"lineFactor":1.45,"emAsciiRatio":0.52},"overflowRule":"溢出处置优先级（禁静默截断）：① 重构承载（列表/卡片/表/图/组合版式）→ ② 拆页/分章（议程→主张→证据卡→明细；01a/01b；信息须完整）→ ③ 换布局形态（V1–V4/多列/卡栅格）→ ④ 有限 fontShrink（阶梯内、模式 floor 以上、最多 4 档）→ ⑤ 禁止：静默截断、砍 so-what/证据/口径、为审美稀疏删决策必需信息。单页字数预算是预警不是删字许可证。","fontShrink":{"ladder":[15,14,13.5,13,12.5,12,11.5,11,10.5,10,9.5,9,8.5],"maxShrinkSteps":4,"floorPt":{"presentation":10,"research":9,"architecture":10},"preferContentFirst":true,"warnBelow":9.5},"continuousTextRule":"语义连续的一句话 / so-what 主句 / 结论句 / 表格单元格正文不得拆成多个独立文本框（避免异常空格、断句、基线漂移）；局部加粗高亮必须用同一文本框内富文本。"};
+var CONT = {"pad":{"card":0.18,"panel":0.2,"cell":0.08,"band":0.16,"soWhat":0.16,"kpi":0.18,"chart":0.1,"head":0.05,"footer":0.05,"node":0.06},"minPad":0.06,"textMetrics":{"lineFactor":1.45,"emAsciiRatio":0.52},"overflowRule":"溢出处置优先级（禁静默截断）：① 重构承载（列表/卡片/表/图/组合版式）→ ② 拆页/分章（议程→主张→证据卡→明细；01a/01b；信息须完整）→ ③ 换布局形态（V1–V4/多列/卡栅格）→ ④ 有限 fontShrink（阶梯内、模式 floor 以上、最多 4 档）→ ⑤ 禁止：静默截断、砍 so-what/证据/口径、为审美稀疏删决策必需信息。单页字数预算是预警不是删字许可证。","fontShrink":{"ladder":[15,14,13.5,13,12.5,12,11.5,11,10.5,10,9.5,9,8.5],"maxShrinkSteps":4,"floorPt":{"presentation":10,"research":9,"architecture":10},"preferContentFirst":true,"warnBelow":9.5},"continuousTextRule":"语义连续的一句话 / so-what 主句 / 结论句 / 表格单元格正文不得拆成多个独立文本框（避免异常空格、断句、基线漂移）；局部加粗高亮必须用同一文本框内富文本。","adaptiveText":{"title":{"base":30,"step1":24,"longChars":28,"longMax":24,"xlongChars":44,"xlongMax":20},"list":{"denseItems":6,"gapFactor":0.5,"denseGapFactor":0.25,"lineFactor":1.45,"denseLineFactor":1.3,"max":14,"denseMax":12},"table":{"cellMax":12.5,"cellFloor":9,"headMax":13,"longCellChars":24,"rowFloorIn":0.22,"cellPadIn":0.07}}};
 var REG = {"bar":{"html":"svg-bars","pptx":"native","nativeType":"bar","dataTable":"notes","min":{"vbHeightMin":160}},"hbar":{"html":"svg-hbars","pptx":"native","nativeType":"bar","dataTable":"notes","min":{"vbHeightMin":100}},"stack":{"html":"svg-stack","pptx":"native","nativeType":"bar","dataTable":"notes","min":{"vbHeightMin":160},"nativeOpt":{"barGrouping":"stacked"}},"stackline":{"html":"svg-stackline","pptx":"native","nativeType":"bar","dataTable":"notes","min":{"vbHeightMin":40},"nativeOpt":{"barGrouping":"percentStacked"}},"line":{"html":"svg-line","pptx":"native","nativeType":"line","dataTable":"notes","min":{"vbHeightMin":160}},"dualline":{"html":"svg-dualline","pptx":"native","nativeType":"line","dataTable":"notes","min":{"vbHeightMin":160}},"area":{"html":"svg-area","pptx":"native","nativeType":"area","dataTable":"notes","min":{"vbHeightMin":160}},"donut":{"html":"svg-donut","pptx":"native","nativeType":"doughnut","dataTable":"notes","min":{"pxWidthMin":140}},"multidonut":{"html":"svg-mdonut","pptx":"native","nativeType":"doughnut","dataTable":"notes","min":{"pxWidthMin":140}},"pie":{"html":"svg-pie","pptx":"native","nativeType":"pie","dataTable":"notes","min":{"pxWidthMin":140}},"radar":{"html":"svg-radar","pptx":"native","nativeType":"radar","dataTable":"notes","min":{"pxWidthMin":220}},"scatter":{"html":"svg-scatter","pptx":"native","nativeType":"scatter","dataTable":"notes","min":{"vbHeightMin":180}},"bubble":{"html":"svg-bubble","pptx":"native","nativeType":"bubble","dataTable":"notes","min":{"vbHeightMin":180}},"waterfall":{"html":"svg-wf","pptx":"native","nativeType":"bar","dataTable":"notes","min":{"vbHeightMin":170},"nativeTrick":"stacked+hiddenBase+connector"},"gauge":{"html":"svg-gauge","pptx":"native","nativeType":"doughnut","dataTable":"notes","min":{"pxWidthMin":180},"nativeTrick":"doughnut+firstSliceAng+hiddenRemainder"},"pareto":{"html":"svg-pareto","pptx":"native","nativeType":"bar","dataTable":"notes","min":{"vbHeightMin":180},"nativeTrick":"multiType+bar+line"},"gantt":{"html":"svg-gantt","pptx":"shape","dataTable":"notes","min":{"vbHeightMin":130},"path":{"forbidPresetShapes":true}},"vsbar":{"html":"svg-vsbar","pptx":"shape","dataTable":"notes","min":{"vbHeightMin":100},"path":{"forbidPresetShapes":true}},"progress":{"html":"svg-progress","pptx":"shape","dataTable":"notes","min":{"vbHeightMin":100},"path":{"forbidPresetShapes":true}},"sparkline":{"html":"svg-spark","pptx":"shape","dataTable":"off","min":{"vbHeightMin":20},"path":{"forbidPresetShapes":true}},"funnel":{"html":"svg-funnel","pptx":"shape","dataTable":"notes","min":{"vbHeightMin":160},"path":{"minSamplePoints":8,"forbidPresetShapes":true}},"treemap":{"html":"svg-treemap","pptx":"shape","dataTable":"appendix","min":{"vbHeightMin":170},"path":{"forbidPresetShapes":true}},"marimekko":{"html":"svg-marimekko","pptx":"shape","dataTable":"appendix","min":{"vbHeightMin":160},"path":{"forbidPresetShapes":true}},"boxplot":{"html":"svg-boxplot","pptx":"shape","dataTable":"appendix","min":{"vbHeightMin":180},"path":{"forbidPresetShapes":true}},"network":{"html":"svg-network","pptx":"shape","dataTable":"appendix","min":{"vbHeightMin":200},"path":{"forbidPresetShapes":true}},"sankey":{"html":"svg-sankey","pptx":"shape","dataTable":"appendix","min":{"vbHeightMin":200},"path":{"minSamplePoints":16,"trackBothEdges":true,"forbidPresetShapes":true}},"streamgraph":{"html":"svg-stream","pptx":"shape","dataTable":"appendix","min":{"vbHeightMin":160},"path":{"minSamplePoints":24,"trackBothEdges":true,"forbidPresetShapes":true}},"slope":{"html":"svg-slope","pptx":"shape","dataTable":"notes","min":{"vbHeightMin":180},"path":{"forbidPresetShapes":true}},"dumbbell":{"html":"svg-dumbbell","pptx":"shape","dataTable":"notes","min":{"vbHeightMin":160},"path":{"forbidPresetShapes":true}},"lollipop":{"html":"svg-lollipop","pptx":"shape","dataTable":"notes","min":{"vbHeightMin":140},"path":{"forbidPresetShapes":true}},"dotplot":{"html":"svg-dotplot","pptx":"shape","dataTable":"notes","min":{"vbHeightMin":120},"path":{"forbidPresetShapes":true}},"bulletchart":{"html":"svg-bullet","pptx":"shape","dataTable":"notes","min":{"vbHeightMin":140},"path":{"forbidPresetShapes":true}},"waffle":{"html":"svg-waffle","pptx":"shape","dataTable":"notes","min":{"vbHeightMin":160},"path":{"forbidPresetShapes":true}},"radialbar":{"html":"svg-radialbar","pptx":"shape","dataTable":"notes","min":{"pxWidthMin":200},"path":{"minSamplePoints":16,"forbidPresetShapes":true}},"rose":{"html":"svg-rose","pptx":"shape","dataTable":"notes","min":{"pxWidthMin":180},"path":{"minSamplePoints":16,"forbidPresetShapes":true}},"candlestick":{"html":"svg-candle","pptx":"shape","dataTable":"appendix","min":{"vbHeightMin":180},"path":{"forbidPresetShapes":true}}};
 var DEEP = {"triggers":["高保真","1:1","一比一","精确还原","按图还原","正式交付","不能偏移","像素级","严格对照","逐页验收"],"complexCharts":["sankey","streamgraph","treemap","marimekko","boxplot","network","rose","radialbar","candlestick","funnel"],"checks":{"anchors":true,"containerOverflow":true,"renderCompare":true,"manifest":true},"renderCompare":{"engine":"soffice","fallback":"powerpoint-com","skipIfMissing":true,"dpi":96}};
 var IMG = {"layouts":["full","half","bleed","grid","compare","wall"],"multiLayouts":["grid","compare","wall"],"fitEnum":["cover","contain"],"fitDefault":"cover","formats":["png","jpeg","jpg","webp","svg"],"ratioDefault":{"full":"3:1","half":"4:3","bleed":"21:9","grid":"4:3","compare":"4:3","wall":"1:1"},"ratioCssClass":{"full":"media--r3-1","half":"media--r4-3","bleed":"media--r21-9","grid":"media--r4-3","compare":"media--r4-3","wall":"media--r1-1"},"recommendedSizePx":{"full":"2400×800","half":"1400×1050","bleed":"2560×1100","grid":"900×675","compare":"1400×1050","wall":"480×480"},"maxInlineBytes":1572864,"maxTotalInlineBytes":8388608,"maxPerPage":6,"placeholderLabel":"配图占位","placeholderHintPrefix":"建议 ","placeholderHintSuffix":"px","zeroExternal":true,"qualityRule":"位图优先提供 ≥2× 显示尺寸；截图用 16:9 或 4:3 锁定比例；数据图不要用截图（应用内联 SVG 图表，可随主题变色）。"};
@@ -2640,7 +2332,7 @@ function regionOf(pageType, slotId, opts) {
 /* __TOPPPT_SCHEMA_START__ */
 /* ── 由 scripts/sync_runtime.py 从 scripts/model-schema.json 注入 · 禁止手改 ── */
 /* DSL schema 单源：浏览器端 validateModel 与 scripts/extract_model.py 消费同一份定义 */
-var MODEL_SCHEMA = {"version":"0.1","modes":["presentation","research","architecture"],"model":{"required":["title","sections:array","closing.title","closing.points:array"],"optional":["mode","style","theme","subtitle","meta","agenda:array"],"agendaMin":{"presentation":3,"research":3,"architecture":0},"agendaMax":7,"agendaMaxWithRefs":8,"agendaHint":"agenda 条目 = 章（篇/section），3–7 条；每章可含多页（sections[] 按页建模）。禁止把逐页标题当大纲。sections[].eyebrow 的 `NN ·` 前缀 = 章键，须与某条 agenda 对应；跳转锚点 = 该章第一页。含「参考资料」条目时 +1 仍 ≤8。","sectionsMin":1,"sectionsRecommended":3,"agendaComfortMax":8},"commonSectionFields":["eyebrow","title","lead","soWhat","footnote","flags","image","exhibitNo","layoutPreset"],"mutualExclusionHint":"verdict 与 soWhat 互斥：二者共用 annotation 结论条槽位，同页双填必叠印。comparison 页填 verdict 时不要再填 soWhat（渲染器已自动二选一，但模型侧应只给一个）。","flagsHint":"flags = 待核实/待二次修改条目字符串数组（如 '2027 增速 xx%（口径未定）'）；渲染为 accent 强调色标注行，提示用户核对。","imageHint":"image = 素材图片/配图占位对象。三选一必填：src（用户图，data: 内联或相对路径，零外链铁律禁 http(s)）｜items（多图版式：grid/compare/wall，元素 {src?, alt?, caption?, placeholder?}）｜placeholder:true（无图时出配图占位，原生形状渲染、pictures 不增）。其余可选：layout（full/half/bleed/grid/compare/wall，见 layout-constants.json imageSpec.layouts）、fit（cover 默认 / contain）、caption、alt、hint、ratio。","imageLayoutHint":"layout 与 HTML 版式对应：full=版心全宽图｜half=左图右注（points 为右栏注解）｜bleed=通栏出血｜grid=多图网格（items 2/3/4/6 张）｜compare=双图 A/B 对比（items 2 张）｜wall=Logo 墙（items 3–12 张小图）。占位符标签文本由双引擎按 imageSpec 拼同一串，保证 A/B 通道逐页文本一致。","chartTypes":["bar","hbar","stack","stackline","line","dualline","area","donut","multidonut","pie","radar","scatter","bubble","waterfall","gauge","pareto","funnel","gantt","vsbar","progress","sparkline","slope","dumbbell","lollipop","dotplot","bulletchart","waffle","radialbar","rose","candlestick"],"chartTypesHint":"chart.type 可取值 = 本表（30 类：16 原生 + 14 形状还原）。其余 6 类复杂信息图（sankey/treemap/boxplot/network/marimekko/streamgraph）是**专属页型**而非 chart.type——它们要按列/段/节点等结构化载荷表达，故走 sections[].type。不变量：charts.registry.types == chartTypes ∪ 上述 6 类页型（sync_runtime.py 校验）。","chartDataTable":{"enum":["notes","inline","appendix","off"],"default":"notes","rule":"非原生图表（registry.pptx=shape）的 dataTable 不得为 off；缺失时按 registry 默认值补齐。"},"pageTypes":{"points":{"label":"要点列表页","modes":["presentation","research","architecture"],"required":["points:array"],"optional":["metrics:array"]},"metrics":{"label":"指标带页（4–6 个核心数字）","modes":["presentation","research"],"required":["metrics:array"]},"kpi":{"label":"大数指标页（hero 大数字 + 支撑指标行）","modes":["presentation","research"],"required":["hero:array"],"optional":["metrics:array"]},"table":{"label":"对比表页","modes":["presentation","research","architecture"],"required":["table.head:array","table.rows:array"],"optional":["table.colW:array"]},"timeline":{"label":"时间线 / 路线页","modes":["presentation","research"],"required":["phases:array"]},"steps":{"label":"步骤条页（N 步横排 + 箭头，可分组）","modes":["presentation","research","architecture"],"required":["steps:array"],"optional":["groups:array","note"]},"bar":{"label":"图表页（chart.type 见 chartTypes；native 通道走原生数据图表，shape 通道走高保真形状还原 + 数据表）","modes":["presentation","research"],"required":["chart.labels:array","chart.values:array"],"optional":["chart.type","chart.series:array","chart.points:array","chart.max","chart.unit","chart.colors:array","chart.start:array","chart.target:array","chart.dataTable","note"]},"donut":{"label":"环形图页（原生 pie 楔形 + 图例）","modes":["presentation","research"],"required":["chart.labels:array","chart.values:array"],"optional":["chart.unit","chart.centerLabel","chart.colors:array","chart.dataTable","note"]},"heatmap":{"label":"热力矩阵页（行 × 列 + 强度色阶）","modes":["presentation","research"],"required":["rowHeads:array","colHeads:array","cells:array"],"optional":["unit","scaleLabel:array","note"]},"bullet":{"label":"达成对比页（实际 vs 目标条）","modes":["presentation","research"],"required":["items:array"],"optional":["unit","max","note"]},"pyramid":{"label":"金字塔页（层级递进，顶层最窄）","modes":["presentation","research","architecture"],"required":["levels:array"],"optional":["note"]},"image":{"label":"素材图片页（full/half/bleed/grid/compare/wall，效果与位置锁定；支持配图占位）","modes":["presentation","research","architecture"],"required":["anyof:image.src:str|image.items:array|image.placeholder"],"optional":["image.caption","image.alt","image.layout","image.fit","image.ratio","image.hint","points:array","note"]},"cards":{"label":"卡片网格页（cards 元素须为 {title, points:[[k,v]…], icon?}，不接受元组）","modes":["presentation","research"],"required":["cards:array"],"optional":["columns"],"cardItemHint":"cards[] 元素：{title:str, points:[[k,v]…]|[{t,d}…]|[str…], icon?:str}。icon = 语义图标名（icon_lib.js 键：增长/下降/数据/图表/趋势/占比/表格/效率/成果/安全/权限/检查/风险/团队/流程/计划/智能/洞察/工具/清单），HTML 与 PPTX 同名真导出；缺省按标题语义自动挑选。"},"split":{"label":"双区组合页（left / right 各可为 要点｜图表｜表格｜图片：type = points（默认）| table | image | 图表类型名；图表/表格字段直接挂在对应侧）","modes":["presentation","research"],"required":["anyof:left.points:array|left.type:str"],"optional":["left.cap","left.image","left.labels:array","left.values:array","left.series:array","left.points:array","left.max","left.unit","left.colors:array","left.dataTable","left.head:array","left.rows:array","left.colW:array","right.type","right.cap","right.image","right.labels:array","right.values:array","right.series:array","right.points:array","right.max","right.unit","right.colors:array","right.dataTable","right.head:array","right.rows:array","right.colW:array"]},"comparison":{"label":"对比页（左右双栏 + 可选结论条）","modes":["presentation","research"],"required":["left.title","left.points:array","right.title","right.points:array"],"optional":["verdict"]},"quote":{"label":"引用 / 金句页（深色全幅）","modes":["presentation","research"],"required":["quote","author"],"optional":["context"]},"diagram":{"label":"分层架构页（architecture 模式走全幅几何）","modes":["presentation","research","architecture"],"required":["layers:array"],"optional":["legend:array"]},"exhibit":{"label":"Exhibit 编号图表页（research R2）","modes":["research"],"required":["chart.labels:array","chart.values:array"],"optional":["exhibitNo","chart.type","chart.series:array","chart.points:array","chart.max","chart.unit","chart.colors:array","chart.dataTable","note"]},"twocol":{"label":"双栏论证页（research R1）","modes":["research"],"required":["paragraphs:array"]},"threecol":{"label":"三栏证据页（research R6）","modes":["research"],"required":["paragraphs:array"]},"halftable":{"label":"半表半图页（research R7）","modes":["research"],"required":["table.head:array","table.rows:array","chart.labels:array","chart.values:array"],"optional":["table.colW:array","chart.type","chart.series:array","chart.points:array","chart.max","chart.unit","chart.colors:array","chart.dataTable","note"]},"matrix":{"label":"矩阵图页（research R8）","modes":["research"],"required":["rowHeads:array","colHeads:array","cells:array"]},"lane":{"label":"泳道页（architecture A2）","modes":["architecture"],"required":["lanes:array"]},"sankey":{"label":"桑基图页（节点-流带，流向与流量）","modes":["research","architecture"],"required":["flows:array"],"optional":["unit","chart.dataTable","note"]},"treemap":{"label":"树图页（面积编码的层级构成）","modes":["research","architecture"],"required":["items:array"],"optional":["unit","chart.dataTable","note"]},"boxplot":{"label":"箱线图页（分布对比：min/q1/median/q3/max）","modes":["research","architecture"],"required":["groups:array"],"optional":["unit","chart.dataTable","note"]},"network":{"label":"关系网络页（节点-边拓扑）","modes":["research","architecture"],"required":["nodes:array","edges:array"],"optional":["chart.dataTable","note"]},"marimekko":{"label":"马赛克图页（列宽 × 列高双重编码）","modes":["research","architecture"],"required":["cols:array","cells:array"],"optional":["unit","chart.dataTable","note"]},"streamgraph":{"label":"流带图页（时间上的构成演变）","modes":["research","architecture"],"required":["series:array"],"optional":["labels:array","chart.dataTable","note"]}}};
+var MODEL_SCHEMA = {"version":"0.1","modes":["presentation","research","architecture"],"model":{"required":["title","sections:array","closing.title","closing.points:array"],"optional":["mode","style","theme","subtitle","meta","agenda:array"],"agendaMin":{"presentation":3,"research":3,"architecture":0},"agendaMax":7,"agendaMaxWithRefs":8,"agendaHint":"agenda 条目 = 章（篇/section），3–7 条；每章可含多页（sections[] 按页建模）。禁止把逐页标题当大纲。sections[].eyebrow 的 `NN ·` 前缀 = 章键，须与某条 agenda 对应；跳转锚点 = 该章第一页。含「参考资料」条目时 +1 仍 ≤8。","sectionsMin":1,"sectionsRecommended":3,"agendaComfortMax":8},"commonSectionFields":["eyebrow","title","lead","soWhat","footnote","note","flags","image","exhibitNo","layoutPreset","variant","anchor"],"mutualExclusionHint":"verdict 与 soWhat 互斥：二者共用 annotation 结论条槽位，同页双填必叠印。comparison 页填 verdict 时不要再填 soWhat（渲染器已自动二选一，但模型侧应只给一个）。","flagsHint":"flags = 待核实/待二次修改条目字符串数组（如 '2027 增速 xx%（口径未定）'）；渲染为 accent 强调色标注行，提示用户核对。","imageHint":"image = 素材图片/配图占位对象。三选一必填：src（用户图，data: 内联或相对路径，零外链铁律禁 http(s)）｜items（多图版式：grid/compare/wall，元素 {src?, alt?, caption?, placeholder?}）｜placeholder:true（无图时出配图占位，原生形状渲染、pictures 不增）。其余可选：layout（full/half/bleed/grid/compare/wall，见 layout-constants.json imageSpec.layouts）、fit（cover 默认 / contain）、caption、alt、hint、ratio。","imageLayoutHint":"layout 与 HTML 版式对应：full=版心全宽图｜half=左图右注（points 为右栏注解）｜bleed=通栏出血｜grid=多图网格（items 2/3/4/6 张）｜compare=双图 A/B 对比（items 2 张）｜wall=Logo 墙（items 3–12 张小图）。占位符标签文本由双引擎按 imageSpec 拼同一串，保证 A/B 通道逐页文本一致。","chartTypes":["bar","hbar","stack","stackline","line","dualline","area","donut","multidonut","pie","radar","scatter","bubble","waterfall","gauge","pareto","funnel","gantt","vsbar","progress","sparkline","slope","dumbbell","lollipop","dotplot","bulletchart","waffle","radialbar","rose","candlestick"],"chartTypesHint":"chart.type 可取值 = 本表（30 类：16 原生 + 14 形状还原）。其余 6 类复杂信息图（sankey/treemap/boxplot/network/marimekko/streamgraph）是**专属页型**而非 chart.type——它们要按列/段/节点等结构化载荷表达，故走 sections[].type。不变量：charts.registry.types == chartTypes ∪ 上述 6 类页型（sync_runtime.py 校验）。","chartDataTable":{"enum":["notes","inline","appendix","off"],"default":"notes","rule":"非原生图表（registry.pptx=shape）的 dataTable 不得为 off；缺失时按 registry 默认值补齐。"},"pageTypes":{"points":{"label":"要点列表页","modes":["presentation","research","architecture"],"required":["points:array"],"optional":["metrics:array"]},"metrics":{"label":"指标带页（4–6 个核心数字）","modes":["presentation","research"],"required":["metrics:array"]},"kpi":{"label":"大数指标页（hero 大数字 + 支撑指标行）","modes":["presentation","research"],"required":["hero:array"],"optional":["metrics:array"]},"table":{"label":"对比表页","modes":["presentation","research","architecture"],"required":["table.head:array","table.rows:array"],"optional":["table.colW:array"]},"timeline":{"label":"时间线 / 路线页","modes":["presentation","research"],"required":["phases:array"]},"steps":{"label":"步骤条页（N 步横排 + 箭头，可分组）","modes":["presentation","research","architecture"],"required":["steps:array"],"optional":["groups:array","note"]},"bar":{"label":"图表页（chart.type 见 chartTypes；native 通道走原生数据图表，shape 通道走高保真形状还原 + 数据表）","modes":["presentation","research"],"required":["chart.labels:array","chart.values:array"],"optional":["chart.type","chart.series:array","chart.points:array","chart.max","chart.unit","chart.colors:array","chart.start:array","chart.target:array","chart.dataTable","note"]},"donut":{"label":"环形图页（原生 pie 楔形 + 图例）","modes":["presentation","research"],"required":["chart.labels:array","chart.values:array"],"optional":["chart.unit","chart.centerLabel","chart.colors:array","chart.dataTable","note"]},"heatmap":{"label":"热力矩阵页（行 × 列 + 强度色阶）","modes":["presentation","research"],"required":["rowHeads:array","colHeads:array","cells:array"],"optional":["unit","scaleLabel:array","note"]},"bullet":{"label":"达成对比页（实际 vs 目标条）","modes":["presentation","research"],"required":["items:array"],"optional":["unit","max","note"]},"pyramid":{"label":"金字塔页（层级递进，顶层最窄）","modes":["presentation","research","architecture"],"required":["levels:array"],"optional":["note"]},"image":{"label":"素材图片页（full/half/bleed/grid/compare/wall，效果与位置锁定；支持配图占位）","modes":["presentation","research","architecture"],"required":["anyof:image.src:str|image.items:array|image.placeholder"],"optional":["image.caption","image.alt","image.layout","image.fit","image.ratio","image.hint","points:array","note"]},"cards":{"label":"卡片网格页（cards 元素须为 {title, points:[[k,v]…], icon?}，不接受元组）","modes":["presentation","research"],"required":["cards:array"],"optional":["columns"],"cardItemHint":"cards[] 元素：{title:str, points:[[k,v]…]|[{t,d}…]|[str…], icon?:str}。icon = 语义图标名（icon_lib.js 键：增长/下降/数据/图表/趋势/占比/表格/效率/成果/安全/权限/检查/风险/团队/流程/计划/智能/洞察/工具/清单），HTML 与 PPTX 同名真导出；缺省按标题语义自动挑选。"},"split":{"label":"双区组合页（left / right 各可为 要点｜图表｜表格｜图片：type = points（默认）| table | image | 图表类型名；图表/表格字段直接挂在对应侧）","modes":["presentation","research"],"required":["anyof:left.points:array|left.type:str"],"optional":["left.cap","left.image","left.labels:array","left.values:array","left.series:array","left.points:array","left.max","left.unit","left.colors:array","left.dataTable","left.head:array","left.rows:array","left.colW:array","right.type","right.cap","right.image","right.labels:array","right.values:array","right.series:array","right.points:array","right.max","right.unit","right.colors:array","right.dataTable","right.head:array","right.rows:array","right.colW:array"]},"comparison":{"label":"对比页（左右双栏 + 可选结论条）","modes":["presentation","research"],"required":["left.title","left.points:array","right.title","right.points:array"],"optional":["verdict"]},"quote":{"label":"引用 / 金句页（深色全幅）","modes":["presentation","research"],"required":["quote","author"],"optional":["context"]},"diagram":{"label":"分层架构页（architecture 模式走全幅几何）","modes":["presentation","research","architecture"],"required":["layers:array"],"optional":["legend:array"]},"exhibit":{"label":"Exhibit 编号图表页（research R2）","modes":["research"],"required":["chart.labels:array","chart.values:array"],"optional":["exhibitNo","chart.type","chart.series:array","chart.points:array","chart.max","chart.unit","chart.colors:array","chart.dataTable","note"]},"twocol":{"label":"双栏论证页（research R1）","modes":["research"],"required":["paragraphs:array"]},"threecol":{"label":"三栏证据页（research R6）","modes":["research"],"required":["paragraphs:array"]},"halftable":{"label":"半表半图页（research R7）","modes":["research"],"required":["table.head:array","table.rows:array","chart.labels:array","chart.values:array"],"optional":["table.colW:array","chart.type","chart.series:array","chart.points:array","chart.max","chart.unit","chart.colors:array","chart.dataTable","note"]},"matrix":{"label":"矩阵图页（research R8）","modes":["research"],"required":["rowHeads:array","colHeads:array","cells:array"]},"lane":{"label":"泳道页（architecture A2）","modes":["architecture"],"required":["lanes:array"]},"sankey":{"label":"桑基图页（节点-流带，流向与流量）","modes":["research","architecture"],"required":["flows:array"],"optional":["unit","chart.dataTable","note"]},"treemap":{"label":"树图页（面积编码的层级构成）","modes":["research","architecture"],"required":["items:array"],"optional":["unit","chart.dataTable","note"]},"boxplot":{"label":"箱线图页（分布对比：min/q1/median/q3/max）","modes":["research","architecture"],"required":["groups:array"],"optional":["unit","chart.dataTable","note"]},"network":{"label":"关系网络页（节点-边拓扑）","modes":["research","architecture"],"required":["nodes:array","edges:array"],"optional":["chart.dataTable","note"]},"marimekko":{"label":"马赛克图页（列宽 × 列高双重编码）","modes":["research","architecture"],"required":["cols:array","cells:array"],"optional":["unit","chart.dataTable","note"]},"streamgraph":{"label":"流带图页（时间上的构成演变）","modes":["research","architecture"],"required":["series:array"],"optional":["labels:array","chart.dataTable","note"]}}};
 /* __TOPPPT_SCHEMA_END__ */
 
 var _mode = 'presentation';   /* 当前模式（slidesOf 里按 model.mode 设置） */

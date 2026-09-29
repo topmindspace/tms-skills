@@ -10,6 +10,7 @@
  *   npx @topmindspace/tms-skills install top-ppt-html
  *   npx @topmindspace/tms-skills install top-ppt-html --to ./skills-out
  *   npx @topmindspace/tms-skills install top-ppt-html --force
+ *   npx @topmindspace/tms-skills uninstall top-ppt-html --to ./skills-out
  *   npx github:topmindspace/tms-skills install top-ppt-html   # follow repo HEAD
  */
 'use strict';
@@ -67,6 +68,30 @@ function readSkillMeta(skillId) {
   if (!m) return { id: skillId, description: '' };
   const desc = (m[1].match(/^description:\s*"(.*)"\s*$/m) || m[1].match(/^description:\s*(.+)\s*$/m) || [])[1] || '';
   return { id: skillId, description: String(desc).slice(0, 120) };
+}
+
+/** 读技能目录下 SKILL.md frontmatter 的 version 字段（读不到返回 ''，调用方兜底）。 */
+function readSkillVersion(skillPath) {
+  try {
+    const p = path.join(skillPath, 'SKILL.md');
+    if (!fs.existsSync(p)) return '';
+    const text = fs.readFileSync(p, 'utf8');
+    const m = text.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+    if (!m) return '';
+    const v = m[1].match(/^version:\s*(.+?)\s*$/m);
+    return v ? v[1] : '';
+  } catch {
+    return '';
+  }
+}
+
+function installerVersion() {
+  try {
+    const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
+    return pkg.version || 'unknown';
+  } catch {
+    return 'unknown';
+  }
 }
 
 function resolveDefaultTarget() {
@@ -132,7 +157,7 @@ function assertDestOutsideSource(src, dest) {
   }
 }
 
-function install(skillId, targetRoot, { force = false } = {}) {
+function install(skillId, targetRoot, { force = false, defaultTarget = false } = {}) {
   assertSkillId(skillId);
   const src = skillDir(skillId);
   if (!fs.existsSync(path.join(src, 'SKILL.md'))) {
@@ -151,22 +176,74 @@ function install(skillId, targetRoot, { force = false } = {}) {
   }
   if (fs.existsSync(dest)) {
     if (!force) {
+      // 已装过：报出已装版本，要求 --force 才覆盖（不静默覆盖）。
+      const installedVer = readSkillVersion(dest) || 'unknown';
+      const packageVer = readSkillVersion(src) || 'unknown';
       die(
-        `Destination already exists: ${dest}\n` +
-          'Refusing to overwrite. Pass --force (or -f) to replace.'
+        `Already installed: ${dest}\n` +
+          `  installed version: ${installedVer} (this package ships ${packageVer})\n` +
+          'Refusing to overwrite. Pass --force (or -f) to replace, or remove it first:\n' +
+          `  tms-skills uninstall ${skillId} --to ${targetRoot}`
       );
     }
     fs.rmSync(dest, { recursive: true, force: true });
   }
   copyDir(src, dest);
+  // 安装摘要三行：装到哪里 / 装了什么版本 / 下一步。
+  const toNote = defaultTarget ? '  (default, auto-detected — no --to given)' : '';
+  const skillVer = readSkillVersion(dest) || 'unknown';
   console.log(`Installed ${skillId}`);
-  console.log(`  from ${src}`);
-  console.log(`  to   ${dest}`);
+  console.log(`  to:      ${dest}${toNote}`);
+  console.log(`  version: skill ${skillVer} (installer ${installerVersion()})`);
+  console.log(`  next:    ${nextStep(skillId, dest)}`);
+}
+
+function nextStep(skillId, dest) {
   if (skillId === 'top-ppt-html') {
-    console.log('');
-    console.log('Optional (PPTX export only):');
-    console.log(`  cd "${dest}" && npm install`);
+    return `optional (PPTX export only): cd "${dest}" && npm install — then restart your agent so it picks up the skill`;
   }
+  return 'restart your agent so it picks up the skill';
+}
+
+/** 列出目标根目录下已安装的技能（有 SKILL.md 的子目录）。 */
+function listInstalledIds(targetRoot) {
+  try {
+    return fs
+      .readdirSync(targetRoot, { withFileTypes: true })
+      .filter((d) => d.isDirectory() && fs.existsSync(path.join(targetRoot, d.name, 'SKILL.md')))
+      .map((d) => d.name)
+      .sort();
+  } catch {
+    return [];
+  }
+}
+
+function uninstall(skillId, targetRoot) {
+  assertSkillId(skillId);
+  const src = skillDir(skillId);
+  const dest = path.join(targetRoot, skillId);
+  // 守卫：--to 指到包内时，dest 会命中安装器自带的技能源目录 → 一律拒绝，
+  // 防止把仓库自身的技能目录删掉（同 install 的 assertDestOutsideSource）。
+  if (fs.existsSync(path.join(src, 'SKILL.md'))) {
+    assertDestOutsideSource(src, dest);
+  }
+  if (!fs.existsSync(dest)) {
+    const installed = listInstalledIds(targetRoot);
+    die(
+      `Nothing to uninstall: ${dest}\n` +
+        `  skill '${skillId}' is not installed under ${targetRoot}.` +
+        (installed.length ? `\n  installed here: ${installed.join(', ')}` : '')
+    );
+  }
+  if (!fs.existsSync(path.join(dest, 'SKILL.md'))) {
+    die(
+      `Refusing to uninstall: ${dest}\n` +
+        `  not a skill directory (missing SKILL.md) — will not delete arbitrary folders.`
+    );
+  }
+  fs.rmSync(dest, { recursive: true, force: true });
+  console.log(`Uninstalled ${skillId}`);
+  console.log(`  from ${dest}`);
 }
 
 function usageText() {
@@ -175,16 +252,33 @@ function usageText() {
 Usage:
   tms-skills list|ls
   tms-skills install <skill-id> [--to|-t <dir>] [--force|-f]
+  tms-skills uninstall <skill-id> [--to|-t <dir>]
   tms-skills help
+
+Behavior:
+  install    copies <skill-id>/ into <dir>/<skill-id>/. If the skill is already
+             installed, the installed version is reported and --force is required
+             to overwrite. Prints where/what-version/next-steps when done.
+  uninstall  removes <dir>/<skill-id>/ (refuses: not installed, not a skill
+             directory, or the package's own skill source).
+  No --to: the target directory is auto-detected (probe order below) and
+  printed explicitly in the install summary.
+
+Target probe order (no --to): ./.agents/skills, ./.claude/skills,
+  ./.cursor/skills, ./.codex/skills, ./.mimocode/skills, then
+  ~/.claude/skills, ~/.agents/skills, ~/.cursor/skills, ~/.codex/skills.
 
 Examples (npm recommended when published):
   npx @topmindspace/tms-skills list
   npx @topmindspace/tms-skills install top-ppt-html
   npx @topmindspace/tms-skills install top-ppt-html --to ./.agents/skills
   npx @topmindspace/tms-skills install top-ppt-html --force
+  npx @topmindspace/tms-skills uninstall top-ppt-html --to ./.agents/skills
 
   # Follow repo HEAD:
   npx github:topmindspace/tms-skills install top-ppt-html
+
+Privacy: the installer is fully local — it never collects or uploads anything.
 `;
 }
 
@@ -233,7 +327,26 @@ function main(argv) {
       }
     }
     const targetRoot = to ? path.resolve(to) : resolveDefaultTarget();
-    install(skillId, targetRoot, { force });
+    install(skillId, targetRoot, { force, defaultTarget: !to });
+    return;
+  }
+
+  if (cmd === 'uninstall') {
+    const skillId = args[1];
+    if (!skillId || skillId.startsWith('-')) {
+      die('Missing skill id.\n\n' + usageText());
+    }
+    let to = null;
+    for (let i = 2; i < args.length; i++) {
+      if (args[i] === '--to' || args[i] === '-t') {
+        to = args[++i];
+        if (!to) die('Option --to requires a directory path.');
+      } else {
+        die(`Unknown option: ${args[i]}\n\n` + usageText());
+      }
+    }
+    const targetRoot = to ? path.resolve(to) : resolveDefaultTarget();
+    uninstall(skillId, targetRoot);
     return;
   }
 

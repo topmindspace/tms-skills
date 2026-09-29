@@ -13,6 +13,46 @@ from pathlib import Path
 
 from render_from_model import extract_model_span
 
+_ICON_DIR = Path(__file__).resolve().parent.parent / 'assets' / 'icons'
+_ICON_CACHE: dict[str, str] = {}
+
+
+def _icon_svg(name: str) -> str | None:
+    """取图标包 SVG（内联用）；缺图标返回 None（调用方保留原标记，由 validate WARN）。"""
+    if name in _ICON_CACHE:
+        return _ICON_CACHE[name]
+    p = _ICON_DIR / f'{name}.svg'
+    try:
+        svg = p.read_text(encoding='utf-8').strip()
+    except OSError:
+        return None
+    _ICON_CACHE[name] = svg
+    return svg
+
+
+# 手写 HTML 模板里的图标占位：<i data-icon="增长"></i> → 内联 SVG（currentColor 随主题变色）
+# 未知图标名保留原标记（validate_report 报 WARN，不静默吞掉）
+ICON_MARK_RE = re.compile(r'<i\s+data-icon="([^"]+)"\s*(?:/>|>\s*</i\s*>)')
+
+
+def hydrate_icons(html: str) -> tuple[str, int, list[str]]:
+    """内联 icon 标记。返回 (new_html, 成功替换数, 未知图标名列表)。"""
+    unknown: list[str] = []
+    replaced = [0]
+
+    def repl(m):
+        name = m.group(1)
+        svg = _icon_svg(name)
+        if svg is None:
+            if name not in unknown:
+                unknown.append(name)
+            return m.group(0)
+        replaced[0] += 1  # 只计真正替换的；未知名保留原标记，不计入
+        return svg
+
+    new_html, _ = ICON_MARK_RE.subn(repl, html)
+    return new_html, replaced[0], unknown
+
 PLACEHOLDER_SVG_RE = re.compile(
     r'<svg class="chart" data-chart="([^"]+)" viewBox="0 0 560 220">\s*'
     r'<!--[\s\S]*?-->\s*'
@@ -336,20 +376,26 @@ def iter_chart_payloads(model: dict):
 
 
 def hydrate(html: str, model: dict) -> str:
+    """占位 SVG → 真实图表 SVG。
+    弹性（0.2.0）：单图数据非法只留占位并记入 errors，不中断整份报告其余图的水合。"""
     payloads = list(iter_chart_payloads(model))
     idx = 0
+    errors: list = []
 
     def repl(m):
         nonlocal idx
         if idx >= len(payloads):
             return m.group(0)
         ch, ctx = payloads[idx]
-        svg = build_svg(ch, ctx)
         idx += 1
-        return svg
+        try:
+            return build_svg(ch, ctx)
+        except ChartDataError as e:
+            errors.append(str(e))
+            return m.group(0)
 
     new_html, n = PLACEHOLDER_SVG_RE.subn(repl, html)
-    return new_html, n, idx, len(payloads)
+    return new_html, n, idx, len(payloads), errors
 
 
 def main() -> int:
@@ -382,13 +428,22 @@ def main() -> int:
         print(f'FAIL: REPORT_MODEL 根节点必须是对象（得到 {type(model).__name__}）')
         return 1
     try:
-        new_html, n_ph, used, total = hydrate(html, model)
+        new_html, n_ph, used, total, chart_errors = hydrate(html, model)
     except ChartDataError as e:
+        # 防御：hydrate 内部已按图捕获，此处仅兜底批量抽取阶段的非法数据
         print(f'FAIL: 图表数据非法——{e}')
         return 1
+    for e in chart_errors:
+        print(f'FAIL: 图表数据非法——{e}（该图保留占位，其余图已水合）')
+    rc = 1 if chart_errors else 0
+    new_html, n_icon, unknown_icons = hydrate_icons(new_html)
+    if unknown_icons:
+        print(f'WARN: 未知图标名（已保留原标记）: {", ".join(unknown_icons)}')
     path.write_text(new_html, encoding='utf-8')
     left = new_html.count('见模型数据')
-    print(f'hydrated placeholders={n_ph} used_payloads={used}/{total} remaining_placeholder={left}')
+    print(f'hydrated placeholders={n_ph} icons={n_icon} used_payloads={used}/{total} remaining_placeholder={left}')
+    if rc:
+        return rc  # 有图表数据非法：文件已落盘（坏图留占位），但以非零码报告
     return 0 if left == 0 else 1
 
 

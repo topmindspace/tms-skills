@@ -138,6 +138,7 @@ SLIDE_RE = re.compile(r"ppt/slides/slide(\d+)\.xml$")
 _PROBE_SKIP_KEYS = {
     "colors", "color", "icon", "href", "id", "type", "exhibitNo", "max", "unit",
     "hint", "src", "alt", "fit", "layout", "placeholder", "ratio", "dataTable",
+    "variant",  # 版式变体注册值（bento-grid/timeline/2-col-feature）不渲染为文本
 }
 
 

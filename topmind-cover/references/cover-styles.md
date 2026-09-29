@@ -1,4 +1,4 @@
-# 封面风格库（8 种）
+# 封面风格库（11 种）
 
 > **原创铁律**：本库示例图均为原创，只演示抽象设计原则（标题是视觉重心、信息分层、留白呼吸感、数字与关键词强调），不临摹任何第三方封面；复用时版式与配色不得与第三方封面构成实质相似——只学原则，不学版式。
 
@@ -29,7 +29,7 @@ prompt 配方为中英双语模板：`{TITLE}` 为标题文字占位符（短标
 
 ---
 
-## 1. gan-huo · 爆款干货
+## 9. gan-huo · 爆款干货
 
 - **适用场景**：干货清单、评测、盘点、实测筛选类文章；"我替你试完了/筛完了"这类
   第一人称实测文的默认选择。示例图：`assets/examples/gan-huo.png`（原创："提示词避坑指南"）。
@@ -69,7 +69,7 @@ prompt 配方为中英双语模板：`{TITLE}` 为标题文字占位符（短标
 
 ---
 
-## 2. big-type · 巨字宣言
+## 5. big-type · 巨字宣言
 
 - **适用场景**：观点评论、深度长文、产品/版本发布宣言；"一句话立场"类文章的默认选择。
   示例图：`assets/examples/big-type.png`（原创："慢即是快"）。
@@ -107,7 +107,7 @@ prompt 配方为中英双语模板：`{TITLE}` 为标题文字占位符（短标
 
 ---
 
-## 3. brand-launch · 品牌发布
+## 10. brand-launch · 品牌发布
 
 - **适用场景**：产品发布、版本更新、官方最佳实践/白皮书；有明确品牌主体的内容首选。
   示例图：`assets/examples/brand-launch.png`（原创虚构品牌"深蓝 OS 2.0"）。
@@ -146,7 +146,7 @@ prompt 配方为中英双语模板：`{TITLE}` 为标题文字占位符（短标
 
 ---
 
-## 4. tutorial-steps · 教程步骤
+## 6. tutorial-steps · 教程步骤
 
 - **适用场景**：教程、上手指南、分步实操、保姆级攻略。
   示例图：`assets/examples/tutorial-steps.png`（原创："从想法到产品"）。
@@ -184,7 +184,7 @@ prompt 配方为中英双语模板：`{TITLE}` 为标题文字占位符（短标
 
 ---
 
-## 5. ip-fun · IP 趣味
+## 11. ip-fun · IP 趣味
 
 - **适用场景**：实战案例、数据战报、复盘、系列连载（上/下篇）。
   示例图：`assets/examples/ip-fun.png`（原创：狐狸画家 IP + "AI绘画挑战营"）。
@@ -228,7 +228,134 @@ prompt 配方为中英双语模板：`{TITLE}` 为标题文字占位符（短标
 
 ---
 
-## 6. news-flash · 资讯快报
+## 1. white-clean · 白色清新
+
+- **适用场景**：干货清单、实测盘点、效率/副业/职场类选题；"替你筛好了、看完即用"类
+  亲和干货的默认选择。示例图：`assets/examples/white-clean.png`（原创："一人公司起步指南"）。
+- **设计语言（抽象原则）**：
+  - 纯白底 + 大面积留白：干净清新，信息流里"透气"。
+  - 标题极大：空间允许时字高冲击画面 1/3；1~2 行横跨顶部，关键词撞色。
+  - 关键词装饰每次只用 2~3 种：撞色变色 / 马克笔横条衬底 / 色块衬底。
+  - 场景化插图：3D 毛绒 / Q 版人物 + 与主题绑定的工作场景（悬浮卡片、工具、桌面），
+    插图讲"正在用"的故事，不做无意义装饰。
+  - 圆角胶囊标签行：浅色胶囊 + 小图标 + 短词，收束卖点。
+  - 小装饰点到为止：星星、感叹号、波浪线，至多 2 处。
+- **配色故事**：纯白 `#FFFFFF` 全幅主色（走极端浅明度）；标题墨黑 `#1A1A1A` 打底；
+  撞色只给标题关键词（优选组合三选一，见配方）；胶囊用撞色对应的浅色系。
+- **标题写法规范**：
+  - 短标题 6~10 字，1~2 行，顶部横跨，空间允许时字高冲击 1/3（底线 ≥1/4），
+    如"一人公司起步指南"。
+  - 每行至多 1 个撞色关键词。
+  - 胶囊标签行 3 个短词，`·` 分隔（如"实测筛选 · 长文精选 · 全流程实操"），
+    字号约为标题的 1/4。
+- **标题文案提炼公式**：人群/场景 + 结果承诺。
+  示例（虚构演示）："打工人副业增收课"。
+- **prompt 配方**：
+  ```
+  中文：白色清新风中文封面。字体量级：标题是绝对视觉重心——顶部横跨墨黑色（#1A1A1A）超大粗黑中文标题"{TITLE}"（逐字准确），1~2 行，空间允许时字高冲击画面 1/3（底线≥1/4）；中部一条浅色圆角胶囊标签行"{TAGLINE}"（如"实测筛选 · 长文精选 · 全流程实操"，必须真实）收束卖点，字号约为标题的 1/4。字体优选组合 {FONT_COMBO} 三选一：A 超粗黑体（力量感，笔画粗、字面满）/ B 圆润黑体（亲和感，笔画圆润、字角圆）/ C 黑体正文 + 英文关键词斜体（国际感）。配色系统：纯白 #FFFFFF 全幅主色（极端浅明度，大面积留白）；标题墨黑 #1A1A1A 打底；撞色优选组合 {COLOR_COMBO} 三选一：A 品牌蓝 #2B7FFF + 活力橙红 #FF5A2E / B 电光紫 #7C5CFF + 薄荷青 #00C2A8 / C 墨黑 #1A1A1A + 品牌蓝 #2B7FFF，撞色只给标题关键词（每行至多 1 个撞色词）；胶囊用撞色对应的浅色（如 #EAF2FF 系）。构图能量：一条"主题→背书→场景"动线——顶部大标题横跨全宽（钩子与主题合一）→ 中部胶囊标签行（背书）→ 底部场景化插图舞台（{SCENE}，如毛绒质感 3D 小角色在悬浮卡片与主题工具之间忙碌、带柔和投影，约占画面 35%，必须与主题绑定、讲"正在用"的故事）做记忆点落点；标题与插图上下叠放，禁止左右对半镜像分区。花式优选组合 {FX_COMBO} 每次只用 2~3 种：①关键词变色高亮（撞色，见配色组合）；②黄色 #FFD93B 马克笔横条衬底（横条略宽于字、不压笔画）；③关键词原位垫实色块（色块高度为字高的 1.2 倍，字色与色块明暗对立，标题总字数不变、严禁复制关键词做独立元素）。方向/透视优选组合 {DIR_COMBO} 三选一：A 标题全水平、胶囊轻微错位叠放；B 撞色关键词整体上扬 ≤8°（字不转、整体转）；C 插图轻微俯视透视、标题保持水平。大标题永远水平，绝不透视变形。质感细节：纯白底必须带一层极淡的纸纹 + 插图区一团柔和的浅色光晕，拒绝死白平板底。除标题、胶囊行外无其他文字；所有文字与关键元素在中央垂直 60% 安全区内，横构图 16:9，尺寸 1200×675。
+
+  EN: Clean-white Chinese cover. Type scale: the title is the absolute visual anchor — an oversized ink-black (#1A1A1A) extra-bold Chinese title "{TITLE}" (exact) spanning the top in 1–2 lines, glyph height pushing toward 1/3 of the frame when space allows (floor 1/4); one light rounded-capsule tag row "{TAGLINE}" (e.g. "实测筛选 · 长文精选 · 全流程实操", must be factual) mid-page cinches the selling points at ~1/4 of the title size. Font combo {FONT_COMBO}, pick one of three: A ultra-bold heiti (powerful, heavy strokes, full letterforms) / B rounded heiti (friendly, soft strokes, rounded corners) / C heiti body with italic English keywords (international feel). Color system: full-bleed pure white #FFFFFF ground (extreme-light value, generous negative space); ink-black #1A1A1A title base; accent combo {COLOR_COMBO}, pick one of three: A brand blue #2B7FFF + vivid orange-red #FF5A2E / B electric purple #7C5CFF + mint teal #00C2A8 / C ink black #1A1A1A + brand blue #2B7FFF — accents touch title keywords only (at most one accented word per line); capsules use the matching light tints (e.g. the #EAF2FF family). Composition energy: one "theme → proof → scene" path — the giant title spans the top (hook and theme in one) → the capsule tag row (proof) → a scenario illustration stage at the bottom ({SCENE}, e.g. a fluffy 3D mascot busy among floating cards and topic tools with soft shadows, ~35% of frame, must tie to the topic and tell a "being used" story) as the memorable landing; title and illustration stack vertically — a mirrored left-right split is forbidden. Flourish combo {FX_COMBO}, use only 2–3 per image: ① keyword recolor highlight (accent color per the palette combo); ② yellow #FFD93B marker highlighter bar behind a keyword (bar slightly wider than the glyphs, never touching strokes); ③ solid color block under a keyword in place (block height 1.2× glyph height, opposing light-dark contrast, total character count unchanged — never duplicate the keyword as a separate element). Direction/perspective combo {DIR_COMBO}, pick one of three: A fully horizontal title with slightly offset-stacked capsules; B the accented keyword tilted upward ≤8° as a whole (glyphs not rotated, the block rotated); C illustration in slight top-down perspective while the title stays horizontal. The main title is always horizontal — never warped in perspective. Texture: the white ground must carry one whisper-faint paper grain plus one soft light-tint halo in the illustration zone — a dead flat white ground is forbidden. No text besides the title and capsule row. All text and key elements within the central vertical 60% safe zone. Landscape 16:9, 1200×675.
+  ```
+  占位符：`{TAGLINE}` 胶囊标签行（3 短词，`·` 分隔，≤14 字，必须真实）、
+  `{SCENE}` 场景化插图描述（必须与主题绑定：角色 + 场景 + 主题道具，讲"正在用"的故事）、
+  `{FONT_COMBO}` 字体三选一（A 超粗黑 / B 圆润黑 / C 黑体+英文斜体）、
+  `{COLOR_COMBO}` 撞色三选一（A 蓝+橙红 / B 紫+青 / C 黑+品牌蓝）、
+  `{FX_COMBO}` 花式每次 2~3 种（变色 / 马克笔横条 / 色块衬底）、
+  `{DIR_COMBO}` 方向三选一（A 全水平 / B 关键词上扬≤8° / C 插图俯视）。
+- **绝不清单**：
+  - 绝不深底/灰底：本风格必须是纯白底，底色一深直接变味。
+  - 绝不标题字高不足 1/4：空间允许必须冲击 1/3。
+  - 绝不左右对半镜像分区：标题与插图必须上下叠放。
+  - 绝不每行超 1 个撞色词：撞色一多就"吵"。
+  - 绝不一句话超 3 种颜色：标题内只许墨黑 + 撞色组合的两种。
+  - 绝不透视变形大标题：大标题永远水平。
+  - 绝不色块吞字：色块高度≤1.3 倍字高，明暗对立。
+  - 绝不装饰压笔画：横条/圈注不压字。
+  - 绝不装饰超量：花式 2~3 种封顶，小装饰（星星/感叹号）至多 2 处。
+  - 绝不无意义插图：插图必须与主题绑定、讲"正在用"的故事，纯装饰角色一律不用。
+
+---
+
+## 2. bg-blur · 背景虚化
+
+- **适用场景**：生活方式、职场日常、运动健康、城市观察；"氛围感 + 主题"类文章的
+  默认选择。示例图：`assets/examples/bg-blur.png`（原创："深夜加班自救手册"）。
+- **设计语言（抽象原则）**：
+  - 虚化摄影背景 + 清晰前景主体：大光圈景深对比本身就是记忆点。
+  - 背景走浅色调虚化（明亮、通透），拒绝暗黑压抑。
+  - 前景主体锐利清晰，与主题强绑定（人物半身 / 产品特写 / 主题物件三选一）。
+  - 大标题压在清晰区：空间允许时字高冲击 1/3，字色与背景明度对立。
+  - 光斑/柔光只做氛围，不进文字区。
+- **配色故事**：浅色虚化摄影背景（米白 / 浅灰 / 柔光，极端浅明度）；标题深色
+  （墨黑 / 深棕）；强调色只给一处（关键词或一处光斑色）。
+- **标题写法规范**：
+  - 短标题 6~10 字，单行或双行，压在画面清晰区，空间允许时字高冲击 1/3（底线 ≥1/4）。
+  - 标题字加浅色光晕衬底或细描边，保证在虚化背景上可读。
+- **标题文案提炼公式**：场景 + 痛点/获得。
+  示例（虚构演示）："通勤包里的效率术"。
+- **prompt 配方**：
+  ```
+  中文：背景虚化风中文封面。字体量级：大标题压在清晰区——深色超大粗黑中文标题"{TITLE}"（逐字准确），单行或双行，空间允许时字高冲击画面 1/3（底线≥1/4），是全图唯一的视觉重心；标题字加一层浅色光晕衬底（或 2px 浅色描边，描边宽≤笔画宽 1/5），保证在虚化背景上清晰可读。字体优选组合 {FONT_COMBO} 三选一：A 超粗黑体（醒目）/ B 人文黑体（亲和）/ C 粗黑 + 数字/英文斜体混排。配色系统：浅色调虚化摄影背景 {BG_SCENE}（极端浅明度：明亮、通透，拒绝暗黑）；标题深色（墨黑 #1A1A1A / 深棕二选一）；强调色优选组合 {COLOR_COMBO} 三选一：A 暖橙 #FF8A3D（配光斑）/ B 品牌蓝 #2B7FFF / C 朱红 #E6392B，强调色只给标题关键词一处。构图能量：一条"氛围→主体→主题"动线——浅色虚化背景（氛围，大光圈虚化 + 柔和光斑，不进文字区）→ 清晰前景主体（{SUBJECT}，锐利清晰、约占画面 30~40%，必须与主题强绑定）→ 大标题压在主体旁的清晰区（主题）；背景与主体明暗/虚实对立，景深对比就是记忆点。花式优选组合 {FX_COMBO} 每次只用 2 种：①关键词变色高亮（强调色）；②关键词字号放大到其余字的 1.4 倍（不换行）。方向/透视优选组合 {DIR_COMBO} 三选一：A 标题全水平、主体三分法站位；B 标题沿主体轮廓轻微上扬 ≤8°；C 前景主体轻微仰视透视、标题保持水平。大标题不做透视变形。质感细节：背景虚化必须有真实的光斑层次 + 前景主体边缘锐利，拒绝"全图均匀模糊"的假虚化。除标题外无其他文字；所有文字与关键主体在中央垂直 60% 安全区内，横构图 16:9，尺寸 1200×675。
+
+  EN: Background-blur Chinese cover. Type scale: the big title presses the sharp zone — an oversized dark extra-bold Chinese title "{TITLE}" (exact), one or two lines, glyph height pushing toward 1/3 of the frame when space allows (floor 1/4), the single visual anchor of the page; the title carries one light halo backing (or a 2px light outline, outline width ≤ 1/5 of stroke width) so it stays legible over the blur. Font combo {FONT_COMBO}, pick one of three: A ultra-bold heiti (punchy) / B humanist heiti (friendly) / C bold heiti mixed with italic numerals/English. Color system: light-toned blurred photographic background {BG_SCENE} (extreme-light value: bright, airy — dark and moody is forbidden); dark title (ink black #1A1A1A / deep brown, pick one); accent combo {COLOR_COMBO}, pick one of three: A warm orange #FF8A3D (pairs with bokeh) / B brand blue #2B7FFF / C vermilion #E6392B — the accent touches exactly one title keyword. Composition energy: one "atmosphere → subject → theme" path — the light blurred background (atmosphere: wide-aperture blur plus soft bokeh, kept out of the text zone) → the sharp foreground subject ({SUBJECT}, tack-sharp, 30–40% of frame, must tie strongly to the topic) → the big title pressed into the clear zone beside the subject (theme); background and subject oppose in light and in sharpness — the depth-of-field contrast IS the memorable element. Flourish combo {FX_COMBO}, use only 2 per image: ① keyword recolor highlight (accent color); ② keyword enlarged to 1.4× the other glyphs (no line break). Direction/perspective combo {DIR_COMBO}, pick one of three: A fully horizontal title with the subject on a rule-of-thirds position; B the title rising gently ≤8° along the subject's contour; C the foreground subject in slight low-angle perspective while the title stays horizontal. The main title is never warped in perspective. Texture: the background blur must show real bokeh layering, and the foreground subject must have crisp edges — uniformly blurred "fake bokeh" is forbidden. No text besides the title. All text and key subjects within the central vertical 60% safe zone. Landscape 16:9, 1200×675.
+  ```
+  占位符：`{BG_SCENE}` 背景虚化场景三选一（明亮办公室虚化 / 城市街景光斑虚化 / 自然柔光虚化，
+  必须浅色调）、`{SUBJECT}` 清晰前景主体三选一（人物半身 / 产品特写 / 主题物件，
+  必须与主题强绑定）、`{FONT_COMBO}` 字体三选一、`{COLOR_COMBO}` 强调色三选一
+  （橙/蓝/朱红，只给一处）、`{FX_COMBO}` 花式 2 种（变色 + 字号对比）、
+  `{DIR_COMBO}` 方向三选一。
+- **绝不清单**：
+  - 绝不暗黑虚化背景：本风格背景必须是浅色调，暗底直接变味。
+  - 绝不全图均匀模糊：背景虚化必须有光斑层次，前景主体必须锐利。
+  - 绝不标题落在虚化重灾区：标题必须压在清晰区，否则可读性全失。
+  - 绝不标题字高不足 1/4：空间允许必须冲击 1/3。
+  - 绝不一句话超 3 种颜色：深色标题 + 一处强调色。
+  - 绝不透视变形大标题。
+  - 绝不光斑进文字区：光斑只做背景氛围。
+  - 绝不主体与主题无关：前景主体必须与主题强绑定，无意义摆拍一律不用。
+  - 绝不装饰超量：变色 + 字号对比 2 种封顶。
+
+---
+
+## 3. paper-collage · 纸感拼贴
+
+- **适用场景**：手账、整理术、生活灵感、旧物改造、轻教程；"手作感 / 人味"类选题的
+  默认选择。示例图：`assets/examples/paper-collage.png`（原创："手账整理术"）。
+- **设计语言（抽象原则）**：
+  - 浅色底 + 纸片拼贴：撕边 / 圆角 / 便签纸片错位叠放，拼贴本身就是构图。
+  - 固定手法三选一：和纸胶带 / 回形针 / 图钉，"贴上去"的真实感。
+  - 标题落在最大纸片上（或牛皮纸标签），空间允许时字高冲击 1/3。
+  - 小贴纸 / 小标签点缀，元素总数 ≤5。
+  - 手工感：撕纸毛边、胶带半透明，拒绝 CG 塑料感。
+- **配色故事**：米白 / 浅灰底（极端浅明度）；纸片用马卡龙浅色系优选组合
+  （浅蓝 / 浅粉 / 浅黄 / 浅绿三选一）；标题深色；一处跳色（朱红 / 赭石）只给最小的标签。
+- **标题写法规范**：
+  - 短标题 4~8 字，印在最大纸片中央，空间允许时字高冲击 1/3（底线 ≥1/4），如"手账整理术"。
+  - 纸片上不加第二行小字，干净。
+- **标题文案提炼公式**：旧物 / 日常 + 动词改造。
+  示例（虚构演示）："工位改造计划"。
+- **prompt 配方**：
+  ```
+  中文：纸感拼贴风中文封面。字体量级：标题是视觉重心——深色超大粗黑中文标题"{TITLE}"（逐字准确），印在最大纸片中央，空间允许时字高冲击画面 1/3（底线≥1/4）；纸片上不加第二行小字。字体优选组合 {FONT_COMBO} 三选一：A 超粗黑体（海报感）/ B 手写体（人味，笔画清晰可辨）/ C 黑体 + 英文小字混排。配色系统：米白 / 浅灰底（极端浅明度）；纸片马卡龙浅色系优选组合 {COLOR_COMBO} 三选一：A 浅蓝 #D6E9FF + 浅黄 #FFF3C4 / B 浅粉 #FFDCE5 + 浅绿 #D9F2E2 / C 牛皮纸 #E8DCC8 + 纯白 #FFFFFF；标题深色（墨黑 / 深棕二选一）；跳色只给最小的标签一处（朱红 #E6392B / 赭石 #B5651D 二选一）。构图能量：一条"底→纸片→标题"动线——浅色底（呼吸）→ 3~5 张纸片 {PAPER_COMBO} 错位叠放拼贴（撕边 / 圆角 / 便签三选一，纸片带撕纸毛边与柔和投影）→ 最大纸片上的大标题（主题）；纸片用 {FIX_COMBO} 固定（和纸胶带 / 回形针 / 图钉三选一，半透明/金属质感真实）；1~2 张小贴纸或小标签做点缀（元素总数 ≤5）。花式优选组合 {FX_COMBO} 每次只用 2 种：①标题关键词变色（跳色）；②小标签上手写感圈注（只圈一处）。方向/透视优选组合 {DIR_COMBO} 三选一：A 纸片全水平、错位叠放；B 最大纸片整体倾斜 ≤8°（字不转、纸转）；C 轻微俯视拼贴桌面、标题保持水平。大标题不做透视变形。质感细节：纸片必须有撕纸毛边 + 纸纹 + 柔和投影，胶带半透明，拒绝 CG 塑料感。除标题、小标签短词外无其他文字；所有文字与关键纸片在中央垂直 60% 安全区内，横构图 16:9，尺寸 1200×675。
+
+  EN: Paper-collage Chinese cover. Type scale: the title is the visual anchor — an oversized dark extra-bold Chinese title "{TITLE}" (exact) printed at the center of the largest paper scrap, glyph height pushing toward 1/3 of the frame when space allows (floor 1/4); no second line of small text on the scrap. Font combo {FONT_COMBO}, pick one of three: A ultra-bold heiti (poster feel) / B handwriting style (human touch, strokes clean and legible) / C heiti mixed with small English. Color system: off-white / light-gray ground (extreme-light value); pastel paper palette combo {COLOR_COMBO}, pick one of three: A light blue #D6E9FF + light yellow #FFF3C4 / B light pink #FFDCE5 + light green #D9F2E2 / C kraft #E8DCC8 + pure white #FFFFFF; dark title (ink black / deep brown, pick one); one pop of color reserved for the smallest tag only (vermilion #E6392B / ochre #B5651D, pick one). Composition energy: one "ground → scraps → title" path — the light ground (breathing room) → 3–5 paper scraps {PAPER_COMBO} in offset collage (torn edge / rounded corner / sticky-note, pick one; scraps carry torn fibrous edges and soft shadows) → the big title on the largest scrap (theme); scraps fastened with {FIX_COMBO} (washi tape / paper clip / push pin, pick one, realistic translucent/metal texture); 1–2 small stickers or tags as garnish (at most 5 elements total). Flourish combo {FX_COMBO}, use only 2 per image: ① title keyword recolor (pop color); ② hand-drawn circle on a small tag (only one circle). Direction/perspective combo {DIR_COMBO}, pick one of three: A all scraps horizontal in offset stack; B the largest scrap tilted ≤8° as a whole (glyphs not rotated, the scrap rotated); C slight top-down view of the collage desk while the title stays horizontal. The main title is never warped in perspective. Texture: scraps must show torn fibrous edges plus paper grain plus soft shadows, tape translucent — plasticky CG rendering is forbidden. No text besides the title and small tag words. All text and key scraps within the central vertical 60% safe zone. Landscape 16:9, 1200×675.
+  ```
+  占位符：`{PAPER_COMBO}` 纸片三选一（撕边 / 圆角 / 便签）、`{FIX_COMBO}` 固定手法三选一
+  （和纸胶带 / 回形针 / 图钉）、`{FONT_COMBO}` 字体三选一、`{COLOR_COMBO}` 纸片配色三选一、
+  `{FX_COMBO}` 花式 2 种（变色 + 圈注）、`{DIR_COMBO}` 方向三选一。
+- **绝不清单**：
+  - 绝不深底：本风格必须是浅色底。
+  - 绝不纸片超 5 张：元素总数 ≤5，多一张就碎。
+  - 绝不标题字高不足 1/4：空间允许必须冲击 1/3。
+  - 绝不 CG 塑料感：无毛边无纸纹无投影的纸片一律重画。
+  - 绝不透视变形大标题。
+  - 绝不一句话超 3 种颜色。
+  - 绝不纸片上加第二行小字。
+  - 绝不装饰超量：变色 + 圈注 2 种封顶。
+
+---
+
+## 4. news-flash · 资讯快报
 
 - **适用场景**：资讯、快讯、热点解读、人物专访预告、"祛魅/揭秘"类选题。
   示例图：`assets/examples/news-flash.png`（原创："今日AI速览" + 纸纹底 + 俯视桌面静物）。
@@ -346,15 +473,18 @@ prompt 配方为中英双语模板：`{TITLE}` 为标题文字占位符（短标
 
 ---
 
-## 风格速查
+## 风格速查（浅色优先：1~8 浅色，9~11 深色/高饱和）
 
 | 风格 | 一句话 | 标题字号占比 | 首选题材 |
 |---|---|---|---|
-| gan-huo | 深炭灰底 + 米白 1/3 巨标题 + 朱红印章点睛，一眼即干货 | ~1/3 | 干货清单/评测/盘点 |
-| big-type | 标题即画面：1/3 幅墨黑书法烫金，奶油亮底一声断言 | 1/3~2/5 | 观点/深度/发布宣言 |
-| brand-launch | 深海军蓝 + 荧光绿唯一强调，品牌大标题压阵 | 1/4~1/3 | 产品发布/版本更新 |
-| tutorial-steps | 宣纸书法 1/3 镇场 + 底部赭石时间线，三步即上手 | ~1/3 | 教程/上手指南 |
-| ip-fun | 暖橙舞台 + 深棕叠放巨标题 + 趣味 IP 记忆点 | 1/4~1/3 | 实战案例/数据战报 |
+| white-clean | 纯白底 + 冲击 1/3 的撞色巨标题 + 场景化插图 + 胶囊标签，清新透气 | 冲击 1/3 | 干货清单/实测盘点/效率职场 |
+| bg-blur | 浅色虚化摄影背景 + 锐利前景主体，大标题压清晰区 | 冲击 1/3 | 生活方式/职场日常/运动健康 |
+| paper-collage | 马卡龙纸片拼贴 + 和纸胶带/回形针，标题印最大纸片上 | 冲击 1/3 | 手账/整理术/旧物改造 |
 | news-flash | 纸纹米底 + 纯黑大标题 + 朱红爆点词点睛，快讯的干脆 | ~1/3 | 资讯/快讯/热点解读 |
+| big-type | 标题即画面：1/3 幅墨黑书法烫金，奶油亮底一声断言 | 1/3~2/5 | 观点/深度/发布宣言 |
+| tutorial-steps | 宣纸书法 1/3 镇场 + 底部赭石时间线，三步即上手 | ~1/3 | 教程/上手指南 |
 | minimal | 85% 留白 + 一处朱红点睛 + 宽字距深灰标题，张力拉满 | ~1/6（字重补） | 随笔/书评/轻观点 |
 | magazine | 暖灰影棚颗粒 + 人像氛围 + 砖红细线，标题压阵 | 1/4~1/3 | 访谈/人物特写/商业分析 |
+| gan-huo | 深炭灰底 + 米白 1/3 巨标题 + 朱红印章点睛，一眼即干货 | ~1/3 | 干货清单/评测/盘点 |
+| brand-launch | 深海军蓝 + 荧光绿唯一强调，品牌大标题压阵 | 1/4~1/3 | 产品发布/版本更新 |
+| ip-fun | 暖橙舞台 + 深棕叠放巨标题 + 趣味 IP 记忆点 | 1/4~1/3 | 实战案例/数据战报 |

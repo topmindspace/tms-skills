@@ -317,5 +317,19 @@
       ]
     ]
   },
-  "theme": "light"
+  "theme": "light",
+  "refs": [
+    {
+      "name": "Gartner：Agentic AI 技术成熟度曲线",
+      "time": "2026-06",
+      "caliber": "试点率 / 采纳率 / 形态成熟度判定",
+      "url": "https://example.com/gartner-agentic-ai"
+    },
+    {
+      "name": "企业智能体发展调研（内部，N=42）",
+      "time": "2026-08",
+      "caliber": "规模化占比与访谈结论，2026-07 至 2026-08",
+      "url": ""
+    }
+  ]
 }

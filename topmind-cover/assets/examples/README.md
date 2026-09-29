@@ -1,15 +1,18 @@
 # 封面风格示例图
 
-8 种风格 × 2 种尺寸 = 16 张示例（随 npm 包发布，npx 安装即得），
-另附 `overview.png`（8 宫格总览，2260×806）。
+11 种风格 × 2 种尺寸 = 22 张示例（随 npm 包发布，npx 安装即得），
+另附 `overview.png`（11 宫格总览：3 行 × 4 列缩略图 + 风格名标注，选风格时先看它）。
 
 - `<style>.png`（1200×675，X 长文封面 / 公众号共用主尺寸）
 - `<style>-wechat.png`（900×383，公众号封面大图，中央裁剪版）
-- `overview.png`（8 宫格总览：2 行 × 4 列缩略图 + 风格名标注，选风格时先看它）
+- `<style>-alt.png`（1200×675，同风格第二张演示样张；白色清新 / 背景虚化 / 纸感拼贴
+  三种新风格各有 2 张：主样张与 alt 样张用了不同的优选组合）
+- `overview.png`（11 宫格总览：3 行 × 4 列缩略图 + 风格名标注，选风格时先看它）
 
-8 种风格（爆款干货 `gan-huo` / 巨字宣言 `big-type` / 品牌发布 `brand-launch` / 教程步骤
-`tutorial-steps` / IP 趣味 `ip-fun` / 资讯快报 `news-flash` / 极简留白 `minimal` /
-杂志编辑 `magazine`）：适用场景索引与配方见 `../references/cover-styles.md`。
+11 种风格（白色清新 `white-clean` / 背景虚化 `bg-blur` / 纸感拼贴 `paper-collage` /
+资讯快报 `news-flash` / 巨字宣言 `big-type` / 教程步骤 `tutorial-steps` /
+极简留白 `minimal` / 杂志编辑 `magazine` / 爆款干货 `gan-huo` / 品牌发布 `brand-launch` /
+IP 趣味 `ip-fun`，浅色优先排序）：适用场景索引与配方见 `../references/cover-styles.md`。
 
 ## 原创与虚构声明（重要）
 
