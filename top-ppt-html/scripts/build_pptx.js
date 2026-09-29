@@ -678,10 +678,28 @@ function imageLayoutShapes(s, layout, img, items, points, isPh, fit, y0, y1) {
     one(0, by, PW, bh, img, false);
     capY = by + bh;
   } else {
-    const fh = Math.min(ih, CW / ratio);
-    const fy = iy + Math.max(0, (ih - fh) / 2);
+    /* full：图在上、要点在下（HTML half 版式有「图+注」，full 无注；B 通道补齐要点以过保真门禁） */
+    const ptsF = (points || []).filter(Boolean);
+    const pfRowH = 0.5;
+    const pfH = ptsF.length ? Math.min(ptsF.length * pfRowH, Math.max(0, ih - 1.8)) : 0;
+    const fh = Math.max(1.0, Math.min(ih - pfH, CW / ratio));
+    const fy = iy + Math.max(0, (ih - pfH - fh) / 2);
     one(MX, fy, CW, fh, img, false);
-    capY = fy + fh;
+    const pfCap = Math.max(0, Math.floor(pfH / pfRowH));
+    ptsF.slice(0, pfCap).forEach((pt, i) => {
+      const kk = Array.isArray(pt) ? String(pt[0] || '') : String((pt && pt.t) || '');
+      const vv = Array.isArray(pt) ? String(pt[1] || '')
+        : (pt && typeof pt === 'object' ? String(pt.d || '') : String(pt == null ? '' : pt));
+      const ly = fy + fh + 0.08 + i * pfRowH;
+      s.addShape('rect', { x: MX, y: ly + pfRowH / 2 - 0.06, w: 0.12, h: 0.12,
+        fill: { color: STYLE.accent }, line: { type: 'none' } });
+      s.addText([
+        { text: kk + (kk && vv ? '　' : ''), options: { fontSize: sz(12), bold: true, color: STYLE.ink } },
+        { text: vv, options: { fontSize: sz(11), color: STYLE.body } },
+      ], { x: MX + 0.26, y: ly, w: CW - 0.32, h: pfRowH - 0.04,
+        fontFace: STYLE.font, valign: 'middle' });
+    });
+    capY = fy + fh + pfH;
   }
   return capY;
 }
@@ -1844,15 +1862,21 @@ CONTENT.sections.forEach((sec) => {
     if (hro[2]) s.addText('▲ ' + hro[2], { x: hreg.x + 0.05, y: hreg.y + 2.1, w: hreg.w - 0.4, h: 0.4,
       fontFace: STYLE.font, fontSize: sz(12), bold: true, color: STYLE.accent });
     const kdivX = MX + CW * K.dividerX;
-    s.addShape('rect', { x: kdivX, y: K.heroY + 0.15, w: 0.025, h: 3.1,
+    /* R6：竖分隔线高度取原设计值与注释带感知下界的较小者——写死 3.1 会在
+       so-what/来源行并存时越过注释带顶（ANNOTATION_BAND_OVERLAP），而无注释时
+       不得比原设计更长（回归：smoke business-blue fixture slide 7）。 */
+    const kpiBottom = chartBottom(!!sec.soWhat, !!sec.footnote) - 0.05;
+    s.addShape('rect', { x: kdivX, y: K.heroY + 0.15, w: 0.025,
+      h: Math.min(3.1, Math.max(0.6, kpiBottom - (K.heroY + 0.15))),
       fill: { color: STYLE.line }, line: { type: 'none' } });
-    /* 支撑指标行：按可用高度收敛行高并截断，保证不越过 contentBottom */
+    /* 右列：支撑指标行在上、要点在下，共用注释带感知高度；禁越过注释带顶 */
     const mreg = REGIONS.regionOf('kpi', 'metrics') ||
       { x: kdivX + 0.35, y: K.metricY0, w: CW * (1 - K.dividerX) - 0.5, h: CONTENT_BOTTOM - K.metricY0 };
+    const kAvail = Math.max(0.8, kpiBottom - mreg.y);
     const kmets = sec.metrics || [];
-    const kCap = Math.max(1, Math.floor((CONTENT_BOTTOM - mreg.y) / K.metricRowH));
+    const kCap = Math.max(1, Math.floor(kAvail / K.metricRowH));
     const kRows = Math.min(kmets.length, kCap);
-    const kRowH = fitRowH(CONTENT_BOTTOM - mreg.y, kRows, K.metricRowH, 0.42);
+    const kRowH = fitRowH(kAvail, kRows, K.metricRowH, 0.42);
     kmets.slice(0, kRows).forEach((m, i) => {
       const ky = mreg.y + i * kRowH;
       s.addText(m[0], { x: mreg.x, y: ky, w: mreg.w, h: Math.min(0.55, kRowH * 0.62),
@@ -1860,6 +1884,24 @@ CONTENT.sections.forEach((sec) => {
       s.addText(m[1], { x: mreg.x, y: ky + Math.min(0.55, kRowH * 0.62), w: mreg.w,
         h: Math.max(0.24, kRowH - Math.min(0.55, kRowH * 0.62)), fontFace: STYLE.font,
         fontSize: sz(10.5), color: STYLE.faint });
+    });
+    /* 要点：指标行下方续排，k/v 双色（与 bar 侧栏同口径）；无位则静默舍去 */
+    const kpts = (sec.points || []).filter(Boolean);
+    const kpRowH = 0.5;
+    const kpY0 = mreg.y + kRows * kRowH + 0.12;
+    const kpCap = Math.max(0, Math.floor((kpiBottom - kpY0) / kpRowH));
+    kpts.slice(0, kpCap).forEach((p, i) => {
+      const kk = Array.isArray(p) ? String(p[0] || '') : String((p && p.t) || '');
+      const vv = Array.isArray(p) ? String(p[1] || '')
+        : (p && typeof p === 'object' ? String(p.d || '') : String(p == null ? '' : p));
+      const ky = kpY0 + i * kpRowH;
+      s.addShape('rect', { x: mreg.x, y: ky + kpRowH / 2 - 0.06, w: 0.12, h: 0.12,
+        fill: { color: STYLE.accent }, line: { type: 'none' } });
+      s.addText([
+        { text: kk + (kk && vv ? '　' : ''), options: { fontSize: sz(12), bold: true, color: STYLE.ink } },
+        { text: vv, options: { fontSize: sz(11), color: STYLE.body } },
+      ], { x: mreg.x + 0.26, y: ky, w: mreg.w - 0.32, h: kpRowH - 0.04,
+        fontFace: STYLE.font, valign: 'middle' });
     });
   } else if (type === 'comparison') {
     const C2 = PT.comparison;
@@ -1936,14 +1978,19 @@ CONTENT.sections.forEach((sec) => {
     const layout = String(img.layout || (items.length > 1 ? 'grid' : 'full')).toLowerCase();
     const fit = String(img.fit || IMG.fitDefault || 'cover').toLowerCase();
     const isPh = !!img.placeholder;
-    const ireg = REGIONS.regionOf('image', 'primary', { top: bodyY, caption: !!img.caption }) ||
+    /* R6：图片区须按注释带感知下界收敛——so-what/来源行并存时图片底边不得越过注释带顶
+      （ANNOTATION_BAND_OVERLAP）；有图注时图注沉底注释带，图片区上界取 min。 */
+    const iBottom = img.caption ? Math.min(bodyBottom, CONTENT_BOTTOM_NOTE) : bodyBottom;
+    const ireg = REGIONS.regionOf('image', 'primary',
+      { top: bodyY, caption: !!img.caption, bottom: iBottom }) ||
       { x: MX, y: Math.max(IM.y, bodyY), w: CW, h: IM.h };
     const iy = ireg.y;
     const capH = img.caption ? 0.32 : 0;
     const ih = Math.max(1.2, ireg.h);
     const capYImg = imageLayoutShapes(s, layout, img, items, sec.points || [], isPh, fit, iy, iy + ih);
-    if (img.caption) s.addText(img.caption, { x: MX, y: capYImg + 0.04, w: CW, h: capH,
-      fontFace: STYLE.font, fontSize: sz(10.5), color: STYLE.faint });
+    /* 图注沉底注释带（annotation self 豁免位）；要点存在时不随之上移，避免被判侵入注释带 */
+    if (img.caption) s.addText(img.caption, { x: MX, y: Math.max(capYImg + 0.04, CONTENT_BOTTOM_NOTE + 0.03),
+      w: CW, h: capH, fontFace: STYLE.font, fontSize: sz(10.5), color: STYLE.faint });
   } else if (type === 'donut') {
     const dcn = sec.chart || {};
     if (dcn.labels && dcn.values) {
@@ -1960,20 +2007,47 @@ CONTENT.sections.forEach((sec) => {
         fontFace: STYLE.font, fontSize: sz(9.5), color: STYLE.faint, valign: 'middle' });
       const n = Math.max(1, dcn.labels.length);
       const maxLegH = Math.max(1.2, bodyBottom - (d.centerY - 1.7));
-      const rowH = Math.min(d.legendRowH, maxLegH / n, 3.4 / n);
-      const ly0 = Math.min(d.centerY - (n * rowH) / 2 + 0.1, bodyBottom - n * rowH - 0.04);
+      /* 要点：与图例共用右列。有要点时右列改顶对齐堆叠（图例行高压缩 + 要点续排），
+         顶锚取 bodyY 以吃满纵向空间；无要点时保持原有环图居中图例（不改变现有版式）。 */
+      const dpts = (sec.points || []).filter(Boolean);
+      const dpRowH = 0.5;
+      let legRowH, legY0;
+      if (dpts.length) {
+        const colAvail = Math.max(1.5, bodyBottom - bodyY - 0.04);
+        const ptsH = dpts.length * dpRowH;
+        legRowH = Math.max(0.32, Math.min(d.legendRowH, (colAvail - 0.1 - ptsH) / n));
+        legY0 = bodyY;
+      } else {
+        legRowH = Math.min(d.legendRowH, maxLegH / n, 3.4 / n);
+        legY0 = Math.min(d.centerY - (n * legRowH) / 2 + 0.1, bodyBottom - n * legRowH - 0.04);
+      }
       const sum2 = total || 1;
       dcn.labels.forEach((lb, i) => {
         const v = dcn.values[i] || 0;
-        const y = ly0 + i * rowH;
+        const y = legY0 + i * legRowH;
         s.addShape('ellipse', { x: d.legendX, y: y + 0.08, w: 0.16, h: 0.16,
           fill: { color: dcols[i % dcols.length] }, line: { type: 'none' } });
-        s.addText(lb, { x: d.legendX + 0.3, y, w: d.legendLabelW, h: rowH, valign: 'middle',
+        s.addText(lb, { x: d.legendX + 0.3, y, w: d.legendLabelW, h: legRowH, valign: 'middle',
           fontFace: STYLE.font, fontSize: sz(12), bold: true, color: STYLE.ink });
-        s.addText(String(v) + (dcn.unit || ''), { x: d.legendX + 3.8, y, w: d.legendValW, h: rowH, align: 'right',
+        s.addText(String(v) + (dcn.unit || ''), { x: d.legendX + 3.8, y, w: d.legendValW, h: legRowH, align: 'right',
           valign: 'middle', fontFace: STYLE.font, fontSize: sz(12), bold: true, color: STYLE.body });
-        s.addText((Math.round(v / sum2 * 1000) / 10) + '%', { x: d.legendPctX, y, w: d.legendPctW, h: rowH,
+        s.addText((Math.round(v / sum2 * 1000) / 10) + '%', { x: d.legendPctX, y, w: d.legendPctW, h: legRowH,
           align: 'right', valign: 'middle', fontFace: STYLE.font, fontSize: sz(10.5), color: STYLE.faint });
+      });
+      const dpY0 = legY0 + n * legRowH + 0.1;
+      const dpCap = Math.max(0, Math.floor((bodyBottom - dpY0) / dpRowH));
+      dpts.slice(0, dpCap).forEach((p, i) => {
+        const kk = Array.isArray(p) ? String(p[0] || '') : String((p && p.t) || '');
+        const vv = Array.isArray(p) ? String(p[1] || '')
+          : (p && typeof p === 'object' ? String(p.d || '') : String(p == null ? '' : p));
+        const py = dpY0 + i * dpRowH;
+        s.addShape('rect', { x: d.legendX, y: py + dpRowH / 2 - 0.06, w: 0.12, h: 0.12,
+          fill: { color: STYLE.accent }, line: { type: 'none' } });
+        s.addText([
+          { text: kk + (kk && vv ? '　' : ''), options: { fontSize: sz(12), bold: true, color: STYLE.ink } },
+          { text: vv, options: { fontSize: sz(11), color: STYLE.body } },
+        ], { x: d.legendX + 0.26, y: py, w: d.legendLabelW + d.legendValW - 0.3, h: dpRowH - 0.04,
+          fontFace: STYLE.font, valign: 'middle' });
       });
     }
   } else if (type === 'heatmap') {
@@ -2299,6 +2373,25 @@ CONTENT.sections.forEach((sec) => {
     const r = Math.ceil((cds.length || 1) / c);
     const gw = (creg.w - (c - 1) * cdC.gap) / c;
     const gh = fitRowH(creg.h - (r - 1) * cdC.gap, r, cdC.maxH, 0.6);
+    /* points 文本归一化（scaffold v9 契约 {title, points:[[k,v]]} 兼容三种形态） */
+    const cardPtText = (pt) => {
+      if (Array.isArray(pt)) {
+        const k = pt[0] == null ? '' : String(pt[0]);
+        const v = pt[1] == null ? '' : String(pt[1]);
+        return k && v ? ('· ' + k + '　' + v) : ('· ' + (k || v));
+      }
+      if (pt && typeof pt === 'object') {
+        return '· ' + String(pt.t || '') + (pt.d ? '　' + String(pt.d) : '');
+      }
+      return '· ' + String(pt == null ? '' : pt);
+    };
+    /* 有限缩字号：按最拥挤卡片的要点文本量统一选档（12 起阶梯下探），行距随字号等比；
+       取代无脑 autofit shrink，保证估算口径与渲染一致（TEXT_OVERFLOW_VERTICAL） */
+    const ptsBoxH = Math.max(0.4, gh - cdC.titleH - 0.34);
+    const ptsFzB = cds.length ? Math.min(...cds.map(cd =>
+      fitFont((cd.points || []).map(cardPtText), gw - 0.36, ptsBoxH,
+        { max: 12, lineFactor: 1.5, gapFactor: 0 }))) : 12;
+    const ptsFz = sz(ptsFzB);
     cds.forEach((cd, i) => {
       const col = i % c, row = Math.floor(i / c);
       const x = creg.x + col * (gw + cdC.gap), y = creg.y + row * (gh + cdC.gap);
@@ -2311,21 +2404,11 @@ CONTENT.sections.forEach((sec) => {
       s.addText(cd.title, { x: x + 0.18 + ico + 0.1, y: y + 0.14, w: gw - 0.36 - ico - 0.1, h: cdC.titleH, fontFace: STYLE.font,
         fontSize: sz(15), bold: true, color: STYLE.ink, fit: 'shrink' });
       /* points 兼容：[[k,v]…] | [str…] | [{t,d}…]（scaffold v9 契约 {title, points:[[k,v]]}） */
-      const ptLines = (cd.points || []).map(pt => {
-        if (Array.isArray(pt)) {
-          const k = pt[0] == null ? '' : String(pt[0]);
-          const v = pt[1] == null ? '' : String(pt[1]);
-          return k && v ? ('· ' + k + '　' + v) : ('· ' + (k || v));
-        }
-        if (pt && typeof pt === 'object') {
-          return '· ' + String(pt.t || '') + (pt.d ? '　' + String(pt.d) : '');
-        }
-        return '· ' + String(pt == null ? '' : pt);
-      });
+      const ptLines = (cd.points || []).map(cardPtText);
       s.addText(ptLines.map(t => ({ text: t + '\n',
-          options: { fontSize: sz(12), color: STYLE.body, fontFace: STYLE.font, breakLine: true } })),
-        { x: x + 0.18, y: y + 0.14 + cdC.titleH + 0.06, w: gw - 0.36, h: Math.max(0.4, gh - cdC.titleH - 0.34),
-          fontFace: STYLE.font, valign: 'top', lineSpacing: sz(12) * 1.5, fit: 'shrink' });
+          options: { fontSize: ptsFz, color: STYLE.body, fontFace: STYLE.font, breakLine: true } })),
+        { x: x + 0.18, y: y + 0.14 + cdC.titleH + 0.06, w: gw - 0.36, h: ptsBoxH,
+          fontFace: STYLE.font, valign: 'top', lineSpacing: ptsFz * 1.5 });
     });
   } else if (type === 'split') {
     /* 双区自由组合页：左区与右区各可为 要点 / 图表 / 表格 / 图片。

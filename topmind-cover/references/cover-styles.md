@@ -217,5 +217,144 @@
   Chinese title "{TITLE}" (exact), small dark-brown subtitle "{SUBTITLE}"
   below; right side an original playful IP character ({CHARACTER}, e.g. a
   beret-wearing fox painter at an easel, warm tones), vivid, ~35% of frame,
-  never covering text; bottom-right a small round seal with "{NUMBER}"; 
-...[truncated 3507 chars]
+  never covering text; bottom-right a small round seal with "{NUMBER}";
+  small vertical byline "{BYLINE}" at bottom-left. No other text. All text
+  within the central vertical 60% safe zone, landscape 16:9, 1200x675.
+  ```
+  占位符：`{SUBTITLE}` 副标题（≤12 字）、`{NUMBER}` 印章内数字（如"30天"，必须真实）、
+  `{BYLINE}` 边角署名（如"@阿狐画画"）、`{CHARACTER}` 原创趣味 IP 形象描述，
+  必须与主题道具绑定（如绘画主题 → 狐狸画家 + 画架），不得照抄任何现有 IP 形象。
+- **避坑**：
+  - 数字造假是红线：封面上的每个数字必须在正文中有出处。
+  - 形象是配角：超过画面 20% 或挡住标题字，整张作废。
+  - 印章和署名是注脚：别放大、别进主视觉流。
+
+---
+
+## 6. news-flash · 资讯快报
+
+- **适用场景**：资讯、快讯、热点解读、人物专访预告、"祛魅/揭秘"类选题。
+  示例图：`assets/examples/news-flash.png`（原创："今日AI速览" + 纸纹底 + 俯视桌面静物）。
+- **设计语言（抽象原则）**：
+  - 标题是绝对视觉重心：单色大字，一眼即主题，快讯的干脆来自"不加修饰"。
+  - 信息分层三层：顶部眉题小字（给栏目/时效）→ 中央大标题（给主题）→
+    右下角落生活静物（给"正在发生"的现场感）。
+  - 点缀手法：俯视桌面静物（报纸/咖啡/闹钟）给氛围，点缀不进文字区。
+  - 纸感来自质感：纸纹米底 + 大面积空旷，留白就是呼吸感。
+- **配色故事**：纸纹米 `#F4F1E8` 做主色（纸感、阅读感）；标题纯黑单色
+  （快讯的干脆，单色是本风格的魂）；静物保留真实色彩（红闹钟是唯一跳色，小面积）。
+- **标题写法规范**：
+  - 短标题 4~6 字，纯黑粗黑单行，如"今日AI速览"，字号约为画面高度 28%。
+  - 顶部眉题小字交代栏目/时效（如"晨间快讯 · 每日更新"），字号约为标题的 25%。
+  - 感叹号/问号至多一个；标题里不出现彩色字。
+- **prompt 配方**：
+  ```
+  中文：资讯快报风中文封面，纸纹米色（#F4F1E8）纸张质感背景，干净纸纹。
+  左上纯黑色超大粗黑中文标题"{TITLE}"（逐字准确），单行，干脆醒目；
+  标题上方顶部眉题小字"{EYEBROW}"；右下角俯视角度的桌面静物点缀
+  （{PROPS}，如一叠报纸、一杯冒热气的咖啡、一只红色小闹钟），
+  生动真实但不遮挡文字。除标题、眉题、静物外无其他文字；
+  所有文字与关键元素落在中央垂直60%安全区内，横构图16:9，尺寸1200×675。
+
+  EN: News-flash style Chinese cover, paper-textured warm beige (#F4F1E8)
+  background, clean paper grain. Huge solid-black bold Chinese title "{TITLE}"
+  (exact) at upper-left, single line, crisp and direct; small top eyebrow text
+  "{EYEBROW}" above the title; bottom-right a top-down desk still life
+  ({PROPS}, e.g. a stack of newspapers, a steaming coffee cup, a small red
+  alarm clock), vivid and real but never covering text. No other text. All
+  text and key elements within the central vertical 60% safe zone, landscape
+  16:9, 1200x675.
+  ```
+  占位符：`{EYEBROW}` 眉题（栏目/时效，≤10 字）、`{PROPS}` 桌面静物描述（2~3 件，
+  与主题相关，如报纸/咖啡/闹钟）。
+- **避坑**：
+  - 单色标题是铁律：标题里出现彩色字，本风格立刻变味。
+  - 静物是氛围组：超过 3 件或进文字区，整张作废。
+  - 眉题必须真实：写"每日更新"就要真有更新节奏，不做无答案的标题党。
+  - 纸纹底怕"脏"：要求"干净纸纹"，防模型加污渍/做旧。
+
+## 7. minimal · 极简留白
+
+- **适用场景**：随笔、书评、轻观点、生活感悟；公众号"轻阅读"类文章，
+  或系列中需要"呼吸感"的穿插封面。
+  示例图：`assets/examples/minimal.png`（原创："慢思考" + 水墨银杏叶点缀）。
+- **设计语言（抽象原则）**：
+  - 留白是主角：≥60% 空旷，呼吸感就是信息。
+  - 点缀手法：一处微小水墨笔触（银杏叶），细节精致、位置克制。
+  - 标题写法：小字号 + 字距拉宽，轻、慢、稳——"慢"的味道全在字距里。
+  - 元素总数 ≤2（点缀+标题），多一件都是负担。
+- **配色故事**：冷白 `#F5F6F4` 做主色（干净、冷静）；淡墨只做点缀；
+  标题用深灰，不用纯黑（纯黑太"重"，极简感全失）。
+- **标题写法规范**：
+  - 短标题 4~8 字，如"慢思考"；字距拉宽；字体用 Noto Sans SC Medium
+    （不用 Black，太重则极简感全失）。
+  - 不加副标题、不加标签条，克制到底。
+- **prompt 配方**：
+  ```
+  中文：极致极简主义封面，冷白色（#F5F6F4）背景，大面积留白。
+  画面右侧中央一处微小的水墨笔触（如一片精致的银杏落叶，淡墨色，细节细腻）；
+  左下角（中央垂直安全区内）深灰色小字号中文标题"{TITLE}"，字距拉宽，
+  呼吸感强，禅意，无其他元素；横构图16:9，尺寸1200×675，除标题外无其他文字。
+
+  EN: Extreme minimalism cover, cool-white (#F5F6F4) background with vast
+  empty space. One tiny ink-brush stroke (a delicate ginkgo leaf in light ink
+  wash, refined detail) near the center-right. Small dark-gray Chinese title
+  "{TITLE}" with wide letter-spacing at the lower-left corner. Calm, airy,
+  zen aesthetic, no other elements, landscape 16:9, 1200x675, no other text.
+  ```
+- **避坑**：
+  - 对"杂物"零容忍：prompt 明确"一处""微小""无其他元素"，防模型加云加山。
+  - 标题字别贪大：字一大立刻变大字报；字距不拉宽就失去"慢"的味道。
+  - 点缀和标题尽量往中央安全区放，防公众号裁剪吃掉左右留白。
+
+## 8. magazine · 杂志编辑风
+
+- **适用场景**：深度访谈、人物特写、商业分析、年度盘点；需要"质感/信任感"时用它，
+  公众号长文首选。
+  示例图：`assets/examples/magazine.png`（原创："创造者访谈" + 侧脸剪影 + 砖红细线）。
+- **设计语言（抽象原则）**：
+  - 质感来自克制：大面积留白 + 一条细色线，就是杂志感。
+  - 人物手法：侧脸剪影（泛指描述），给"人"的存在感但不抢标题。
+  - 信息分层两层：细色线（定调）→ 标题（给主题）。
+  - 同一色调只用一种底：浅底/深底不混用。
+- **配色故事**：暖灰 `#E9E5DB` 做主色（影棚质感）；砖红 `#A63A2A` 只做一条细线点睛；
+  标题炭黑，沉稳。
+- **标题写法规范**：
+  - 短标题 4~8 字，如"创造者访谈"；字体用 Noto Serif SC Bold（宋体感）或思源黑体 Bold。
+  - 标题上方一条砖红细线是杂志感的灵魂，别省略。
+- **prompt 配方**：
+  ```
+  中文：杂志编辑风封面，暖灰色（#E9E5DB）影棚质感背景，大面积留白。
+  右侧三分之一处黑白质感人物侧脸剪影（{SUBJECT}，泛指描述，
+  如穿西装的人物侧脸剪影），沉稳不抢戏；左侧下方（中央垂直安全区内）
+  炭黑色典雅粗体中文标题"{TITLE}"，标题上方一条砖红色（#A63A2A）细线；
+  克制高级，杂志封面美学，横构图16:9，尺寸1200×675，除标题外无其他文字。
+
+  EN: Editorial magazine style cover, warm-gray (#E9E5DB) studio-textured
+  background with generous negative space. Black-and-white profile silhouette
+  ({SUBJECT}, generic description, e.g. a suited figure in profile) in the
+  right third, calm and unobtrusive. Dark charcoal elegant bold Chinese title
+  "{TITLE}" at lower-left, with a thin brick-red (#A63A2A) rule line above it.
+  Refined, minimal, magazine cover aesthetic, landscape 16:9, 1200x675, no
+  other text.
+  ```
+  占位符：`{SUBJECT}` 人物泛指描述（职业/姿态，不得出现可识别的真实人物长相）。
+- **避坑**：
+  - 人物肖像必须用"泛指"描述，不得出现可识别的真实人物长相。
+  - 留白处别手痒加装饰字——杂志风的力量全在克制。
+  - 浅底版和深底版不要混用。
+
+---
+
+## 风格速查
+
+| 风格 | 一句话 | 标题字号占比 | 首选题材 |
+|---|---|---|---|
+| gan-huo | 深炭灰底 + 米白居中大标题 + 眉题 + 朱红印章 | ~30% | 干货清单/评测/盘点 |
+| big-type | 标题即画面：墨黑书法烫金字，奶油亮底 | 35%~45% | 观点/深度/发布宣言 |
+| brand-launch | 深海军蓝底 + 荧光绿细线 + 顶部居中品牌标题 | 20%~28% | 产品发布/版本更新 |
+| tutorial-steps | 宣纸底 + 墨色书法题字 + 底部横向时间线 | ~25% | 教程/上手指南 |
+| ip-fun | 暖橙底 + 深棕大标题 + 趣味 IP + 印章/署名注脚 | 数字进印章 | 实战案例/数据战报 |
+| news-flash | 纸纹米底 + 纯黑单色大标题 + 俯视桌面静物 | ~28% | 资讯/快讯/热点解读 |
+| minimal | 冷白大面积留白 + 水墨银杏叶 + 小字宽字距标题 | 8%~12% | 随笔/书评/轻观点 |
+| magazine | 暖灰底 + 侧脸剪影 + 砖红细线 + 宋体感标题 | 14%~20% | 访谈/人物特写/商业分析 |

@@ -1,5 +1,41 @@
+## [0.3.4] - 2026-09-29
+
+> **本版备发中**（未 push、未打 tag、npm 无此版本）。
+> 根包 0.3.3 → **0.3.4**（patch）；4 个技能 `version` 保持不动（top-ppt-html 0.1.19，其余 0.1.0）。
+> 注：0.3.2、0.3.3 均未发布，全部内容已并入本版。
+
+### top-ppt-html：全面审查 + 必要优化（第六轮）
+
+- **渲染管线实跑**：虚构测试稿走完 render → hydrate_charts → data URI 内联 → validate --strict
+  （95 PASS / 0 WARN / 0 FAIL）；故意注入 3 类缺陷（超大图片、布局溢出、空 alt）全部被抓；
+  PPTX 11 slides 实跑，16:9、微软雅黑、中文原生文本、原生图表，strict 0 error / 0 warning；
+  ELEMENT_OVERLAP / LAYOUT_FILL 门禁经真实 PPTX 注入验证有效。
+- **build_pptx.js 修 6 处**：KPI 竖分隔线越过注释带、KPI/donut/image 页 `sec.points` 被丢弃、
+  image 页图片底边越过注释带、cards 要点无脑 shrink 被 TEXT_OVERFLOW 抓、
+  points 纯字符串/`{t,d}` 形态渲染为空或 `[object Object]`。
+- **hydrate_charts.py**：空 labels/values、非数字 values、长度不一致原抛 Traceback，
+  现干净报错（`ChartDataError`，带 section 定位），禁静默截断。
+- **validate_report.py 修 2 处**：`alt=""` 视同缺失；图片体积按 data URI **解码后字节数**计量
+  （原按标签字符串长度，属 bug；级别保持 WARN，strict 已拦截）。
+- **SKILL.md/文档**：修 `（=?）` 编辑残留；README（中英）补 3 分钟最小示例；
+  修 13 处死引用（错乱脚本路径、`docs/archive/…` 改 `../docs/archive/…` 等）；
+  9 风格抽 3 套（品牌红/靛紫/光谱彩色）实跑渲染全部成功。
+- 零用户可见行为改动。遗留候选：render_from_model 不同步 style/theme（需产品决策）、
+  超长中文图表标签不截断、图片超限 WARN 不升级 FAIL、代码块页型缺失。
+
+### 全仓横扫（第六轮）
+
+- **修真 bug**：第五轮重写 `topmind-cover/references/cover-styles.md` 时把截断输出写进文件
+  （ip-fun 尾部丢失、news-flash/minimal/magazine 三节整节丢失），已按审计文档+样张实物补齐。
+- **docs/PUBLISHING.md**：补 HTTPS+PAT 推送方式（SSH 隧道被代理墙掐断后的实际走法；
+  GitHub git 接口不认 Bearer 只认 Basic）、tag↔package.json 校验、NPM_TOKEN/E409 加固的文档记载。
+- 三个新技能 README（中英）补版本号行；根 README.en 示例图体积与实测对齐（~8.9MB）。
+- 四技能 description 触发边界复核：互不重叠、无真空（"X 长文封面"良性重叠已写清委托关系）。
+- 隐私扫描 PASS（199 文件）；安装器四技能回归全过。
+
 ## [0.3.3] - 2026-09-29
 
+> **本版未发布**（备发中：未 push、未打 tag、npm 无此版本）。
 > 根包 0.3.2 → **0.3.3**（patch）；4 个技能 `version` 保持不动（top-ppt-html 0.1.19，其余 0.1.0）。
 > 注：0.3.2 未发布，已并入本版。
 

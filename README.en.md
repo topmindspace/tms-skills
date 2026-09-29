@@ -122,13 +122,13 @@ See [top-ppt-html/README.md](./top-ppt-html/README.md#html-header-toolbar) and [
 | [`topmind-x-article`](./topmind-x-article/) | **0.1.0** | X long-form one-click publish: Markdown → paste-ready plain text + cover + checklist |
 | [`topmind-cover`](./topmind-cover/) | **0.1.0** | Cover art for X / WeChat: striking, theme-focused; 8-style cover style library + 17 dual-size example images, size specs + crop tooling |
 
-Installer [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) is **0.3.3** (whole-repo same-tag releases).
+Installer [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) is **0.3.4** (whole-repo same-tag releases).
 
 ### topmind-cover · Cover style library
 
 Style index and the 8-grid overview are in the topmind-cover skill intro above.
 
-**Three steps to a cover**: ① pick 1 of 8 styles by topic → ② check the matching example in [`topmind-cover/assets/examples/`](./topmind-cover/assets/examples/) → ③ compose the prompt from that style's recipe in [`references/cover-styles.md`](./topmind-cover/references/cover-styles.md). 17 example images (8 styles × 1200×675 master + 900×383 WeChat center-crop + `overview.png` 8-grid overview, ~7.5MB) ship with the npm package; **safe-zone rule**: title text and key subject must stay inside the central vertical 60% safe zone.
+**Three steps to a cover**: ① pick 1 of 8 styles by topic → ② check the matching example in [`topmind-cover/assets/examples/`](./topmind-cover/assets/examples/) → ③ compose the prompt from that style's recipe in [`references/cover-styles.md`](./topmind-cover/references/cover-styles.md). 17 example images (8 styles × 1200×675 master + 900×383 WeChat center-crop + `overview.png` 8-grid overview, ~8.9MB) ship with the npm package; **safe-zone rule**: title text and key subject must stay inside the central vertical 60% safe zone.
 
 ## Install
 
@@ -138,7 +138,7 @@ Style index and the 8-grid overview are in the topmind-cover skill intro above.
 npx @topmindspace/tms-skills list
 npx @topmindspace/tms-skills install top-ppt-html
 npx @topmindspace/tms-skills install top-ppt-html --to ./.claude/skills
-npx @topmindspace/tms-skills@0.3.3 install top-ppt-html   # pin
+npx @topmindspace/tms-skills@0.3.4 install top-ppt-html   # pin
 ```
 
 ```bash

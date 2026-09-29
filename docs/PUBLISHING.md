@@ -12,12 +12,12 @@
 - 包：<https://www.npmjs.com/package/@topmindspace/tms-skills>
 - 仓库：<https://github.com/topmindspace/tms-skills>
 
-当前线：安装器 **0.3.3** · 技能 top-ppt-html **0.1.19** · topmind-wechat-post / topmind-x-article / topmind-cover **0.1.0**（整仓同 tag 发版；见 CHANGELOG）。
+当前线：安装器 **0.3.4** · 技能 top-ppt-html **0.1.19** · topmind-wechat-post / topmind-x-article / topmind-cover **0.1.0**（整仓同 tag 发版；见 CHANGELOG）。
 
 
 ## npm 2.x 弃用说明（仓库重置）
 
-npm 上的 `@topmindspace/tms-skills` **2.0.0–2.1.1 已弃用**（仓库重置前的过时线）；**不要安装 `^2`**。当前线是 **0.2.x**（`latest` 指向 0.2.x）。
+npm 上的 `@topmindspace/tms-skills` **2.0.0–2.1.1 已弃用**（仓库重置前的过时线）；**不要安装 `^2`**。当前线是 **0.3.x**（`latest` 指向 0.3.1）。
 
 若需重写弃用文案，维护者可在已 `npm login` 的机器上执行 `bash scripts/deprecate-npm-2x.sh`（one-shot `@2.x` + verify）。
 
@@ -35,7 +35,7 @@ npm 上的 `@topmindspace/tms-skills` **2.0.0–2.1.1 已弃用**（仓库重置
 
 ## 版本策略（务必遵守）
 
-**整仓同 tag**：`git tag vX.Y.Z` 的 `X.Y.Z` = 根 `package.json` 的 `version`（即安装器 version，如当前 v0.3.3）；tag 号不代表任何技能版本。**各技能 `version` 独立演进**（如 top-ppt-html 0.1.19、新技能 0.1.0），不与 tag 号绑定。
+**整仓同 tag**：`git tag vX.Y.Z` 的 `X.Y.Z` = 根 `package.json` 的 `version`（即安装器 version，如当前 v0.3.4）；tag 号不代表任何技能版本。**各技能 `version` 独立演进**（如 top-ppt-html 0.1.19、新技能 0.1.0），不与 tag 号绑定。
 
 | 包 | 事实源 | 规则 |
 |----|--------|------|
@@ -72,7 +72,23 @@ CI/Release 细节见 [`docs/ci.md`](./ci.md)。
    git tag vX.Y.Z
    git push origin main --tags
    ```
-   CI：门禁 → 技能 zip → GitHub Release → `npm publish`（版本已存在则跳过）→ prune Releases（留 2，tags 保留）。
+
+   > **推送方式（2026-09-29 起）**：SSH 隧道已被代理墙掐断（`ssh.github.com:443` 与 22 端口的
+   > CONNECT 均被 reset），改走 **HTTPS + PAT Basic 认证**推送：
+   > ```bash
+   > git -c "http.extraHeader=Authorization: Basic <base64(x-access-token:PAT)>" \
+   >   push https://github.com/topmindspace/tms-skills.git main
+   > ```
+   > 注意：① GitHub git 接口不认 `Bearer`，只认 Basic；② origin 是 SSH 地址时必须显式给 HTTPS URL；
+   > ③ PAT 为一次性 fine-grained token（仅本仓 Contents 读写），用完即弃，**不入库、不写进文档**。
+
+   Release workflow（`.github/workflows/release.yml`）按序执行：
+   - **tag ↔ `package.json` 交叉校验**：`vX.Y.Z` 必须等于根 `package.json` 的 `version`，不一致直接失败
+     （tag 号是安装器版本 ≠ 任何技能版本，见上文版本策略）。
+   - 门禁 → 技能 zip → GitHub Release。
+   - `npm publish`：先查 registry，版本已存在则跳过；**`NPM_TOKEN` 缺失 → 显式失败**（拒绝发无 npm 包的 Release）；
+     publish 命中 **E409 / 版本冲突 → 显式失败**（说明打 tag 前没 bump 版本；禁止复用 tag 号）。
+   - prune Releases（留最近 2 个；git tags 保留不删）。
 6. 验证：`npm view @topmindspace/tms-skills version`
 
 ### 手工 publish

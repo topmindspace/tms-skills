@@ -18,7 +18,7 @@ Plenty of PPT skills exist. This one is for **formal business presenting**: clea
 </p>
 
 - Skill id: `top-ppt-html`; brand: **TopPPT HTML**
-- Version: **v0.1.19** (same tag as `@topmindspace/tms-skills@0.3.3`)
+- Version: **v0.1.19** (same tag as `@topmindspace/tms-skills@0.3.4`)
 - **Agent entry**: `SKILL.md` → `references/playbook.md` (L1) → L2 on demand
 - **Human maintainers**: this README (install / commands / layout); do not treat it as the generation spec
 
@@ -73,10 +73,27 @@ Also: arrow-key paging; **Esc** closes modals. After style/theme change, re-run 
 
 ```bash
 npx @topmindspace/tms-skills install top-ppt-html
-npx @topmindspace/tms-skills@0.3.3 install top-ppt-html
+npx @topmindspace/tms-skills@0.3.4 install top-ppt-html
 npx github:topmindspace/tms-skills install top-ppt-html
 ```
 
 PPTX needs `npm install` in this folder (pptxgenjs). HTML generation: Python stdlib only.
+
+### Minimal example (~3 min)
+
+```bash
+cd top-ppt-html
+python3 scripts/scaffold_report.py --mode research --style mckinsey \
+  --title "Sample report" --sections 8 --out report.html
+# Open report.html, fill in window.REPORT_MODEL only (single source of truth), then:
+python3 scripts/render_from_model.py report.html --inplace
+python3 scripts/validate_report.py report.html --strict   # ship only at 0 errors / 0 warnings
+# For PPTX (after npm install):
+python3 scripts/extract_model.py report.html report.model.json
+node scripts/build_pptx.js report.pptx --model=report.model.json
+python3 scripts/validate_pptx.py report.pptx --strict --model=report.model.json
+```
+
+Swap modes: `--mode presentation --style business-blue` (A) / `--mode architecture --style graphite-dark` (C).
 
 Full Chinese maintainer docs (directory map, command cookbook): see [`README.md`](./README.md). Agent rules live in `SKILL.md` / `playbook.md`.

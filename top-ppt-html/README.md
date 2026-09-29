@@ -18,7 +18,7 @@
 </p>
 
 - 技能标识：`top-ppt-html`；品牌名：**TopPPT HTML**
-- 版本：**v0.1.19**（与 `@topmindspace/tms-skills@0.3.3` 同 tag）
+- 版本：**v0.1.19**（与 `@topmindspace/tms-skills@0.3.4` 同 tag）
 - **智能体入口**：`SKILL.md` → `references/playbook.md`（L1）→ L2 按需
 - **人类维护者**：本 README（安装 / 命令 / 目录）；勿把本文件当生成规范
 
@@ -120,6 +120,23 @@ npm install                  # 依 package.json 安装 pptxgenjs（^4）
 
 脚本会自动探测 Node 与 node_modules（`TOP_PPT_NODE_EXE` / `TOP_PPT_NODE_PATH` 环境变量 > `PATH` > 常见托管目录），不绑定任何机器的固定路径。参考图刷新（可选，非交付依赖）另需 playwright：`npm install playwright && npx playwright install chromium`。
 
+### 最小示例（复制即跑 · 约 3 分钟）
+
+```bash
+cd top-ppt-html
+python3 scripts/scaffold_report.py --mode research --style mckinsey \
+  --title "示例报告" --sections 8 --out report.html
+# 用浏览器打开 report.html，只填 window.REPORT_MODEL（内容唯一事实源），然后：
+python3 scripts/render_from_model.py report.html --inplace
+python3 scripts/validate_report.py report.html --strict   # 0 errors / 0 warnings 才交付
+# 要 PPTX 时（先 npm install 装好 pptxgenjs）：
+python3 scripts/extract_model.py report.html report.model.json
+node scripts/build_pptx.js report.pptx --model=report.model.json
+python3 scripts/validate_pptx.py report.pptx --strict --model=report.model.json
+```
+
+三模式速换：`--mode presentation --style business-blue`（A 演示）/ `--mode architecture --style graphite-dark`（C 架构）。完整工作流与门禁见「智能体视角」与 `references/playbook.md`。
+
 ### 用户视角（三步走）
 
 1. 对智能体说出意图（例：「帮我把这份调研做成一份咨询风格的研究报告」）
@@ -215,7 +232,7 @@ python scripts/check_triggers.py
 
 | 路径 | 用途 |
 |------|------|
-| `SKILL.md` | L0 路由（≤13KB）；智能体唯一入口 |
+| `SKILL.md` | L0 路由（约 16KB）；智能体唯一入口 |
 | `references/playbook.md` | L1 决策层（Mode / 路径 / V1–V4 / 组合 / 多样性摘要 / 命令 / 路由） |
 | `references/page-type-matrix.md` | L2 页型穷举表 |
 | `references/chart-decision-tree.md` | L2 图表决策树 + 七种误用 |

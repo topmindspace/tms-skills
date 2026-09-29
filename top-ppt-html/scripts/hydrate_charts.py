@@ -259,10 +259,41 @@ def svg_waterfall(labels, values, unit='') -> str:
             + '\n      '.join(parts) + '\n    </svg>')
 
 
-def build_svg(chart: dict) -> str:
+class ChartDataError(ValueError):
+    """图表数据非法：调用方应捕获并输出干净 FAIL（不打 Traceback）。"""
+
+
+def _coerce_values(values, ctx: str) -> list:
+    out = []
+    for i, v in enumerate(values):
+        try:
+            f = float(v)
+        except (TypeError, ValueError):
+            raise ChartDataError(f'{ctx}: values[{i}] 非数字（{str(v)[:40]!r}），无法绘制')
+        if f != f or f in (float('inf'), float('-inf')):
+            raise ChartDataError(f'{ctx}: values[{i}] 非有限数字，无法绘制')
+        out.append(f)
+    return out
+
+
+def validate_payload(chart: dict, ctx: str) -> tuple:
+    """校验图表数据：空数据/长度不一致/非数字一律干净报错，禁静默截断。"""
     ct = (chart.get('type') or 'bar').lower()
     labels = chart.get('labels') or []
     values = chart.get('values') or []
+    if not labels or not values:
+        raise ChartDataError(
+            f'{ctx}: labels/values 为空（labels={len(labels)} values={len(values)}），无法绘制 {ct} 图')
+    if len(labels) != len(values):
+        raise ChartDataError(
+            f'{ctx}: labels({len(labels)}) 与 values({len(values)}) 长度不一致，'
+            f'拒绝静默截断（{ct} 图）')
+    return list(labels), _coerce_values(values, ctx)
+
+
+def build_svg(chart: dict, ctx: str = '') -> str:
+    ct = (chart.get('type') or 'bar').lower()
+    labels, values = validate_payload(chart, ctx or f'图表({ct})')
     unit = chart.get('unit') or ''
     max_v = chart.get('max')
     if ct == 'hbar':
@@ -279,16 +310,17 @@ def build_svg(chart: dict) -> str:
 
 
 def iter_chart_payloads(model: dict):
-    """Yield chart dicts in document order (sections + split sides)."""
-    for sec in model.get('sections') or []:
+    """Yield (chart dict, context str) in document order (sections + split sides)."""
+    for si, sec in enumerate(model.get('sections') or []):
         st = (sec.get('type') or '').lower()
+        sctx = f'第{si + 1}节[{sec.get("title") or st}]'
         if st in ('bar', 'donut', 'exhibit', 'halftable') and sec.get('chart'):
             ch = dict(sec['chart'])
             if st == 'donut':
                 ch.setdefault('type', 'donut')
             elif not ch.get('type'):
                 ch['type'] = 'bar'
-            yield ch
+            yield ch, f'{sctx} 主图表'
         for side in ('left', 'right'):
             el = sec.get(side)
             if isinstance(el, dict) and el.get('labels') and el.get('values') is not None:
@@ -300,7 +332,7 @@ def iter_chart_payloads(model: dict):
                     'max': el.get('max'),
                     'centerLabel': el.get('centerLabel'),
                 }
-                yield ch
+                yield ch, f'{sctx} {side}区图表'
 
 
 def hydrate(html: str, model: dict) -> str:
@@ -311,7 +343,8 @@ def hydrate(html: str, model: dict) -> str:
         nonlocal idx
         if idx >= len(payloads):
             return m.group(0)
-        svg = build_svg(payloads[idx])
+        ch, ctx = payloads[idx]
+        svg = build_svg(ch, ctx)
         idx += 1
         return svg
 
@@ -330,7 +363,11 @@ def main() -> int:
         print('FAIL: no REPORT_MODEL')
         return 1
     model = json.loads(m.group(1))
-    new_html, n_ph, used, total = hydrate(html, model)
+    try:
+        new_html, n_ph, used, total = hydrate(html, model)
+    except ChartDataError as e:
+        print(f'FAIL: 图表数据非法——{e}')
+        return 1
     path.write_text(new_html, encoding='utf-8')
     left = new_html.count('见模型数据')
     print(f'hydrated placeholders={n_ph} used_payloads={used}/{total} remaining_placeholder={left}')

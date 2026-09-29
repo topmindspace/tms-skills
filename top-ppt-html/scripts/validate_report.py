@@ -28,6 +28,7 @@ research / architecture 仍须显式传 --layout-qa（不强制）。
 import sys
 import re
 import json
+import base64
 import hashlib
 from typing import Optional
 from html.parser import HTMLParser
@@ -1194,6 +1195,28 @@ def _img_srcs(img):
     return srcs
 
 
+def _img_alt_ok(tag: str) -> bool:
+    """alt 存在且非空（alt="" 视为缺失）。"""
+    m = re.search(r'alt\s*=\s*("([^"]*)"|\'([^\']*)\')', tag)
+    if not m:
+        return False
+    val = m.group(2) if m.group(2) is not None else m.group(3)
+    return bool(val and val.strip())
+
+
+def _data_uri_bytes(tag: str):
+    """解码 data: URI 的实际字节数；非 base64 或解码失败时回落为载荷字符数。"""
+    m = (re.search(r'src\s*=\s*"data:[^"\',]*,([^"]*)"', tag)
+         or re.search(r"src\s*=\s*'data:[^\"\',]*,([^']*)'", tag))
+    if not m:
+        return None
+    payload = re.sub(r'\s', '', m.group(1))
+    try:
+        return len(base64.b64decode(payload))
+    except Exception:
+        return len(payload)
+
+
 def _check_media(txt, chk, model):
     """素材图片与配图占位：零外链铁律（<img> 只允许 data: 内联或相对路径）；
     alt 可访问性；配图占位必须有可见标签；模型 image 三选一（src/items/placeholder）
@@ -1203,13 +1226,15 @@ def _check_media(txt, chk, model):
         bad = [t for t in imgs if re.search(r'src\s*=\s*["\']\s*(?:https?:)?//', t)]
         chk("图片源无外链（data: 内联或相对路径，零外链铁律）", not bad,
             f"{len(bad)} 处外链图片" if bad else "")
-        noalt = [t for t in imgs if 'alt=' not in t]
+        noalt = [t for t in imgs if not _img_alt_ok(t)]
         chk("图片均带 alt（可访问性）", not noalt,
-            f"{len(noalt)} 处缺 alt" if noalt else "", level="WARN")
+            f"{len(noalt)} 处缺 alt（含空 alt)" if noalt else "", level="WARN")
         data_imgs = [t for t in imgs if re.search(r'src\s*=\s*["\']\s*data:', t)]
-        inline_bytes = sum(len(t) for t in data_imgs)
-        chk("单图 data: 内联体积在上限内", all(len(t) <= IMAGE_MAX_INLINE for t in data_imgs),
-            f"最大 {max((len(t) for t in data_imgs), default=0) // 1024}KB > 上限 {IMAGE_MAX_INLINE // 1024}KB",
+        data_sizes = [(_data_uri_bytes(t), t) for t in data_imgs]
+        max_bytes = max((b or 0 for b, _ in data_sizes), default=0)
+        inline_bytes = sum(b if b is not None else len(t) for b, t in data_sizes)
+        chk("单图 data: 内联体积在上限内", all((b or 0) <= IMAGE_MAX_INLINE for b, _ in data_sizes),
+            f"最大 {max_bytes // 1024}KB > 上限 {IMAGE_MAX_INLINE // 1024}KB（按解码后字节计）",
             level="WARN")
         chk("报告内联图片总量在上限内", inline_bytes <= IMAGE_MAX_TOTAL,
             f"{inline_bytes // 1024}KB > 上限 {IMAGE_MAX_TOTAL // 1024}KB（改用相对路径）",

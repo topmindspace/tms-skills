@@ -120,7 +120,7 @@ author: TopMindspace
 | **T** | 亮暗 | 按文件记忆；同步 `REPORT_MODEL.theme` |
 | 9 套 | 风格 | 实时换肤；交付前写回 `REPORT_MODEL.style` |
 | **P** | 预览 PPTX | 页序列 + 精导提示词 |
-| **H** | 生成指引 | 双通道说明（=?） |
+| **H** | 生成指引 | 双通道说明（页面预览 vs 智能体精导） |
 | **F**/**B** | 全屏/折叠 | 沉浸演示；迷你条记忆 |
 | 方向键/**Esc** | 翻页/关模态 | PPT 式翻页 |
 
@@ -139,4 +139,4 @@ author: TopMindspace
 - **PPTX 精导**：Node + pptxgenjs（`TOP_PPT_NODE_EXE`/`TOP_PPT_NODE_PATH`；见 `pptx-export.md`）。
 - **硬门禁**：标签泄漏/空页/极偏图/简单大图 → `layout-constants.json` + `failure-modes.md`。
 - **可选**：页高/裁切与参考图重生成需 playwright（`regression.py` 探测，缺失跳过）。
-- **回归 / 自检**：`regression.py`；`audit_skill/docs/styles/css.py`。
+- **回归/自检**：`regression.py`、`audit_*.py`。

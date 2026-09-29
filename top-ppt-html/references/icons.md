@@ -2,7 +2,7 @@
 
 > **何时读**：需要卡片头 / 列表行首 / 指标角标 / 提示条图标时。  
 > **取码**：本节「高频取码」或 `python scripts/extract_snippet.py --task icons`。  
-> **完整 SVG 枚举**（60+）：`docs/archive/refs/icons-catalog.md`（生成默认**不**预读；仅当高频未覆盖语义时按名查阅）。
+> **完整 SVG 枚举**（60+）：`../docs/archive/refs/icons-catalog.md`（生成默认**不**预读；仅当高频未覆盖语义时按名查阅）。
 
 全部 24×24、描边（stroke 1.8，圆角线帽），`currentColor` 随主题变色。
 
@@ -192,4 +192,4 @@
 
 ---
 
-> 包内 `icons.md` 保持 REQUIRED（语义 + 禁区 + 尺寸 + 高频码）。完整枚举见 `docs/archive/refs/icons-catalog.md`；默认生成**不**预读归档。
+> 包内 `icons.md` 保持 REQUIRED（语义 + 禁区 + 尺寸 + 高频码）。完整枚举见 `../docs/archive/refs/icons-catalog.md`；默认生成**不**预读归档。
