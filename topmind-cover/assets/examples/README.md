@@ -1,29 +1,37 @@
 # 封面风格示例图
 
-6 种风格 × 2 种尺寸 = 12 张示例（共约 6.4MB，随 npm 包发布，npx 安装即得）：
+8 种风格 × 2 种尺寸 = 16 张示例（共约 7.5MB，随 npm 包发布，npx 安装即得），
+另附 `overview.png`（8 宫格总览，2360×854）。
 
 - `<style>.png`（1200×675，X 长文封面 / 公众号共用主尺寸）
 - `<style>-wechat.png`（900×383，公众号封面大图，`scripts/crop-cover.py` 中央裁剪版）
+- `overview.png`（8 宫格总览：2 行 × 4 列缩略图 + 风格名标注，选风格时先看它）
 
 | 文件 | 风格 | 适用场景（一句话） |
 |------|------|--------------------|
-| `big-poster.png` / `big-poster-wechat.png` | 震撼大字报 | 观点评论、行业观察、热点快评，"一句话立场"类文章默认选它 |
-| `tech-future.png` / `tech-future-wechat.png` | 科技未来感 | AI/大模型/智能体/前沿技术题材，X 长文科技类默认风格 |
-| `magazine.png` / `magazine-wechat.png` | 杂志编辑风 | 深度访谈、人物特写、商业分析，需要质感与信任感时用它 |
-| `minimal.png` / `minimal-wechat.png` | 极简留白 | 随笔、书评、轻观点，给版面"呼吸感"的穿插封面 |
-| `guochao.png` / `guochao-wechat.png` | 国潮插画 | 传统文化、历史、节气、非遗、国货品牌，节日特辑首选 |
-| `cyber-glitch.png` / `cyber-glitch-wechat.png` | 赛博故障艺术 | 网络文化、赛博朋克、前沿实验，年轻化/亚文化话题 |
+| `gan-huo.png` / `gan-huo-wechat.png` | 爆款干货 | 干货清单、评测、盘点、实测筛选；"我替你试完了/筛完了"类第一人称实测文默认选它 |
+| `big-type.png` / `big-type-wechat.png` | 巨字宣言 | 观点评论、深度长文、产品/版本发布宣言；"一句话立场"类文章默认选它 |
+| `brand-launch.png` / `brand-launch-wechat.png` | 品牌发布 | 产品发布、版本更新、官方最佳实践/白皮书；有明确品牌主体的内容首选 |
+| `tutorial-steps.png` / `tutorial-steps-wechat.png` | 教程步骤 | 教程、上手指南、分步实操、保姆级攻略 |
+| `ip-fun.png` / `ip-fun-wechat.png` | IP 趣味 | 实战案例、数据战报、复盘、系列连载（上/下篇） |
+| `news-flash.png` / `news-flash-wechat.png` | 资讯快报 | 资讯、快讯、热点解读、人物专访预告、"祛魅/揭秘"类选题 |
+| `minimal.png` / `minimal-wechat.png` | 极简留白 | 随笔、书评、轻观点、生活感悟；公众号"轻阅读"类文章 |
+| `magazine.png` / `magazine-wechat.png` | 杂志编辑 | 深度访谈、人物特写、商业分析、年度盘点；需要"质感/信任感"时用它 |
 
 详细配方（配色 hex / 字体 / 中英 prompt / 避坑）见 `../references/cover-styles.md`。
 
 ## 安全区说明（重要）
 
-所有示例的标题字都落在**中央垂直 60% 安全区**内——这正是 `900×383` 中央裁剪版标题不被裁掉的原因。
+所有示例的标题字与关键元素都落在**中央垂直 60% 安全区**（画面垂直 20%~80%）内——
+这正是 `900×383` 中央裁剪版（保留画面垂直 21.6%~78.4%）标题不被裁掉的原因。
 自己组 prompt 时务必遵守：标题/关键主体不得超出上下各 13% 的禁区，否则公众号版会被切掉。
-反例：标题压在顶部 15% 处时，`-wechat.png` 里只剩半截字（第一版 tech-future/guochao 示例即如此，已修正）。
+反例：胶囊标签条/副标题横条压在底部 85% 以下时，`-wechat.png` 里会只剩半截或完全消失
+（本轮重制时 gan-huo / big-type / brand-launch / tutorial-steps 均因此返工过）。
 
 ## 复用声明
 
 **示例图可直接拿去用/改，作封面底图或风格参考。**
 拿去用时建议按 `scripts/crop-cover.py` 的流程重新裁剪双尺寸并按包规约命名落盘；
 改图时保留原风格的配色与版式语言，只换主体与标题字，以维持系列感。
+注意：示例标题均为虚构演示文案（如"星火最佳实践""100天"），直接复用前请换成自己的真实标题；
+凡封面上的数字必须在正文中有出处，严禁编造数据。

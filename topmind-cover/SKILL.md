@@ -29,6 +29,25 @@ updated: 2026-09-29
 标题/主题 → 风格模板 → 生成 → 检查 → 裁剪双尺寸 → 落盘命名
 ```
 
+## 风格样张
+
+<p align="center">
+  <img src="https://github.com/topmindspace/tms-skills/raw/main/topmind-cover/assets/examples/overview.png" alt="topmind-cover · 8 封面风格总览" width="960" />
+</p>
+
+| 风格 | 适用场景 |
+|------|----------|
+| 爆款干货 `gan-huo` | 干货清单、评测、盘点、实测筛选；"我替你试完了/筛完了"类第一人称实测文默认选它 |
+| 巨字宣言 `big-type` | 观点评论、深度长文、产品/版本发布宣言；"一句话立场"类文章默认选它 |
+| 品牌发布 `brand-launch` | 产品发布、版本更新、官方最佳实践/白皮书；有明确品牌主体的内容首选 |
+| 教程步骤 `tutorial-steps` | 教程、上手指南、分步实操、保姆级攻略 |
+| IP 趣味 `ip-fun` | 实战案例、数据战报、复盘、系列连载（上/下篇） |
+| 资讯快报 `news-flash` | 资讯、快讯、热点解读、人物专访预告、"祛魅/揭秘"类选题 |
+| 极简留白 `minimal` | 随笔、书评、轻观点、生活感悟；公众号"轻阅读"类文章 |
+| 杂志编辑 `magazine` | 深度访谈、人物特写、商业分析、年度盘点；需要"质感/信任感"时用它 |
+
+单风格大图：`assets/examples/<style>.png`；配方：`references/cover-styles.md`。
+
 ## 尺寸表
 
 | 平台 | 尺寸 | 比例 | 备注 |
@@ -41,7 +60,7 @@ updated: 2026-09-29
 ## 工作流
 
 0. **选风格（三步，必做）**：
-   ① 按题材从 `references/cover-styles.md` 选 1 种风格（6 选 1）；
+   ① 按题材从 `references/cover-styles.md` 选 1 种风格（8 选 1）；
    ② 看 `assets/examples/<style>.png` 示例图，确认视觉语言符合预期；
    ③ 按该风格的 prompt 配方组 prompt（把 `{TITLE}` 换成实际标题）。
    示例清单见 `assets/examples/README.md`。

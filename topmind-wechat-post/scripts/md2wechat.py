@@ -880,6 +880,10 @@ def resolve_image(src, md_path, out_dir, assets, asset_root):
         if os.path.exists(candidate):
             abs_path = candidate
     if not os.path.exists(abs_path):
+        # 本地文件缺失：登记缺失记录再返回原 src（HTML 保留占位 <img>，
+        # embed 会跳过并提示"未内嵌"，上传清单与计数也不会漏掉这一项）
+        assets.append({"src": src, "local": None, "remote": False,
+                       "missing": True})
         return src
     img_dir = os.path.join(out_dir, "images")
     os.makedirs(img_dir, exist_ok=True)
@@ -1435,9 +1439,12 @@ def write_manifest(out_dir, slug, title, assets, diagrams, theme, footnotes,
                 size = "%.0f KB" % kb if kb < 1024 else "%.1f MB" % (kb / 1024)
             if a.get("remote"):
                 lines.append("| %d | %s（远程） | %s | `%s` |" % (idx, a["src"], size, a["src"]))
+            elif a.get("missing"):
+                lines.append("| %d | ⚠ 本地文件缺失：`%s` | — | `%s` |"
+                             % (idx, a["src"], a["src"]))
             else:
                 lines.append("| %d | `%s` | %s | `%s` |"
-                             % (idx, a.get("basename", ""), size, a["src"]))
+                             % (idx, a.get("basename") or "", size, a["src"]))
         lines.append("")
         lines.append("图片目录：`images/`（公众号单图建议 < 2 MB，宽度 1080 px 左右）")
         lines.append("")
