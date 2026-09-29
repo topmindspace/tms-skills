@@ -48,6 +48,9 @@ Input `demo.md` (9 lines):
     ![diagram](images/a.png)
 
 ```bash
+# first drop a real image at images/a.png next to demo.md (missing files land in the
+# checklist as "not embedded" and will be lost on paste)
+mkdir -p images && cp /path/to/your-image.png images/a.png
 python3 scripts/md2wechat.py --input demo.md --out-dir demo --slug demo --embed-images
 ```
 
@@ -69,7 +72,7 @@ Also generated: `demo/图片上传清单.md` — the upload checklist for images
 | `--input` / `--out-dir` / `--slug` | Required: input md, output dir, filename slug |
 | `--embed-images` | Inline images as base64 (mandatory, or pasted images go missing) |
 | `--theme` | Theme id / Chinese name / JSON path, or `genre:<topic>` for auto-pick; `--list-themes` shows all |
-| `--link-mode` | `footnote` (default: links → end-of-article footnotes) / `inline` (parenthesized) / `note` |
+| `--link-mode` | Link rendering: `footnote` (default: superscript `[n]` + end-of-article "参考链接") / `inline` (label normal, URL gray: `文字（url）`) / `note` (whole block gray small text: `文字（url）`) |
 | `--asset-root` | Asset root dir, resolves `../assets/`-style image paths in the draft |
 | `--no-toc` | Skip the auto-inserted "本文看点" reading guide |
 | `--signature` / `--author` / `--author-bio` | Closing signature: `auto` (default, skipped if the draft has one) / `on` / `off`, name and bio |

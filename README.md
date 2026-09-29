@@ -35,7 +35,7 @@ npx @topmindspace/tms-skills install topmind-x-article
 
 ### topmind-cover · 封面配图生成
 
-X 长文与公众号共用的封面图：震撼、醒目、主题突出。内置 **8 种封面风格库**（爆款干货 / 巨字宣言 / 品牌发布 / 教程步骤 / IP 趣味 / 资讯快报 / 极简留白 / 杂志编辑，含适用场景、配色 hex、字体建议、中英 prompt 配方）+ **17 张双尺寸示例图**（`assets/examples/`，随包发布）：**选风格 → 看示例 → 按配方组 prompt** 三步出图，`crop-cover.py` 一键裁出双平台尺寸（X 1200×675、公众号 900×383）。
+X 长文与公众号共用的封面图：震撼、醒目、主题突出。内置 **8 种封面风格库**（爆款干货 / 巨字宣言 / 品牌发布 / 教程步骤 / IP 趣味 / 资讯快报 / 极简留白 / 杂志编辑，含适用场景、配色故事、抽象设计原则、中英 prompt 配方）+ **17 张双尺寸示例图**（`assets/examples/`，随包发布）：**选风格 → 看示例 → 按配方组 prompt** 三步出图，`crop-cover.py` 一键裁出双平台尺寸（X 1200×675、公众号 900×383）。
 
 ```bash
 npx @topmindspace/tms-skills install topmind-cover
@@ -57,6 +57,8 @@ npx @topmindspace/tms-skills install topmind-cover
 | 资讯快报 `news-flash` | 资讯、快讯、热点解读、人物专访预告、"祛魅/揭秘"类选题 |
 | 极简留白 `minimal` | 随笔、书评、轻观点、生活感悟；公众号"轻阅读"类文章 |
 | 杂志编辑 `magazine` | 深度访谈、人物特写、商业分析、年度盘点；需要"质感/信任感"时用它 |
+
+> **原创声明**：16 张示例图均为原创设计，仅用于演示 8 种风格的抽象设计原则（标题是视觉重心、信息分层、留白呼吸感、数字与关键词的强调手法），不临摹任何第三方封面的版式与配色；图中标题、数字、品牌、署名均为虚构演示内容，版式与配色亦不得与第三方封面构成实质相似——只学原则，不学版式。
 
 > 让 idea 飞，好想法被看见。
 
@@ -118,13 +120,13 @@ npx @topmindspace/tms-skills install topmind-cover
 | [`topmind-x-article`](./topmind-x-article/) | **0.1.0** | X 长文一键发布：Markdown 原稿转可直接粘贴的纯文本 + 封面图 + 发布清单 |
 | [`topmind-cover`](./topmind-cover/) | **0.1.0** | 文章封面配图（X / 公众号共用）：震撼醒目主题突出；8 风格封面风格库 + 17 张双尺寸示例图，尺寸规范 + 裁剪落盘 |
 
-安装器 [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) 为 **0.3.2**（整仓同 tag 发版）。
+安装器 [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) 为 **0.3.3**（整仓同 tag 发版）。
 
 ### topmind-cover · 封面风格库
 
 风格索引与 8 宫格总览样张见上文 topmind-cover 技能介绍处。
 
-**三步出图**：① 按题材从 8 风格选 1 → ② 看 [`topmind-cover/assets/examples/`](./topmind-cover/assets/examples/) 对应示例图 → ③ 按 [`references/cover-styles.md`](./topmind-cover/references/cover-styles.md) 该风格的 prompt 配方组 prompt。17 张示例图（8 风格 × 1200×675 主图 + 900×383 公众号中央裁剪版 + `overview.png` 8 宫格总览，约 7.5MB）随 npm 包发布；**安全区铁律**：标题字与关键主体必须落在画面中央垂直 60% 安全区内。
+**三步出图**：① 按题材从 8 风格选 1 → ② 看 [`topmind-cover/assets/examples/`](./topmind-cover/assets/examples/) 对应示例图 → ③ 按 [`references/cover-styles.md`](./topmind-cover/references/cover-styles.md) 该风格的 prompt 配方组 prompt。17 张示例图（8 风格 × 1200×675 主图 + 900×383 公众号中央裁剪版 + `overview.png` 8 宫格总览，约 8.9MB）随 npm 包发布；**安全区铁律**：标题字与关键主体必须落在画面中央垂直 60% 安全区内；**原创铁律**：版式与配色不得与第三方封面构成实质相似，只学原则不学版式，样张标题/数字/品牌均为虚构演示。
 
 ## 安装
 
@@ -134,7 +136,7 @@ npx @topmindspace/tms-skills install topmind-cover
 npx @topmindspace/tms-skills list
 npx @topmindspace/tms-skills install top-ppt-html
 npx @topmindspace/tms-skills install top-ppt-html --to ./.claude/skills
-npx @topmindspace/tms-skills@0.3.2 install top-ppt-html   # 钉版本
+npx @topmindspace/tms-skills@0.3.3 install top-ppt-html   # 钉版本
 ```
 
 ```bash

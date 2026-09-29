@@ -8,9 +8,12 @@ triggers:
   - 发 X 文章
   - X article
   - 长文发 X
+  - X 发长文
 triggers_cn:
   - 写 X 长文
   - X 长文发布
+  - 推特长文
+  - twitter 长文
 author: TopMindspace
 license: MIT
 homepage: https://github.com/topmindspace/tms-skills#readme

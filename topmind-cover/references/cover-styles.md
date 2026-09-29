@@ -4,353 +4,218 @@
 选风格三步走：**先选风格 → 看 `assets/examples/` 对应示例图 → 按本库配方组 prompt**。
 
 每种风格的 prompt 配方都是中英双语模板：`{TITLE}` 为标题文字占位符（短标题 4~8 字）、
-`{KEYWORDS}` 为需要彩色突出的数字/关键词占位符，其余占位符见各风格说明。
-尺寸固定 1200×675、横构图 16:9。标题字逐字写进 prompt；生成后第一件事就是检查标题字。
+其余占位符见各风格说明。尺寸固定 1200×675、横构图 16:9。标题字逐字写进 prompt；
+生成后第一件事就是检查标题字。
 
 ## 安全区铁律（所有风格通用）
 
 900×383 公众号版是从 1200×675 主图**中央裁剪**（上下各裁约 12.2%）：
 **标题字与关键主体必须落在画面中央垂直 60% 安全区内**
 （上下各预留 20% 不放标题字），否则公众号版会被裁掉。
-选风格、组 prompt、检查成图时都要先过这一条；以下各风格的标题位置描述
-均已按此约束书写。
+选风格、组 prompt、检查成图时都要先过这一条。
 
 ## 原创铁律（所有风格通用）
 
-本库的 prompt 配方是**设计语言**（构图公式、配色、文字层级、安全区），不是文案模板：
-**禁止照抄任何第三方封面的文案与形象**——包括但不限于标题文字、数字、品牌词、
-IP 形象、署名。`assets/examples/` 中的 16 张示例图均为原创设计，
-其标题/数字/品牌/署名（如"星尘 OS 3.0""7天玩转提示词""30天AI绘画挑战""@阿狐画画"）
-均为虚构演示内容，仅用于演示设计语言。
-用本库组 prompt 时，标题与形象必须自己原创；改图时只换主体与标题字，
-保留原风格的配色与版式语言。
+本库的 prompt 配方沉淀的是**抽象设计原则**——标题是视觉重心、信息分层、
+留白与呼吸感、数字与关键词的强调手法——**不是任何具体版式**。
+**版式与配色也不得与第三方封面构成实质相似：只学原则，不学版式。**
+禁止照抄任何第三方封面的文案、形象、版式结构与配色组合——包括但不限于
+标题文字、数字、品牌词、IP 形象、署名，以及"左文右图""底部标签条""两行撞色标题"
+这类可辨识的构图公式。`assets/examples/` 中的 16 张示例图均为原创设计，
+其标题/数字/品牌/署名（如"深蓝 OS 2.0""提示词避坑指南""AI绘画挑战营""@阿狐画画"）
+均为虚构演示内容，仅用于演示设计原则。
+用本库组 prompt 时，标题、形象、版式细节必须自己原创；
+改图时只换主体与标题字，保留本风格的配色故事与设计原则。
 
 ---
 
 ## 1. gan-huo · 爆款干货
 
 - **适用场景**：干货清单、评测、盘点、实测筛选类文章；"我替你试完了/筛完了"这类
-  第一人称实测文的默认选择。示例图：`assets/examples/gan-huo.png`（原创：纸飞机机器人 + "7天玩转提示词"）。
-- **构图公式**：左右分区。左侧 60% 为文案堆叠区（自上而下：短引子行 → 巨型标题 →
-  底部胶囊标签条）；右侧 40% 为原创 IP 形象（与主题相关的原创小形象，如纸飞机造型
-  机器人抱着提示词卡片），形象顶部不超过标题区、不遮挡任何文字。标题字占画面高度 25%~32%。
-- **配色方案**：暖白底 `#FFF9F0`（或米白 `#FAF6EF`）；主标题炭黑 `#1A1A1A`；
-  数字/品牌词用亮蓝 `#2B7FFF`；篇数类数字可用橙红 `#FF4D2E`；
-  关键词下垫黄色笔刷底 `#FFD23F`；底部标签条为蓝色胶囊 `#2B7FFF` 配白字。
+  第一人称实测文的默认选择。示例图：`assets/examples/gan-huo.png`（原创："提示词避坑指南"）。
+- **设计语言（抽象原则）**：
+  - 标题是绝对视觉重心：居中大字，一眼即主题。
+  - 信息分层三层：顶部眉题小字（给上下文）→ 中央大标题（给主题）→ 角落印章小数字（给数据点）。
+  - 数字强调手法：数字不做彩色大字，收进印章/徽章做"小而精"的点睛。
+  - 留白与呼吸感：深色底 + 大面积空旷，克制干练。
+- **配色故事**：深炭灰 `#2B2B30` 做主色（沉稳、可信）；暖橙 `#FF8A3D` 只做细线点缀；
+  朱红印章做一处跳色；标题米白高对比。
 - **标题写法规范**：
-  - 短标题 4~8 字，如"7天玩转提示词"；上方加 1~2 行引子小字
-    （如"12种写法逐条实测"），引子字号约为标题的 55%。
-  - 数字必须放大并上色："7天"中的 7 用亮蓝；关键词下可垫黄色笔刷底 `#FFD23F`。
-  - 底部标签条：蓝色圆角胶囊，内放 3 个标签，格式 `⚡四字词 | 📋四字词 | 📊四字词`
-    （如"实测筛选 | 模板直拿 | 避坑清单"），字号约为标题的 30%。
+  - 短标题 4~8 字，如"提示词避坑指南"；标题居中，字号约为画面高度 30%。
+  - 顶部眉题小字交代筛选口径（如"12种写法 · 逐条实测"），字号约为标题的 30%。
+  - 数据（如"18篇"）放右上角朱红印章内，白字，不放大。
 - **prompt 配方**：
   ```
-  中文：爆款干货风中文封面，暖白色干净背景，左侧文案区：上方小字引子行，
-  中央巨型炭黑色粗黑标题"{TITLE}"，其中数字与关键词"{KEYWORDS}"用亮蓝色与橙红色突出，
-  关键词下方垫黄色笔刷底色；底部一条蓝色圆角胶囊标签条；右侧一只毛茸茸的可爱
-  IP 萌物抱着与主题相关的物品，萌物占画面右侧三分之一、不遮挡文字，
-  画面中央垂直安全区内，星星小点缀，亲切活泼，横构图16:9，尺寸1200×675。
+  中文：爆款干货风中文封面，深炭灰色（#2B2B30）背景，暖橙色（#FF8A3D）细线点缀。
+  中央米白色超大粗黑中文标题"{TITLE}"（逐字准确），居中构图；标题上方顶部眉题小字"{EYEBROW}"；
+  右上角一枚朱红色方形印章，内写白色小字"{NUMBER}"；左侧一只小尺寸原创小形象
+  （{CHARACTER}，占画面约15%，小巧不抢戏）。除标题、眉题、印章、形象外无其他文字；
+  所有文字与关键元素落在中央垂直60%安全区内，克制干练，横构图16:9，尺寸1200×675。
 
-  EN: Chinese viral-listicle style cover, clean warm-white background. Left
-  text zone: small intro lines on top, giant bold charcoal-black Chinese
-  title "{TITLE}" at center, with numbers and keywords "{KEYWORDS}" highlighted
-  in bright blue and orange-red, a yellow brush stroke behind keywords; a blue
-  rounded capsule tag bar at the bottom. On the right third, a fluffy cute IP
-  mascot holding a theme-related item, never overlapping the text. All key
-  elements within the central vertical safe zone, tiny star accents, friendly
-  and lively, landscape 16:9, 1200x675.
+  EN: Chinese viral-listicle style cover, deep charcoal-gray (#2B2B30)
+  background with thin warm-orange (#FF8A3D) line accents. Huge off-white bold
+  Chinese title "{TITLE}" (exact) centered, ~30% of frame height; small top
+  eyebrow text "{EYEBROW}" above the title; a small vermilion square seal at
+  top-right with white text "{NUMBER}"; a small original mascot ({CHARACTER},
+  ~15% of frame) on the left, tiny and unobtrusive. No other text. All text
+  and key elements within the central vertical 60% safe zone, restrained and
+  crisp, landscape 16:9, 1200x675.
   ```
-  占位符：`{CHARACTER}` 为原创 IP 形象描述（如"纸飞机造型蓝色小机器人抱着提示词卡片"），
-  必须与文章主题相关，且不得照抄任何现有 IP 形象。
+  占位符：`{EYEBROW}` 眉题（≤10 字）、`{NUMBER}` 印章内数字（如"18篇"，必须真实）、
+  `{CHARACTER}` 原创小形象描述（如"纸飞机造型蓝色小机器人"），不得照抄任何现有 IP 形象。
 - **避坑**：
-  - 萌物是配角：占画面不超过 40%，一旦挡住标题字整张作废。
-  - 彩色字不要超过 2 种颜色，三色以上立刻变杂。
-  - 胶囊标签条必须整体落在中央安全区内，上下留白防裁切。
-  - 元素总数 ≤5（引子+标题+标签条+萌物+小点缀），多一件都是负担。
+  - 数字放大上色是旧套路：本风格数字只进印章，标题里不再出现彩色大数字。
+  - 形象是配角：超过画面 20% 或挡住标题字，整张作废。
+  - 元素总数 ≤4（眉题+标题+印章+形象），多一件都是负担。
 
 ## 2. big-type · 巨字宣言
 
 - **适用场景**：观点评论、深度长文、产品/版本发布宣言；"一句话立场"类文章的默认选择。
-  示例图：`assets/examples/big-type.png`（原创："AI效率/手册" + 抽象光影几何背景）。
-- **构图公式**：标题即画面。巨型标题字占画面高度 35%~45%，横跨画面三分之二以上，
-  分两行：上行关键词（白色或黑色），下行宣言（品牌色/红色，可做 3D 立体字）；
-  背景为抽象光影几何或空间纵深（不要人物推书这类具象叙事场景）；
-  底部一条白色横条放问题式副标题，横条整体落在中央安全区内。
-- **配色方案**：深底版：近黑 `#101014` 底 + 纯白 `#FFFFFF` 字 + 强调红 `#E63B2E`
-  （或品牌色）；浅底版：白底 + 黑字 + 红字。同一系列固定一种底色。
+  示例图：`assets/examples/big-type.png`（原创："慢即是快"）。
+- **设计语言（抽象原则）**：
+  - 标题即画面：单行超大，字形本身做文章（书法笔意 / 描边 / 烫金质感均可）。
+  - 副标题是注解：陈述句，解释标题，不提问、不煽动。
+  - 明亮底色反衬：用"亮"制造宣言的从容感，而非暗黑压迫感。
+- **配色故事**：奶油底 `#FAF3E7`（温暖、纸感）；墨黑标题字；烫金 `#C9A227`
+  只做笔画点缀，一处即够。
 - **标题写法规范**：
-  - 短标题 4~8 字，分两行断句，如"AI效率/手册"；下行宣言用彩色。
-  - 底部白横条用问句引出内容，如"每天省下两小时，怎么做？"，
-    字号约为标题的 35%，横条整体落在中央安全区内。
+  - 短标题 4~8 字，单行，横跨画面宽度约 80%，如"慢即是快"。
+  - 副标题用陈述句（如"慢公司的效率哲学"），字号约为标题的 25%。
 - **prompt 配方**：
   ```
-  中文：震撼巨字宣言风中文封面，深色抽象背景（{SCENE}，如光影几何/空间纵深，
-  无人物无具象叙事元素），画面中央巨型中文标题"{TITLE}"占画面近一半，
-  上行白色下行红色粗黑体，可做轻微3D立体质感，极具冲击力；底部一条白色横条，
-  内写黑色问句副标题；标题与横条均在中央垂直安全区内，高对比，
+  中文：巨字宣言风中文封面，明亮奶油色（#FAF3E7）背景，细腻纸纹。
+  画面中央单行超大中文标题"{TITLE}"（逐字准确），横跨画面约80%，
+  {TYPE_STYLE}（如墨黑书法体配烫金#FFD23F描边/空心描边字/竖排大字三选一），
+  极具冲击力；标题下方深灰色陈述句副标题"{SUBTITLE}"；背景极淡的金色几何线条点缀，
+  不抢字。除标题与副标题外无其他文字；所有文字在中央垂直60%安全区内，
   横构图16:9，尺寸1200×675。
 
-  EN: Bold giant-type manifesto Chinese cover, dark abstract background
-  ({SCENE}, e.g. light-and-shadow geometry / spatial depth, no people and no
-  figurative narrative elements). Enormous bold Chinese title "{TITLE}" dominates the center, nearly
-  half the frame, white on the first line and red on the second, subtle 3D
-  extruded type feel, maximum impact; a white horizontal bar at the bottom
-  with a black question-style subtitle. Title and bar inside the central
-  vertical safe zone, high contrast, landscape 16:9, 1200x675.
+  EN: Giant-type manifesto Chinese cover, bright cream (#FAF3E7) background
+  with subtle paper grain. Single-line oversized Chinese title "{TITLE}"
+  (exact) at center, spanning ~80% of frame width, {TYPE_STYLE} (ink-black
+  calligraphy with gold #C9A227 accents / outlined type / vertical type),
+  maximum impact; small dark-gray declarative subtitle "{SUBTITLE}" below;
+  very faint gold geometric line accents in background, unobtrusive. No other
+  text. All text within central vertical 60% safe zone, landscape 16:9,
+  1200x675.
   ```
-  占位符：`{SCENE}` 为抽象背景描述，必须与主题气质相符（如效率主题用"深蓝光影几何"），
-  不得使用"人物推巨书"这类具象叙事场景。
+  占位符：`{TYPE_STYLE}` 字形处理三选一（书法烫金 / 描边空心 / 竖排），
+  `{SUBTITLE}` 陈述句副标题（≤10 字，禁止问句）。
 - **避坑**：
-  - 标题超过 10 个字必翻车——先压缩成 4~8 字再生成。
-  - 3D 立体字与背景对比度不够会"糊"：深底配白字、浅底配黑字，边缘加细描边。
-  - 背景人物只是比例参照，放大抢戏就喧宾夺主。
-  - 字不能顶到画面边缘：四周至少留 5% 空气，否则公众号裁剪会切字。
+  - 标题超过 8 个字必翻车——先压缩再生成。
+  - 两行撞色标题是别人的版式：本风格只做单行（或竖排），不用两行撞色。
+  - 副标题一旦写成问句，整张的气质就垮了。
 
 ## 3. brand-launch · 品牌发布
 
 - **适用场景**：产品发布、版本更新、官方最佳实践/白皮书；有明确品牌主体的内容首选。
-  示例图：`assets/examples/brand-launch.png`（原创虚构品牌"星尘 OS 3.0"）。
-- **构图公式**：左文右图。左上品牌 logo 区（AI 不画 logo，prompt 里留空位、后期贴真实 logo）；
-  左侧大标题（品牌词用品牌色渐变 + 其余黑字），标题下手写感副标题 + 品牌色下划线；
-  右侧 50% 为产品/界面展示（深色控制台、App 界面、产品渲染图）；
-  底部 3~4 个卖点图标条：图标 + 中文卖点词，整体落在中央安全区内。标题字占画面高度 20%~28%。
-- **配色方案**：以品牌主色为准（示例：青色 `#22D3EE` 渐变至紫色 `#8B5CF6`）；
-  浅底 `#F2F4FD`（或品牌浅色 tint）；文字炭黑 `#1A1A1A`；
-  图标底色用品牌色 10% 浅底。
+  示例图：`assets/examples/brand-launch.png`（原创虚构品牌"深蓝 OS 2.0"）。
+- **设计语言（抽象原则）**：
+  - 标题视觉重心居中置顶：品牌名就是标题，不藏不绕。
+  - 氛围代替写实：用发光线条/光影做产品氛围，不画写实产品大图（防 AI 乱码也防呆板）。
+  - 卖点信息分层：一排分隔符小字（"更快 · 更稳 · 更懂你"），轻量不做图标条。
+- **配色故事**：深海军蓝 `#0A1F44` 做全幅主色（深邃、专业）；荧光绿 `#3DFF88`
+  做唯一强调色（发光描边、细线、分隔符小字都用它）。
 - **标题写法规范**：
-  - 品牌词前置并上色："星尘"用品牌色渐变，"OS 3.0"用黑字；短标题 4~8 字。
-  - 副标题口语化、手写感，如"更快，更稳，更懂你"，下方加品牌色笔刷下划线。
-  - 卖点条格式：`图标 + 中文卖点词`（如"秒开应用 / 超低功耗 / 智能助手"），3~4 个。
+  - 品牌词前置并上色："深蓝"用荧光绿发光描边，其余白字；短标题 4~8 字。
+  - 标题下一条荧光绿细线收束视觉。
+  - 底部一排分隔符小字卖点，格式 `更快 · 更稳 · 更懂你`，浅灰白小字。
 - **prompt 配方**：
   ```
-  中文：品牌发布风中文封面，品牌浅色背景（{BRAND_TINT}），左上预留空白 logo 区，
-  左侧大标题"{TITLE}"，其中品牌词"{KEYWORDS}"用品牌主色（{BRAND_COLOR}）渐变突出、
-  其余字炭黑色粗黑体；标题下方手写感副标题配品牌色下划线；
-  右侧一半为产品展示（{PRODUCT}，深色界面、发光细节）；底部 3~4 个卖点图标条
-  （图标+中文+英文小字）；干净高级，横构图16:9，尺寸1200×675。
+  中文：品牌发布风中文封面，深海军蓝（#0A1F44）全幅背景，荧光绿（#3DFF88）发光点缀。
+  顶部居中大号白色粗黑中文标题"{TITLE}"（逐字准确），其中品牌词"{KEYWORDS}"用荧光绿
+  描边发光、其余白色；标题下方一条荧光绿细线；画面中央下方一组荧光绿发光线条勾勒的
+  抽象产品氛围（{PRODUCT}，线框/光影，无可读文字）；底部中央一排小字卖点
+  "{SELLING_POINTS}"（分隔符式，如"更快 · 更稳 · 更懂你"）；左上预留空白 logo 区。
+  除标题、卖点小字外无其他文字；所有文字在中央垂直60%安全区内，
+  横构图16:9，尺寸1200×675。
 
-  EN: Brand-launch style Chinese cover, light brand-tinted background
-  ({BRAND_TINT}), empty logo area reserved at top-left. Large title "{TITLE}"
-  on the left, brand term "{KEYWORDS}" in gradient brand color
-  ({BRAND_COLOR}), remaining characters in bold charcoal black; handwritten-feel
-  subtitle below with a brand-color underline. Right half shows the product
-  ({PRODUCT}, dark UI with glowing details). Bottom row of 3-4 selling-point
-  icon chips (icon + Chinese + small English). Clean and premium, landscape
-  16:9, 1200x675.
+  EN: Brand-launch style Chinese cover, full-bleed deep navy (#0A1F44)
+  background with fluorescent-green (#3DFF88) glowing accents. Large white bold
+  Chinese title "{TITLE}" (exact) centered at top, brand term "{KEYWORDS}" in
+  glowing fluorescent-green outline, rest white; a thin fluorescent-green rule
+  below the title; lower center an abstract product atmosphere drawn in glowing
+  fluorescent-green lines ({PRODUCT}, wireframe/light, no readable text);
+  bottom center one row of small separator-style selling points
+  "{SELLING_POINTS}" (e.g. "更快 · 更稳 · 更懂你"); empty logo area reserved
+  at top-left. No other text. All text within central vertical 60% safe zone,
+  landscape 16:9, 1200x675.
   ```
-  占位符：`{BRAND_COLOR}`/`{BRAND_TINT}` 为品牌色 hex，`{PRODUCT}` 为产品展示描述；
+  占位符：`{KEYWORDS}` 品牌词、`{PRODUCT}` 产品氛围描述、`{SELLING_POINTS}` 分隔符小字（≤12 字）；
   真实 logo 必须后期贴图，绝不用 AI 生成 logo。
 - **避坑**：
-  - 产品界面里的 UI 文字让 AI 生成必出乱码：要求"界面文字模糊/占位块"，
-    或只展示界面氛围不展示可读文字。
-  - 卖点条超过 4 个立刻变说明书；英文小字必须人工核对拼写。
-  - 品牌色渐变只用在品牌词上，全标题上色等于没重点。
+  - 产品界面里的 UI 文字让 AI 生成必出乱码：只要氛围线框，不要可读文字。
+  - 图标式卖点条是旧版式：本风格只用一排分隔符小字。
+  - 强调色只用荧光绿一种，第二种颜色出现即杂。
 
 ## 4. tutorial-steps · 教程步骤
 
 - **适用场景**：教程、上手指南、分步实操、保姆级攻略。
-  示例图：`assets/examples/tutorial-steps.png`（原创："从想法到产品" + 步骤卡片）。
-- **构图公式**：左文右卡。左侧：顶部彩色笔刷横条（写起点，如"0基础可学"）→
-  大黑标题（4~8 字）→ 底部彩色笔刷横条（内容总结，如"想法拆解×原型落地"）；
-  右侧：2~3 张步骤卡片纵向拼贴（撕纸/便签质感），每张含彩色圆章序号（01/02）+
-  小图标 + 短句，卡片间用箭头连接；右上小字点睛（如"先懂逻辑，再动手"）。
-  标题字占画面高度 22%~30%。
-- **配色方案**：纸白底 `#F7F4EC`；笔刷/序号章用强调红 `#E8401F`
-  （或品牌色）；标题字炭黑 `#1A1A1A`；卡片描边浅灰。
+  示例图：`assets/examples/tutorial-steps.png`（原创："从想法到产品"）。
+- **设计语言（抽象原则）**：
+  - 标题做视觉锚：墨色书法题字，一字千钧，镇住画面。
+  - 步骤沿横向时间线展开：一条线串起线框数字，数字是节奏点不是徽章。
+  - 东方留白：大面积宣纸空，步骤区只占底部一条。
+- **配色故事**：宣纸米 `#F2EDE0` 做底（温润）；墨黑书法标题；赭石 `#B5651D`
+  只做时间线与线框数字。
 - **标题写法规范**：
-  - 顶部笔刷条：白字写起点/承诺，如"0基础可学"，4~6 字最有力。
-  - 大标题 4~8 字，如"从想法/到产品"，分两行断句。
-  - 底部笔刷条：白字总结全文骨架，如"想法拆解×原型落地"，用 × 连接两个关键词。
-  - 步骤卡片内文字极简：序号 + 8 字以内短句（如"想清楚方向"）。
+  - 大标题 4~8 字，墨色书法体，如"从想法到产品"，占画面高度约 25%。
+  - 时间线：赭色水平细线 + 三个线框空心数字 `01 02 03`，每数字下一句极简短句（≤4 字）。
+  - 右上角小字点睛（如"先懂逻辑，再动手"）。
 - **prompt 配方**：
   ```
-  中文：教程步骤风中文封面，纸白色温暖背景，左侧：顶部红色笔刷横条白字写"{HOOK}"，
-  中央大号炭黑色粗黑标题"{TITLE}"，底部红色笔刷横条白字写"{SUMMARY}"；
-  右侧两张撕纸质感便签卡片纵向排列，卡片上有红色圆形序号章（01/02）、
-  简笔画小图标与极简短句，卡片间黑色箭头连接；右上角小字点睛；
-  红黑白三色，对比鲜明，横构图16:9，尺寸1200×675。
+  中文：教程步骤风中文封面，宣纸米色（#F2EDE0）背景，淡墨纹理。
+  顶部中央墨色毛笔书法体大字标题"{TITLE}"（逐字准确），占画面高度约25%；
+  底部一条横向时间线：一根赭色（#B5651D）水平细线横贯画面下部，
+  线上三个线框空心数字"{N1}""{N2}""{N3}"，每数字下方配极简短句"{S1}""{S2}""{S3}"；
+  右上角小字点睛"{TIP}"。除上述文字外无其他文字；所有文字在中央垂直60%安全区内，
+  文人气、克制，横构图16:9，尺寸1200×675。
 
-  EN: Tutorial-steps style Chinese cover, warm paper-white background. Left
-  side: red brush-stroke banner with white text "{HOOK}" on top, large bold
-  charcoal-black Chinese title "{TITLE}" at center, red brush banner with white
-  text "{SUMMARY}" at the bottom. Right side: two torn-paper memo cards
-  stacked vertically, each with a red circular number badge (01/02), a small
-  line icon and minimal short text, connected by a black arrow; small accent
-  text at top-right. Red-black-white palette, crisp contrast, landscape 16:9,
-  1200x675.
+  EN: Tutorial-steps style Chinese cover, rice-paper beige (#F2EDE0)
+  background with faint ink texture. Top center: large ink-brush calligraphy
+  title "{TITLE}" (exact), ~25% of frame height. Bottom: a horizontal timeline
+  — one thin ochre (#B5651D) horizontal line across the lower frame, with three
+  wireframe hollow numbers "{N1}" "{N2}" "{N3}" on it, each with a minimal short
+  phrase below ("{S1}" "{S2}" "{S3}"); small accent text "{TIP}" at top-right.
+  No other text. All text within central vertical 60% safe zone, scholarly and
+  restrained, landscape 16:9, 1200x675.
   ```
-  占位符：`{HOOK}` 顶部钩子（≤4 字）、`{SUMMARY}` 底部总结（≤10 字）、
-  卡片短句直接写进 prompt 且每张 ≤8 字（模型小字易错，越短越安全）。
+  占位符：`{N1..N3}` 线框数字（01/02/03）、`{S1..S3}` 短句（每句 ≤4 字，越短越安全）、
+  `{TIP}` 右上点睛（≤8 字）。
 - **避坑**：
-  - 步骤卡片最多 3 张，第 4 张起画面必乱。
-  - 卡片内一个字都不能多：小字是 AI 错别字重灾区，生成后逐字核对。
-  - 箭头方向必须明确向下/向右，别让模型自由发挥画成回路。
-  - 笔刷横条别压住标题字，上下留 breathing room。
+  - 步骤超过 3 个立刻变说明书。
+  - 圆形实心序号章是旧版式：本风格只用线框空心数字。
+  - 红色笔刷横条不用：本风格的强调色只有赭石。
 
 ## 5. ip-fun · IP 趣味
 
 - **适用场景**：实战案例、数据战报、复盘、系列连载（上/下篇）。
-  示例图：`assets/examples/ip-fun.png`（原创：狐狸画家 IP + "30天AI绘画挑战"）。
-- **构图公式**：左文右图。左侧：巨型彩色数字行（数字占画面高度 20%+，如"30天"，
-  数字彩色）→ 大黑标题（4~8 字）→ 灰色副标题 + 署名（小字，均落在中央安全区内）；
-  右侧 50% 为原创趣味 IP 形象：原创小动物/角色 + 主题道具（如狐狸画家 + 画架 + 颜料），
-  形象生动、与主题强绑定，不得使用猫等已有知名形象。
-- **配色方案**：纯白底 `#FFFFFF`；数字用亮蓝 `#2B7FFF`（或品牌色）；
-  标题炭黑 `#1A1A1A`；副标题/署名用中灰 `#9AA0A6`。
+  示例图：`assets/examples/ip-fun.png`（原创：狐狸画家 IP + "AI绘画挑战营"）。
+- **设计语言（抽象原则）**：
+  - 暖色氛围做主角情绪：整张的"热气"是第一眼记忆。
+  - 标题深色压住暖底：深棕/深色字在暖色底上形成对比重心。
+  - 数字收进角落印章：数据是注脚，不是标题。
+  - 署名做边角点缀：竖排小字，不进主视觉流。
+- **配色故事**：橙黄暖色 `#FF9E2C → #FFC53D` 做主色（阳光、热闹）；
+  标题与副标题用深棕 `#4A2C0A`（在暖底上最稳的重色）。
 - **标题写法规范**：
-  - 数字前置造冲击："30天"中的数字放大并上色；数字必须真实，严禁编造数据。
-  - 大标题 4~8 字黑粗体，如"AI绘画挑战"。
-  - 副标题灰字说明结构，如"每天一幅 · 进化看得见"；署名（如"@阿狐画画"）放副标题下方小字。
+  - 大标题 4~8 字深棕粗黑，如"AI绘画挑战营"；下方深棕小字副标题（如"每天一幅 · 进化看得见"）。
+  - 数据（如"30天"）放右下角圆形印章内小字，不放大。
+  - 署名（如"@阿狐画画"）放左下角竖排小字。
 - **prompt 配方**：
   ```
-  中文：IP 趣味风中文封面，纯白干净背景，左侧：巨型亮蓝色数字"{NUMBER}"
-  配炭黑色单位字，下方大号炭黑色粗黑标题"{TITLE}"，再下方灰色小字副标题与署名；
-  右侧一半为原创趣味 IP 形象（{CHARACTER}，如戴贝雷帽的狐狸画家在画架前作画、
-  颜料点缀），形象生动、细节丰富但不遮挡文字；所有文字在中央垂直安全区内，
+  中文：IP 趣味风中文封面，暖橙黄色（#FF9E2C 渐变至 #FFC53D）主色背景，阳光感。
+  中央偏左深棕色（#4A2C0A）大号粗黑中文标题"{TITLE}"（逐字准确），
+  下方深棕色小字副标题"{SUBTITLE}"；右侧原创趣味 IP 形象（{CHARACTER}，
+  如戴贝雷帽的狐狸画家在画架前作画，暖色调），生动，约占画面35%，不遮挡文字；
+  右下角一枚圆形印章，内写"{NUMBER}"小字；左下角竖排小字署名"{BYLINE}"。
+  除上述文字外无其他文字；所有文字在中央垂直60%安全区内，
   横构图16:9，尺寸1200×675。
 
-  EN: Fun-IP style Chinese cover, clean pure-white background. Left side: huge
-  bold charcoal-black Chinese title "{TITLE}" below, small gray subtitle and
-  byline underneath. Right half features an original playful IP character
-  ({CHARACTER}, e.g. a beret-wearing fox painter painting at a wooden easel
-  with paint blobs around), vivid and detailed but never covering the
-  text. All text within the central vertical safe zone, landscape 16:9,
-  1200x675.
-  ```
-  占位符：`{NUMBER}` 为真实数据（如"30天"）、`{CHARACTER}` 为原创 IP 形象描述，
-  必须与主题道具绑定（如绘画主题 → 狐狸画家 + 画架），不得照抄任何现有 IP 形象。
-- **避坑**：
-  - 数字造假是红线：封面上的每个数字必须在正文中有出处。
-  - IP 形象再可爱也不能抢字：右侧边界止于画面 55% 处。
-  - 白底最怕"脏"：要求"纯白干净背景"，防模型加渐变/纹理。
-  - 连载标注（上篇/下篇）放副标题里，别进大标题。
-
-## 6. news-flash · 资讯快报
-
-- **适用场景**：资讯、快讯、热点解读、人物专访预告、"祛魅/揭秘"类选题。
-  示例图：`assets/examples/news-flash.png`（原创："AI/早报！" + 报纸咖啡闹钟点缀）。
-- **构图公式**：左文右图。左侧：两行大字标题（上行黑字、下行品牌色 + 感叹号）→
-  下方彩色胶囊副标题（问句/悬念，整体落在中央安全区内）；右侧 35%~50% 为原创
-  主题元素点缀（如报纸叠、咖啡杯、红色闹钟），点缀丰富但不进文字区。
-  标题字占画面高度 22%~30%。
-- **配色方案**：白底 `#FFFFFF`；标题黑 `#1A1A1A` + 品牌蓝 `#2B7FFF`
-  （或品牌色）；胶囊副标题用品牌色底 + 白字。
-- **标题写法规范**：
-  - 标题两行、上黑下彩，如"AI/早报！"，每行 4~6 字；
-    感叹号是点睛，一个就够。
-  - 胶囊副标题用问句或悬念短句，如"新模型新应用，一次看完"，字数 ≤12 字；
-    问句必须在正文中有答案，不做无答案的标题党。
-  - 右侧点缀元素别超过 4 件，多了就抢标题的风头。
-- **prompt 配方**：
-  ```
-  中文：资讯快报风中文封面，纯白背景，左侧两行大字标题，上行炭黑色"{TITLE_TOP}"、
-  下行品牌蓝色"{TITLE_BOTTOM}"加感叹号，粗黑体；标题下方蓝色圆角胶囊副标题，
-  白字问句"{SUBTITLE}"；右侧原创主题元素点缀（{CHARACTER}，如报纸叠、咖啡杯、
-  红色闹钟），生动但不遮挡文字；
-  所有文字在中央垂直安全区内，横构图16:9，尺寸1200×675。
-
-  EN: News-flash style Chinese cover, white background. Left side: two-line
-  bold headline, charcoal-black "{TITLE_TOP}" on top and brand-blue
-  "{TITLE_BOTTOM}" with exclamation mark below; a blue rounded capsule
-  subtitle with a white question-style "{SUBTITLE}" underneath. Right side
-  decorative original theme elements ({CHARACTER}, e.g. a newspaper stack,
-  a coffee cup, a red alarm clock), lively but never covering the
-  text. All text within the central vertical safe zone, landscape 16:9,
-  1200x675.
-  ```
-  占位符：`{TITLE_TOP}` 上行（黑字）、`{TITLE_BOTTOM}` 下行（彩色）、
-  `{SUBTITLE}` 胶囊问句、`{CHARACTER}` 右侧点缀描述。
-- **避坑**：
-  - 感叹号/问号各一个，多了变地摊文学。
-  - 右侧点缀元素别超过 4 件，多了就抢标题的风头。
-  - 胶囊问句的字数 ≤12 字，太长胶囊装不下会被模型挤小。
-  - 热点人物用"泛指"描述，不画可识别真人。
-
-## 7. minimal · 极简留白
-
-- **适用场景**：随笔、书评、轻观点、生活感悟；公众号"轻阅读"类文章，
-  或系列中需要"呼吸感"的穿插封面。
-- **构图公式**：大面积留白（≥60%）。一处微小点缀落在右侧中央安全区内
-  （如一片银杏落叶的水墨笔触）；标题小字号放左下安全区内（下沿不低于 80% 高度线），不与点缀打架。
-  标题字占画面高度 8%~12%。
-  示例图：`assets/examples/minimal.png`（原创："慢思考" + 银杏叶点缀）。
-- **配色方案**：主色米白 `#F7F4EC`（或冷白 `#F2F4F6`），
-  辅色淡墨 `#9AA0A6`（小面积点缀），文字色深灰 `#3A3A3A`。
-- **标题写法规范**：短标题 4~8 字即可，字体用 Noto Sans SC Medium（不用 Black，
-  太重则极简感全失）；不加副标题、不加标签条，克制到底。
-- **prompt 配方**：
-  ```
-  中文：极致极简主义封面，暖米白背景，大面积留白，一处微小的水墨笔触
-  （如一片银杏落叶）点缀在画面右侧中央（中央垂直安全区内），左下角（中央垂直安全区内）
-  小字号深灰色中文标题"{TITLE}"，呼吸感强，禅意，无其他元素，
-  横构图16:9，尺寸1200×675，除标题外无其他文字。
-
-  EN: Extreme minimalism cover, warm off-white background with vast empty
-  space, one tiny ink-brush stroke (like a ginkgo leaf) near the
-  center-right. Small dark-gray Chinese title "{TITLE}" in delicate bold type
-  at the lower-left corner. Calm, airy, zen aesthetic, no other elements,
-  landscape 16:9, 1200x675, no other text.
-  ```
-- **避坑**：
-  - 对"杂物"零容忍：prompt 明确"一处""微小""无其他元素"，防模型加云加山。
-  - 标题字别贪大：字一大立刻变大字报。
-  - 主体和标题尽量往中央安全区放，防公众号裁剪吃掉左右留白。
-
-## 8. magazine · 杂志编辑风
-
-- **适用场景**：深度访谈、人物特写、商业分析、年度盘点；需要"质感/信任感"时用它，
-  公众号长文首选。
-  示例图：`assets/examples/magazine.png`（原创："创造者访谈" + 黑白人物肖像 + 砖红细线）。
-- **构图公式**：三分法。右侧三分之一为黑白质感人物肖像（泛指描述）；
-  左侧大面积留白；标题放左侧下方安全区内，标题上方一条品牌色/砖红细线。
-  标题字占画面高度 14%~20%。
-- **配色方案**：主色暖灰 `#E8E4DC`（浅底）或墨黑 `#141414`（深底版），
-  辅色砖红 `#B03A2E`（细线/点缀），文字色炭黑 `#2B2B2B`（浅底）/
-  米白 `#F5F1E8`（深底）。
-- **标题写法规范**：短标题 4~8 字，如"创造者访谈"；字体用 Noto Serif SC Bold（宋体感）或思源黑体 Bold；
-  标题上方一条细色线是杂志感的灵魂，别省略；深底/浅底同一系列只用一种。
-- **prompt 配方**：
-  ```
-  中文：杂志编辑风封面，暖灰色影棚背景，右侧三分之一处黑白质感人物肖像，
-  左侧大面积留白，左侧下方（中央垂直安全区内）炭黑色典雅粗体中文标题"{TITLE}"，
-  标题上方一条砖红色细线，克制高级，杂志封面美学，
-  横构图16:9，尺寸1200×675，除标题外无其他文字。
-
-  EN: Editorial magazine style cover, warm light-gray studio background,
-  dramatic black-and-white portrait in the right third, generous negative
-  space on the left. Dark charcoal elegant bold Chinese title "{TITLE}" at
-  lower left, with a thin brick-red rule line above it. Refined, minimal,
-  magazine cover aesthetic, landscape 16:9, 1200x675, no other text.
-  ```
-- **避坑**：
-  - 人物肖像必须用"泛指"描述（商务人士/学者剪影），不得出现可识别的真实人物长相。
-  - 留白处别手痒加装饰字——杂志风的力量全在克制。
-  - 深底版和浅底版不要混用。
-
----
-
-## 通用组装公式（沿用）
-
-```
-{风格模板一句话}，主体：{主体描述}，
-画面中央大标题"{≤10字标题}"，{暗底亮字/亮底深字}，
-横构图16:9，主体占画面40%以上，四周留白8%，
-极简，不堆砌元素，电影感光影
-```
-
-标题字逐字写进 prompt；生成后第一件事就是检查标题字。
-示例图在 `assets/examples/`（`<style>.png` 1200×675 主图 + `<style>-wechat.png`
-900×383 公众号裁剪版），选风格前先看图。
-
-## 风格速查
-
-| 风格 | 一句话 | 标题字号占比 | 首选题材 |
-|---|---|---|---|
-| gan-huo | 萌物 + 巨型标题 + 彩色数字 + 胶囊标签条 | 25%~32% | 干货清单/评测/盘点 |
-| big-type | 标题即画面，字占近半，分两行撞色 | 35%~45% | 观点/深度/发布宣言 |
-| brand-launch | 品牌色大标题 + 产品展示 + 卖点图标条 | 20%~28% | 产品发布/版本更新 |
-| tutorial-steps | 笔刷横条标题 + 步骤卡片拼贴 + 序号章 | 22%~30% | 教程/上手指南 |
-| ip-fun | 巨型彩色数字 + 趣味 IP + 署名 | 数字 20%+ | 实战案例/数据战报 |
-| news-flash | 两行大字 + 胶囊问句 + 人物点缀 | 22%~30% | 资讯/解读/快讯 |
-| minimal | 大面积留白，一处点缀，小字标题 | 8%~12% | 随笔/书评/轻阅读 |
-| magazine | 三分法 + 人物肖像 + 细线标题 | 14%~20% | 访谈/商业分析/盘点 |
+  EN: Fun-IP style Chinese cover, warm orange-yellow (#FF9E2C to #FFC53D)
+  dominant background, sunny feel. Center-left large dark-brown (#4A2C0A) bold
+  Chinese title "{TITLE}" (exact), small dark-brown subtitle "{SUBTITLE}"
+  below; right side an original playful IP character ({CHARACTER}, e.g. a
+  beret-wearing fox painter at an easel, warm tones), vivid, ~35% of frame,
+  never covering text; bottom-right a small round seal with "{NUMBER}"; 
+...[truncated 3507 chars]

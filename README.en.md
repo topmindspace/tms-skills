@@ -37,7 +37,7 @@ npx @topmindspace/tms-skills install topmind-x-article
 
 ### topmind-cover · Cover art generation
 
-Shared cover art for X long-form and WeChat: striking, eye-catching, theme-focused. Built-in **8-style cover style library** (viral dry-goods / giant-type manifesto / brand launch / tutorial steps / fun IP / news flash / minimalist / editorial magazine — each with use cases, hex palettes, font suggestions, Chinese+English prompt recipes) + **17 dual-size example images** (`assets/examples/`, shipped with the package): **pick a style → check the example → compose the prompt from the recipe**, then one-click crop to both platform sizes with `crop-cover.py` (X 1200×675, WeChat 900×383).
+Shared cover art for X long-form and WeChat: striking, eye-catching, theme-focused. Built-in **8-style cover style library** (viral dry-goods / giant-type manifesto / brand launch / tutorial steps / fun IP / news flash / minimalist / editorial magazine — each with use cases, palette stories, abstract design principles, Chinese+English prompt recipes) + **17 dual-size example images** (`assets/examples/`, shipped with the package): **pick a style → check the example → compose the prompt from the recipe**, then one-click crop to both platform sizes with `crop-cover.py` (X 1200×675, WeChat 900×383).
 
 ```bash
 npx @topmindspace/tms-skills install topmind-cover
@@ -59,6 +59,8 @@ npx @topmindspace/tms-skills install topmind-cover
 | News flash `news-flash` | News, flashes, hot-topic explainers, interview teasers, "myth-busting" angles |
 | Minimal `minimal` | Essays, book reviews, light takes, lifestyle musings; WeChat "light reading" pieces |
 | Editorial magazine `magazine` | In-depth interviews, profiles, business analysis, year-in-review; when "craft / trust" matters |
+
+> **Originality note**: the 16 example images are original designs demonstrating only the 8 styles' abstract design principles (title as visual anchor, information hierarchy, breathing whitespace, number/keyword emphasis) — no third-party cover's layout or palette is copied; all titles, numbers, brands, and bylines in them are fictional placeholders, and layouts/palettes must not be substantially similar to any third-party cover: learn the principles, not the layouts.
 
 > Let ideas fly — make good thinking visible.
 
@@ -120,7 +122,7 @@ See [top-ppt-html/README.md](./top-ppt-html/README.md#html-header-toolbar) and [
 | [`topmind-x-article`](./topmind-x-article/) | **0.1.0** | X long-form one-click publish: Markdown → paste-ready plain text + cover + checklist |
 | [`topmind-cover`](./topmind-cover/) | **0.1.0** | Cover art for X / WeChat: striking, theme-focused; 8-style cover style library + 17 dual-size example images, size specs + crop tooling |
 
-Installer [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) is **0.3.2** (whole-repo same-tag releases).
+Installer [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) is **0.3.3** (whole-repo same-tag releases).
 
 ### topmind-cover · Cover style library
 
@@ -136,7 +138,7 @@ Style index and the 8-grid overview are in the topmind-cover skill intro above.
 npx @topmindspace/tms-skills list
 npx @topmindspace/tms-skills install top-ppt-html
 npx @topmindspace/tms-skills install top-ppt-html --to ./.claude/skills
-npx @topmindspace/tms-skills@0.3.2 install top-ppt-html   # pin
+npx @topmindspace/tms-skills@0.3.3 install top-ppt-html   # pin
 ```
 
 ```bash

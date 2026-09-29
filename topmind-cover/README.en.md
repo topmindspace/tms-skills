@@ -21,6 +21,8 @@ A reusable skill for generating cover art for X long-form posts and WeChat artic
 | Minimal `minimal` | Essays, book reviews, light takes, lifestyle musings; WeChat "light reading" pieces |
 | Editorial magazine `magazine` | In-depth interviews, profiles, business analysis, year-in-review; when "craft / trust" matters |
 
+> **Originality note**: the 16 example images are original designs demonstrating only the 8 styles' abstract design principles (title as visual anchor, information hierarchy, breathing whitespace, number/keyword emphasis) — no third-party cover's layout or palette is copied; all titles, numbers, brands, and bylines in them are fictional placeholders; when reusing this library, layouts and palettes must not be substantially similar to any third-party cover: learn the principles, not the layouts.
+
 ## Install
 
 ```bash
@@ -45,8 +47,8 @@ python3 scripts/crop-cover.py <main-image> --out-dir <package>/images/
 
 ## Style library & examples
 
-- **Style library** `references/cover-styles.md`: 8 styles (viral dry-goods / giant-type manifesto / brand launch / tutorial steps / fun IP / news flash / minimalist / editorial magazine), each with use cases, hex palettes, font suggestions, Chinese+English prompt recipes, and pitfalls.
-- **Example images** [assets/examples/](./assets/examples/): 17 (8 styles × 1200×675 master + 900×383 WeChat center-crop + `overview.png` 8-grid overview, ~7.5MB), shipped with the package, free to reuse or adapt (manifest + safe-zone notes + reuse terms in [assets/examples/README.md](./assets/examples/README.md)).
+- **Style library** `references/cover-styles.md`: 8 styles (viral dry-goods / giant-type manifesto / brand launch / tutorial steps / fun IP / news flash / minimalist / editorial magazine), each with use cases, palette stories, abstract design principles, Chinese+English prompt recipes, and pitfalls.
+- **Example images** [assets/examples/](./assets/examples/): 17 (8 styles × 1200×675 master + 900×383 WeChat center-crop + `overview.png` 8-grid overview, ~8.9MB), shipped with the package, free to reuse or adapt (manifest + safe-zone notes + reuse terms in [assets/examples/README.md](./assets/examples/README.md)).
 - **Safe-zone rule**: title text and key subject must stay inside the central vertical 60% safe zone (keep the top/bottom 13%+ free of title text), or the WeChat center crop will cut the title.
 
 ## Sizes

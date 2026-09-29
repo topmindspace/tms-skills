@@ -177,7 +177,7 @@ python3 scripts/md2wechat.py \
 1. **永远 `--embed-images`**，否则粘贴丢图（相对路径被序列化成 file://）  
 2. **图片 basename 铁律**：正文引用名 = `images/` 目标名；禁止两套同名图共处  
 3. 行内图片（段落里的 `![alt](x.png)`）同样走图片管线：复制到 `images/`、进上传清单、可被内嵌  
-4. 外链默认转文末脚注上标；`--link-mode inline` 改括号注（`文字（url）`）  
+4. 外链三种形态：默认 `footnote`（正文上标 `[n]` + 文末「参考链接」）；`--link-mode inline`（文字正常、URL 灰小字）；`--link-mode note`（整块灰小字，标签与 URL 同降）  
 5. 合规自检出现 `✗` 改生成器，不要手改 HTML  
 
 坑清单：[`references/known-pits.md`](references/known-pits.md)。
@@ -189,8 +189,8 @@ python3 scripts/md2wechat.py \
 | `assets/themes/minimal-ink.json`（默认） | 黑白灰 + 砖红 | 观点 / 深度分析 / 随笔 |
 | `assets/themes/tech-blue.json` | 科技蓝 | 教程 / 实操 / 工具测评 |
 | `assets/themes/newsprint.json` | 报纸衬线 | 复盘 / 特稿 / 行业观察 / 长文 |
-| `assets/themes/graphite.json` | 石墨克制 | 技术说明 / 专业评论 / 方法 |
-| `assets/themes/amber-review.json` | 琥珀评测 | 评测 / 模型评测 / 数据对比 |
+| `assets/themes/graphite.json` | 石墨克制 | 技术说明 / 专业评论 / 方法 / 原理 |
+| `assets/themes/amber-review.json` | 琥珀评测 | 评测 / 模型评测 / 数据对比 / 榜单 / 速览 |
 
 `md2wechat.py --list-themes` 看全部；`--theme genre:评测` 可按题材自动选。  
 渲染规格见 [`references/element-spec.md`](references/element-spec.md) · 主题映射见 [`references/theme-map.md`](references/theme-map.md)。

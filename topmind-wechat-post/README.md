@@ -48,6 +48,8 @@ python3 scripts/sync-status.py --set 定稿 <包> --apply
     ![示意图](images/a.png)
 
 ```bash
+# 先在 demo.md 同级放一张真实图片到 images/a.png（缺图会进"未内嵌"清单，粘贴后丢图）
+mkdir -p images && cp /path/to/你的图.png images/a.png
 python3 scripts/md2wechat.py --input demo.md --out-dir demo --slug demo --embed-images
 ```
 
@@ -69,7 +71,7 @@ python3 scripts/md2wechat.py --input demo.md --out-dir demo --slug demo --embed-
 | `--input` / `--out-dir` / `--slug` | 必填：输入 md、输出目录、文件名标识 |
 | `--embed-images` | 图片 base64 内嵌（必加，否则粘贴丢图） |
 | `--theme` | 主题标识 / 中文名 / JSON 路径，或 `genre:题材` 按题材自动选；`--list-themes` 查看全部 |
-| `--link-mode` | `footnote`（默认，外链转文末脚注上标）/ `inline`（括号注）/ `note` |
+| `--link-mode` | 外链形态：`footnote`（默认：正文上标 `[n]` + 文末「参考链接」）/ `inline`（文字正常、URL 灰小字：`文字（url）`）/ `note`（整块灰小字：`文字（url）`） |
 | `--asset-root` | 素材根目录，用于解析稿中 `../assets/` 形式的图片路径 |
 | `--no-toc` | 不自动插入前言导读 |
 | `--signature` / `--author` / `--author-bio` | 尾部签名区：`auto`（默认，有签名则不重复）/ `on` / `off`，署名与简介 |
