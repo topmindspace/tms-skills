@@ -75,8 +75,11 @@
 | 技能 | 版本 | 做什么 |
 |------|------|--------|
 | [`top-ppt-html`](./top-ppt-html/) | **0.1.19** | 正式商务演示：HTML 可翻页 + 16:9 可编辑 PPTX；双交付 · MD3 密度克制；三模式 × 九风格；strict 0/0 |
+| [`topmind-wechat-post`](./topmind-wechat-post/) | **0.1.0** | 公众号文章全生命周期：交付包、审校改写、质量三关、微信内联排版与发布清单 |
+| [`topmind-x-article`](./topmind-x-article/) | **0.1.0** | X 长文一键发布：Markdown 原稿转可直接粘贴的纯文本 + 封面图 + 发布清单 |
+| [`topmind-cover`](./topmind-cover/) | **0.1.0** | 文章封面配图（X / 公众号共用）：震撼醒目主题突出，尺寸规范 + 风格模板 + 裁剪落盘 |
 
-安装器 [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) 同为 **0.1.19**（整仓同 tag 发版）。
+安装器 [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) 为 **0.2.0**（整仓同 tag 发版）。
 
 ## 安装
 

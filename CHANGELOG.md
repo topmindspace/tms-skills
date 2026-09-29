@@ -1,3 +1,24 @@
+## [0.2.0] - 2026-09-29
+
+### 新增三个写作/配图技能
+
+- **topmind-wechat-post `0.1.0`**：公众号文章全生命周期技能（由 topmind-wechat 适配改名）。
+  交付包 / 审校改写 / 质量三关（事实·逻辑·去 AI 味 ≥85）/ 状态同步 / 微信内联排版（`md2wechat --embed-images`）/ 发布清单。
+  适配点：frontmatter 去 topmind-pack 专有键（`degradation`/`action_category`/`entrypoint`），
+  跨 skill 引用改为通用表述，`writing-quality.md` 改用技能自带 `scan_ai_flavor.py`
+  （原引用本机 `~/.workbuddy` 路径），`md2wechat.py` 缺失输入改干净报错（原 Traceback）。
+- **topmind-x-article `0.1.0`**：X 长文一键发布。`md2x.py` 把 Markdown 转可直接粘贴进
+  X Article 编辑器的纯文本（标题→纯文本行、加粗/斜体去标记、链接→`文字（url）`、
+  图片→`[图N]`+文末配图清单、表格→"项：值"列表）；`references/publish-checklist.md`
+  沉淀实战经验（首评置顶补信息、图序核对、发布后抓回核对）。缺失输入干净报错。
+- **topmind-cover `0.1.0`**：文章封面配图，X / 公众号共用。设计铁律（震撼·醒目·主题突出：
+  一图一主题、大标题 ≤10 字、四周 8% 留白）+ 5 套风格模板；
+  `crop-cover.py` 从 16:9 主图中央裁出公众号 900×383 版（X 用 1200×675），落盘命名规范。
+  缺失输入 / 非图片干净报错。
+- 每个新技能带轻量 CI 门禁：`package_skill.py --check`（frontmatter/版本/引用完整性/禁用文件）、
+  `audit_skill.py` / `audit_docs.py` / `audit_styles.py` / `audit_css.py`、`negative_tests.py`
+  （异常输入不崩溃）。`ci_privacy_scan.py` 全仓通过。
+
 ## [0.1.19] - 2026-09-28
 
 ### 排版修复 · 大纲篇章化 · 参考资料去假 · 图标真导出 · PPTX 高保真增强

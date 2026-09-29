@@ -1,0 +1,40 @@
+# topmind-x-article · X 长文一键发布
+
+把 Markdown 原稿变成"复制 → 粘贴 → 发"的 X 长文（Article）发布包。
+
+## 安装
+
+```bash
+npx @topmindspace/tms-skills install topmind-x-article
+```
+
+## 用法
+
+```bash
+# 1. 原稿转可粘贴纯文本（一键复制的核心）
+python3 scripts/md2x.py <原稿>.md --out <包>/X发布稿.txt
+
+# 2. 封面图：用 topmind-cover 生成 1200×675
+
+# 3. 按 references/publish-checklist.md 逐项发布
+```
+
+## 转换规则
+
+X Article 编辑器对 markdown 支持弱且不稳定，`md2x.py` 按 `references/x-format.md`
+转纯文本：标题→纯文本行、加粗/斜体去标记、链接→`文字（url）`、
+图片→`[图N]`（文末附配图清单）、表格→"项：值"列表。
+
+转完必须人工通读一遍。
+
+## 发布
+
+X 长文目前走人工粘贴发布（X Article 编辑器），API 不发长文。
+发布后按清单做：首条评论置顶补信息、全文抓回核对。
+
+## 开发
+
+```bash
+python3 scripts/package_skill.py --check   # 发布前校验
+python3 scripts/negative_tests.py          # 异常输入测试
+```

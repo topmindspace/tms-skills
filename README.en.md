@@ -77,8 +77,11 @@ See [top-ppt-html/README.md](./top-ppt-html/README.md) and [SKILL.md](./top-ppt-
 | Skill | Version | What it does |
 |-------|---------|--------------|
 | [`top-ppt-html`](./top-ppt-html/) | **0.1.19** | Formal business decks: paginated HTML + editable 16:9 PPTX; dual delivery · MD3-inspired density; 3 modes × 9 styles; strict 0/0 |
+| [`topmind-wechat-post`](./topmind-wechat-post/) | **0.1.0** | WeChat article lifecycle: package, review, 3 quality gates, inline typography & publish checklist |
+| [`topmind-x-article`](./topmind-x-article/) | **0.1.0** | X long-form one-click publish: Markdown → paste-ready plain text + cover + checklist |
+| [`topmind-cover`](./topmind-cover/) | **0.1.0** | Cover art for X / WeChat: striking, theme-focused; size specs + style templates + crop tooling |
 
-Installer [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) is also **0.1.19** (whole-repo same-tag releases).
+Installer [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) is **0.2.0** (whole-repo same-tag releases).
 
 ## Install
 
@@ -88,7 +91,7 @@ Installer [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspa
 npx @topmindspace/tms-skills list
 npx @topmindspace/tms-skills install top-ppt-html
 npx @topmindspace/tms-skills install top-ppt-html --to ./.claude/skills
-npx @topmindspace/tms-skills@0.1.19 install top-ppt-html   # pin
+npx @topmindspace/tms-skills@0.2.0 install top-ppt-html   # pin
 ```
 
 ```bash
