@@ -140,9 +140,20 @@ def pick_icon(title: str = '', idx: int = 0) -> str:
     return ICONS[_ICONS_ORDER[idx % len(_ICONS_ORDER)]]
 
 
-def card_head(title: str, idx: int = 0) -> str:
-    """卡片头：图标路标 + 标题（与 scaffold 的 .card__hd + .card__ico 同源）。"""
-    return (f'<div class="card__hd"><div class="card__ico">{pick_icon(title, idx)}</div>'
+def pick_icon_name(title: str = '', idx: int = 0) -> str:
+    """图标名（与 icon_lib.js / PPTX 真导出同名）。"""
+    t = str(title or '')
+    for key in ICONS:
+        if key in t:
+            return key
+    return _ICONS_ORDER[idx % len(_ICONS_ORDER)]
+
+
+def card_head(title: str, idx: int = 0, icon_name: str | None = None) -> str:
+    """卡片头：图标路标 + 标题（与 scaffold 的 .card__hd + .card__ico 同源）。
+    icon_name 写入 data-icon，供 extract_model / build_pptx 真导出同名图标。"""
+    name = icon_name or pick_icon_name(title, idx)
+    return (f'<div class="card__hd"><div class="card__ico" data-icon="{esc(name)}">{pick_icon(title, idx)}</div>'
             f'<h3 class="t-h3">{esc(title)}</h3></div>')
 
 
@@ -320,14 +331,23 @@ def r_cards(i, sec):
     cards = sec.get('cards') or []
     n = int(sec.get('columns') or min(3, max(1, len(cards))))
     cls = {1: 'g-2', 2: 'g-2', 3: 'g-3', 4: 'g-4'}.get(n, 'g-3')
+    # 纯卡片栅格强制等高（g-2--equal / g-3--equal），与 CSS / layout-grammar「同行卡片 stretch」一致
+    if cls in ('g-2', 'g-3', 'g-4'):
+        cls = cls + '--equal'
     blocks = []
     for ci, cd in enumerate(cards):
-        title = cd.get('title') if isinstance(cd, dict) else (cd[0] if cd else '')
-        points = cd.get('points') if isinstance(cd, dict) else ([['', cd[1]]] if isinstance(cd, (list, tuple)) and len(cd) > 1 else [])
+        if isinstance(cd, dict):
+            title = cd.get('title')
+            points = cd.get('points') or []
+            icon_name = cd.get('icon')
+        elif isinstance(cd, (list, tuple)) and len(cd) > 1:
+            title, points, icon_name = cd[0], [['', cd[1]]], None
+        else:
+            title, points, icon_name = (cd or ''), [], None
         blocks.append(
-            f'      <div class="card">{card_head(str(title), ci)}\n'
+            f'      <div class="card">{card_head(str(title), ci, icon_name)}\n'
             f'        {pts_list(points)}</div>')
-    body = f'    <div class="grid {cls} rv a-start">\n' + '\n'.join(blocks) + '\n    </div>\n'
+    body = f'    <div class="grid {cls} rv">\n' + '\n'.join(blocks) + '\n    </div>\n'
     return wrap(i, 'cards', body, sec)
 
 
@@ -682,20 +702,64 @@ def render_body(model: dict) -> str:
 </section>''')
     agenda = model.get('agenda') or []
     secs = [s for s in (model.get('sections') or []) if isinstance(s, dict)]
-    # Agenda 与 sections 对齐：模型 agenda 缺失/条数不符时以 sections 为准（并回写模型）
-    if len(agenda) != len(secs):
-        model['agenda'] = [[f'{i:02d}', s.get('title') or '', s.get('eyebrow') or '']
-                           for i, s in enumerate(secs, 1)]
+
+    def _chapter_key(sec, idx):
+        """从 eyebrow 的 `NN ·` 前缀或 chapter 字段取章键；无则退回页码。"""
+        ch = sec.get('chapter')
+        if ch not in (None, ''):
+            return str(ch)
+        eb = (sec.get('eyebrow') or '').strip()
+        m = re.match(r'^(\d{1,2})\s*[·・\-—]', eb)
+        if m:
+            return m.group(1).zfill(2)
+        return f'{idx:02d}'
+
+    def _chapter_title(sec):
+        """章标题 = eyebrow 去掉 `NN ·` 前缀；无则退回页标题。"""
+        eb = (sec.get('eyebrow') or '').strip()
+        m = re.match(r'^\d{1,2}\s*[·・\-—]\s*(.+)$', eb)
+        if m and m.group(1).strip():
+            return m.group(1).strip()
+        return sec.get('title') or ''
+
+    # Agenda = 章节大纲（3–7 章），不是逐页标题罗列。
+    # 模型给了合法 agenda（≤8 条）就原样用；否则按 eyebrow 章前缀归并，而不是按页重建。
+    MAX_CH = 8
+    if not agenda or len(agenda) > MAX_CH or len(agenda) == len(secs) and len(secs) > MAX_CH:
+        chapters = {}
+        order = []
+        for i, s in enumerate(secs, 1):
+            key = _chapter_key(s, i)
+            if key not in chapters:
+                chapters[key] = {'num': key, 'title': _chapter_title(s), 'desc': (s.get('eyebrow') or ''),
+                                 'first': i, 'pages': 0}
+                order.append(key)
+            chapters[key]['pages'] += 1
+        model['agenda'] = [[c['num'], c['title'], c['desc']] for c in (chapters[k] for k in order)]
         agenda = model['agenda']
+        chapter_first = {c['num']: c['first'] for c in (chapters[k] for k in order)}
+    else:
+        # 模型 agenda 已是章级：锚点落到该章第一页（按 eyebrow 对齐）
+        chapter_first = {}
+        for i, s in enumerate(secs, 1):
+            key = _chapter_key(s, i)
+            chapter_first.setdefault(key, i)
+            # 同时用序号兜底
+            chapter_first.setdefault(f'{i:02d}', i)
+        for gi, ag in enumerate(agenda, 1):
+            if isinstance(ag, (list, tuple)) and ag:
+                num = str(ag[0]).zfill(2) if str(ag[0]).isdigit() else str(ag[0])
+                chapter_first.setdefault(num, gi)
+
     if agenda or not (model.get('mode') == 'architecture' and len(secs) <= 4):
         lis = []
-        for i, s in enumerate(secs, 1):
-            ag = agenda[i - 1] if i - 1 < len(agenda) else [f'{i:02d}', s.get('title') or '', s.get('eyebrow') or '']
-            num = ag[0] if isinstance(ag, (list, tuple)) and ag else f'{i:02d}'
-            title = ag[1] if isinstance(ag, (list, tuple)) and len(ag) > 1 else (s.get('title') or '')
-            desc = ag[2] if isinstance(ag, (list, tuple)) and len(ag) > 2 else (s.get('eyebrow') or '')
+        for gi, ag in enumerate(agenda, 1):
+            num = ag[0] if isinstance(ag, (list, tuple)) and ag else f'{gi:02d}'
+            title = ag[1] if isinstance(ag, (list, tuple)) and len(ag) > 1 else ''
+            desc = ag[2] if isinstance(ag, (list, tuple)) and len(ag) > 2 else ''
+            href_i = chapter_first.get(str(num).zfill(2)) or chapter_first.get(str(num)) or gi
             lis.append(
-                f'      <li class="agenda__i"><a class="agenda__a" href="#s{i}">'
+                f'      <li class="agenda__i"><a class="agenda__a" href="#s{href_i}">'
                 f'<span class="agenda__n">{esc(num)}</span>'
                 f'<span><span class="agenda__t">{esc(title)}</span>'
                 f'<div class="agenda__d">{esc(desc)}</div></span></a></li>')
@@ -731,18 +795,45 @@ def render_body(model: dict) -> str:
       <h2 class="t-h1 shead__title">{esc(closing.get("title") or "收尾")}</h2></div>
 {body}  </div>
 </section>''')
-    # 参考资料
-    refs = []
-    all_text = json.dumps(model, ensure_ascii=False)
-    for n in sorted({int(x) for x in re.findall(r'\[(\d+)\]', all_text)}):
-        refs.append(f'      <li id="ref-{n}">[{n}] 来源名称，时间；口径。</li>')
-    parts.append(f'''<section class="band band--flow" id="refs">
+    # 参考资料：只列模型给的真实来源；无真实来源整节省略（禁止占位条目）
+    refs_src = model.get('refs') or model.get('references') or []
+    real_refs = []
+    for r in refs_src:
+        if isinstance(r, dict):
+            name = (r.get('name') or r.get('title') or '').strip()
+            time_ = (r.get('time') or r.get('date') or '').strip()
+            caliber = (r.get('caliber') or r.get('note') or '').strip()
+            url = (r.get('url') or r.get('link') or '').strip()
+        elif isinstance(r, (list, tuple)) and r:
+            name = str(r[0]).strip() if r[0] else ''
+            time_ = str(r[1]).strip() if len(r) > 1 and r[1] else ''
+            caliber = str(r[2]).strip() if len(r) > 2 and r[2] else ''
+            url = str(r[3]).strip() if len(r) > 3 and r[3] else ''
+        else:
+            name = str(r or '').strip()
+            time_ = caliber = url = ''
+        # 拦占位串：宁缺毋假
+        if not name or any(p in name for p in ('来源名称', '替换为真实来源', '来源 N', '某行业报告')):
+            continue
+        if time_ and any(p in time_ for p in ('YYYY-MM', 'YYYY', '2026-01；口径')):
+            time_ = ''
+        real_refs.append((name, time_, caliber, url))
+    if real_refs:
+        lis = []
+        for n, (name, time_, caliber, url) in enumerate(real_refs, 1):
+            meta = '，'.join(x for x in (time_, caliber) if x)
+            label = esc(name)
+            if url and url.startswith(('http://', 'https://', './', '../')) and 'example.com' not in url:
+                label = f'<a class="ref-link" href="{esc(url)}" target="_blank" rel="noopener">{esc(name)}</a>'
+            lis.append(f'      <li id="ref-{n}">[{n}] {label}' + (f'，{esc(meta)}' if meta else '') + '。</li>')
+        parts.append(f'''<section class="band band--flow" id="refs">
   <div class="wrap">
     <div class="shead rv"><div class="t-eyebrow">附录</div>
       <h2 class="t-h1 shead__title">参考资料</h2></div>
-    <ol class="refs">{''.join(refs) or '<li>（无外部引用）</li>'}</ol>
+    <ol class="refs">{''.join(lis)}</ol>
   </div>
 </section>''')
+    # 无真实来源 → 不渲染 #refs 整节（也不写占位）
     return '\n\n'.join(parts)
 
 
@@ -754,6 +845,14 @@ def load_model(path: Path) -> dict:
     if not m:
         raise SystemExit('未找到 window.REPORT_MODEL')
     return json.loads(m.group(1))
+
+
+def _strip_refs_nav(html: str, body: str) -> str:
+    """无真实来源（正文不含 #refs 节）时，摘掉导航/收尾的「参考资料」入口，避免悬空锚点。"""
+    if 'id="refs"' in body:
+        return html
+    html = re.sub(r'\s*<a[^>]*href="#refs"[^>]*>[\s\S]*?</a>', '', html)
+    return html
 
 
 def main() -> int:
@@ -783,6 +882,7 @@ def main() -> int:
         # 同步模型（确保与渲染源一致）
         t = MODEL_RE.sub('window.REPORT_MODEL = ' +
                          json.dumps(model, ensure_ascii=False, indent=2) + ';', t, count=1)
+        t = _strip_refs_nav(t, body)
         src.write_text(t, encoding='utf-8')
         print(f'已按模型重渲染正文：{src}（{len(body)} 字符）')
         print(f'  下一步: python scripts/validate_report.py "{src}" --strict')
@@ -801,6 +901,7 @@ def main() -> int:
     t = CONTENT_RE.sub(r'\1\n' + body.replace('\\', '\\\\') + r'\n\2', t, count=1)
     t = MODEL_RE.sub('window.REPORT_MODEL = ' +
                      json.dumps(model, ensure_ascii=False, indent=2) + ';', t, count=1)
+    t = _strip_refs_nav(t, body)
     out = Path(args.out or (src.with_suffix('.html')))
     out.write_text(t, encoding='utf-8')
     print(f'已从模型生成：{out}  sections={len(model.get("sections") or [])}')

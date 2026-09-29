@@ -81,6 +81,55 @@ const CONTENT_BOTTOM_NOTE = LAY.contentBottomWithNote != null ? LAY.contentBotto
 /* 页型布局区域 IR：语义槽位 → 英寸矩形（与 layout_slots.json 同源；未识别槽位时回落 PT 常量） */
 const REGIONS = require('./lib_layout_regions.js');
 
+/* ══ 语义图标真导出（SVG→PNG · scripts/icon-assets.json 预生成缓存）══
+ * HTML .card__ico / .ul--ico 的 SVG 图标在此栅格化为 PNG 嵌入，不再用 accent 方块替代。
+ * 图标图 objectName 统一 `icon:` 前缀 —— validate_pptx 单独计数，不进 pictures 内容图门禁。 */
+const ICON_LIB = require('./icon_lib.js');
+let ICON_ASSETS = { icons: {}, px: 64 };
+try {
+  ICON_ASSETS = JSON.parse(fs.readFileSync(path.join(__dirname, 'icon-assets.json'), 'utf-8'));
+} catch (e) {
+  try {
+    const { execFileSync } = require('child_process');
+    execFileSync(process.execPath, [path.join(__dirname, 'build_icon_assets.js')],
+      { env: process.env, stdio: 'pipe' });
+    ICON_ASSETS = JSON.parse(fs.readFileSync(path.join(__dirname, 'icon-assets.json'), 'utf-8'));
+  } catch (e2) {
+    console.warn('[build_pptx] 图标资产缺失且生成失败，卡片头回落 accent 方块：' + (e2 && e2.message));
+  }
+}
+function _normColor(c) {
+  if (typeof c !== 'string') return '#333333';
+  let v = c.trim().toLowerCase();
+  if (/^[0-9a-f]{6}$/.test(v)) v = '#' + v;
+  if (/^[0-9a-f]{3}$/.test(v)) v = '#' + v;
+  return v;
+}
+/** 取图标 PNG data URI；无缓存时按名挑色兜底（accent → 首色 → null） */
+function iconPng(name, colorHex) {
+  const n = name && ICON_ASSETS.icons[name] ? name : ICON_LIB.pickIconName(name, 0);
+  const bag = ICON_ASSETS.icons[n];
+  if (!bag) return null;
+  const want = _normColor(colorHex);
+  if (bag[want]) return bag[want];
+  const keys = Object.keys(bag);
+  return bag[keys[0]] || null;
+}
+/** 在指定盒内嵌图标（真导出）；无图标资产时回落 accent 小方块（可扫读路标） */
+function addIcon(s, name, x, y, size, colorHex) {
+  const uri = iconPng(name, colorHex || (STYLE && STYLE.accent) || '#1a56a8');
+  if (uri) {
+    try {
+      s.addImage({ data: uri, x, y, w: size, h: size, objectName: 'icon:' + (name || 'icon') });
+      return true;
+    } catch (e) { /* 回落方块 */ }
+  }
+  s.addShape('roundRect', { x, y, w: size, h: size, rectRadius: 0.04,
+    fill: { color: (STYLE && STYLE.accent) || '1A73E8' }, line: { type: 'none' },
+    objectName: 'icon:' + (name || 'mark') });
+  return false;
+}
+
 const modelArg = (process.argv.find(a => a.startsWith('--model=')) || '').split('=')[1];
 let styleArg = (process.argv.find(a => a.startsWith('--style=')) || '').split('=')[1];
 let themeArg = (process.argv.find(a => a.startsWith('--theme=')) || '').split('=')[1];
@@ -345,7 +394,7 @@ function head(s, eyebrow, title, lead) {
   const titleH = eyebrow ? (H.ruleY - H.titleY - 0.06) : 1.6 - 0.6;
   const tSize = estTextH(title, CW, sz(30), 1.25) > titleH ? sz(24) : sz(30);
   s.addText(title, { x: H.x, y: eyebrow ? H.titleY : 0.6, w: H.w, h: Math.max(0.6, titleH),
-    fontFace: STYLE.fontDisplay, fontSize: tSize, bold: true, color: STYLE.ink });
+    fontFace: STYLE.fontDisplay, fontSize: tSize, bold: true, color: STYLE.ink, fit: 'shrink' });
   s.addShape('rect', { x: H.x, y: eyebrow ? H.ruleY : 1.6, w: 0.9, h: 0.045, fill: { color: STYLE.accent }, line: { type: 'none' } });
   if (lead) s.addText(lead, { x: H.x, y: H.leadY || PT.common.leadY, w: H.w, h: 0.5, fontFace: STYLE.font,
     fontSize: sz(14), color: STYLE.body });
@@ -358,6 +407,26 @@ function footer(s, n, total) {
 /* 容器语义名（p:cNvPr@name）：供 validate_pptx 按 containers.pad 分型扣内边距。
    文本框坐标已由引擎 inset，校验器不再对无名 shape 二次扣大 pad。 */
 function trName(kind) { return 'tr:' + kind; }
+/* 发射前矩形相交断言：组合布局（图表+数据表/图例+标签）在 addShape/addText 前自检，
+   发现叠印立刻 console.warn 并计入 OVERLAP_PREEMIT（validate_pptx 的 ELEMENT_OVERLAP 是事后裁判）。 */
+function rectsOverlap(a, b, slack) {
+  const s = slack != null ? slack : 0.02;
+  return (a.x < b.x + b.w - s && b.x < a.x + a.w - s &&
+          a.y < b.y + b.h - s && b.y < a.y + a.h - s);
+}
+const OVERLAP_PREEMIT = [];
+function assertNoOverlap(tag, a, b) {
+  if (rectsOverlap(a, b)) {
+    OVERLAP_PREEMIT.push({ tag, a, b });
+    if (typeof console !== 'undefined') {
+      console.warn(`[build_pptx] PREEMIT_OVERLAP ${tag}: ` +
+        `(${a.x.toFixed(2)},${a.y.toFixed(2)},${a.w.toFixed(2)}×${a.h.toFixed(2)}) ` +
+        `∩ (${b.x.toFixed(2)},${b.y.toFixed(2)},${b.w.toFixed(2)}×${b.h.toFixed(2)})`);
+    }
+    return false;
+  }
+  return true;
+}
 /* 双形态载荷判定：[[t,d]…] 数组 vs [{t,d,accent}…] 记录。
    typeof [] === 'object'，绝不能用 typeof 区分——否则数组形态的 t/d 被读成 undefined 静默丢字。 */
 function isRec(v) { return !!v && typeof v === 'object' && !Array.isArray(v); }
@@ -372,14 +441,14 @@ function soWhatBar(s, text) {
   s.addText(String(text || ''), {
     x: R.x + padX, y: R.y + padY, w: R.w - padX * 2, h: R.h - padY * 2,
     fontFace: STYLE.font, fontSize: sz(fzB), bold: true, color: STYLE.ink, valign: 'middle',
-    objectName: trName('soWhat'),
+    objectName: trName('soWhat'), fit: 'shrink',
   });
 }
 function footnoteLine(s, text) {
   const R = REGIONS.regionOf('exhibit', 'footnote') ||
     { x: MX, y: PT.exhibit.footnoteY, w: CW - 1.2, h: 0.32 };
   s.addText(text, { x: R.x, y: R.y, w: R.w, h: R.h,
-    fontFace: STYLE.font, fontSize: sz(9.5), color: STYLE.faint, objectName: trName('footnote') });
+    fontFace: STYLE.font, fontSize: sz(9.5), color: STYLE.faint, objectName: trName('footnote'), fit: 'shrink' });
 }
 /* R2：sec.note 与 sec.footnote 共用注释带末行（footnoteY=6.72）。
    note.y=6.55 会压进 so-what 带——同页二者合并为一行。 */
@@ -1163,11 +1232,14 @@ function shapeSlope(s, c, x, y, w, h, dcols) {
     shapeValue(s, c, Number(other[i]) || 0, rightX + 0.1, y2 - 0.14, 0.62, 0.28, false);
   });
 }
-/* 华夫图（waffle）：10×N 点阵按占比填充 */
+/* 华夫图（waffle）：10×N 点阵按占比填充；图例含在图高 h 内（几何铁律②，防与 inline 数据表叠印） */
 function shapeWaffle(s, c, x, y, w, h, dcols) {
   const M = shapeMetrics(c, w, h);
   const cols = 10, rows = 10;
-  const cell = Math.min(w / cols, h / rows);
+  /* 图例带收在 h 内：网格只用 h-legendH，图例贴在网格下方 */
+  const legendH = 0.30;
+  const plotH = Math.max(0.6, h - legendH);
+  const cell = Math.min(w / cols, plotH / rows);
   const total = M.values.reduce((a, b) => a + b, 0) || 1;
   const units = 100;
   let filled = 0;
@@ -1181,13 +1253,14 @@ function shapeWaffle(s, c, x, y, w, h, dcols) {
     }
   });
   let lx = x;
+  const legendY = y + Math.min(plotH, rows * cell) + 0.02;
   M.labels.forEach((lb, i) => {
     const dc = dcols ? dcols[i % dcols.length] : (i === 0 ? STYLE.accent : STYLE.faint);
-    s.addShape('ellipse', { x: lx, y: y + h + 0.06, w: 0.1, h: 0.1, fill: { color: dc }, line: { type: 'none' } });
-    s.addText(lb, { x: lx + 0.14, y: y + h + 0.02, w: 0.9, h: 0.24,
+    s.addShape('ellipse', { x: lx, y: legendY + 0.04, w: 0.1, h: 0.1, fill: { color: dc }, line: { type: 'none' } });
+    s.addText(lb, { x: lx + 0.14, y: legendY, w: 0.9, h: 0.24,
       fontFace: STYLE.font, fontSize: sz(10.5), color: STYLE.body, valign: 'middle' });
     s.addText(String(M.values[i] != null ? M.values[i] : '') + (c.unit || ''),
-      { x: lx + 1.06, y: y + h + 0.02, w: 0.66, h: 0.24, fontFace: STYLE.font, fontSize: sz(10.5),
+      { x: lx + 1.06, y: legendY, w: 0.66, h: 0.24, fontFace: STYLE.font, fontSize: sz(10.5),
         bold: true, color: STYLE.body, valign: 'middle' });
     lx += 1.9;
   });
@@ -1213,8 +1286,11 @@ function chartBlock(s, c, x, y, w, h, dcols) {
         fill: { color: ri === 0 ? STYLE.accent : STYLE.bg },
       },
     })));
-    s.addTable(rows, { x: x, y: y + chH + 0.1, w: w, rowH: rowH, autoPage: false,
-      border: { pt: 0.5, color: STYLE.line }, margin: dense ? 1 : 3 });
+    const tblBox = { x: x, y: y + chH + 0.1, w: w, h: tH };
+    const chartBox = { x: x, y: y, w: w, h: chH };
+    assertNoOverlap('chartBlock:chart∩inlineTable', chartBox, tblBox);
+    s.addTable(rows, { x: tblBox.x, y: tblBox.y, w: tblBox.w, h: tblBox.h, rowH: rowH, autoPage: false,
+      border: { pt: 0.5, color: STYLE.line }, margin: dense ? 1 : 3, fit: 'shrink', valign: 'middle' });
   }
   if (isNativeChart(c.type)) nativeChart(s, c, x, y, w, chH, dcols);
   else shapeChart(s, c, x, y, w, chH, dcols);
@@ -1472,7 +1548,11 @@ function infoMarimekko(s, sec, y0, y1) {
   const legend = (sec.legend || []).map(String);
   const cells = sec.cells || [];
   const total = cols.reduce((a, c) => a + (Number(c[1]) || 0), 0) || 1;
-  const plotH = (P.y1 - P.y0) - G.legendH - 0.1;
+  /* 图例收在 P.y1 底带；列标签在图区下沿之上——二者留 0.12in 间隙，禁叠印（几何铁律②） */
+  const legendH = Math.max(0.28, G.legendH || 0.32);
+  const plotH = Math.max(0.5, (P.y1 - P.y0) - legendH - 0.40);
+  const labelY = P.y0 + plotH + 0.04;
+  const legendY = P.y1 - 0.22;
   const availW = CW - G.colGap * Math.max(0, cols.length - 1);
   const palette = [STYLE.accent, STYLE.faint, STYLE.body, STYLE.line];
   let cx0 = MX;
@@ -1486,20 +1566,20 @@ function infoMarimekko(s, sec, y0, y1) {
       s.addShape('rect', { x: cx0, y: cy0, w: cw, h: sh,
         fill: { color: palette[k % palette.length] }, line: { color: STYLE.bg, width: 0.75 } });
       s.addText(String(v) + (sec.unit || ''), { x: cx0, y: cy0 + sh / 2 - 0.13, w: cw, h: 0.26, align: 'center',
-        fontFace: STYLE.font, fontSize: sz(10), bold: true,
+        fontFace: STYLE.font, fontSize: sz(10), bold: true, fit: 'shrink',
         color: k === 0 ? STYLE.onAccent : STYLE.ink });
       cy0 += sh;
     });
-    s.addText(String(c[0]), { x: cx0, y: P.y0 + plotH + 0.06, w: cw, h: 0.3, align: 'center',
-      fontFace: STYLE.font, fontSize: sz(10.5), bold: true, color: STYLE.body });
+    s.addText(String(c[0]), { x: cx0, y: labelY, w: cw, h: 0.28, align: 'center',
+      fontFace: STYLE.font, fontSize: sz(10.5), bold: true, color: STYLE.body, fit: 'shrink' });
     cx0 += cw + G.colGap;
   });
   let lx = MX;
   legend.forEach((lg, k) => {
-    s.addShape('rect', { x: lx, y: P.y1 - 0.2, w: 0.12, h: 0.12,
+    s.addShape('rect', { x: lx, y: legendY + 0.06, w: 0.12, h: 0.12,
       fill: { color: palette[k % palette.length] }, line: { type: 'none' } });
-    s.addText(lg, { x: lx + 0.16, y: P.y1 - 0.26, w: 1.5, h: 0.26,
-      fontFace: STYLE.font, fontSize: sz(10), color: STYLE.body, valign: 'middle' });
+    s.addText(lg, { x: lx + 0.16, y: legendY, w: 1.5, h: 0.24,
+      fontFace: STYLE.font, fontSize: sz(10), color: STYLE.body, valign: 'middle', fit: 'shrink' });
     lx += 1.75;
   });
 }
@@ -1557,7 +1637,7 @@ function infoStreamgraph(s, sec, y0, y1) {
       fontFace: STYLE.font, fontSize: sz(9.5), color: STYLE.faint });
   });
 }
-/* 表格：行高按可用高度自适应（research 密表 ≤16 行不再溢出） */
+/* 表格：行高按可用高度自适应；行数×minRowH 超高时压到 hardFloor 并告警，禁止溢出注释带 */
 function addTable(s, tbl, x, y, w, availH, opts) {
   opts = opts || {};
   const rowsIn = tbl.rows || [];
@@ -1565,17 +1645,32 @@ function addTable(s, tbl, x, y, w, availH, opts) {
   const n = rowsIn.length + 1;
   const maxRowH = opts.maxRowH != null ? opts.maxRowH : PT.table.rowH;
   const minRowH = opts.minRowH != null ? opts.minRowH : PT.table.rowHMin;
-  const rowH = Math.max(minRowH, Math.min(maxRowH, availH / Math.max(1, n)));
-  /* 行多则同步收字号（research 密排允许更小） */
+  const headRowH = opts.headRowH != null ? opts.headRowH : (PT.table.headRowH || minRowH);
+  /* 行数超过容量时优先压行高到 hardFloor，仍放不下则整体缩放到 availH（禁溢出） */
+  const hardFloor = Math.min(minRowH, 0.22);
+  const ideal = availH / Math.max(1, n);
+  let rowH = Math.min(maxRowH, Math.max(hardFloor, ideal));
+  if (n * rowH > availH + 0.01) {
+    rowH = availH / Math.max(1, n);
+    if (typeof console !== 'undefined') {
+      console.warn(`addTable: ${n} 行×${rowH.toFixed(3)}in 仍超 availH=${availH.toFixed(2)}，已压到可用高度`);
+    }
+  }
+  /* 行多则同步收字号（research 密排允许更小；句子单元格仍走语义字号门禁） */
   const dense = rowH < 0.42;
   const headSz = sz(dense ? 11 : 13), bodySz = sz(dense ? 10 : 12.5);
+  const hRowH = Math.min(headRowH, Math.max(hardFloor, rowH * 1.15));
   const rows = [head.map(h => ({ text: h, options: { bold: true, color: STYLE.onAccent,
       fill: { color: STYLE.accent }, fontSize: headSz, fontFace: STYLE.font, valign: 'middle' } }))]
     .concat(rowsIn.map(r => r.map(c => ({ text: String(c), options: { fontSize: bodySz,
       color: STYLE.body, fontFace: STYLE.font, valign: 'middle', fill: { color: STYLE.bg } } }))));
+  /* rowH 数组：表头略高、正文均分剩余（pptxgenjs 支持逐行 rowH） */
+  const rowHeights = [hRowH].concat(rowsIn.map(() => rowH));
   s.addTable(rows, { x, y, w, colW: tbl.colW, border: { pt: 0.75, color: STYLE.line },
-    rowH: rowH, autoPage: false, margin: dense ? 2 : 5 });
-  return n * rowH;
+    rowH: rowHeights, autoPage: false, margin: dense ? 2 : 5,
+    /* 文本框自动收缩：PowerPoint 字体度量 ≠ 浏览器，宁可缩字号也不溢出 */
+    fit: 'shrink', valign: 'middle' });
+  return hRowH + rowsIn.length * rowH;
 }
 
 /* 封面 */
@@ -2034,7 +2129,6 @@ CONTENT.sections.forEach((sec) => {
       { x: MX, y: isH ? PT.bar.hbarY0 : PT.bar.chartY, w: CW, h: 3 };
     const pts = (sec.points || []).filter(Boolean);
     let cx = reg.x, cw = reg.w;
-    /* 有侧栏要点时让出右栏，保证 HTML g-side / 怎么读这张图 与 PPTX 同源可核对 */
     if (pts.length && !isH) {
       const sideW = Math.min(3.6, Math.max(2.6, reg.w * 0.30));
       cw = Math.max(3.2, reg.w - sideW - 0.28);
@@ -2174,13 +2268,12 @@ CONTENT.sections.forEach((sec) => {
       const x = creg.x + col * (gw + cdC.gap), y = creg.y + row * (gh + cdC.gap);
       s.addShape('roundRect', { x, y, w: gw, h: gh, rectRadius: 0.08,
         fill: { color: STYLE.surface }, line: { color: STYLE.line, width: 0.75 } });
-      /* 卡片头路标（PPTX 侧图标等价物：accent 小方块，与 HTML .card__ico 的 accent 底同语义）
-         —— HTML 内联 SVG 图标不跨通道；用原生形状保持「路标不是装饰」的可扫读性 */
+      /* 卡片头路标：真导出语义图标（SVG→PNG），与 HTML .card__ico 同源；无资产时回落 accent 方块 */
       const ico = 0.18;
-      s.addShape('roundRect', { x: x + 0.18, y: y + 0.2, w: ico, h: ico, rectRadius: 0.04,
-        fill: { color: STYLE.accent }, line: { type: 'none' }, objectName: trName('card') });
+      const icoName = cd.icon || ICON_LIB.pickIconName(cd.title || '', i);
+      addIcon(s, icoName, x + 0.18, y + 0.2, ico, STYLE.accent);
       s.addText(cd.title, { x: x + 0.18 + ico + 0.1, y: y + 0.14, w: gw - 0.36 - ico - 0.1, h: cdC.titleH, fontFace: STYLE.font,
-        fontSize: sz(15), bold: true, color: STYLE.ink });
+        fontSize: sz(15), bold: true, color: STYLE.ink, fit: 'shrink' });
       /* points 兼容：[[k,v]…] | [str…] | [{t,d}…]（scaffold v9 契约 {title, points:[[k,v]]}） */
       const ptLines = (cd.points || []).map(pt => {
         if (Array.isArray(pt)) {
@@ -2196,7 +2289,7 @@ CONTENT.sections.forEach((sec) => {
       s.addText(ptLines.map(t => ({ text: t + '\n',
           options: { fontSize: sz(12), color: STYLE.body, fontFace: STYLE.font, breakLine: true } })),
         { x: x + 0.18, y: y + 0.14 + cdC.titleH + 0.06, w: gw - 0.36, h: Math.max(0.4, gh - cdC.titleH - 0.34),
-          fontFace: STYLE.font, valign: 'top', lineSpacing: sz(12) * 1.5 });
+          fontFace: STYLE.font, valign: 'top', lineSpacing: sz(12) * 1.5, fit: 'shrink' });
     });
   } else if (type === 'split') {
     /* 双区自由组合页：左区与右区各可为 要点 / 图表 / 表格 / 图片。
@@ -2491,4 +2584,7 @@ pptx.writeFile({ fileName: out }).then(() => {
   }
   console.log('下一步（质检硬门禁，本技能内置脚本；--model 启用模型往返保真检查）:');
   console.log('  python scripts/validate_pptx.py "' + out + '" --strict' + (modelArg ? ' --model="' + modelArg + '"' : ' --model="<报告.model.json>"'));
+  if (OVERLAP_PREEMIT.length) {
+    console.warn('[build_pptx] PREEMIT_OVERLAP 共 ' + OVERLAP_PREEMIT.length + ' 处（发射前几何自检，详见上方 warn）——请先修区域分配再交付。');
+  }
 });

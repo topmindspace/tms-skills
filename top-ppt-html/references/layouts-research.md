@@ -128,7 +128,7 @@
       <span class="exhibit__t">右栏图表标题（结论式）</span>
     </div>
     <svg class="chart" data-chart="hbar" viewBox="0 0 480 190"><!-- …条形图… --></svg>
-    <div class="exhibit__src">来源：来源名称，YYYY-MM；口径说明</div>
+    <div class="exhibit__src">来源：<真实来源名>，YYYY-MM；口径说明</div>
   </div>
 </div>
 

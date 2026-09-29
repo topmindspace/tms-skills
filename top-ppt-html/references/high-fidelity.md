@@ -120,8 +120,21 @@ python scripts/render_compare.py "报告.pptx" --html "报告.html" --out "rende
 
 | 业界做法 | 不采纳原因 |
 |---------|-----------|
-| ImageGen 逐页蓝图（生成 16:9 位图再逐页还原） | 环境依赖重；且与"单文件零外链 + pictures=0 默认"冲突。本技能以「锁定版式 + 常量单源 + 形状还原规则」达成同等的版式可复现性。 |
+| ImageGen 逐页蓝图（生成 16:9 位图再逐页还原） | 环境依赖重；且与「单文件零外链 + pictures=0 默认」冲突。本技能以「锁定版式 + 常量单源 + 形状还原规则」达成同等的版式可复现性。 |
 | PowerPoint COM 渲染回归作为**硬门禁** | 需本机 PowerPoint；降级为可选路径（本文 §六），日常由 A 通道预览 + python-pptx 双裁判覆盖。 |
 | SHA-256 冻结签名 + 逐页人工验收确认 | 交互轮次与耗时显著增加，与「一次问询 + 自动生成 + 校验闭环」定位冲突；改为 manifest 登记（可复现、无需冻结）。 |
 | 禁止 `python-pptx`（必须只用 pptxgenjs） | 本技能用 pptxgenjs 做**生成**，用 python-pptx 做**第三方裁判**（`cross_verify.py`）——职责分离比"单一引擎"更能暴露问题（实测抓出两处 OOXML 规范缺陷）。 |
 | 联网检索素材（web_search 脚本） | 越出"报告生成"边界；外部数据由用户提供或由 AI 在对话中检索，来源须可追溯（`[n]` + 参考资料）。 |
+
+---
+
+## 九、已落地的高保真增强（对照业界混合通道）
+
+| 增强 | 做法 | 业界参照 |
+|------|------|---------|
+| **图标真导出** | `icon_lib.js` + sharp 栅格化 PNG，`objectName: icon:*`，`icon_pictures` 单独计数 | Slidev `pptx-editable`：SVG/canvas 按元素降级为图，整页不动 |
+| **发射前叠印断言** | `assertNoOverlap` / `rectsOverlap` 在 addShape 前自检组合布局（图表∩inline 数据表等），计入 `OVERLAP_PREEMIT` | IR band allocator；事后裁判（`ELEMENT_OVERLAP`）仍保留 |
+| **表格行高自适应** | `addTable` 超容量压到 hardFloor / 整体缩放；表头独立 `headRowH`；`fit:'shrink'` | Measured `colW[]`/`rowH[]`；文本 `fit:'shrink'` |
+| **图表区对齐版心** | `regionOf('bar')` 纠正 chartX/chartW 双偏移，与标题/表格左边距一致 | 坐标区域映射的静默漂移防护 |
+| **图例收进图高** | waffle/marimekko/slope 图例带含在 `h` 内，与 inline 数据表留间隙 | 几何铁律②「类目标签含在图高 h 内」 |
+| **文本自动收缩** | 标题/卡片/结论条/页脚加 `fit:'shrink'`（PowerPoint 字体度量 ≠ 浏览器） | `fit:'shrink'` + 高度余量 |

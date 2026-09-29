@@ -330,7 +330,13 @@ border-color:color-mix(in srgb,var(--accent-on) 20%,transparent);color:var(--acc
    rows-2 / rows-3：等高行分区（纵向节奏，替代等高卡片堆叠） */
 .g-211{grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr)}
 .g-121{grid-template-columns:minmax(0,1fr) minmax(0,2fr) minmax(0,1fr)}
-.g-quad{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:minmax(0,1fr);align-items:stretch}
+.g-quad{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:minmax(min-content,1fr);align-items:stretch}
+.g-half{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);align-items:stretch}
+@media (max-width:1180px){.g-half{grid-template-columns:1fr}}
+.g-2--equal,.g-3--equal,.g-4--equal{grid-auto-rows:minmax(min-content,1fr);align-items:stretch}
+.grid.g-2>.card,.grid.g-3>.card,.grid.g-4>.card,
+.grid.g-quad>.card,.grid.g-half>.card,.grid.g-2--equal>.card,
+.grid.g-3--equal>.card,.grid.g-4--equal>.card{align-self:stretch}
 .g-aside{grid-template-columns:minmax(0,1fr) minmax(200px,.36fr);align-items:start}
 .g-aside__side{position:sticky;top:calc(var(--bar-h) + 16px)}
 .g-mosaic{grid-template-columns:repeat(3,minmax(0,1fr));
@@ -346,7 +352,7 @@ grid-template-areas:"main main main" "s1 s2 s3"}
 .kv--2col{grid-template-columns:auto minmax(0,1fr) auto minmax(0,1fr)}
 /* ── 拼贴栅格 g-bento（Bento / 马赛克）：4 列基准 + 跨列/跨行工具类 ──
    .sp-2/.sp-3/.sp-4 跨列（span），.rw-2 跨行；窄屏自动降列并收敛 span。 */
-.g-bento{grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:minmax(118px,auto)}
+.g-bento{grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:minmax(min-content,1fr)}
 .sp-2{grid-column:span 2}.sp-3{grid-column:span 3}.sp-4{grid-column:span 4}
 .rw-2{grid-row:span 2}
 @media (max-width:1180px){.g-bento{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -381,19 +387,21 @@ background:color-mix(in srgb,var(--bg) 86%,transparent);
 backdrop-filter:saturate(160%) blur(14px);-webkit-backdrop-filter:saturate(160%) blur(14px);
 border-bottom:1px solid var(--border-soft);
 transition:height var(--dur-medium) var(--ease-standard)}
-.bar__in{height:100%;display:flex;align-items:center;justify-content:space-between;gap:var(--sp-4)}
-.brand{display:flex;align-items:center;gap:var(--sp-3);min-width:0}
+.bar__in{height:100%;display:flex;align-items:center;justify-content:space-between;gap:var(--sp-4);overflow:hidden}
+.brand{display:flex;align-items:center;gap:var(--sp-3);min-width:0;flex:1 1 auto;overflow:hidden}
 .brand__mark{width:34px;height:34px;flex:none;border-radius:10px;background:var(--accent);
 color:var(--accent-on);display:grid;place-items:center;font-size:13px;font-weight:700}
+.brand__txt{min-width:0;overflow:hidden;flex:1 1 auto}
 .brand__title{font-size:var(--fs-sm);font-weight:600;color:var(--text);white-space:nowrap;
-overflow:hidden;text-overflow:ellipsis}
+overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .brand__sub{font-size:var(--fs-xs);color:var(--text-3);white-space:nowrap;overflow:hidden;
-text-overflow:ellipsis}
-.nav{display:flex;align-items:center;gap:var(--sp-1)}
+text-overflow:ellipsis;max-width:100%}
+.nav{display:flex;align-items:center;gap:var(--sp-1);flex:0 1 auto;min-width:0;overflow:hidden}
 .nav a{padding:8px 14px;border-radius:var(--r-full);color:var(--text-2);text-decoration:none;
 font-size:var(--fs-sm);font-weight:500;white-space:nowrap;transition:background-color var(--dur-short),color var(--dur-short)}
 .nav a:hover{background:var(--surface-2);color:var(--text)}
 @media (max-width:1180px){.nav{display:none}}
+@media (max-width:1360px){.brand__sub{display:none}}
 .iconbtn{width:40px;height:40px;flex:none;display:grid;place-items:center;
 border:1px solid var(--border);border-radius:var(--r-full);background:transparent;
 color:var(--text-2);cursor:pointer;transition:background-color var(--dur-short),color var(--dur-short)}
@@ -448,12 +456,15 @@ transition:background-color var(--dur-short),box-shadow var(--dur-short),transfo
 .btn--ghost{background:transparent;color:var(--text);border-color:var(--border)}
 .btn--onDark{background:var(--surface);color:var(--text)}
 .card{background:var(--surface);border:1px solid var(--border-soft);border-radius:var(--r-lg);
-padding:clamp(20px,2vw,30px);transition:border-color var(--dur-short),box-shadow var(--dur-short),background-color var(--dur-medium)}
+padding:clamp(20px,2vw,30px);transition:border-color var(--dur-short),box-shadow var(--dur-short),background-color var(--dur-medium);
+display:flex;flex-direction:column;min-width:0}
 .card:hover{border-color:var(--border);box-shadow:var(--shadow-1)}
 .card--flat{background:var(--surface-1);border-color:transparent}
 .card--flat:hover{background:var(--surface-2)}
 .card--accent{background:var(--accent-soft);border-color:transparent}
-.card__hd{display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-3)}
+.card__hd{display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-3);flex:none}
+.card>.ul,.card>.t-body,.card>.t-sm{flex:1 1 auto}
+.card>.so-what,.card>.tbd-legend,.card>.flagbar{flex:none;margin-top:auto}
 .card__ico{width:34px;height:34px;flex:none;border-radius:10px;background:var(--accent-soft);
 color:var(--accent-text);display:grid;place-items:center;font-size:15px;font-weight:600}
 .card__ico svg{width:18px;height:18px}
@@ -901,7 +912,6 @@ background:var(--surface-2);border-radius:6px;padding:2px 7px;color:var(--text)}
     <nav class="nav">
       <a href="#s1">章节一</a>
       <a href="#s2">章节二</a>
-      <a href="#refs">参考资料</a>
     </nav>
     <div class="toolsbar">
       <div class="seld" id="styleSel">
@@ -959,7 +969,7 @@ background:var(--surface-2);border-radius:6px;padding:2px 7px;color:var(--text)}
 <section class="band band--fit" id="cover">
   <div class="wrap">
     <div class="shead rv">
-      <div class="t-eyebrow">产品介绍 · 2026-09-26 · v0.1.18</div>
+      <div class="t-eyebrow">产品介绍 · 2026-09-26 · v0.1.19</div>
       <h1 class="t-display shead__title">TopMind × tms-skills</h1>
       <p class="t-lead shead__desc">HTML + PPT 双交付 · 为正式商务演示而生</p>
     </div>
@@ -970,22 +980,22 @@ background:var(--surface-2);border-radius:6px;padding:2px 7px;color:var(--text)}
   <div class="wrap">
     <div class="shead rv"><div class="t-eyebrow">目录</div>
       <h2 class="t-h1 shead__title">报告大纲</h2></div>
-    <ol class="agenda agenda--2col rv">      <li class="agenda__i"><a class="agenda__a" href="#s1"><span class="agenda__n">01</span><span><span class="agenda__t">市面 PPT 技能很多，为何还要 top-ppt-html</span><div class="agenda__d">01 · 为什么是我们</div></span></a></li>      <li class="agenda__i"><a class="agenda__a" href="#s2"><span class="agenda__n">02</span><span><span class="agenda__t">tms-skills：整仓可安装的智能体技能</span><div class="agenda__d">02 · tms-skills</div></span></a></li>      <li class="agenda__i"><a class="agenda__a" href="#s3"><span class="agenda__n">03</span><span><span class="agenda__t">双交付：HTML 即演示，PPTX 可继续编</span><div class="agenda__d">03 · top-ppt-html</div></span></a></li>      <li class="agenda__i"><a class="agenda__a" href="#s4"><span class="agenda__n">04</span><span><span class="agenda__t">模式先定后写：A 演示 · B 研究 · C 架构</span><div class="agenda__d">04 · 三模式</div></span></a></li>      <li class="agenda__i"><a class="agenda__a" href="#s5"><span class="agenda__n">05</span><span><span class="agenda__t">交付面三件套：演示 HTML · 可编辑 PPTX · 门禁说明</span><div class="agenda__d">05 · 图表工艺</div></span></a></li>      <li class="agenda__i"><a class="agenda__a" href="#s6"><span class="agenda__n">06</span><span><span class="agenda__t">0.1.x 能力累进：定位与样张随版本加厚</span><div class="agenda__d">05 · 图表工艺</div></span></a></li>      <li class="agenda__i"><a class="agenda__a" href="#s7"><span class="agenda__n">07</span><span><span class="agenda__t">九风格开场即可见，亮暗主题一键贯穿</span><div class="agenda__d">06 · 风格主题</div></span></a></li>      <li class="agenda__i"><a class="agenda__a" href="#s8"><span class="agenda__n">08</span><span><span class="agenda__t">散装出稿止步，strict 0/0 才算交付</span><div class="agenda__d">07 · 质量门禁</div></span></a></li>      <li class="agenda__i"><a class="agenda__a" href="#s9"><span class="agenda__n">09</span><span><span class="agenda__t">从想法到上台：工艺链路如何把主张垫实</span><div class="agenda__d">07 · 质量门禁</div></span></a></li>      <li class="agenda__i"><a class="agenda__a" href="#s10"><span class="agenda__n">10</span><span><span class="agenda__t">核图优先：排名对比用横向条，一眼分出轻重</span><div class="agenda__d">05 · 图表工艺</div></span></a></li>      <li class="agenda__i"><a class="agenda__a" href="#s11"><span class="agenda__n">11</span><span><span class="agenda__t">打开 HTML 即演示：顶栏快捷操作一览</span><div class="agenda__d">08 · Header 工具栏</div></span></a></li>      <li class="agenda__i"><a class="agenda__a" href="#s12"><span class="agenda__n">12</span><span><span class="agenda__t">Fast Mode：跳过问询，不跳过工艺</span><div class="agenda__d">09 · Fast Mode</div></span></a></li></ol>
+    <ol class="agenda rv">      <li class="agenda__i"><a class="agenda__a" href="#s1"><span class="agenda__n">01</span><span><span class="agenda__t">为什么是我们</span><div class="agenda__d">01 · 为什么是我们</div></span></a></li>      <li class="agenda__i"><a class="agenda__a" href="#s2"><span class="agenda__n">02</span><span><span class="agenda__t">tms-skills</span><div class="agenda__d">02 · tms-skills</div></span></a></li>      <li class="agenda__i"><a class="agenda__a" href="#s3"><span class="agenda__n">03</span><span><span class="agenda__t">top-ppt-html</span><div class="agenda__d">03 · top-ppt-html</div></span></a></li>      <li class="agenda__i"><a class="agenda__a" href="#s4"><span class="agenda__n">04</span><span><span class="agenda__t">三模式</span><div class="agenda__d">04 · 三模式</div></span></a></li>      <li class="agenda__i"><a class="agenda__a" href="#s5"><span class="agenda__n">05</span><span><span class="agenda__t">图表工艺</span><div class="agenda__d">05 · 图表工艺</div></span></a></li>      <li class="agenda__i"><a class="agenda__a" href="#s7"><span class="agenda__n">06</span><span><span class="agenda__t">风格主题</span><div class="agenda__d">06 · 风格主题</div></span></a></li>      <li class="agenda__i"><a class="agenda__a" href="#s8"><span class="agenda__n">07</span><span><span class="agenda__t">质量门禁</span><div class="agenda__d">07 · 质量门禁</div></span></a></li>      <li class="agenda__i"><a class="agenda__a" href="#s11"><span class="agenda__n">08</span><span><span class="agenda__t">Header 工具栏</span><div class="agenda__d">08 · Header 工具栏</div></span></a></li>      <li class="agenda__i"><a class="agenda__a" href="#s12"><span class="agenda__n">09</span><span><span class="agenda__t">Fast Mode</span><div class="agenda__d">09 · Fast Mode</div></span></a></li></ol>
   </div>
 </section>
 
-<section class="band" id="s1" data-skel="P4" data-page-type="points">
+<section class="band" id="s1" data-skel="P5" data-page-type="cards">
   <div class="wrap">
     <div class="shead rv">
       <div class="t-eyebrow">01 · 为什么是我们</div>
       <h2 class="t-h1 shead__title">市面 PPT 技能很多，为何还要 top-ppt-html</h2>
     </div>
-    <div class="grid g-3 rv a-start">
-      <div class="card"><div class="card__hd"><div class="card__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.5 13 17 22l-5-3-5 3 1.5-9"/></svg></div><h3 class="t-h3">正式商务演示</h3></div>
+    <div class="grid g-3--equal rv">
+      <div class="card"><div class="card__hd"><div class="card__ico" data-icon="增长"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 7l-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg></div><h3 class="t-h3">正式商务演示</h3></div>
         <ul class="ul"><li><strong>不是花哨 gadget。</strong>为演示报告与上台汇报而生——直观、大气、可编辑</li><li><strong>一屏一主张。</strong>标题即行动句，少装饰堆砌</li></ul></div>
-      <div class="card"><div class="card__hd"><div class="card__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M8 20h8"/></svg></div><h3 class="t-h3">HTML + PPT 双交付</h3></div>
+      <div class="card"><div class="card__hd"><div class="card__ico" data-icon="下降"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 17l-8.5-8.5-5 5L2 7"/><path d="M16 17h6v-6"/></svg></div><h3 class="t-h3">HTML + PPT 双交付</h3></div>
         <ul class="ul"><li><strong>HTML 日常上台。</strong>单文件可翻页，等同幻灯片</li><li><strong>PPTX 按需导出。</strong>版式保真、可继续编辑</li></ul></div>
-      <div class="card"><div class="card__hd"><div class="card__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-3z"/></svg></div><h3 class="t-h3">MD3 式克制</h3></div>
+      <div class="card"><div class="card__hd"><div class="card__ico" data-icon="数据"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/></svg></div><h3 class="t-h3">MD3 式克制</h3></div>
         <ul class="ul"><li><strong>密度合适。</strong>文字/图形/形状/颜色克制</li><li><strong>无 AI chrome。</strong>结论条 tonal 满铺，禁左侧装饰轨</li></ul></div>
     </div>
     <div class="sowhat rv"><span class="sowhat__v">产出即上台：同源模型保证 HTML 与 PPTX 一致，图表带数据可核对。</span></div>
@@ -998,16 +1008,16 @@ background:var(--surface-2);border-radius:6px;padding:2px 7px;color:var(--text)}
       <div class="t-eyebrow">02 · tms-skills</div>
       <h2 class="t-h1 shead__title">tms-skills：整仓可安装的智能体技能</h2>
     </div>
-    <div class="grid g-3 rv a-start">
-      <div class="card"><div class="card__hd"><div class="card__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l9 5-9 5-9-5 9-5z"/><path d="M3 12l9 5 9-5"/><path d="M3 17l9 5 9-5"/></svg></div><h3 class="t-h3">Monorepo</h3></div>
+    <div class="grid g-3--equal rv">
+      <div class="card"><div class="card__hd"><div class="card__ico" data-icon="增长"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 7l-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg></div><h3 class="t-h3">Monorepo</h3></div>
         <ul class="ul"><li><strong>一仓多技能。</strong>根目录技能包 + 统一安装器</li><li><strong>同 tag 发版。</strong>安装器与技能整仓对齐</li></ul></div>
-      <div class="card"><div class="card__hd"><div class="card__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z"/></svg></div><h3 class="t-h3">双通道安装</h3></div>
+      <div class="card"><div class="card__hd"><div class="card__ico" data-icon="下降"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 17l-8.5-8.5-5 5L2 7"/><path d="M16 17h6v-6"/></svg></div><h3 class="t-h3">双通道安装</h3></div>
         <ul class="ul"><li><strong>npm 钉版本。</strong>npx @topmindspace/tms-skills</li><li><strong>GitHub 跟 HEAD。</strong>日常可 clone / 直装</li></ul></div>
-      <div class="card"><div class="card__hd"><div class="card__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h6"/></svg></div><h3 class="t-h3">当前主技能</h3></div>
+      <div class="card"><div class="card__hd"><div class="card__ico" data-icon="数据"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/></svg></div><h3 class="t-h3">当前主技能</h3></div>
         <ul class="ul"><li><strong>top-ppt-html。</strong>正式场合演示文稿</li><li><strong>HTML + PPTX。</strong>同源模型 · 双交付</li></ul></div>
     </div>
-    <div class="footnote">包名 @topmindspace/tms-skills · 当前线 0.1.18（latest）</div>
-      <div class="sowhat rv"><span class="sowhat__v">安装器与技能同仓同 tag——装一次，版本线对齐。</span></div>
+    <div class="sowhat rv"><span class="sowhat__v">安装器与技能同仓同 tag——装一次，版本线对齐。</span></div>
+    <div class="footnote">包名 @topmindspace/tms-skills · 当前线 0.1.19（latest）</div>
   </div>
 </section>
 
@@ -1018,23 +1028,12 @@ background:var(--surface-2);border-radius:6px;padding:2px 7px;color:var(--text)}
       <h2 class="t-h1 shead__title">双交付：HTML 即演示，PPTX 可继续编</h2>
     </div>
     <div class="grid g-side rv a-start">
-      <div class="stack gap-4"><ul class="ul ul--ico"><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h6"/></svg><strong>日常 HTML 上台。</strong>单文件可翻页，等同幻灯片；亮暗与九风格顶栏即切</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6" rx="1"/><rect x="12" y="8" width="3" height="10" rx="1"/><rect x="17" y="4" width="3" height="14" rx="1"/></svg><strong>需要时再出 PPT。</strong>版式保真可编辑 PPTX；图表数据可标注、可核对</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-3z"/></svg><strong>克制的商务面。</strong>参考 MD3：合适信息密度，少装饰、一屏一主张</li></ul></div>
+      <div class="stack gap-4"><ul class="ul"><li><strong>日常 HTML 上台。</strong>单文件可翻页，等同幻灯片；亮暗与九风格顶栏即切</li><li><strong>需要时再出 PPT。</strong>版式保真可编辑 PPTX；图表数据可标注、可核对</li><li><strong>克制的商务面。</strong>参考 MD3：合适信息密度，少装饰、一屏一主张</li></ul></div>
       <div class="fig"><div class="fig__cap">工艺关注点（产品强调 · 示意权重）</div>
       <svg class="chart" data-chart="bar" viewBox="0 0 560 220">
-      <line x1="46" y1="170" x2="540" y2="170" class="s-bds" stroke-width="1"/>
-      <rect data-anim="grow" x="92.0" y="58.0" width="56.1" height="112.0" rx="6" class="f-s3"><title>版式 32</title></rect>
-      <text data-anim="fade" x="120.0" y="192" text-anchor="middle" class="f-txt3" font-size="11">版式</text>
-      <text data-anim="fade" x="120.0" y="50.0" text-anchor="middle" class="f-txt2" font-size="12" font-weight="600">32</text>
-      <rect data-anim="grow" x="211.9" y="72.0" width="56.1" height="98.0" rx="6" class="f-s3"><title>排版 28</title></rect>
-      <text data-anim="fade" x="240.0" y="192" text-anchor="middle" class="f-txt3" font-size="11">排版</text>
-      <text data-anim="fade" x="240.0" y="64.0" text-anchor="middle" class="f-txt2" font-size="12" font-weight="600">28</text>
-      <rect data-anim="grow" x="331.9" y="107.0" width="56.1" height="63.0" rx="6" class="f-acc"><title>色彩 18</title></rect>
-      <text data-anim="fade" x="360.0" y="192" text-anchor="middle" class="f-txt3" font-size="11">色彩</text>
-      <text data-anim="fade" x="360.0" y="99.0" text-anchor="middle" class="f-txt2" font-size="12" font-weight="600">18</text>
-      <rect data-anim="grow" x="451.9" y="93.0" width="56.1" height="77.0" rx="6" class="f-acc"><title>内容 22</title></rect>
-      <text data-anim="fade" x="480.0" y="192" text-anchor="middle" class="f-txt3" font-size="11">内容</text>
-      <text data-anim="fade" x="480.0" y="85.0" text-anchor="middle" class="f-txt2" font-size="12" font-weight="600">22</text>
-    </svg>
+        <!-- 数据以 REPORT_MODEL.chart 为准；复杂图形用 extract_snippet --chart bar -->
+        <text x="280" y="110" text-anchor="middle" class="f-txt3" font-size="12">bar · 见模型数据</text>
+      </svg>
       </div>
     </div>
     <div class="sowhat rv"><span class="sowhat__v">工艺在结构与密度，不在 gadget——正式场合演讲/汇报才是主场。</span></div>
@@ -1047,16 +1046,16 @@ background:var(--surface-2);border-radius:6px;padding:2px 7px;color:var(--text)}
       <div class="t-eyebrow">04 · 三模式</div>
       <h2 class="t-h1 shead__title">模式先定后写：A 演示 · B 研究 · C 架构</h2>
     </div>
-    <div class="grid g-3 rv a-start">
-      <div class="card"><div class="card__hd"><div class="card__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div><h3 class="t-h3">A · 演示</h3></div>
+    <div class="grid g-3--equal rv">
+      <div class="card"><div class="card__hd"><div class="card__ico" data-icon="增长"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 7l-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg></div><h3 class="t-h3">A · 演示</h3></div>
         <ul class="ul"><li><strong>每屏一主张。</strong>标题即行动句，非话题标签</li><li><strong>大气留白。</strong>证据充分但不堆咨询 dump</li></ul></div>
-      <div class="card"><div class="card__hd"><div class="card__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6" rx="1"/><rect x="12" y="8" width="3" height="10" rx="1"/><rect x="17" y="4" width="3" height="14" rx="1"/></svg></div><h3 class="t-h3">B · 研究</h3></div>
+      <div class="card"><div class="card__hd"><div class="card__ico" data-icon="下降"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 17l-8.5-8.5-5 5L2 7"/><path d="M16 17h6v-6"/></svg></div><h3 class="t-h3">B · 研究</h3></div>
         <ul class="ul"><li><strong>咨询密排。</strong>Exhibit · 来源 · 结论条</li><li><strong>结论可核对。</strong>数字与口径双向对齐</li></ul></div>
-      <div class="card"><div class="card__hd"><div class="card__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M14.5 9.5l-2 5-5 2 2-5 5-2z"/></svg></div><h3 class="t-h3">C · 架构</h3></div>
+      <div class="card"><div class="card__hd"><div class="card__ico" data-icon="数据"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/></svg></div><h3 class="t-h3">C · 架构</h3></div>
         <ul class="ul"><li><strong>图为王。</strong>拓扑 / 泳道 / 分层</li><li><strong>少字多结构。</strong>一图说清关系</li></ul></div>
     </div>
-    <div class="footnote">意图线索：路演/汇报/演讲 → A；调研/对标 → B；拓扑/方案图 → C</div>
     <div class="sowhat rv"><span class="sowhat__v">先定模式再写页——A/B/C 契约决定密度、图表与结论条用法。</span></div>
+    <div class="footnote">意图线索：路演/汇报/演讲 → A；调研/对标 → B；拓扑/方案图 → C</div>
   </div>
 </section>
 
@@ -1069,15 +1068,9 @@ background:var(--surface-2);border-radius:6px;padding:2px 7px;color:var(--text)}
     <div class="grid g-side rv a-start">
       <div class="fig" style="text-align:center"><div class="fig__cap">构成占比</div>
       <svg class="chart" data-chart="donut" viewBox="0 0 560 220">
-      <g transform="translate(210,40)">
-        <circle cx="70" cy="70" r="54" class="f-none s-bds" stroke-width="15"/>
-        <circle data-sweep data-circ="339.3" data-p="0.4000" cx="70" cy="70" r="54" class="f-none s-acc" stroke-width="15" stroke-dasharray="135.7 203.6" stroke-linecap="butt" transform="rotate(-90.0 70 70)"><title>可翻页 HTML 40%</title></circle>
-        <circle data-sweep data-circ="339.3" data-p="0.3500" cx="70" cy="70" r="54" class="f-none s-txt2" stroke-width="15" stroke-dasharray="118.8 220.5" stroke-linecap="butt" transform="rotate(54.0 70 70)"><title>保真 PPTX 35%</title></circle>
-        <circle data-sweep data-circ="339.3" data-p="0.2500" cx="70" cy="70" r="54" class="f-none s-txt3" stroke-width="15" stroke-dasharray="84.8 254.5" stroke-linecap="butt" transform="rotate(180.0 70 70)"><title>质检交付说明 25%</title></circle>
-        <text x="70" y="68" text-anchor="middle" class="f-txt" font-size="22" font-weight="600" data-count="40" data-suffix="%">40%</text>
-        <text x="70" y="88" text-anchor="middle" class="f-txt3" font-size="11">同源模型</text>
-      </g>
-    </svg>
+        <!-- 数据以 REPORT_MODEL.chart 为准；复杂图形用 extract_snippet --chart donut -->
+        <text x="280" y="110" text-anchor="middle" class="f-txt3" font-size="12">donut · 见模型数据</text>
+      </svg>
       </div>
       <div class="stack gap-4"><h3 class="t-h3">构成明细</h3>
         <ul class="ul">        <li><strong>可翻页 HTML。</strong>40（40%）</li>        <li><strong>保真 PPTX。</strong>35（35%）</li>        <li><strong>质检交付说明。</strong>25（25%）</li></ul>
@@ -1096,21 +1089,9 @@ background:var(--surface-2);border-radius:6px;padding:2px 7px;color:var(--text)}
     <div class="grid g-side rv a-start">
       <div class="fig"><div class="fig__cap">0.1.x 能力累进：定位与样张随版本加厚</div>
       <svg class="chart" data-chart="line" viewBox="0 0 560 220">
-      <line x1="46" y1="180" x2="540" y2="180" class="s-bds" stroke-width="1"/>
-      <line x1="46" y1="130" x2="540" y2="130" class="s-bds" stroke-width="1" stroke-dasharray="3 5"/>
-      <line x1="46" y1="80" x2="540" y2="80" class="s-bds" stroke-width="1" stroke-dasharray="3 5"/>
-      <path data-draw d="M60.0,100.0 L175.0,80.0 L290.0,70.0 L405.0,60.0 L520.0,50.0" class="f-none s-acc" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-      <circle cx="60.0" cy="100.0" r="4" class="f-acc"><title>0.1.7 · 8项</title></circle>
-      <text x="60.0" y="200" text-anchor="middle" class="f-txt3" font-size="11">0.1.7</text>
-      <circle cx="175.0" cy="80.0" r="4" class="f-acc"><title>0.1.8 · 10项</title></circle>
-      <text x="175.0" y="200" text-anchor="middle" class="f-txt3" font-size="11">0.1.8</text>
-      <circle cx="290.0" cy="70.0" r="4" class="f-acc"><title>0.1.9 · 11项</title></circle>
-      <text x="290.0" y="200" text-anchor="middle" class="f-txt3" font-size="11">0.1.9</text>
-      <circle cx="405.0" cy="60.0" r="4" class="f-acc"><title>0.1.10 · 12项</title></circle>
-      <text x="405.0" y="200" text-anchor="middle" class="f-txt3" font-size="11">0.1.10</text>
-      <circle cx="520.0" cy="50.0" r="4" class="f-acc"><title>0.1.11 · 13项</title></circle>
-      <text x="520.0" y="200" text-anchor="middle" class="f-txt3" font-size="11">0.1.11</text>
-    </svg>
+        <!-- 数据以 REPORT_MODEL.chart 为准；复杂图形用 extract_snippet --chart line -->
+        <text x="280" y="110" text-anchor="middle" class="f-txt3" font-size="12">line · 见模型数据</text>
+      </svg>
       </div>
       <div class="stack gap-4"><h3 class="t-h3">怎么读这张图</h3>
         <ul class="ul"><li><strong>真实版本线。</strong>对应 CHANGELOG 已合并能力，非虚构增速</li><li><strong>本版强化。</strong>差异化定位 · 双交付叙事 · README 总览精简</li></ul>
@@ -1143,9 +1124,9 @@ background:var(--surface-2);border-radius:6px;padding:2px 7px;color:var(--text)}
       <h2 class="t-h1 shead__title">散装出稿止步，strict 0/0 才算交付</h2>
     </div>
     <div class="grid g-half g-2 rv a-start">
-      <div class="card"><div class="card__hd"><div class="card__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg></div><h3 class="t-h3">散装路径 · 风险</h3></div>
+      <div class="card"><h3 class="t-h3">散装路径 · 风险</h3>
         <ul class="ul"><li><strong>手改 HTML。</strong>模型与正文双写，一改就漂</li><li><strong>无严格校验。</strong>截断、同型图、半空卡易漏</li><li><strong>口头交付。</strong>缺七要素，验收靠感觉</li></ul></div>
-      <div class="card" style="background:var(--accent-soft);border-color:transparent"><div class="card__hd"><div class="card__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div><h3 class="t-h3" style="color:var(--accent)">门禁路径 · 目标</h3></div>
+      <div class="card" style="background:var(--accent-soft);border-color:transparent"><h3 class="t-h3" style="color:var(--accent)">门禁路径 · 目标</h3>
         <ul class="ul"><li><strong>模型单写。</strong>render 回填，禁手改正文</li><li><strong>HTML + PPTX。</strong>validate --strict 双侧 0/0</li><li><strong>七要素说明。</strong>quality_gate --deliver</li></ul></div>
     </div>
     <div class="sowhat rv"><span class="sowhat__v">反截断、图表多样性、runtime SHA——门禁是交付的一部分。</span></div>
@@ -1161,33 +1142,12 @@ background:var(--surface-2);border-radius:6px;padding:2px 7px;color:var(--text)}
     <div class="grid g-side rv a-start">
       <div class="fig"><div class="fig__cap">从想法到上台：工艺链路如何把主张垫实</div>
       <svg class="chart" data-chart="waterfall" viewBox="0 0 560 220">
-      <line x1="40" y1="190" x2="540" y2="190" class="s-bds" stroke-width="1"/>
-      <rect data-anim="grow" x="68.4" y="159.1" width="44.9" height="30.9" rx="5" class="f-s3"/>
-      <text x="90.8" y="151.1" text-anchor="middle" class="f-txt2" font-size="12" font-weight="600">20pt</text>
-      <text x="90.8" y="206" text-anchor="middle" class="f-txt3" font-size="11">意图</text>
-      <rect data-anim="grow" x="150.0" y="135.9" width="44.9" height="23.2" rx="5" class="f-acc"/>
-      <text x="172.5" y="127.9" text-anchor="middle" class="f-acc" font-size="12" font-weight="600">+15pt</text>
-      <text x="172.5" y="206" text-anchor="middle" class="f-txt3" font-size="11">模式</text>
-      <line x1="131.7" y1="159.1" x2="150.0" y2="159.1" class="s-bds" stroke-width="1" stroke-dasharray="3 3"/>
-      <rect data-anim="grow" x="231.7" y="97.2" width="44.9" height="38.6" rx="5" class="f-acc"/>
-      <text x="254.2" y="89.2" text-anchor="middle" class="f-acc" font-size="12" font-weight="600">+25pt</text>
-      <text x="254.2" y="206" text-anchor="middle" class="f-txt3" font-size="11">模型</text>
-      <line x1="213.3" y1="135.9" x2="231.7" y2="135.9" class="s-bds" stroke-width="1" stroke-dasharray="3 3"/>
-      <rect data-anim="grow" x="313.4" y="74.1" width="44.9" height="23.2" rx="5" class="f-acc"/>
-      <text x="335.8" y="66.1" text-anchor="middle" class="f-acc" font-size="12" font-weight="600">+15pt</text>
-      <text x="335.8" y="206" text-anchor="middle" class="f-txt3" font-size="11">图表</text>
-      <line x1="295.0" y1="97.2" x2="313.4" y2="97.2" class="s-bds" stroke-width="1" stroke-dasharray="3 3"/>
-      <rect data-anim="grow" x="395.0" y="50.9" width="44.9" height="23.2" rx="5" class="f-acc"/>
-      <text x="417.5" y="42.9" text-anchor="middle" class="f-acc" font-size="12" font-weight="600">+15pt</text>
-      <text x="417.5" y="206" text-anchor="middle" class="f-txt3" font-size="11">门禁</text>
-      <line x1="376.7" y1="74.1" x2="395.0" y2="74.1" class="s-bds" stroke-width="1" stroke-dasharray="3 3"/>
-      <rect data-anim="grow" x="476.7" y="50.9" width="44.9" height="139.1" rx="5" class="f-acc"/>
-      <text x="499.2" y="42.9" text-anchor="middle" class="f-txt2" font-size="12" font-weight="600">90pt</text>
-      <text x="499.2" y="206" text-anchor="middle" class="f-txt3" font-size="11">上台</text>
-    </svg>
+        <!-- 数据以 REPORT_MODEL.chart 为准；复杂图形用 extract_snippet --chart waterfall -->
+        <text x="280" y="110" text-anchor="middle" class="f-txt3" font-size="12">waterfall · 见模型数据</text>
+      </svg>
       </div>
       <div class="stack gap-4"><h3 class="t-h3">怎么读这张图</h3>
-        <ul class="ul ul--ico"><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M14.5 9.5l-2 5-5 2 2-5 5-2z"/></svg><strong>意图定模式。</strong>路演→A · 调研→B · 拓扑→C</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><strong>门禁收口。</strong>strict 0/0 前不算交付</li></ul>
+        <ul class="ul"><li><strong>意图定模式。</strong>路演→A · 调研→B · 拓扑→C</li><li><strong>门禁收口。</strong>strict 0/0 前不算交付</li></ul>
       </div>
     </div>
     <div class="sowhat rv"><span class="sowhat__v">上台交付 = 模式契约 + 模型单写 + 多样图表 + 门禁收口。</span></div>
@@ -1201,30 +1161,12 @@ background:var(--surface-2);border-radius:6px;padding:2px 7px;color:var(--text)}
       <h2 class="t-h1 shead__title">核图优先：排名对比用横向条，一眼分出轻重</h2>
     </div>
     <div class="grid g-side rv a-start">
-      <div class="stack gap-4"><ul class="ul ul--ico"><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><strong>产品已交付能力。</strong>五项均为当前线真实能力，不是预测</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6" rx="1"/><rect x="12" y="8" width="3" height="10" rx="1"/><rect x="17" y="4" width="3" height="14" rx="1"/></svg><strong>图表选型。</strong>谁大谁小 → hbar；趋势 → line；占比 → donut</li></ul></div>
+      <div class="stack gap-4"><ul class="ul"><li><strong>产品已交付能力。</strong>五项均为当前线真实能力，不是预测</li><li><strong>图表选型。</strong>谁大谁小 → hbar；趋势 → line；占比 → donut</li></ul></div>
       <div class="fig"><div class="fig__cap">能力就绪（当前发布线）</div>
       <svg class="chart" data-chart="hbar" viewBox="0 0 560 220">
-      <text x="0" y="30.0" class="f-txt2" font-size="12">strict 0/0</text>
-      <rect x="130" y="20.0" width="340" height="15" rx="7.5" class="f-s2"/>
-      <rect data-anim="grow" x="130" y="20.0" width="340.0" height="15" rx="7.5" class="f-acc"><title>strict 0/0 100%</title></rect>
-      <text x="482" y="32.0" class="f-txt" font-size="12" font-weight="600">100%</text>
-      <text x="0" y="66.0" class="f-txt2" font-size="12">三模式契约</text>
-      <rect x="130" y="56.0" width="340" height="15" rx="7.5" class="f-s2"/>
-      <rect data-anim="grow" x="130" y="56.0" width="340.0" height="15" rx="7.5" class="f-acc"><title>三模式契约 100%</title></rect>
-      <text x="482" y="68.0" class="f-txt" font-size="12" font-weight="600">100%</text>
-      <text x="0" y="102.0" class="f-txt2" font-size="12">九风格皮肤</text>
-      <rect x="130" y="92.0" width="340" height="15" rx="7.5" class="f-s2"/>
-      <rect data-anim="grow" x="130" y="92.0" width="340.0" height="15" rx="7.5" class="f-acc"><title>九风格皮肤 100%</title></rect>
-      <text x="482" y="104.0" class="f-txt" font-size="12" font-weight="600">100%</text>
-      <text x="0" y="138.0" class="f-txt2" font-size="12">双通道交付</text>
-      <rect x="130" y="128.0" width="340" height="15" rx="7.5" class="f-s2"/>
-      <rect data-anim="grow" x="130" y="128.0" width="340.0" height="15" rx="7.5" class="f-acc"><title>双通道交付 100%</title></rect>
-      <text x="482" y="140.0" class="f-txt" font-size="12" font-weight="600">100%</text>
-      <text x="0" y="174.0" class="f-txt2" font-size="12">Fast Mode</text>
-      <rect x="130" y="164.0" width="340" height="15" rx="7.5" class="f-s2"/>
-      <rect data-anim="grow" x="130" y="164.0" width="340.0" height="15" rx="7.5" class="f-acc"><title>Fast Mode 100%</title></rect>
-      <text x="482" y="176.0" class="f-txt" font-size="12" font-weight="600">100%</text>
-    </svg>
+        <!-- 数据以 REPORT_MODEL.chart 为准；复杂图形用 extract_snippet --chart hbar -->
+        <text x="280" y="110" text-anchor="middle" class="f-txt3" font-size="12">hbar · 见模型数据</text>
+      </svg>
       </div>
     </div>
     <div class="sowhat rv"><span class="sowhat__v">说服力来自可核对的能力清单与图表多样性，而非单张柱图凑数。</span></div>
@@ -1266,14 +1208,6 @@ background:var(--surface-2);border-radius:6px;padding:2px 7px;color:var(--text)}
     <div class="grid g-3 rv a-start">
 <ul class="ul"><li><strong>装技能。</strong>npx @topmindspace/tms-skills install top-ppt-html</li><li><strong>看样张。</strong>Showcase · style-gallery · 顶栏 T/P/H/F/B</li><li><strong>双交付上台。</strong>HTML 日常演示 · PPTX 按需导出 · strict 0/0</li></ul>
     </div>
-  </div>
-</section>
-
-<section class="band band--flow" id="refs">
-  <div class="wrap">
-    <div class="shead rv"><div class="t-eyebrow">附录</div>
-      <h2 class="t-h1 shead__title">参考资料</h2></div>
-    <ol class="refs"><li>（无外部引用）</li></ol>
   </div>
 </section>
 <!-- __TOPPPT_CONTENT_END__ -->
@@ -1889,66 +1823,51 @@ window.REPORT_MODEL = {
   "theme": "light",
   "title": "TopMind × tms-skills",
   "subtitle": "HTML + PPT 双交付 · 为正式商务演示而生",
-  "meta": "产品介绍 · 2026-09-26 · v0.1.18",
+  "meta": "产品介绍 · 2026-09-26 · v0.1.19",
   "agenda": [
     [
       "01",
-      "市面 PPT 技能很多，为何还要 top-ppt-html",
+      "为什么是我们",
       "01 · 为什么是我们"
     ],
     [
       "02",
-      "tms-skills：整仓可安装的智能体技能",
+      "tms-skills",
       "02 · tms-skills"
     ],
     [
       "03",
-      "双交付：HTML 即演示，PPTX 可继续编",
+      "top-ppt-html",
       "03 · top-ppt-html"
     ],
     [
       "04",
-      "模式先定后写：A 演示 · B 研究 · C 架构",
+      "三模式",
       "04 · 三模式"
     ],
     [
       "05",
-      "交付面三件套：演示 HTML · 可编辑 PPTX · 门禁说明",
+      "图表工艺",
       "05 · 图表工艺"
     ],
     [
       "06",
-      "0.1.x 能力累进：定位与样张随版本加厚",
-      "05 · 图表工艺"
-    ],
-    [
-      "07",
-      "九风格开场即可见，亮暗主题一键贯穿",
+      "风格主题",
       "06 · 风格主题"
     ],
     [
+      "07",
+      "质量门禁",
+      "07 · 质量门禁"
+    ],
+    [
       "08",
-      "散装出稿止步，strict 0/0 才算交付",
-      "07 · 质量门禁"
-    ],
-    [
-      "09",
-      "从想法到上台：工艺链路如何把主张垫实",
-      "07 · 质量门禁"
-    ],
-    [
-      "10",
-      "核图优先：排名对比用横向条，一眼分出轻重",
-      "05 · 图表工艺"
-    ],
-    [
-      "11",
-      "打开 HTML 即演示：顶栏快捷操作一览",
+      "Header 工具栏",
       "08 · Header 工具栏"
     ],
     [
-      "12",
-      "Fast Mode：跳过问询，不跳过工艺",
+      "09",
+      "Fast Mode",
       "09 · Fast Mode"
     ]
   ],
@@ -1971,7 +1890,8 @@ window.REPORT_MODEL = {
               "一屏一主张",
               "标题即行动句，少装饰堆砌"
             ]
-          ]
+          ],
+          "icon": "增长"
         },
         {
           "title": "HTML + PPT 双交付",
@@ -1984,7 +1904,8 @@ window.REPORT_MODEL = {
               "PPTX 按需导出",
               "版式保真、可继续编辑"
             ]
-          ]
+          ],
+          "icon": "下降"
         },
         {
           "title": "MD3 式克制",
@@ -1997,7 +1918,8 @@ window.REPORT_MODEL = {
               "无 AI chrome",
               "结论条 tonal 满铺，禁左侧装饰轨"
             ]
-          ]
+          ],
+          "icon": "数据"
         }
       ],
       "soWhat": "产出即上台：同源模型保证 HTML 与 PPTX 一致，图表带数据可核对。"
@@ -2020,7 +1942,8 @@ window.REPORT_MODEL = {
               "同 tag 发版",
               "安装器与技能整仓对齐"
             ]
-          ]
+          ],
+          "icon": "增长"
         },
         {
           "title": "双通道安装",
@@ -2033,7 +1956,8 @@ window.REPORT_MODEL = {
               "GitHub 跟 HEAD",
               "日常可 clone / 直装"
             ]
-          ]
+          ],
+          "icon": "下降"
         },
         {
           "title": "当前主技能",
@@ -2046,10 +1970,11 @@ window.REPORT_MODEL = {
               "HTML + PPTX",
               "同源模型 · 双交付"
             ]
-          ]
+          ],
+          "icon": "数据"
         }
       ],
-      "footnote": "包名 @topmindspace/tms-skills · 当前线 0.1.18（latest）",
+      "footnote": "包名 @topmindspace/tms-skills · 当前线 0.1.19（latest）",
       "soWhat": "安装器与技能同仓同 tag——装一次，版本线对齐。"
     },
     {
@@ -2112,7 +2037,8 @@ window.REPORT_MODEL = {
               "大气留白",
               "证据充分但不堆咨询 dump"
             ]
-          ]
+          ],
+          "icon": "增长"
         },
         {
           "title": "B · 研究",
@@ -2125,7 +2051,8 @@ window.REPORT_MODEL = {
               "结论可核对",
               "数字与口径双向对齐"
             ]
-          ]
+          ],
+          "icon": "下降"
         },
         {
           "title": "C · 架构",
@@ -2138,7 +2065,8 @@ window.REPORT_MODEL = {
               "少字多结构",
               "一图说清关系"
             ]
-          ]
+          ],
+          "icon": "数据"
         }
       ],
       "footnote": "意图线索：路演/汇报/演讲 → A；调研/对标 → B；拓扑/方案图 → C",
@@ -2444,7 +2372,7 @@ window.REPORT_MODEL = {
 
 /* __TOPPPT_RUNTIME_START__ */
 /* ══ PPTX 导出运行时（assets/pptx-export.js 的内联副本 · 由 scripts/sync_runtime.py 注入，禁止手改） ══ */
-/* __TOPPPT_RUNTIME_SHA__:73cff2ca1dbc78a8 */
+/* __TOPPPT_RUNTIME_SHA__:af6e25f25fd2e116 */
 /* ═══════════════════════════════════════════════════════════════════════════
  * TopPPT HTML· 浏览器端 PPTX 预览运行时
  * 零依赖、随报告单文件分发；OOXML 序列化器（仅供预览，页面不导出文件）。
@@ -2568,7 +2496,8 @@ function regionOf(pageType, slotId, opts) {
   if (type === 'bar' && slot === 'primary') {
     var by = P.chartY || 2.95;
     var bb = opts.bottom != null ? opts.bottom : bottomDefault;
-    return { x: MX + (P.chartX || 0), y: by, w: CW - (P.chartW || 0), h: Math.max(1.2, bb - by) };
+    /* chartX/chartW 历史误用已纠正：与 donut/table/hbar/exhibit 同口径，图表盒对齐版心 (MX, CW) */
+    return { x: MX, y: by, w: CW, h: Math.max(1.2, bb - by) };
   }
   if (type === 'bar' && slot === 'hbar') {
     var y0 = P.hbarY0 || 2.6;
@@ -2680,7 +2609,7 @@ function regionOf(pageType, slotId, opts) {
 /* __TOPPPT_SCHEMA_START__ */
 /* ── 由 scripts/sync_runtime.py 从 scripts/model-schema.json 注入 · 禁止手改 ── */
 /* DSL schema 单源：浏览器端 validateModel 与 scripts/extract_model.py 消费同一份定义 */
-var MODEL_SCHEMA = {"version":"0.1","modes":["presentation","research","architecture"],"model":{"required":["title","sections:array","closing.title","closing.points:array"],"optional":["mode","style","theme","subtitle","meta","agenda:array"],"agendaMin":{"presentation":3,"research":3,"architecture":0},"sectionsMin":1,"sectionsRecommended":3,"agendaComfortMax":16},"commonSectionFields":["eyebrow","title","lead","soWhat","footnote","flags","image","exhibitNo","layoutPreset"],"mutualExclusionHint":"verdict 与 soWhat 互斥：二者共用 annotation 结论条槽位，同页双填必叠印。comparison 页填 verdict 时不要再填 soWhat（渲染器已自动二选一，但模型侧应只给一个）。","flagsHint":"flags = 待核实/待二次修改条目字符串数组（如 '2027 增速 xx%（口径未定）'）；渲染为 accent 强调色标注行，提示用户核对。","imageHint":"image = 素材图片/配图占位对象。三选一必填：src（用户图，data: 内联或相对路径，零外链铁律禁 http(s)）｜items（多图版式：grid/compare/wall，元素 {src?, alt?, caption?, placeholder?}）｜placeholder:true（无图时出配图占位，原生形状渲染、pictures 不增）。其余可选：layout（full/half/bleed/grid/compare/wall，见 layout-constants.json imageSpec.layouts）、fit（cover 默认 / contain）、caption、alt、hint、ratio。","imageLayoutHint":"layout 与 HTML 版式对应：full=版心全宽图｜half=左图右注（points 为右栏注解）｜bleed=通栏出血｜grid=多图网格（items 2/3/4/6 张）｜compare=双图 A/B 对比（items 2 张）｜wall=Logo 墙（items 3–12 张小图）。占位符标签文本由双引擎按 imageSpec 拼同一串，保证 A/B 通道逐页文本一致。","chartTypes":["bar","hbar","stack","stackline","line","dualline","area","donut","multidonut","pie","radar","scatter","bubble","waterfall","gauge","pareto","funnel","gantt","vsbar","progress","sparkline","slope","dumbbell","lollipop","dotplot","bulletchart","waffle","radialbar","rose","candlestick"],"chartTypesHint":"chart.type 可取值 = 本表（30 类：16 原生 + 14 形状还原）。其余 6 类复杂信息图（sankey/treemap/boxplot/network/marimekko/streamgraph）是**专属页型**而非 chart.type——它们要按列/段/节点等结构化载荷表达，故走 sections[].type。不变量：charts.registry.types == chartTypes ∪ 上述 6 类页型（sync_runtime.py 校验）。","chartDataTable":{"enum":["notes","inline","appendix","off"],"default":"notes","rule":"非原生图表（registry.pptx=shape）的 dataTable 不得为 off；缺失时按 registry 默认值补齐。"},"pageTypes":{"points":{"label":"要点列表页","modes":["presentation","research","architecture"],"required":["points:array"],"optional":["metrics:array"]},"metrics":{"label":"指标带页（4–6 个核心数字）","modes":["presentation","research"],"required":["metrics:array"]},"kpi":{"label":"大数指标页（hero 大数字 + 支撑指标行）","modes":["presentation","research"],"required":["hero:array"],"optional":["metrics:array"]},"table":{"label":"对比表页","modes":["presentation","research","architecture"],"required":["table.head:array","table.rows:array"],"optional":["table.colW:array"]},"timeline":{"label":"时间线 / 路线页","modes":["presentation","research"],"required":["phases:array"]},"steps":{"label":"步骤条页（N 步横排 + 箭头，可分组）","modes":["presentation","research","architecture"],"required":["steps:array"],"optional":["groups:array","note"]},"bar":{"label":"图表页（chart.type 见 chartTypes；native 通道走原生数据图表，shape 通道走高保真形状还原 + 数据表）","modes":["presentation","research"],"required":["chart.labels:array","chart.values:array"],"optional":["chart.type","chart.series:array","chart.points:array","chart.max","chart.unit","chart.colors:array","chart.start:array","chart.target:array","chart.dataTable","note"]},"donut":{"label":"环形图页（原生 pie 楔形 + 图例）","modes":["presentation","research"],"required":["chart.labels:array","chart.values:array"],"optional":["chart.unit","chart.centerLabel","chart.colors:array","chart.dataTable","note"]},"heatmap":{"label":"热力矩阵页（行 × 列 + 强度色阶）","modes":["presentation","research"],"required":["rowHeads:array","colHeads:array","cells:array"],"optional":["unit","scaleLabel:array","note"]},"bullet":{"label":"达成对比页（实际 vs 目标条）","modes":["presentation","research"],"required":["items:array"],"optional":["unit","max","note"]},"pyramid":{"label":"金字塔页（层级递进，顶层最窄）","modes":["presentation","research","architecture"],"required":["levels:array"],"optional":["note"]},"image":{"label":"素材图片页（full/half/bleed/grid/compare/wall，效果与位置锁定；支持配图占位）","modes":["presentation","research","architecture"],"required":["anyof:image.src:str|image.items:array|image.placeholder"],"optional":["image.caption","image.alt","image.layout","image.fit","image.ratio","image.hint","points:array","note"]},"cards":{"label":"卡片网格页（cards 元素须为 {title, points:[[k,v]…]}，不接受元组）","modes":["presentation","research"],"required":["cards:array"],"optional":["columns"]},"split":{"label":"双区组合页（left / right 各可为 要点｜图表｜表格｜图片：type = points（默认）| table | image | 图表类型名；图表/表格字段直接挂在对应侧）","modes":["presentation","research"],"required":["anyof:left.points:array|left.type:str"],"optional":["left.cap","left.image","left.labels:array","left.values:array","left.series:array","left.points:array","left.max","left.unit","left.colors:array","left.dataTable","left.head:array","left.rows:array","left.colW:array","right.type","right.cap","right.image","right.labels:array","right.values:array","right.series:array","right.points:array","right.max","right.unit","right.colors:array","right.dataTable","right.head:array","right.rows:array","right.colW:array"]},"comparison":{"label":"对比页（左右双栏 + 可选结论条）","modes":["presentation","research"],"required":["left.title","left.points:array","right.title","right.points:array"],"optional":["verdict"]},"quote":{"label":"引用 / 金句页（深色全幅）","modes":["presentation","research"],"required":["quote","author"],"optional":["context"]},"diagram":{"label":"分层架构页（architecture 模式走全幅几何）","modes":["presentation","research","architecture"],"required":["layers:array"],"optional":["legend:array"]},"exhibit":{"label":"Exhibit 编号图表页（research R2）","modes":["research"],"required":["chart.labels:array","chart.values:array"],"optional":["exhibitNo","chart.type","chart.series:array","chart.points:array","chart.max","chart.unit","chart.colors:array","chart.dataTable","note"]},"twocol":{"label":"双栏论证页（research R1）","modes":["research"],"required":["paragraphs:array"]},"threecol":{"label":"三栏证据页（research R6）","modes":["research"],"required":["paragraphs:array"]},"halftable":{"label":"半表半图页（research R7）","modes":["research"],"required":["table.head:array","table.rows:array","chart.labels:array","chart.values:array"],"optional":["table.colW:array","chart.type","chart.series:array","chart.points:array","chart.max","chart.unit","chart.colors:array","chart.dataTable","note"]},"matrix":{"label":"矩阵图页（research R8）","modes":["research"],"required":["rowHeads:array","colHeads:array","cells:array"]},"lane":{"label":"泳道页（architecture A2）","modes":["architecture"],"required":["lanes:array"]},"sankey":{"label":"桑基图页（节点-流带，流向与流量）","modes":["research","architecture"],"required":["flows:array"],"optional":["unit","chart.dataTable","note"]},"treemap":{"label":"树图页（面积编码的层级构成）","modes":["research","architecture"],"required":["items:array"],"optional":["unit","chart.dataTable","note"]},"boxplot":{"label":"箱线图页（分布对比：min/q1/median/q3/max）","modes":["research","architecture"],"required":["groups:array"],"optional":["unit","chart.dataTable","note"]},"network":{"label":"关系网络页（节点-边拓扑）","modes":["research","architecture"],"required":["nodes:array","edges:array"],"optional":["chart.dataTable","note"]},"marimekko":{"label":"马赛克图页（列宽 × 列高双重编码）","modes":["research","architecture"],"required":["cols:array","cells:array"],"optional":["unit","chart.dataTable","note"]},"streamgraph":{"label":"流带图页（时间上的构成演变）","modes":["research","architecture"],"required":["series:array"],"optional":["labels:array","chart.dataTable","note"]}}};
+var MODEL_SCHEMA = {"version":"0.1","modes":["presentation","research","architecture"],"model":{"required":["title","sections:array","closing.title","closing.points:array"],"optional":["mode","style","theme","subtitle","meta","agenda:array"],"agendaMin":{"presentation":3,"research":3,"architecture":0},"agendaMax":7,"agendaMaxWithRefs":8,"agendaHint":"agenda 条目 = 章（篇/section），3–7 条；每章可含多页（sections[] 按页建模）。禁止把逐页标题当大纲。sections[].eyebrow 的 `NN ·` 前缀 = 章键，须与某条 agenda 对应；跳转锚点 = 该章第一页。含「参考资料」条目时 +1 仍 ≤8。","sectionsMin":1,"sectionsRecommended":3,"agendaComfortMax":8},"commonSectionFields":["eyebrow","title","lead","soWhat","footnote","flags","image","exhibitNo","layoutPreset"],"mutualExclusionHint":"verdict 与 soWhat 互斥：二者共用 annotation 结论条槽位，同页双填必叠印。comparison 页填 verdict 时不要再填 soWhat（渲染器已自动二选一，但模型侧应只给一个）。","flagsHint":"flags = 待核实/待二次修改条目字符串数组（如 '2027 增速 xx%（口径未定）'）；渲染为 accent 强调色标注行，提示用户核对。","imageHint":"image = 素材图片/配图占位对象。三选一必填：src（用户图，data: 内联或相对路径，零外链铁律禁 http(s)）｜items（多图版式：grid/compare/wall，元素 {src?, alt?, caption?, placeholder?}）｜placeholder:true（无图时出配图占位，原生形状渲染、pictures 不增）。其余可选：layout（full/half/bleed/grid/compare/wall，见 layout-constants.json imageSpec.layouts）、fit（cover 默认 / contain）、caption、alt、hint、ratio。","imageLayoutHint":"layout 与 HTML 版式对应：full=版心全宽图｜half=左图右注（points 为右栏注解）｜bleed=通栏出血｜grid=多图网格（items 2/3/4/6 张）｜compare=双图 A/B 对比（items 2 张）｜wall=Logo 墙（items 3–12 张小图）。占位符标签文本由双引擎按 imageSpec 拼同一串，保证 A/B 通道逐页文本一致。","chartTypes":["bar","hbar","stack","stackline","line","dualline","area","donut","multidonut","pie","radar","scatter","bubble","waterfall","gauge","pareto","funnel","gantt","vsbar","progress","sparkline","slope","dumbbell","lollipop","dotplot","bulletchart","waffle","radialbar","rose","candlestick"],"chartTypesHint":"chart.type 可取值 = 本表（30 类：16 原生 + 14 形状还原）。其余 6 类复杂信息图（sankey/treemap/boxplot/network/marimekko/streamgraph）是**专属页型**而非 chart.type——它们要按列/段/节点等结构化载荷表达，故走 sections[].type。不变量：charts.registry.types == chartTypes ∪ 上述 6 类页型（sync_runtime.py 校验）。","chartDataTable":{"enum":["notes","inline","appendix","off"],"default":"notes","rule":"非原生图表（registry.pptx=shape）的 dataTable 不得为 off；缺失时按 registry 默认值补齐。"},"pageTypes":{"points":{"label":"要点列表页","modes":["presentation","research","architecture"],"required":["points:array"],"optional":["metrics:array"]},"metrics":{"label":"指标带页（4–6 个核心数字）","modes":["presentation","research"],"required":["metrics:array"]},"kpi":{"label":"大数指标页（hero 大数字 + 支撑指标行）","modes":["presentation","research"],"required":["hero:array"],"optional":["metrics:array"]},"table":{"label":"对比表页","modes":["presentation","research","architecture"],"required":["table.head:array","table.rows:array"],"optional":["table.colW:array"]},"timeline":{"label":"时间线 / 路线页","modes":["presentation","research"],"required":["phases:array"]},"steps":{"label":"步骤条页（N 步横排 + 箭头，可分组）","modes":["presentation","research","architecture"],"required":["steps:array"],"optional":["groups:array","note"]},"bar":{"label":"图表页（chart.type 见 chartTypes；native 通道走原生数据图表，shape 通道走高保真形状还原 + 数据表）","modes":["presentation","research"],"required":["chart.labels:array","chart.values:array"],"optional":["chart.type","chart.series:array","chart.points:array","chart.max","chart.unit","chart.colors:array","chart.start:array","chart.target:array","chart.dataTable","note"]},"donut":{"label":"环形图页（原生 pie 楔形 + 图例）","modes":["presentation","research"],"required":["chart.labels:array","chart.values:array"],"optional":["chart.unit","chart.centerLabel","chart.colors:array","chart.dataTable","note"]},"heatmap":{"label":"热力矩阵页（行 × 列 + 强度色阶）","modes":["presentation","research"],"required":["rowHeads:array","colHeads:array","cells:array"],"optional":["unit","scaleLabel:array","note"]},"bullet":{"label":"达成对比页（实际 vs 目标条）","modes":["presentation","research"],"required":["items:array"],"optional":["unit","max","note"]},"pyramid":{"label":"金字塔页（层级递进，顶层最窄）","modes":["presentation","research","architecture"],"required":["levels:array"],"optional":["note"]},"image":{"label":"素材图片页（full/half/bleed/grid/compare/wall，效果与位置锁定；支持配图占位）","modes":["presentation","research","architecture"],"required":["anyof:image.src:str|image.items:array|image.placeholder"],"optional":["image.caption","image.alt","image.layout","image.fit","image.ratio","image.hint","points:array","note"]},"cards":{"label":"卡片网格页（cards 元素须为 {title, points:[[k,v]…], icon?}，不接受元组）","modes":["presentation","research"],"required":["cards:array"],"optional":["columns"],"cardItemHint":"cards[] 元素：{title:str, points:[[k,v]…]|[{t,d}…]|[str…], icon?:str}。icon = 语义图标名（icon_lib.js 键：增长/下降/数据/图表/趋势/占比/表格/效率/成果/安全/权限/检查/风险/团队/流程/计划/智能/洞察/工具/清单），HTML 与 PPTX 同名真导出；缺省按标题语义自动挑选。"},"split":{"label":"双区组合页（left / right 各可为 要点｜图表｜表格｜图片：type = points（默认）| table | image | 图表类型名；图表/表格字段直接挂在对应侧）","modes":["presentation","research"],"required":["anyof:left.points:array|left.type:str"],"optional":["left.cap","left.image","left.labels:array","left.values:array","left.series:array","left.points:array","left.max","left.unit","left.colors:array","left.dataTable","left.head:array","left.rows:array","left.colW:array","right.type","right.cap","right.image","right.labels:array","right.values:array","right.series:array","right.points:array","right.max","right.unit","right.colors:array","right.dataTable","right.head:array","right.rows:array","right.colW:array"]},"comparison":{"label":"对比页（左右双栏 + 可选结论条）","modes":["presentation","research"],"required":["left.title","left.points:array","right.title","right.points:array"],"optional":["verdict"]},"quote":{"label":"引用 / 金句页（深色全幅）","modes":["presentation","research"],"required":["quote","author"],"optional":["context"]},"diagram":{"label":"分层架构页（architecture 模式走全幅几何）","modes":["presentation","research","architecture"],"required":["layers:array"],"optional":["legend:array"]},"exhibit":{"label":"Exhibit 编号图表页（research R2）","modes":["research"],"required":["chart.labels:array","chart.values:array"],"optional":["exhibitNo","chart.type","chart.series:array","chart.points:array","chart.max","chart.unit","chart.colors:array","chart.dataTable","note"]},"twocol":{"label":"双栏论证页（research R1）","modes":["research"],"required":["paragraphs:array"]},"threecol":{"label":"三栏证据页（research R6）","modes":["research"],"required":["paragraphs:array"]},"halftable":{"label":"半表半图页（research R7）","modes":["research"],"required":["table.head:array","table.rows:array","chart.labels:array","chart.values:array"],"optional":["table.colW:array","chart.type","chart.series:array","chart.points:array","chart.max","chart.unit","chart.colors:array","chart.dataTable","note"]},"matrix":{"label":"矩阵图页（research R8）","modes":["research"],"required":["rowHeads:array","colHeads:array","cells:array"]},"lane":{"label":"泳道页（architecture A2）","modes":["architecture"],"required":["lanes:array"]},"sankey":{"label":"桑基图页（节点-流带，流向与流量）","modes":["research","architecture"],"required":["flows:array"],"optional":["unit","chart.dataTable","note"]},"treemap":{"label":"树图页（面积编码的层级构成）","modes":["research","architecture"],"required":["items:array"],"optional":["unit","chart.dataTable","note"]},"boxplot":{"label":"箱线图页（分布对比：min/q1/median/q3/max）","modes":["research","architecture"],"required":["groups:array"],"optional":["unit","chart.dataTable","note"]},"network":{"label":"关系网络页（节点-边拓扑）","modes":["research","architecture"],"required":["nodes:array","edges:array"],"optional":["chart.dataTable","note"]},"marimekko":{"label":"马赛克图页（列宽 × 列高双重编码）","modes":["research","architecture"],"required":["cols:array","cells:array"],"optional":["unit","chart.dataTable","note"]},"streamgraph":{"label":"流带图页（时间上的构成演变）","modes":["research","architecture"],"required":["series:array"],"optional":["labels:array","chart.dataTable","note"]}}};
 /* __TOPPPT_SCHEMA_END__ */
 
 var _mode = 'presentation';   /* 当前模式（slidesOf 里按 model.mode 设置） */

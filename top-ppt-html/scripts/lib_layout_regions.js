@@ -109,7 +109,9 @@ function regionOf(pageType, slotId, opts) {
       const y = PT.chartY || 2.95;
       const bottom = (opts && opts.bottom != null) ? opts.bottom
         : ((opts && opts.withNote) ? L.contentBottomWithNote : L.contentBottom);
-      return { x: mx + (PT.chartX || 0), y, w: cw - (PT.chartW || 0), h: Math.max(1.2, bottom - y) };
+      /* chartX/chartW 是历史误用：与 donut/table/hbar/exhibit 同口径，图表盒对齐版心 (mx, cw)。
+         此前 `mx+chartX` / `cw-chartW` 造成 bar 图右移 0.6in，与标题/表格左边距不齐。 */
+      return { x: mx, y, w: cw, h: Math.max(1.2, bottom - y) };
     }
     if (slot === 'hbar') {
       const y0 = PT.hbarY0 || 2.6;

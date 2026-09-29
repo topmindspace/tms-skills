@@ -164,7 +164,8 @@ function regionOf(pageType, slotId, opts) {
   if (type === 'bar' && slot === 'primary') {
     var by = P.chartY || 2.95;
     var bb = opts.bottom != null ? opts.bottom : bottomDefault;
-    return { x: MX + (P.chartX || 0), y: by, w: CW - (P.chartW || 0), h: Math.max(1.2, bb - by) };
+    /* chartX/chartW 历史误用已纠正：与 donut/table/hbar/exhibit 同口径，图表盒对齐版心 (MX, CW) */
+    return { x: MX, y: by, w: CW, h: Math.max(1.2, bb - by) };
   }
   if (type === 'bar' && slot === 'hbar') {
     var y0 = P.hbarY0 || 2.6;

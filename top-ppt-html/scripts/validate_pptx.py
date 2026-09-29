@@ -1021,6 +1021,14 @@ def inspect_slide(
     picture_area_ratios: list[float] = []
     margin_emu = int(MIN_EDGE_MARGIN_IN * 914400)
 
+    # 图标语义图（objectName `icon:` 前缀）单独计数：不进 pictures 内容图门禁
+    def _is_icon_pic(el) -> bool:
+        nv = el.find('.//p:cNvPr', NS)
+        name = (nv.get('name') if nv is not None else '') or ''
+        return name.startswith('icon:')
+    icon_pictures = [p for p in pictures if _is_icon_pic(p)]
+    content_pictures = [p for p in pictures if not _is_icon_pic(p)]
+
     for element in all_elements:
         box = shape_bounds(element)
         if box is None:
@@ -1193,7 +1201,8 @@ def inspect_slide(
         "slide": slide_number,
         "native_text_shapes": native_text_shapes,
         "native_graphic_shapes": len(shapes) + len(graphic_frames),
-        "pictures": len(pictures),
+        "pictures": len(content_pictures),
+        "icon_pictures": len(icon_pictures),
         "charts": len(charts),
         "tables": len(tables),
         "element_count": len(all_elements),
@@ -1557,6 +1566,7 @@ def empty_report(path: Path) -> dict[str, Any]:
             "native_text_shapes": 0,
             "native_graphic_shapes": 0,
             "pictures": 0,
+            "icon_pictures": 0,
             "charts": 0,
             "tables": 0,
         },
@@ -1720,7 +1730,7 @@ def validate_pptx(
                 slide_chart_texts.append(slide_chart_text(archive, slide_name))
 
             report["summary"]["slide_count"] = len(slide_names)
-            for field in ("native_text_shapes", "native_graphic_shapes", "pictures", "charts", "tables"):
+            for field in ("native_text_shapes", "native_graphic_shapes", "pictures", "icon_pictures", "charts", "tables"):
                 report["summary"][field] = sum(slide[field] for slide in report["slides"])
 
             # P1-6 chrome 一致性：页脚/页码 y 相对中位数漂移
@@ -1730,7 +1740,8 @@ def validate_pptx(
             # 仅当模型显式声明 section.image / split.right.image 时才允许对应数量的图片落地。
             # 配图占位（image.placeholder）走原生形状，不计入图片数；版式/裁切/多图数量另做硬门禁。
             declared_images = count_model_images(model) if model_path is not None else 0
-            n_pics = report["summary"]["pictures"]
+            n_pics = report["summary"]["pictures"]   # 内容图（已扣除 icon: 语义图标图）
+            n_icons = int(report["summary"].get("icon_pictures", 0) or 0)
             img_issues: list[tuple[str, str]] = []
             if model_path is not None and model is not None:
                 img_issues = model_image_issues(model, _image_spec(),

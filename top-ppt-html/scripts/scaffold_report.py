@@ -320,7 +320,7 @@ def pg_exhibit(i, sec):
         <div class="exhibit__hd"><span class="exhibit__no">Exhibit {sec.get('exhibitNo', 1)}</span>
           <span class="exhibit__t">图表标题（结论式）</span></div>
 {chart_svg(ct, i)}
-        <div class="exhibit__src">来源：来源名称，YYYY-MM；口径说明<a class="cite" href="#ref-1">[1]</a></div>
+        <div class="exhibit__src">来源：<真实来源名>，YYYY-MM；口径说明<a class="cite" href="#ref-1">[1]</a></div>
       </div>
 {SIDE_NOTES}
     </div>
@@ -333,7 +333,7 @@ def pg_exhibit(i, sec):
                   'chart': {'type': ct, 'labels': ['A', 'B', 'C'], 'values': [42, 61, 35],
                             'dataTable': 'notes'},
                   'soWhat': '一行含义或建议（≤60 字）。',
-                  'footnote': '来源：来源名称，YYYY-MM；口径说明'}
+                  'footnote': '来源：<真实来源名>，YYYY-MM；口径说明'}
 
 
 def pg_twocol(i, sec):
@@ -389,7 +389,7 @@ def pg_halftable(i, sec):
         <div class="exhibit__hd"><span class="exhibit__no">Exhibit {sec.get('exhibitNo', 1)}</span>
           <span class="exhibit__t">右栏图表标题（结论式）</span></div>
 {chart_svg(ct, i)}
-        <div class="exhibit__src">来源：来源名称，YYYY-MM；口径说明<a class="cite" href="#ref-1">[1]</a></div>
+        <div class="exhibit__src">来源：<真实来源名>，YYYY-MM；口径说明<a class="cite" href="#ref-1">[1]</a></div>
       </div>
     </div>
   </div>
@@ -705,7 +705,7 @@ def pg_info(i, sec):
            'marimekko': '双重编码（列宽 ∝ 规模，列高 = 构成占比）',
            'streamgraph': '构成演变（基线居中 · 带宽 ∝ 规模）'}[t]
     # 信息图页承载在 .fig 里（不是 .exhibit 框）→ 来源行走 .footnote，避免与 Exhibit 来源行统计混淆
-    src = ('    <div class="footnote">来源：来源名称，YYYY-MM；口径说明'
+    src = ('    <div class="footnote">来源：<真实来源名>，YYYY-MM；口径说明'
            '<a class="cite" href="#ref-1">[1]</a></div>\n')
     html = f'''<section class="band" id="s{i}">
   <div class="wrap">
@@ -824,15 +824,15 @@ def closing(mode, title, points):
 
 
 def refs(mode, items):
-    """参考资料条目与正文 `[n]` 上标一一对应（校验器检查双向对齐）。"""
-    if items:
-        body = ('    <ul class="ul ul--num rv">\n' + '\n'.join(
-            f'''        <li id="ref-{n}">{esc(s)}　<span class="t-xs" style="color:var(--text-3)">{esc(t)}</span></li>'''
-            for n, (s, t) in enumerate(items, 1)) + '\n    </ul>')
-    else:
-        body = ('    <p class="t-body rv">本报告暂无外部引用；内部材料的来源、时间与口径见各页来源行与'
-                ' <code>.footnote</code>。补入外部数据时同步加 <code>[n]</code> 上标与本节条目。</p>')
-    return f'''<!-- 参考资料 -->
+    """参考资料：只列真实来源条目；无真实来源时整节省略（禁止占位条目误导读者）。
+    items 元素 = (来源名, 时间；口径) 且来源名必须是真实机构/报告/文档名。"""
+    if not items:
+        # 宁缺毋假：scaffold 不生成假「参考资料」页；正文无 [n] 时也不需要该节
+        return ''
+    body = ('    <ul class="ul ul--num rv">\n' + '\n'.join(
+        f'''        <li id="ref-{n}">{esc(s)}　<span class="t-xs" style="color:var(--text-3)">{esc(t)}</span></li>'''
+        for n, (s, t) in enumerate(items, 1)) + '\n    </ul>')
+    return f'''<!-- 参考资料（只列真实来源；无真实来源请整节删除并去掉正文 [n] 与导航入口） -->
 <section class="band band--tint" id="refs">
   <div class="wrap">
     <div class="shead rv">
@@ -985,7 +985,25 @@ def main() -> int:
         if p.get('lead'):
             m['lead'] = p['lead']
         model_secs.append(m)
-        agenda_items.append((f's{k}', p['title'], p.get('eyebrow', '')))
+
+    # Agenda = 章节大纲（3–7 章），不是逐页标题罗列：按 eyebrow 的 `NN ·` 前缀归并
+    def _chap_key(eb, idx):
+        mm = re.match(r'^(\d{1,2})\s*[·・\-—]', (eb or '').strip())
+        return mm.group(1).zfill(2) if mm else f'{idx:02d}'
+
+    def _chap_title(eb, title):
+        mm = re.match(r'^\d{1,2}\s*[·・\-—]\s*(.+)$', (eb or '').strip())
+        return mm.group(1).strip() if mm and mm.group(1).strip() else (title or '')
+
+    chapters, ch_order = {}, []
+    for i, p in enumerate(pages, 1):
+        key = _chap_key(p.get('eyebrow', ''), i)
+        if key not in chapters:
+            chapters[key] = {'num': key, 'title': _chap_title(p.get('eyebrow', ''), p['title']),
+                             'desc': p.get('eyebrow', ''), 'first': i}
+            ch_order.append(key)
+    agenda_items = [(f's{chapters[k]["first"]}', chapters[k]['title'], chapters[k]['desc'])
+                    for k in ch_order]
 
     show_agenda = not (mode == 'architecture' and len(pages) <= 4)
     closing_points = [['动作一', '一句话说明。'], ['动作二', '一句话说明。'], ['动作三', '一句话说明。']]
@@ -997,28 +1015,33 @@ def main() -> int:
     body.append(closing(mode, '收尾主张（回应封面问题）', closing_points))
     head = '\n\n'.join(body)
 
-    # 参考资料条目由正文实际 `[n]` 上标反推（校验器检查双向对齐）
+    # 参考资料：只在有真实来源条目时生成；scaffold 不再写「来源 N（替换为真实来源名称）」占位
+    # 交付前由内容作者补 model.refs = [[来源名, 时间；口径]…]（真实机构/报告/文档名），再跑 render_from_model
     ref_ids = sorted(set(re.findall(r'class="cite" href="#(ref-\d)"', head)))
-    ref_items = [[f'来源 {i}（替换为真实来源名称）', '2026-01；口径说明'] for i in range(1, len(ref_ids) + 1)]
-    content = head + '\n\n' + refs(mode, ref_items) + '\n\n' + footer(args.title, args.subtitle, args.meta)
+    ref_items = []  # 真实来源由内容作者填入；空 = 不生成参考资料节（宁缺毋假）
+    content = head
+    if ref_items:
+        content = head + '\n\n' + refs(mode, ref_items)
+    content = content + '\n\n' + footer(args.title, args.subtitle, args.meta)
 
     assert CONTENT_RE.search(t), f'{tpl_path.name} 缺少 __TOPPPT_CONTENT__ 标记'
     t = CONTENT_RE.sub('<!-- __TOPPPT_CONTENT_START__ -->\n' + content +
                        '\n<!-- __TOPPPT_CONTENT_END__ -->', t, count=1)
 
-    # ③ 顶栏导航与 Agenda 锚点一致
-    nav_links = '\n'.join(f'      <a href="#s{i}">{esc(p["title"][:10])}</a>'
-                          for i, p in enumerate(pages[:3], 1))
+    # ③ 顶栏导航与 Agenda 锚点一致（章级，不是逐页标题）
+    nav_links = '\n'.join(
+        f'      <a href="#s{chapters[k]["first"]}">{esc(chapters[k]["title"][:10])}</a>'
+        for k in ch_order[:5])
     assert NAV_RE.search(t), '模板缺少顶栏导航'
-    t = NAV_RE.sub('<nav class="nav">\n' + nav_links + '\n      <a href="#refs">参考资料</a>\n    </nav>',
-                   t, count=1)
+    nav_extra = '\n      <a href="#refs">参考资料</a>' if ref_items else ''
+    t = NAV_RE.sub(f'<nav class="nav">\n{nav_links}{nav_extra}\n    </nav>', t, count=1)
 
     # ④ REPORT_MODEL 骨架（与正文一一对应 · 严格 JSON）
     model = {
         'mode': mode, 'style': style, 'theme': theme,
         'title': args.title, 'subtitle': args.subtitle, 'meta': args.meta,
-        'agenda': [[f'{i:02d}', p['title'], p.get('eyebrow', '')] for i, p in enumerate(pages, 1)]
-                  if show_agenda else [],
+        'agenda': [[chapters[k]['num'], chapters[k]['title'], chapters[k]['desc']]
+                   for k in ch_order] if show_agenda else [],
         'sections': model_secs,
         'closing': {'title': '收尾主张（回应封面问题）',
                     'points': [list(x) for x in closing_points]},

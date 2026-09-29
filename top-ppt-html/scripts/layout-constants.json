@@ -1346,7 +1346,10 @@
       "judgmentPattern": "\\d|[二两三四五六七八九十半]|一(?!览|体|致|直|些|般|系列|同|起|方面)|是(?!否)|应(?!用|急|对|届)|需(?!求)|将(?!来|近)|增|降|优先|瓶颈|关键|高于|低于|快于|慢于|第一|唯一|从.{1,12}到|翻倍|过半|不足|领先|落后|卡在|分化|出现|成为|仍|并非|必须|才能|才是|最大|最浅|最深|马当先|明显|尚在|已(?!知)|提升|贡献|占比|领跑|先行|滞后|分野|显著|差异|穿越|兑现|放量|[：:—–]"
     },
     "agenda": {
-      "$comment": "大纲条目数阈值：≤singleMax 单列；>singleMax 须 .agenda--2col（两列/两排）；>splitMax 拆上篇/下篇或只列一级章节。titleMaxChars = 单条标题字数上限（超长截断+全称沉 notes）。scaffold / validate_report 消费。",
+      "$comment": "大纲 = 章节大纲（3–7 章），不是逐页标题罗列。chapterMin/Max = 章数预算；含「参考资料」条目 +1 仍 ≤8。singleMax 单列上限；>singleMax 才 .agenda--2col（异常安全网）。splitMax 仅作 PPTX 自动分页兜底，不是设计目标。titleMaxChars = 单条标题字数上限。scaffold / validate_report 消费。",
+      "chapterMin": 3,
+      "chapterMax": 7,
+      "chapterMaxWithRefs": 8,
       "singleMax": 8,
       "splitMax": 16,
       "titleMaxChars": 36,

@@ -4,7 +4,7 @@ description: "Use when 用户要做报告、演示、汇报、PPT、slides、dec
 license: MIT
 compatibility: "Python 3 stdlib for HTML generation; Node >=18 + pptxgenjs for PPTX; optional playwright for browser regression / theme captures."
 metadata:
-  version: "0.1.18"
+  version: "0.1.19"
   author: TopMindspace
 ---
 # TopPPT HTML
@@ -102,13 +102,13 @@ metadata:
 1. **单文件零外链**——无 CDN/外部字体/外部图片，图形一律内联 SVG；`<img src>` 仅 `data:` 或相对路径且必带 `alt`（单图 ≤1.5MB、全篇 ≤8MB）；无素材图不留空不省略，用配图占位（`components.md` §11c-3）。
 2. **模式先定后写**——从对应模式模板起步；`data-mode` = `REPORT_MODEL.mode`，页面无模式切换；MD3 映射；PPTX 字号走三模式独立比例尺。
 3. **亮暗双主题一致**——CSS 变量整块换肤 + header 切换 + 文件级记忆；`REPORT_MODEL.theme` 与页面一致，PPTX 同主题导出；强调带只用 accent 家族，**末页禁 `band--deep`**。
-4. **每页一屏 + 高度稳定**——`section.band` ≥ 一屏；主内容不得溢出画布或压进结论条/注释带。放不下按「重构承载 → 拆页/分章 → 换布局形态 → 有限缩字号」（`containers.overflowRule`）；**禁止**静默截断或为疏朗删结论条/证据。大纲 **>8 条**用 `.agenda--2col`（两列/两排）。结论条 = MD3 tonal surface（无「So what」标签、**无左侧 accent 轨**）；要点卡/关键列表按 `icons.md` 克制取用图标。
+4. **每页一屏 + 高度稳定**——`section.band` ≥ 一屏；主内容不得溢出画布或压进结论条/注释带。放不下按「重构承载 → 拆页/分章 → 换布局形态 → 有限缩字号」（`containers.overflowRule`）；**禁止**静默截断或为疏朗删结论条/证据。**大纲 = 3–7 章（每章 1+ 页），禁逐页标题罗列**（`outline-design.md` ⑤）。结论条 = MD3 tonal surface（无「So what」标签、**无左侧 accent 轨**）；要点卡/关键列表按 `icons.md` 克制取用图标。
 5. **PPT 式翻页 + 骨架固定**——`section.band` 即一页；方向键翻页、页码可点；Agenda 第二页（arch 内容页 ≤4 可省）；页头只留 eyebrow + 标题 + 可选导语，页脚全文一个；页头页脚之外不加装饰。
 6. **标题与字号**——主标题粗体；research=结论句（≥12 字）；**presentation=主张/行动句**（禁话题标签）；字号随模式，`clamp()`，图表不缩水。
 7. **组合版式 + 细节保全**——默认一页 = 主件 + 从件 + 注释层（矩阵 playbook §四）；先判定决策必需信息再定形态，**禁砍口径列/时间列/维度**；密度 L/M/H 禁连续 3 页同档；同一版式不连用超 2 页（扩展签名可 3 页）。
 8. **列表优先 + 去 AI 味 + 图标克制**——大段文字转列表（research 双/三栏正文除外）；`aiFlavor` 词表零命中；图标每屏 3–8 个（架构图为王可无）。
 9. **图表够大 + 够多样 + 双通道**——尺寸 ≥ `charts.minSize`；`data-chart` 须在 `charts.registry`（36 种）登记；多样性下限与相邻不同型按 `charts.variety`（playbook §五）；原生通道 `addChart` 双击可编辑数据，形状通道须按登记策略附数据表（口径注解见 tech-design §二）。
-10. **引用与待核实**——外部数据 `[n]` + 文末参考资料（来源+时间+口径）双向对齐；research 关键图表 Exhibit N 连续编号 + 来源行；`.tbd` 强调色标注必须配图例（content-rules §五-b），单页 ≤12 处；只标色不解释即不合格。
+10. **引用与待核实**——外部数据 `[n]` + 文末参考资料（来源+时间+口径）双向对齐；**只列真实来源，无则省略参考资料整节，禁占位条目**；research 关键图表 Exhibit N 连续编号 + 来源行；`.tbd` 强调色标注必须配图例（content-rules §五-b），单页 ≤12 处；只标色不解释即不合格。
 11. **容器级门禁 + 语义字号**——溢出按**归属容器**判定，越过容器即失败（哪怕未越页）；容器保留内边距，不得缩字号解决溢出；表格正文用 `body` 层级，`micro` 只给轴标签/单位/短标签；连续句不拆文本框。
 12. **双单源 + 校验闭环**——schema 只改 `scripts/model-schema.json`，其余常量只改 `scripts/layout-constants.json`，改后必跑 `sync_runtime.py`（禁手改注入副本）；**HTML strict 0/0 才交付**，带 PPTX 加验 `validate_pptx.py --strict --model=` 0/0；页面只提供「预览 PPTX」与提示词，不做文件导出。
 
@@ -132,7 +132,7 @@ metadata:
 
 ## 版本口径
 
-包 semver（现 0.1.18）≠ schema 线（layout-constants / model-schema，现 `0.1`）；patch 不抬 schema。
+包 semver（现 0.1.19）≠ schema 线（layout-constants / model-schema，现 `0.1`）；patch 不抬 schema。
 
 ## 环境依赖
 

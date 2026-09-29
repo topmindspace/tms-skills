@@ -158,7 +158,27 @@ def main():
         print(f"[净化] 剥离 {stripped['count']} 处模型字段中的 HTML 标签: {stripped['samples']}")
         print("  注意：引用在模型里写 [n] 纯文本；HTML 正文才用 <a class=\"cite\">。禁止把标签写进模型。")
 
-    # 风格/模式/主题兜底：模型未写时取页面 data-style / data-mode / data-theme
+    # 图标名回填：模型 cards[].icon 缺失时，从 HTML .card__ico[data-icon] 同步
+    # （保证「HTML 真图标 ↔ PPTX 真导出」同名；旧模型/手改 HTML 也能对齐）
+    def _backfill_icons(model, html):
+        n = 0
+        html_icons = re.findall(r'data-icon="([^"]+)"', html)
+        for sec in model.get('sections') or []:
+            if not isinstance(sec, dict):
+                continue
+            cards = sec.get('cards')
+            if not isinstance(cards, list):
+                continue
+            for ci, cd in enumerate(cards):
+                if isinstance(cd, dict) and not cd.get('icon') and html_icons:
+                    # 按序对齐 data-icon（render_from_model 与卡片同序输出）
+                    if ci < len(html_icons):
+                        cd['icon'] = html_icons[ci]
+                        n += 1
+        return n
+    n_icons = _backfill_icons(model, txt)
+    if n_icons:
+        print(f"[图标] 从 HTML data-icon 回填 {n_icons} 个卡片图标名（PPTX 将真导出同名图标）")
     if not model.get('style'):
         sm = re.search(r'<html[^>]*data-style="([^"]+)"', txt)
         if sm:

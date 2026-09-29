@@ -329,7 +329,9 @@ fill = Body 区被内容覆盖的估算面积 / Body 区面积
 | 条目数 | 版式 | 类名 |
 |--------|------|------|
 | ≤8 | 单列 | `.agenda` |
-| 9–16 | **两列 / 两排** | `.agenda.agenda--2col` |
+| 3–7（目标） | **单列** | `.agenda`（章节大纲，每章 1+ 页） |
+| 8 | 单列上限 | `.agenda` |
+| >8（异常） | **两列 / 两排** | `.agenda.agenda--2col`（安全网，非设计目标） |
 | >16 | 拆上篇/下篇或只列一级章节 | — |
 
 阈值单源：`layout-constants.json` → `contentQuality.agenda.singleMax`（默认 8）。校验：`validate_report` WARN（只认 `<ol class="…agenda--2col">`，不被 CSS 选择器误伤）。

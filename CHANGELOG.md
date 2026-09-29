@@ -1,3 +1,48 @@
+## [0.1.19] - 2026-09-28
+
+### 排版修复 · 大纲篇章化 · 参考资料去假 · 图标真导出 · PPTX 高保真增强
+
+> 源起：2026-09-28 用户复盘五类问题（顶栏重叠 / 卡片不齐 / 大纲罗列页标题 / 参考资料占位 / PPTX 格式错乱），并要求「业界怎么解决的，不要闭门造车」。本次对照 Slidev `pptx-editable` / PptxGenJS / think-cell 混合通道模式系统整改。
+
+#### A. HTML 排版硬伤
+- **顶栏副标题压住右侧工具钮**：`.brand__txt` 此前无基础样式，flex `min-width:auto` 钉死整行文字宽，省略号永不触发。补 `min-width:0; overflow:hidden`，`.brand` / `.bar__in` / `.nav` 收缩链修复；≤1360px 自动收起副标题。
+- **卡片高度不一致**：`.card` 改 flex 列 + 底对齐；`.g-quad` / `.g-half` / `.g-*--equal` 强制等高；`.g-half` 提升进 `engine.css` 并改 `align-items:stretch`（此前 research 专属且 `start` 违反「同构同高」契约）；纯卡片栅格不再误用 `.a-start`。
+
+#### B. 大纲 = 章节大纲（3–7 章），不是页目录
+- **结构契约**：`agenda` 条目 = 章（篇/section），每章 1+ 页；页标题逐页出现，章标题只在 Agenda 出现一次。预算 3–7 章（含参考资料 +1 仍 ≤8）。
+- **生成器**：`render_from_model` / `scaffold_report` 按 eyebrow `NN ·` 章前缀归并，删掉「agenda 条数 ≠ 页数就按页强制重建」逻辑；锚点落该章第一页。
+- **schema / 阈值**：`model-schema` 加 `agendaMax=7` / `agendaHint`；`layout-constants.contentQuality.agenda` 加 `chapterMin/Max`；`agendaComfortMax` 16→8。
+- **文档**：`content-rules` §Agenda 重写；`SKILL` 铁律 4；`components-atoms` / `failure-modes` F20 / `layout-grammar` 阈值同步。
+- **样张**：showcase 大纲 12 条页标题 → 9 章（`05 · 图表工艺` 下 3 页只占 1 条）。
+
+#### C. 参考资料只列真实来源（宁缺毋假）
+- **冒烟枪**：`render_from_model.py:738` 对每个 `[n]` 生成 `「来源名称，时间；口径。」`；scaffold 写「来源 N（替换为真实来源名称）」。
+- **新规则**：只列 `model.refs` 真实来源；**无真实来源整节省略**（连导航 `#refs` 入口一并摘掉，避免悬空锚点）。硬拦占位串（`来源名称` / `替换为真实来源` / `某行业报告`）。
+- **模板**：三份模式模板参考节改为注释掉的真实样例 + 「无真实来源则删整节」说明；`example.com` 假条目清除。
+- **文档**：`content-rules` §五 规则 4 重写；`SKILL` 铁律 10；`layouts-research` / `.ref-link` 示例改真实机构名。
+
+#### D. 图标真导出（SVG→PNG，不再用 accent 方块替代）
+- **新模块**：`scripts/icon_lib.js`（20 语义图标单源）· `scripts/build_icon_assets.js`（sharp 栅格化）· `scripts/icon-assets.json`（PNG 缓存，gitignore）· `scripts/icon_raster.js`。
+- **链路**：模型 `cards[].icon` / HTML `data-icon` → `extract_model` 回填 → `build_pptx` 嵌 PNG。`objectName: icon:*`，`validate_pptx` 单独计数 `icon_pictures`，**不进** `pictures=0` 内容图门禁。缺 sharp/资产回落 accent 方块。
+- **schema**：`cards[].icon` 字段 + 取值说明（`icon_lib.js` 键）。
+
+#### E. PPTX 高保真增强（对照业界混合通道）
+- **发射前叠印断言**：`assertNoOverlap` / `rectsOverlap` 在 `addShape` 前自检组合布局（图表∩inline 数据表等），计入 `OVERLAP_PREEMIT`。
+- **表格行高自适应**：`addTable` 超容量压到 hardFloor / 整体缩放；表头独立 `headRowH`；`fit:'shrink'`。
+- **`regionOf('bar')` 双偏移纠正**：`chartX/chartW` 此前被当偏移再加 `mx`，柱图右移 0.6in 与标题/表格不齐——改与 donut/table/hbar 同口径对齐版心。双引擎同步。
+- **图例收进图高**：waffle / marimekko / slope 图例带含在 `h` 内，与 inline 数据表留间隙（几何铁律②）。
+- **文本自动收缩**：标题 / 卡片 / 结论条 / 页脚统一 `fit:'shrink'`（PowerPoint 字体度量 ≠ 浏览器）。
+
+#### F. 文档与工程
+- `icons.md` / `pptx-export.md` / `high-fidelity.md`（新增「已落地的高保真增强」对照表）/ `failure-modes` F20 / `tech-design`（图标单源登记）/ `package_skill`（三模块进必收）。
+- 业界调研纪要：`docs/industry-pptx-research.md`（Slidev pptx-editable / PptxGenJS / think-cell / Marp / reveal.js 路线对比与取舍）。
+
+#### 回归
+- 技能审计 ✓ · 文档审计 ✓ · 研究 HTML 94/0/0 ✓ · 展示 HTML 85/2/0 ✓ · 两份 PPTX `errors:[] warnings:[]` ✓ · 打包校验 106 文件 ✓。
+
+### 红线未动
+反截断、图表多样性地板、Mode A craft、runtime SHA 同版本门禁、中文「演示文稿」术语、整仓 npm 发版、motion=none、结论条无「So what」标签、无左侧 accent 装饰轨、双单源 + sync_runtime、strict 0/0 交付。
+
 ## [0.1.18] - 2026-09-28
 
 ### PPTX 导出质量整改 · 双通道几何收敛 + 门禁盲区补齐

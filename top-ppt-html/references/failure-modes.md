@@ -238,16 +238,18 @@
 
 **根因**：几何算法与内容量脱钩（固定偏移、单栏宽当总宽、同槽位无仲裁）。**门禁**：`validate_pptx.py --strict` 已含 `ELEMENT_OVERLAP` / `LAYOUT_FILL` / `ANNOTATION_BAND_OVERLAP`；`cross_verify` 比对 Agenda 阅读顺序、图片数、图表数据标签。
 
-## F20 · Agenda 溢出 / 图表退化 / 图标缺失（v9.2 · 容量与跨通道）
+## F20 · Agenda 溢出 / 图表退化 / 图标跨通道（v9.2 · 容量与跨通道）
 
 | 信号 | 错误码 | 修复 |
 |------|--------|------|
-| Agenda >16 条撑爆一屏 | `Agenda 条数 ≤16`（validate_report） | 拆上/下篇或改章节级大纲 6–8 条；PPTX 已自动分页（>12 条） |
+| Agenda 列成页目录（>8 条） | `Agenda 条数 ≤16`（validate_report）；`contentQuality.agenda.chapterMax=7` | 按 eyebrow 章前缀归并回章（3–7 条）；禁止逐页标题当大纲 |
 | Agenda 单条标题 >36 字 | `Agenda 单条标题 ≤36 字`（WARN） | 截断+全称沉 notes；或精炼标题 |
 | Agenda 两通道阅读顺序不一致 | `Agenda序=DRIFT`（cross_verify） | 列优先（先左列后右列）；HTML 用 `column-count`，PPTX 用列填充 |
 | low 图型无数据表 | `图表 PPTX 还原度提示`（WARN） | area/radar/treemap/sankey/streamgraph/marimekko/boxplot/network 在 PPTX 显著退化——改 bar/line/hbar/donut 或 `dataTable=inline` |
-| ≥2 卡且无 `.card__ico` | `要点/卡片页含 .card__ico`（WARN） | 从 `icons.md` 取语义图标（`render_from_model.py` 已内置 `card_head()` 自动出图标） |
+| ≥2 卡且无 `.card__ico` | `要点/卡片页含 .card__ico`（WARN） | 从 `icons.md` 取语义图标（`render_from_model.py` 已内置 `card_head()` 自动出图标 + `data-icon`） |
+| PPTX 卡片头是方块不是图标 | `icon_pictures=0`（validate_pptx summary） | 跑 `node scripts/build_icon_assets.js` 生成 `icon-assets.json`（需 sharp）；确认模型 `cards[].icon` 有值。缺资产时引擎回落 accent 方块（可扫读，但非真图标） |
+| 图标 PNG 进了内容图门禁 | `PICTURES_NOT_DECLARED` 误报 | 图标 `objectName` 必须以 `icon:` 开头；`validate_pptx` 按前缀分流到 `icon_pictures` |
 | 图片占位标签 A/B 不同串 | `图片数=DRIFT` / 文本覆盖不足 | 占位标签由 `imageSpec` 同源拼接；`render_from_model` 与 PPTX `imgPlaceholderLabel` 必须同串 |
 
-**根因**：页型容量契约缺失 + 图表双通道无还原度约定 + 图标/占位文本两处手写。**门禁**：`contentQuality.agenda`（singleMax/splitMax/titleMaxChars）、`charts.fidelityMap`、`cross_verify --full-ab` 三项一致性检查。
+**根因**：页型容量契约缺失 + 图表双通道无还原度约定 + 图标/占位文本两处手写。**门禁**：`contentQuality.agenda`（singleMax/splitMax/titleMaxChars/chapterMax）、`charts.fidelityMap`、`cross_verify --full-ab`、`icon_pictures` 分流计数。
 

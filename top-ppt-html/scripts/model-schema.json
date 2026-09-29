@@ -26,9 +26,12 @@
       "research": 3,
       "architecture": 0
     },
+    "agendaMax": 7,
+    "agendaMaxWithRefs": 8,
+    "agendaHint": "agenda 条目 = 章（篇/section），3–7 条；每章可含多页（sections[] 按页建模）。禁止把逐页标题当大纲。sections[].eyebrow 的 `NN ·` 前缀 = 章键，须与某条 agenda 对应；跳转锚点 = 该章第一页。含「参考资料」条目时 +1 仍 ≤8。",
     "sectionsMin": 1,
     "sectionsRecommended": 3,
-    "agendaComfortMax": 16
+    "agendaComfortMax": 8
   },
   "commonSectionFields": [
     "eyebrow",
@@ -276,7 +279,7 @@
       ]
     },
     "cards": {
-      "label": "卡片网格页（cards 元素须为 {title, points:[[k,v]…]}，不接受元组）",
+      "label": "卡片网格页（cards 元素须为 {title, points:[[k,v]…], icon?}，不接受元组）",
       "modes": [
         "presentation",
         "research"
@@ -286,7 +289,8 @@
       ],
       "optional": [
         "columns"
-      ]
+      ],
+      "cardItemHint": "cards[] 元素：{title:str, points:[[k,v]…]|[{t,d}…]|[str…], icon?:str}。icon = 语义图标名（icon_lib.js 键：增长/下降/数据/图表/趋势/占比/表格/效率/成果/安全/权限/检查/风险/团队/流程/计划/智能/洞察/工具/清单），HTML 与 PPTX 同名真导出；缺省按标题语义自动挑选。"
     },
     "split": {
       "label": "双区组合页（left / right 各可为 要点｜图表｜表格｜图片：type = points（默认）| table | image | 图表类型名；图表/表格字段直接挂在对应侧）",

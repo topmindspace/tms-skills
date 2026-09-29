@@ -17,6 +17,9 @@
 # prepare_images.py 产出的片段与模型对象
 /report-assets/
 
+# 图标 PNG 资产缓存（build_icon_assets.js 生成 · sharp 栅格化）
+scripts/icon-assets.json
+
 # render_compare.py 的渲染对照产物
 /render-compare/
 **/render-compare/

@@ -541,7 +541,7 @@ python scripts/prepare_images.py ./photos --layout grid --mode path   # 大图�
 }
 ```
 
-> **阈值（layout-constants `contentQuality.agenda`）**：≤8 单列；**>8 须 `.agenda--2col`（两列，列优先）**；>12 条 PPTX 自动分页（Agenda I/II）；>16 拆「上篇/下篇」或只列一级章节。单条标题 ≤36 字（`titleMaxChars`，超长截断+全称沉 notes）。放不下先换列/分页，禁单列撑爆一屏。
+> **阈值（layout-constants `contentQuality.agenda`）**：**大纲 = 章（3–7 条），不是页目录**；每章 1+ 页，页标题不进 Agenda。≤8 单列；仅异常超 8 才 `.agenda--2col`；PPTX 自动分页只是安全网。单条标题 ≤36 字（`titleMaxChars`，超长截断+全称沉 notes）。放不下先归并回章，禁逐页罗列撑爆一屏。
 > 条目仍偏高：压缩 `.agenda__a` 的 `padding`（如 `clamp(12px,1.6vh,18px)`）。
 
 ---

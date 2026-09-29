@@ -1693,7 +1693,7 @@ def main():
         ag_cfg = (LC.get('contentQuality') or {}).get('agenda') or {}
         split_max = int(ag_cfg.get('splitMax') or 16)
         title_max = int(ag_cfg.get('titleMaxChars') or 36)
-        chk(f"Agenda 条数 ≤{split_max}（超出请拆上/下篇或章节级大纲）",
+        chk(f"Agenda 条数 ≤{split_max}（大纲=章，3–7 条；超出说明在列页，请归并回章）",
             n_items <= split_max,
             f"{n_items} 条超上限——PPTX 已自动分页，HTML 会撑出一屏，建议改章节级大纲 6–8 条")
         long_titles = re.findall(r'class="agenda__t"[^>]*>([^<]{%d,})' % (title_max + 1), txt)

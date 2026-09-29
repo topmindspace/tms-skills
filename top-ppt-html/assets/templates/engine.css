@@ -306,7 +306,13 @@ border-color:color-mix(in srgb,var(--accent-on) 20%,transparent);color:var(--acc
    rows-2 / rows-3：等高行分区（纵向节奏，替代等高卡片堆叠） */
 .g-211{grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr)}
 .g-121{grid-template-columns:minmax(0,1fr) minmax(0,2fr) minmax(0,1fr)}
-.g-quad{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:minmax(0,1fr);align-items:stretch}
+.g-quad{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:minmax(min-content,1fr);align-items:stretch}
+.g-half{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);align-items:stretch}
+@media (max-width:1180px){.g-half{grid-template-columns:1fr}}
+.g-2--equal,.g-3--equal,.g-4--equal{grid-auto-rows:minmax(min-content,1fr);align-items:stretch}
+.grid.g-2>.card,.grid.g-3>.card,.grid.g-4>.card,
+.grid.g-quad>.card,.grid.g-half>.card,.grid.g-2--equal>.card,
+.grid.g-3--equal>.card,.grid.g-4--equal>.card{align-self:stretch}
 .g-aside{grid-template-columns:minmax(0,1fr) minmax(200px,.36fr);align-items:start}
 .g-aside__side{position:sticky;top:calc(var(--bar-h) + 16px)}
 .g-mosaic{grid-template-columns:repeat(3,minmax(0,1fr));
@@ -322,7 +328,7 @@ grid-template-areas:"main main main" "s1 s2 s3"}
 .kv--2col{grid-template-columns:auto minmax(0,1fr) auto minmax(0,1fr)}
 /* ── 拼贴栅格 g-bento（Bento / 马赛克）：4 列基准 + 跨列/跨行工具类 ──
    .sp-2/.sp-3/.sp-4 跨列（span），.rw-2 跨行；窄屏自动降列并收敛 span。 */
-.g-bento{grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:minmax(118px,auto)}
+.g-bento{grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:minmax(min-content,1fr)}
 .sp-2{grid-column:span 2}.sp-3{grid-column:span 3}.sp-4{grid-column:span 4}
 .rw-2{grid-row:span 2}
 @media (max-width:1180px){.g-bento{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -357,19 +363,21 @@ background:color-mix(in srgb,var(--bg) 86%,transparent);
 backdrop-filter:saturate(160%) blur(14px);-webkit-backdrop-filter:saturate(160%) blur(14px);
 border-bottom:1px solid var(--border-soft);
 transition:height var(--dur-medium) var(--ease-standard)}
-.bar__in{height:100%;display:flex;align-items:center;justify-content:space-between;gap:var(--sp-4)}
-.brand{display:flex;align-items:center;gap:var(--sp-3);min-width:0}
+.bar__in{height:100%;display:flex;align-items:center;justify-content:space-between;gap:var(--sp-4);overflow:hidden}
+.brand{display:flex;align-items:center;gap:var(--sp-3);min-width:0;flex:1 1 auto;overflow:hidden}
 .brand__mark{width:34px;height:34px;flex:none;border-radius:10px;background:var(--accent);
 color:var(--accent-on);display:grid;place-items:center;font-size:13px;font-weight:700}
+.brand__txt{min-width:0;overflow:hidden;flex:1 1 auto}
 .brand__title{font-size:var(--fs-sm);font-weight:600;color:var(--text);white-space:nowrap;
-overflow:hidden;text-overflow:ellipsis}
+overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .brand__sub{font-size:var(--fs-xs);color:var(--text-3);white-space:nowrap;overflow:hidden;
-text-overflow:ellipsis}
-.nav{display:flex;align-items:center;gap:var(--sp-1)}
+text-overflow:ellipsis;max-width:100%}
+.nav{display:flex;align-items:center;gap:var(--sp-1);flex:0 1 auto;min-width:0;overflow:hidden}
 .nav a{padding:8px 14px;border-radius:var(--r-full);color:var(--text-2);text-decoration:none;
 font-size:var(--fs-sm);font-weight:500;white-space:nowrap;transition:background-color var(--dur-short),color var(--dur-short)}
 .nav a:hover{background:var(--surface-2);color:var(--text)}
 @media (max-width:1180px){.nav{display:none}}
+@media (max-width:1360px){.brand__sub{display:none}}
 .iconbtn{width:40px;height:40px;flex:none;display:grid;place-items:center;
 border:1px solid var(--border);border-radius:var(--r-full);background:transparent;
 color:var(--text-2);cursor:pointer;transition:background-color var(--dur-short),color var(--dur-short)}
@@ -424,12 +432,15 @@ transition:background-color var(--dur-short),box-shadow var(--dur-short),transfo
 .btn--ghost{background:transparent;color:var(--text);border-color:var(--border)}
 .btn--onDark{background:var(--surface);color:var(--text)}
 .card{background:var(--surface);border:1px solid var(--border-soft);border-radius:var(--r-lg);
-padding:clamp(20px,2vw,30px);transition:border-color var(--dur-short),box-shadow var(--dur-short),background-color var(--dur-medium)}
+padding:clamp(20px,2vw,30px);transition:border-color var(--dur-short),box-shadow var(--dur-short),background-color var(--dur-medium);
+display:flex;flex-direction:column;min-width:0}
 .card:hover{border-color:var(--border);box-shadow:var(--shadow-1)}
 .card--flat{background:var(--surface-1);border-color:transparent}
 .card--flat:hover{background:var(--surface-2)}
 .card--accent{background:var(--accent-soft);border-color:transparent}
-.card__hd{display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-3)}
+.card__hd{display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-3);flex:none}
+.card>.ul,.card>.t-body,.card>.t-sm{flex:1 1 auto}
+.card>.so-what,.card>.tbd-legend,.card>.flagbar{flex:none;margin-top:auto}
 .card__ico{width:34px;height:34px;flex:none;border-radius:10px;background:var(--accent-soft);
 color:var(--accent-text);display:grid;place-items:center;font-size:15px;font-weight:600}
 .card__ico svg{width:18px;height:18px}
