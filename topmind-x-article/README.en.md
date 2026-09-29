@@ -4,7 +4,7 @@
 
 Turn a Markdown draft into a "copy → paste → publish" X long-form (Article) package.
 
-- Version: **v0.1.0** (same tag as `@topmindspace/tms-skills@0.4.1`)
+- Version: **v0.2.0** (same tag as `@topmindspace/tms-skills@0.5.0`)
 
 ## Install
 
@@ -15,17 +15,37 @@ npx @topmindspace/tms-skills install topmind-x-article
 ## Usage
 
 ```bash
-# 1. Draft → paste-ready plain text (the heart of one-click copying)
+# 1. Draft → one-click-copy HTML (preferred)
+python3 scripts/md2x-html.py <draft>.md --out <package>/X长文.html \
+  --images <img1> <img2> ... [--cover cover-1200x675.png]
+# Open X长文.html in a browser → click the top 「一键复制全文」 button → paste into the X Article editor body
+# (the first # heading is excluded from the clipboard — fill it into X's title field by hand;
+#  upload the cover separately via X's dedicated cover entry)
+
+# 2. Plain-text fallback (when HTML copying misbehaves)
 python3 scripts/md2x.py <draft>.md --out <package>/X发布稿.txt
 
-# 2. Cover: generate a 1200×675 cover with topmind-cover
+# 3. Cover: generate a 1200×675 cover with topmind-cover
 
-# 3. Follow references/publish-checklist.md item by item
+# 4. Follow references/publish-checklist.md item by item
 ```
 
 ## Conversion rules
 
-The X Article editor has weak, unstable markdown support, so `md2x.py` converts to plain text per `references/x-format.md`: headings → plain text lines, horizontal rules → blank lines, emphasis markers removed, links → `text（url）`, images → `[图N]` (image list appended at the end), tables → "label：value" lists, blockquotes unquoted, `\` escapes restored.
+The HTML path follows `references/x-html-format.md`: rich-text paste into the X editor
+(headings/bold/links/lists/quote blocks preserved); ` ``` ` prompt blocks render as quote
+blocks with a 「复制提示词」 copy button; GFM tables become lists (X drops `<table>` on paste);
+the first `#` heading is excluded from the clipboard; images are base64-inlined and numbered
+`[图N]`, with per-image 「下载图片」 download buttons as fallback upload.
+
+Prompt copying is dual-channel: the author side uses the 「复制提示词」 button in the HTML
+(to grab the text before publishing); the reader-side one-click copy can only come from X
+native code blocks (convert each block by hand via Insert → Code — native code blocks carry a
+native copy button, while pasted `<pre>` is discarded by X).
+
+The plain-text fallback follows `references/x-format.md`: headings → plain text lines,
+horizontal rules → blank lines, emphasis markers removed, links → `text（url）`, images →
+`[图N]` (image list appended at the end), tables → "label：value" lists, blockquotes unquoted.
 
 Read the result through once by hand after converting.
 
