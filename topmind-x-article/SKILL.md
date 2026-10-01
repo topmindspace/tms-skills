@@ -157,4 +157,4 @@ updated: 2026-09-29
 
 ## 发文铁律
 
-精炼客观 + 素材优先 + 研究深度，见 [../references/writing-principles.md](../references/writing-principles.md)。触发本技能时默认执行。
+精炼客观 + 素材优先 + 研究深度，见 [references/writing-principles.md](references/writing-principles.md)。触发本技能时默认执行。

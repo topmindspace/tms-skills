@@ -253,4 +253,4 @@ python3 scripts/md2wechat.py \
 
 ## 发文铁律
 
-精炼客观 + 素材优先 + 研究深度，见 [../references/writing-principles.md](../references/writing-principles.md)。触发本技能时默认执行。
+精炼客观 + 素材优先 + 研究深度，见 [references/writing-principles.md](references/writing-principles.md)。触发本技能时默认执行。
