@@ -1,7 +1,7 @@
 # 封面风格库（19 种）
 
 > 想自己写提示词直接丢给 AI 生图（不走技能流程）？看 [`cover-prompts.md`](./cover-prompts.md)——
-> 11 风格完整可拷贝提示词 + 2 张参考图复刻学习 + 全平台爆款封面流派调研。
+> 19 风格完整可拷贝提示词 + 全平台爆款封面流派调研。
 
 > **原创铁律**：本库示例图均为原创，只演示抽象设计原则（标题是视觉重心、信息分层、留白呼吸感、数字与关键词强调），不临摹任何第三方封面；复用时版式与配色不得与第三方封面构成实质相似——只学原则，不学版式。
 
@@ -27,7 +27,7 @@ X 与公众号在手机端信息流里，左右边缘可能被平台图标/时�
 禁止照抄任何第三方封面的文案、形象、版式结构与配色组合——包括但不限于
 标题文字、数字、品牌词、IP 形象、署名，以及"左文右图""底部标签条""两行撞色标题"
 这类可辨识的构图公式。`assets/examples/` 中的 26 张风格示例图均为原创设计，
-其标题/数字/品牌/署名（如"深蓝 OS 2.0""提示词避坑指南""AI绘画挑战营""@阿狐画画"）
+其标题/数字/品牌/署名（如"深蓝 OS 2.0""提示词避坑指南""读书打卡计划""@书山有路"）
 均为虚构演示内容，仅用于演示设计原则。
 用本库组 prompt 时，标题、形象、版式细节必须自己原创；
 改图时只换主体与标题字，保留本风格的配色故事与设计原则。
@@ -37,7 +37,7 @@ X 与公众号在手机端信息流里，左右边缘可能被平台图标/时�
 ## 9. gan-huo · 爆款干货
 
 - **适用场景**：干货清单、评测、盘点、实测筛选类文章；"我替你试完了/筛完了"这类
-  第一人称实测文的默认选择。示例图：`assets/examples/gan-huo.png`（原创："提示词避坑指南"）。
+  第一人称实测文的默认选择。示例图：`assets/examples/gan-huo.png`（原创："工具测评精选"）。
 - **设计语言（抽象原则）**：
   - 标题是绝对视觉重心：居中大字，一眼即主题。
   - 信息分层三层：顶部眉题小字（给上下文）→ 中央大标题（给主题）→ 角落印章小数字（给数据点）。
@@ -77,7 +77,7 @@ X 与公众号在手机端信息流里，左右边缘可能被平台图标/时�
 ## 5. big-type · 巨字宣言
 
 - **适用场景**：观点评论、深度长文、产品/版本发布宣言；"一句话立场"类文章的默认选择。
-  示例图：`assets/examples/big-type.png`（原创："慢即是快"）。
+  示例图：`assets/examples/big-type.png`（原创："少即是多"）。
 - **设计语言（抽象原则）**：
   - 标题即画面：单行超大，字形本身做文章（书法笔意 / 描边 / 烫金质感均可）。
   - 副标题是注解：陈述句，解释标题，不提问、不煽动。
@@ -115,7 +115,7 @@ X 与公众号在手机端信息流里，左右边缘可能被平台图标/时�
 ## 10. brand-launch · 品牌发布
 
 - **适用场景**：产品发布、版本更新、官方最佳实践/白皮书；有明确品牌主体的内容首选。
-  示例图：`assets/examples/brand-launch.png`（原创虚构品牌"深蓝 OS 2.0"）。
+  示例图：`assets/examples/brand-launch.png`（原创虚构品牌"晨光 3.0"）。
 - **设计语言（抽象原则）**：
   - 标题视觉重心居中置顶：品牌名就是标题，不藏不绕。
   - 氛围代替写实：用发光线条/光影做产品氛围，不画写实产品大图（防 AI 乱码也防呆板）。
@@ -154,7 +154,7 @@ X 与公众号在手机端信息流里，左右边缘可能被平台图标/时�
 ## 6. tutorial-steps · 教程步骤
 
 - **适用场景**：教程、上手指南、分步实操、保姆级攻略。
-  示例图：`assets/examples/tutorial-steps.png`（原创："从想法到产品"）。
+  示例图：`assets/examples/tutorial-steps.png`（原创："三步学会烘焙"）。
 - **设计语言（抽象原则）**：
   - 标题做视觉锚：墨色书法题字，一字千钧，镇住画面。
   - 步骤沿横向时间线展开：一条线串起线框数字，数字是节奏点不是徽章。
@@ -192,7 +192,7 @@ X 与公众号在手机端信息流里，左右边缘可能被平台图标/时�
 ## 11. ip-fun · IP 趣味
 
 - **适用场景**：实战案例、数据战报、复盘、系列连载（上/下篇）。
-  示例图：`assets/examples/ip-fun.png`（原创：狐狸画家 IP + "AI绘画挑战营"）。
+  示例图：`assets/examples/ip-fun.png`（原创：戴眼镜的小刺猬 IP + "读书打卡计划"）。
 - **设计语言（抽象原则）**：
   - 暖色氛围做主角情绪：整张的"热气"是第一眼记忆。
   - 标题顶部叠放压阵：深棕大字在上，IP 形象在下半部做记忆点舞台，
@@ -203,12 +203,12 @@ X 与公众号在手机端信息流里，左右边缘可能被平台图标/时�
   标题与副标题用深棕 `#4A2C0A`（在暖底上最稳的重色）；
   朱红 `#E6392B` 只做右下印章，是全图唯一的跳色。
 - **标题写法规范**：
-  - 大标题 4~8 字深棕粗黑顶部叠放，字高占画面 1/4~1/3，如"AI绘画挑战营"；
+  - 大标题 4~8 字深棕粗黑顶部叠放，字高占画面 1/4~1/3，如"读书打卡计划"；
     下方深棕小字副标题（如"每天一幅 · 进化看得见"）。
   - 数据（如"30天"）放右下角圆形印章内小字，不放大。
-  - 署名（如"@阿狐画画"）放左下角竖排小字。
+  - 署名（如"@书山有路"）放左下角竖排小字。
 - **标题文案提炼公式**：天数挑战 + 动词结果。
-  示例（虚构演示）："21天接单挑战"。
+  示例（虚构演示）："30天读书打卡"。
 - **prompt 配方**：
   ```
   中文：IP 趣味风中文封面。字体量级：标题压阵——顶部叠放深棕色（#4A2C0A）超大粗黑中文标题"{TITLE}"（逐字准确），字高占画面 1/4~1/3；下方深棕色小字副标题"{SUBTITLE}"（≤12字）只做注解；标题与 IP 形象上下叠放，禁止左右对半分区。配色系统：橙黄暖色 #FF9E2C → #FFC53D 全幅主色（阳光热闹，走高饱和暖色）；深棕 #4A2C0A 标题在暖底上形成对比重心；右下角圆形印章内"{NUMBER}"小字（必须真实）用朱红 #E6392B，是全图唯一的跳色注脚。构图能量：一条对角线动线——顶部大标题（情绪钩子）→ 下半部原创趣味 IP 形象（{CHARACTER}，如戴贝雷帽的狐狸画家在画架前作画，暖色调，约占画面40%）做记忆点舞台 → 右下印章（数据注脚）收束；左下角竖排小字署名"{BYLINE}"做边角点缀，不进主视觉流。质感细节：暖色底必须加一层细腻纸纹颗粒 + 一团柔和的阳光光晕，拒绝塑料感平滑渲染。文字特效：潮玩感来自“贴纸+徽章”，全句颜色不超过 3 种——①标题里的关键词（如挑战词“接单”）原位下方垫一块深棕 #4A2C0A 实色矩形（色块在字下方、标题总字数不变，严禁把关键词复制一份做成独立元素），色块高度为字高的 1.2 倍，字换成米白色压在色块上、明暗对立；②标题字后方加一层同字形、朱红 #E6392B、向右下错位 4px 的字，只错位一层，做出徽章凸起的轻微立体感；色块与立体已是两种效果，不再加描边和阴影。除上述文字外无其他文字；所有文字避开左右各 5% 的边缘区域，横构图5:2，尺寸1500×600。
@@ -216,7 +216,7 @@ X 与公众号在手机端信息流里，左右边缘可能被平台图标/时�
   EN: Fun-IP Chinese cover. Type scale: the title holds the fort — a stacked top dark-brown (#4A2C0A) extra-bold Chinese title "{TITLE}" (exact), glyph height 1/4 to 1/3 of the frame, with a small dark-brown subtitle "{SUBTITLE}" (max 12 characters) below as annotation only; title and IP character stack vertically — a left-right split layout is forbidden. Color system: warm orange-yellow #FF9E2C → #FFC53D full-bleed ground (sunny, high-saturation warmth); the dark-brown #4A2C0A title forms the contrast anchor on the warm ground; a small round seal bottom-right with "{NUMBER}" micro-text (must be factual) in vermilion #E6392B — the single accent footnote on the page. Composition energy: one diagonal reading path — top title (emotion hook) → an original playful IP character ({CHARACTER}, e.g. a beret-wearing fox painter at an easel, warm tones, ~40% of frame) staging the lower half as the memorable element → bottom-right seal (data footnote) closes the read; a small vertical byline "{BYLINE}" bottom-left as a corner garnish, kept out of the main visual flow. Texture: the warm ground must carry fine paper-grain plus a soft sunlight halo — plasticky smooth rendering is forbidden. Text effects: the collectible-toy feel comes from “sticker plus badge” — at most 3 colors in the line: ① slide a solid dark-brown #4A2C0A rectangle under the title's keyword in place (e.g. the challenge word; block sits beneath the glyphs, total character count unchanged — never duplicate the keyword as a separate element), block height 1.2× glyph height, off-white type over it with opposing light-dark contrast; ② add one same-glyph layer behind the title in vermilion #E6392B, offset 4px down-right, a single offset only, for a badge-like subtle 3D lift; block plus 3D is already two effects — never add outline or shadow. No other text. All text clear of the 5% edge margins on left and right. Landscape 5:2, 1500×600.
   ```
   占位符：`{SUBTITLE}` 副标题（≤12 字）、`{NUMBER}` 印章内数字（如"30天"，必须真实）、
-  `{BYLINE}` 边角署名（如"@阿狐画画"）、`{CHARACTER}` 原创趣味 IP 形象描述，
+  `{BYLINE}` 边角署名（如"@书山有路"）、`{CHARACTER}` 原创趣味 IP 形象描述，
   必须与主题道具绑定（如绘画主题 → 狐狸画家 + 画架），不得照抄任何现有 IP 形象。
 - **绝不清单**：
   - 绝不左文右图对半分：标题与形象必须上下叠放/错位，禁止左右镜像分区。
@@ -236,9 +236,7 @@ X 与公众号在手机端信息流里，左右边缘可能被平台图标/时�
 ## 1. white-clean · 白色清新
 
 - **适用场景**：干货清单、实测盘点、效率/副业/职场类选题；"替你筛好了、看完即用"类
-  亲和干货的默认选择。示例图：`assets/examples/white-clean.png`（原创："一人公司起步指南"）。
-  设计语言来源：用户 2026-09-29 提供的两张"白色清新"风格代表图
-  （`references/ref-white-clean-1.png`、`ref-white-clean-2.png`）；只学抽象设计语言，不抄版式。
+  亲和干货的默认选择。示例图：`assets/examples/white-clean.png`（原创："远程工作效率手册"）。
 - **设计语言（抽象原则）**：
   - 纯白底 + 大面积留白：干净清新，信息流里"透气"。
   - 标题极大：空间允许时字高冲击画面 1/3；1~2 行横跨顶部，关键词撞色。
@@ -314,7 +312,7 @@ X 与公众号在手机端信息流里，左右边缘可能被平台图标/时�
 ## 2. bg-blur · 背景虚化
 
 - **适用场景**：生活方式、职场日常、运动健康、城市观察；"氛围感 + 主题"类文章的
-  默认选择。示例图：`assets/examples/bg-blur.png`（原创："深夜加班自救手册"）。
+  默认选择。示例图：`assets/examples/bg-blur.png`（原创："城市晨跑指南"）。
 - **设计语言（抽象原则）**：
   - 虚化摄影背景 + 清晰前景主体：大光圈景深对比本身就是记忆点。
   - 背景走浅色调虚化（明亮、通透），拒绝暗黑压抑。
@@ -355,7 +353,7 @@ X 与公众号在手机端信息流里，左右边缘可能被平台图标/时�
 ## 3. paper-collage · 纸感拼贴
 
 - **适用场景**：手账、整理术、生活灵感、旧物改造、轻教程；"手作感 / 人味"类选题的
-  默认选择。示例图：`assets/examples/paper-collage.png`（原创："手账整理术"）。
+  默认选择。示例图：`assets/examples/paper-collage.png`（原创："旧物改造计划"）。
 - **设计语言（抽象原则）**：
   - 浅色底 + 纸片拼贴：撕边 / 圆角 / 便签纸片错位叠放，拼贴本身就是构图。
   - 固定手法三选一：和纸胶带 / 回形针 / 图钉，"贴上去"的真实感。
@@ -393,7 +391,7 @@ X 与公众号在手机端信息流里，左右边缘可能被平台图标/时�
 ## 4. news-flash · 资讯快报
 
 - **适用场景**：资讯、快讯、热点解读、人物专访预告、"祛魅/揭秘"类选题。
-  示例图：`assets/examples/news-flash.png`（原创："今日AI速览" + 纸纹底 + 俯视桌面静物）。
+  示例图：`assets/examples/news-flash.png`（原创："科技周报精选"）。
 - **设计语言（抽象原则）**：
   - 标题是绝对视觉重心：单色大字，一眼即主题，快讯的干脆来自"不加修饰"。
   - 信息分层三层：顶部眉题小字（给栏目/时效）→ 中央大标题（给主题）→
@@ -434,7 +432,7 @@ X 与公众号在手机端信息流里，左右边缘可能被平台图标/时�
 
 - **适用场景**：随笔、书评、轻观点、生活感悟；公众号"轻阅读"类文章，
   或系列中需要"呼吸感"的穿插封面。
-  示例图：`assets/examples/minimal.png`（原创："慢思考" + 水墨银杏叶点缀）。
+  示例图：`assets/examples/minimal.png`（原创："独处指南"）。
 - **设计语言（抽象原则）**：
   - 留白是主角：≥60% 空旷，呼吸感就是信息。
   - 点缀手法：一枚朱红印泥圆点做第一眼点睛，一处微小水墨笔触（银杏叶）
@@ -475,7 +473,7 @@ X 与公众号在手机端信息流里，左右边缘可能被平台图标/时�
 
 - **适用场景**：深度访谈、人物特写、商业分析、年度盘点；需要"质感/信任感"时用它，
   公众号长文首选。
-  示例图：`assets/examples/magazine.png`（原创："创造者访谈" + 侧脸剪影 + 砖红细线）。
+  示例图：`assets/examples/magazine.png`（原创："对话：匠人精神"）。
 - **设计语言（抽象原则）**：
   - 质感来自克制：影棚颗粒 + 一条细色线，就是杂志感。
   - 人物手法：侧脸剪影（泛指描述）退为全幅背景氛围，给"人"的存在感但不抢标题。
@@ -524,7 +522,7 @@ X 与公众号在手机端信息流里，左右边缘可能被平台图标/时�
   - 数字钩子放大 1.5~2 倍 + 换对比色（如黑字中的橙红数字）。
   - 底部胶囊标签行 3 短词，`·` 分隔。
 - **标题文案提炼公式**：数字 + 筛选动作 + 价值承诺。
-  示例（虚构演示）："26篇爆款干货"。
+  示例（虚构演示）："12个治愈时刻"。
 - **prompt 配方**：
   ```
   中文：3D萌系潮玩风中文封面。字体量级：超大深色标题"{TITLE}"（逐字准确），字高冲击画面 1/3，
@@ -573,7 +571,7 @@ X 与公众号在手机端信息流里，左右边缘可能被平台图标/时�
   - 材质三选一：混凝土 / 粗糙岩石 / 红黑砖石。
   - 小人物（{TINY_HUMAN}）在巨字下做动作（翻书/攀爬/仰望）。
 - **标题文案提炼公式**：领域 + "指南/精通/架构"。
-  示例（虚构演示）："Skill 指南"。
+  示例（虚构演示）："架构之道"。
 - **prompt 配方**：
   ```
   中文：硬核立体字风中文封面。字体量级：标题"{TITLE}"（逐字准确）做成 {MATERIAL}
@@ -619,7 +617,7 @@ X 与公众号在手机端信息流里，左右边缘可能被平台图标/时�
     （如 `Jev` 单独做发光描边）。
   - 底部 4 个胶囊徽标（如"更高效 / 更安全 / 更好体验 / 更强生产力"）。
 - **标题文案提炼公式**：产品名 + 版本/核心卖点。
-  示例（虚构演示）："Jev 最佳实践"。
+  示例（虚构演示）："云端协作指南"。
 - **prompt 配方**：
   ```
   中文：暗色SaaS风中文封面。字体量级：白色大号标题"{TITLE}"（逐字准确），字高占画面

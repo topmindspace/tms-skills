@@ -65,7 +65,7 @@ npx @topmindspace/topmind-writing-skills install topmind-cover
 |-------|---------|--------------|
 | [`topmind-wechat-post`](./topmind-wechat-post/) | **0.2.0** | WeChat article lifecycle: package, review, 3 quality gates, inline typography & publish checklist |
 | [`topmind-x-article`](./topmind-x-article/) | **0.4.0** | X long-form one-click publish: Markdown → one-click-copy HTML (images/prompt copy, click-to-zoom images) / plain-text fallback + cover + checklist |
-| [`topmind-cover`](./topmind-cover/) | **0.3.2** | Cover art for X / WeChat (X master 1500×600 / 5:2): striking, theme-focused; 11-style cover style library + 26 example images (incl. 3 alt samples) + 1 style overview |
+| [`topmind-cover`](./topmind-cover/) | **0.3.3** | Cover art for X / WeChat (X master 1500×600 / 5:2): striking, theme-focused; 11-style cover style library + 26 example images (incl. 3 alt samples) + 1 style overview |
 | [`topmind-briefs`](./topmind-briefs/) | **0.2.1** | Short-form briefs (WeChat + X): one topic, one chart; data rankings / paper one-liners / product alerts / mechanism explainers; one-click-copy HTML for both |
 
 Installer [`@topmindspace/topmind-writing-skills`](https://www.npmjs.com/package/@topmindspace/topmind-writing-skills) is **0.7.0** (whole-repo same-tag releases).
@@ -78,7 +78,7 @@ Installer [`@topmindspace/topmind-writing-skills`](https://www.npmjs.com/package
 npx @topmindspace/topmind-writing-skills list
 npx @topmindspace/topmind-writing-skills install topmind-briefs
 npx @topmindspace/topmind-writing-skills install topmind-briefs --to ./.claude/skills
-npx @topmindspace/topmind-writing-skills@0.7.4 install topmind-briefs   # pin
+npx @topmindspace/topmind-writing-skills@0.7.5 install topmind-briefs   # pin
 npx @topmindspace/topmind-writing-skills uninstall topmind-briefs --to ./.claude/skills
 ```
 
