@@ -1,3 +1,39 @@
+## [0.7.0] - 2026-10-01
+
+> 根包 0.6.0 → **0.7.0**（minor，本轮是功能轮）；技能版本：topmind-x-article 0.3.0 → **0.4.0**、
+> topmind-wechat-post 0.1.0 → **0.2.0**、topmind-briefs 0.1.0 → **0.2.0**；
+> topmind-cover 保持 0.3.0、top-ppt-html 保持 0.2.1（无变更）。
+> 注：0.6.0 发版时 x-article SKILL.md frontmatter 漏 bump（仍为 0.2.0），本轮一并纠正为 0.4.0。
+
+### topmind-x-article 0.4.0（X 配图错位根治）
+
+- `scripts/md2x-html.py` 新增 **`--images-from 公众号稿.md`**：从源 md 的 `![]()` 按文档顺序
+  自动派生图片，**禁止手工拼 `--images` 顺序**。根因：旧构建按 `images/*` 文件名排序传入，
+  而文件名数字顺序 ≠ 文档顺序（`14-kling`/`15-china-models` 建图顺序与文档相反；
+  `21-codex`/`22-harness` 后加，排在 `16-openrouter` 之后），导致九月全景 X 版从第六节起整段配图错位
+- 脚本内置校验：`[图N]` 必须连续编号且数量 = 图片数，否则直接报错退出（不静默生成错版）
+- SKILL.md：工作流改用 `--images-from`；新增"错位症状 B"根因记录；补事实铁律/文字铁律/交付铁律；
+  README 中英、references/x-html-format.md 同步
+
+### topmind-wechat-post 0.2.0
+
+- 签名区去掉"我是 {{作者名}}，{{一句话简介}}"自我介绍行，只保留三连 CTA（兼容旧参数）
+- 新增**双版一致性校验**：同一选题出 X 版后，必跑 X 内嵌图序列 vs 公众号内嵌图序列逐字节比对
+- 新增**交付铁律**：发布/分享用交付包 HTML 原文件原样呈现，不临时重生成；`公众号稿.md` 唯一改稿入口
+- 三个写作技能统一**语言铁律**：默认中文写作，只有用户明确要求英文才用英文
+
+### topmind-briefs 0.2.0
+
+- 工作流改用 `--images-from 公众号短文.md` 派生图片顺序（同 x-article 根治方案）
+- 构建后校验加：X 版内嵌图序列（无封面）与公众号版逐字节一致
+- 新增交付铁律；语言铁律同步
+
+### 文档与元数据
+
+- 根 README 中英：技能表（x-article 0.4.0、wechat-post 0.2.0、briefs 0.2.0）、安装器版本 0.7.0、钉版本示例 `@0.7.0`
+- 各技能 README 中英「同 tag」引用全部 → `@topmindspace/tms-skills@0.7.0`
+- `docs/PUBLISHING.md`：当前线更新为 0.7.0
+
 ## [0.6.0] - 2026-09-30
 
 > 根包 0.5.0 → **0.6.0**（minor，本轮是功能轮）；技能版本：topmind-cover 0.2.0 → **0.3.0**、

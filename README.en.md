@@ -62,12 +62,12 @@ npx @topmindspace/tms-skills install topmind-cover
 | Skill | Version | What it does |
 |-------|---------|--------------|
 | [`top-ppt-html`](./top-ppt-html/) | **0.2.1** | Formal business decks: paginated HTML + editable 16:9 PPTX; dual delivery · MD3-inspired density; 3 modes × 9 styles; strict 0/0 |
-| [`topmind-wechat-post`](./topmind-wechat-post/) | **0.1.0** | WeChat article lifecycle: package, review, 3 quality gates, inline typography & publish checklist |
-| [`topmind-x-article`](./topmind-x-article/) | **0.3.0** | X long-form one-click publish: Markdown → one-click-copy HTML (images/prompt copy, click-to-zoom images) / plain-text fallback + cover + checklist |
+| [`topmind-wechat-post`](./topmind-wechat-post/) | **0.2.0** | WeChat article lifecycle: package, review, 3 quality gates, inline typography & publish checklist |
+| [`topmind-x-article`](./topmind-x-article/) | **0.4.0** | X long-form one-click publish: Markdown → one-click-copy HTML (images/prompt copy, click-to-zoom images) / plain-text fallback + cover + checklist |
 | [`topmind-cover`](./topmind-cover/) | **0.3.0** | Cover art for X / WeChat (X master 1500×600 / 5:2): striking, theme-focused; 11-style cover style library + 26 example images (incl. 3 alt samples) + 1 style overview |
-| [`topmind-briefs`](./topmind-briefs/) | **0.1.0** | Short-form briefs (WeChat + X): one topic, one chart; data rankings / paper TL;DR / product launches; one-click-copy HTML for both |
+| [`topmind-briefs`](./topmind-briefs/) | **0.2.0** | Short-form briefs (WeChat + X): one topic, one chart; data rankings / paper TL;DR / product launches; one-click-copy HTML for both |
 
-Installer [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) is **0.6.0** (whole-repo same-tag releases).
+Installer [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) is **0.7.0** (whole-repo same-tag releases).
 
 ## Install
 
@@ -77,7 +77,7 @@ Installer [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspa
 npx @topmindspace/tms-skills list
 npx @topmindspace/tms-skills install top-ppt-html
 npx @topmindspace/tms-skills install top-ppt-html --to ./.claude/skills
-npx @topmindspace/tms-skills@0.6.0 install top-ppt-html   # pin
+npx @topmindspace/tms-skills@0.7.0 install top-ppt-html   # pin
 npx @topmindspace/tms-skills uninstall top-ppt-html --to ./.claude/skills
 ```
 
