@@ -22,7 +22,7 @@
 | `### 标题` | `<h3 style="16px/600">` | S | |
 | `#### 标题` | `<h4 style="15px/600">` | S | |
 | 段落 | `<p style="margin:0 0 {para_gap};line-height:{line_height};letter-spacing:0.5px;text-align:left;word-break:break-word">` | S | `text-align` 只允许 left/center/right |
-| `---` | 嵌套 `<section>`：外层 `margin:32px 0`，内层 `<section style="width:12%;height:2px;background:accent;margin:0 auto">` | S | 宽度用百分比，块级 `margin:0 auto` 居中，**不用 `display:inline-block`**：那是生成器自己的输出，用户无从修复，inline-block 会在合规自检里留下一条洗不掉的 WARN |
+| `---` | `<p style="center"><span style="display:inline-block;width:12%;height:2px;background:accent">` | D | 短横线依赖 `inline-block`；丢了会退化成一条不可见的行内元素 |
 | `> 引用` | `<section>` + `background:surface` + `border-left:3px solid accent` | S | **不用 `<blockquote>`**：微信有原生引用样式会覆盖我们的配色 |
 | `- 项` / `1. 项` | `<ul>`/`<ol>` + `<li>`，支持嵌套 | S | 圆点颜色取 accent |
 | ```` ```lang ```` | `<section background:code_bg>` → 语言标签 `<section>` → 代码体 `<section style="white-space:pre-wrap;word-break:break-all">` | S | **不用 `<pre>`**；详见「代码块」 |
@@ -124,9 +124,10 @@
 | `on` | 无条件追加 |
 | `off` | 只在显式写了 `::: sign` 时渲染 |
 
-- 署名用占位 `{{作者名}}`，**不替用户编造人名**；`--author` / `--author-bio` 可填
+- 署名区**不再渲染"自我介绍"行**（2026-10-01 用户要求去掉"我是{{作者名}}，{{一句话简介}}"）；
+  只保留三连 CTA。`--author` / `--author-bio` 参数保留仅为兼容旧调用，不再使用
 - 判定「已自带」的口径：正文末尾 8 个非空段落内出现
-  `点赞 / 在看 / 三连 / 点个关注 / 欢迎关注 / 关注「 / 扫码 / 分享给 / 我是…，`
+  `点赞 / 在看 / 三连 / 点个关注 / 欢迎关注 / 关注「 / 扫码 / 分享给`
 
 ---
 

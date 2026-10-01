@@ -143,7 +143,7 @@ LANG_RULES = {
     ],
     "yaml": [
         ("comment", r"#[^\n]*"),
-        ("key", r"^\s*[\w.\-/]+(?=\s*:)"),
+        ("key", r"(?m)^\s*[\w.\-/]+(?=\s*:)"),
         ("string", r'"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\''),
         ("keyword", r"\b(?:true|false|null|yes|no|on|off)\b"),
         ("number", r"\b\d+\.?\d*\b"),
@@ -157,9 +157,9 @@ LANG_RULES = {
         ("op", r"[=<>!*/+\-]+"),
     ],
     "diff": [
-        ("meta", r"^@@[^\n]*|^---[^\n]*|^\+\+\+[^\n]*"),
-        ("add", r"^\+[^\n]*"),
-        ("del", r"^-[^\n]*"),
+        ("meta", r"(?m)^@@[^\n]*|^---[^\n]*|^\+\+\+[^\n]*"),
+        ("add", r"(?m)^\+[^\n]*"),
+        ("del", r"(?m)^-[^\n]*"),
     ],
     "html": [
         ("comment", r"<!--[\s\S]*?-->"),
@@ -217,13 +217,7 @@ def highlight(code, lang, scheme=None):
     if not rules:
         return html.escape(code, quote=False)
     palette = scheme or CTX.get("hl_scheme") or HIGHLIGHT
-    pattern = _HL_PATTERN_CACHE.get(key)
-    if pattern is None:
-        # (?m) 不能写进单个分支：拼成 alternation 后它就不在表达式开头了，
-        # Python 会报 "global flags not at the start"（历史 crash：```yaml / ```diff
-        # 代码块直接 Traceback）。MULTILINE 在编译期统一加，分支里只留 ^。
-        pattern = re.compile("|".join("(?P<%s>%s)" % (name, pat) for name, pat in rules), re.S | re.M)
-        _HL_PATTERN_CACHE[key] = pattern
+    pattern = re.compile("|".join("(?P<%s>%s)" % (name, pat) for name, pat in rules), re.S)
     out = []
     pos = 0
     for m in pattern.finditer(code):
@@ -297,12 +291,8 @@ def load_theme(spec):
     path = resolve_theme(spec)
     if not path:
         return base
-    try:
-        with open(path, encoding="utf-8") as fh:
-            data = json.load(fh)
-    except (OSError, ValueError) as e:
-        # ValueError 覆盖 json.JSONDecodeError：坏掉的主题文件给干净报错，不抛 Traceback
-        sys.exit("错误：主题文件无法解析 %s（%s）" % (path, e))
+    with open(path, encoding="utf-8") as fh:
+        data = json.load(fh)
     accent = data.get("accent", base["accent"])
     # 主色派生字段必须按「本主题」的主色重算，不能继承默认主题的值：
     # 默认主题的 accent_light / mark_bg 是砖红系，继承过来会让蓝色或灰色主题里
@@ -345,81 +335,6 @@ HAN_RE = re.compile("[%s]" % HAN)
 PANGU_A = re.compile(r"([%s])([A-Za-z0-9])" % HAN)
 PANGU_B = re.compile(r"([A-Za-z0-9])([%s])" % HAN)
 
-# render_inline() 的行内模式：预编译在模块级，避免每行重复走 re 缓存查找
-# （666k 行级调用 × 10 个模式时，re.sub 的字符串模式查找是可观开销）。
-INLINE_CODE_RE = re.compile(r"`([^`]+)`")
-
-
-def _parse_paren(s, j):
-    """s[j] == '(' 时找与之匹配的 ')'（括号可嵌套：URL 里允许出现平衡括号，如维基链接）。
-
-    返回 (括号内文本, 右括号之后的位置)；括号不平衡返回 None。
-    """
-    depth = 0
-    k, n = j, len(s)
-    while k < n:
-        c = s[k]
-        if c == "(":
-            depth += 1
-        elif c == ")":
-            depth -= 1
-            if depth == 0:
-                return s[j + 1:k], k + 1
-        k += 1
-    return None
-
-
-# `(url)` / `(url "title")` / `(url 'title')` / `(url (title))` → url（title 丢弃）。
-_URL_TITLE_RE = re.compile(r'^(\S+?)(?:\s+(?:"[^"]*"|\'[^\']*\'|\([^()]*\)))?\s*$')
-
-
-def _split_url_title(inner):
-    """把链接/图片括号内的 `url "title"` 拆出 url（title 丢弃）。
-
-    裸 url 不得含空白：含裸空白时返回 ""（调用方保留原文，
-    与旧正则 `[^)\\s]+` 的行为一致，不静默吞掉）。
-    """
-    m = _URL_TITLE_RE.match(inner.strip())
-    return m.group(1) if m else ""
-
-
-def _scan_md_links(text, img, repl):
-    """扫描替换行内图片/链接，url 括号支持嵌套、可带 "title"。
-
-    img=True 扫 ![alt](src)，False 扫 [label](url)；repl(文本, url) -> 替换串。
-    括号不平衡、url 为空、url 含裸空白时保留原文（旧正则同样认不出这些写法，
-    保留原文比截断 URL 更安全——历史 bug：`![a](img(1).png)` 被截成 `img(1`，
-    文件明明存在却被记成缺失；`[维基](…/猫_(动物))` 的 URL 被截断、正文多个 `)`）。
-    """
-    open_tok = "![" if img else "["
-    skip = len(open_tok)
-    res = []
-    i, n = 0, len(text)
-    while i < n:
-        if text.startswith(open_tok, i):
-            k = text.find("]", i + skip)
-            if k != -1 and k + 1 < n and text[k + 1] == "(":
-                parsed = _parse_paren(text, k + 1)
-                if parsed:
-                    url = _split_url_title(parsed[0])
-                    if url:
-                        res.append(repl(text[i + skip:k], url))
-                        i = parsed[1]
-                        continue
-        res.append(text[i])
-        i += 1
-    return "".join(res)
-INLINE_BADGE_RE = re.compile(r"\[!([^\]]+)\]")
-INLINE_HL_RE = re.compile(r"==([^=]+)==")
-INLINE_UNDER_RE = re.compile(r"\+\+([^+]+)\+\+")
-INLINE_U_RE = re.compile(r"&lt;u&gt;(.+?)&lt;/u&gt;")
-INLINE_MARK_RE = re.compile(r"~~([^~]+)~~")
-INLINE_STRONG_RE = re.compile(r"\*\*([^*]+)\*\*")
-INLINE_EM_RE = re.compile(r"(?<![*\w])\*([^*\n]+)\*(?!\*)")
-
-# highlight() 的语言联合模式缓存：同一语言的多段代码块只编译一次
-_HL_PATTERN_CACHE = {}
-
 
 def pangu(text):
     text = PANGU_A.sub(r"\1 \2", text)
@@ -448,7 +363,7 @@ def render_inline(raw):
         return CODE_TOKEN % (len(spans) - 1)
 
     text = esc(raw)
-    text = INLINE_CODE_RE.sub(lambda m: stash(m.group(1)), text)
+    text = re.sub(r"`([^`]+)`", lambda m: stash(m.group(1)), text)
 
     if use_pangu:
         text = pangu(text)
@@ -456,53 +371,38 @@ def render_inline(raw):
     strong = 'font-weight:600;color:%s;' % theme["text_strong"]
     em = 'font-style:normal;color:%s;' % theme["text_muted"]
 
-    # images（行内图与独立成行图共用同一括号语义）
-    def img_repl(alt, src):
-        # 行内图片同样走图片管线：本地文件解析 → 复制到 images/ → 登记清单，
-        # 否则 --embed-images 找不到文件、清单漏项、计数为 0（历史 bug：
-        # 段落里的 ![alt](x.png) 被原样保留相对路径，粘贴到公众号后整图消失）。
-        resolver = CTX.get("img_resolve")
-        if resolver and not re.match(r"^(https?:|data:|//)", src):
-            src = resolver(html.unescape(src))
+    # images
+    def img_repl(m):
+        alt, src = m.group(1), m.group(2)
         caption = ' alt="%s"' % alt if alt else ""
         return ('<img src="%s"%s style="max-width:100%%;height:auto;'
                 'border-radius:3px;vertical-align:middle;">') % (src, caption)
 
-    text = _scan_md_links(text, True, img_repl)
+    text = re.sub(r"!\[([^\]]*)\]\(([^)\s]+)\)", img_repl, text)
 
     # links
-    def link_repl(label, url):
-        # 入口处已 esc()：先还原，插入点与脚注登记处再按需转义。
-        # 否则脚注列表里 URL 的 & 会被 esc 两次、显示成 &amp;（历史 bug）。
-        label, url = html.unescape(label), html.unescape(url)
+    def link_repl(m):
+        label, url = m.group(1), m.group(2)
         if link_mode == "footnote" and footnotes is not None:
-            # url→序号字典：原写法每次链接都扫全表两次（O(n²)），长文链接多时明显变慢
-            fidx = CTX.get("footnote_idx")
-            if fidx is not None and url in fidx:
-                idx = fidx[url]
-            elif fidx is not None:
+            if url not in [f["url"] for f in footnotes]:
                 footnotes.append({"url": url, "label": label})
-                idx = len(footnotes)
-                fidx[url] = idx
-            else:  # 外部直接调 render_inline 且未初始化索引时，走原来的线性查找
-                if url not in [f["url"] for f in footnotes]:
-                    footnotes.append({"url": url, "label": label})
-                idx = [f["url"] for f in footnotes].index(url) + 1
+            idx = [f["url"] for f in footnotes].index(url) + 1
             return ('%s<sup style="font-size:11px;color:%s;'
                     'padding-left:1px;">[%d]</sup>'
-                    % (esc(label), theme["accent"], idx))
+                    % (label, theme["accent"], idx))
         if link_mode == "inline":
             return ('%s<span style="font-size:13px;color:%s;">（%s）</span>'
-                    % (esc(label), theme["text_light"], esc(url)))
+                    % (label, theme["text_light"], url))
         return ('<span style="font-size:13px;color:%s;word-break:break-all;">'
-                '%s（%s）</span>' % (theme["text_light"], esc(label), esc(url)))
+                '%s（%s）</span>' % (theme["text_light"], label, url))
 
-    text = _scan_md_links(text, False, link_repl)
+    text = re.sub(r"\[([^\]]+)\]\(([^)\s]+)\)", link_repl, text)
 
     # badges: [!文本]
     # 不用 display:inline-block：公众号对非常规 display 值支持不稳定，
     # 徽章是纯行内元素，padding 足够撑开视觉。
-    text = INLINE_BADGE_RE.sub(
+    text = re.sub(
+        r"\[!([^\]]+)\]",
         r'<span style="font-size:11px;line-height:1.6;'
         r'color:' + theme["accent"] + r';background:' + theme["accent_soft"] + r';'
         r'padding:1px 6px;border-radius:2px;margin:0 2px;'
@@ -511,7 +411,8 @@ def render_inline(raw):
     )
 
     # ==高亮== before bold so inner markup still works
-    text = INLINE_HL_RE.sub(
+    text = re.sub(
+        r"==([^=]+)==",
         r'<strong style="font-weight:600;color:' + theme["text_strong"] + r';'
         r'background:' + theme["accent_soft"] + r';padding:1px 3px;'
         r'border-radius:2px;">\1</strong>',
@@ -523,19 +424,20 @@ def render_inline(raw):
     underline = ('<span style="border-bottom:2px solid %s;font-weight:600;'
                  'color:%s;">\\1</span>'
                  % (theme["accent_light"], theme["text_strong"]))
-    text = INLINE_UNDER_RE.sub(underline, text)
-    text = INLINE_U_RE.sub(underline, text)
+    text = re.sub(r"\+\+([^+]+)\+\+", underline, text)
+    text = re.sub(r"&lt;u&gt;(.+?)&lt;/u&gt;", underline, text)
 
     # ~~荧光笔~~：半高亮。用纯色浅底，不用 linear-gradient
     # （渐变在公众号会被静默丢弃，退化成无底）。
-    text = INLINE_MARK_RE.sub(
+    text = re.sub(
+        r"~~([^~]+)~~",
         r'<span style="background:%s;font-weight:600;color:%s;">\1</span>'
         % (theme["accent_soft"], theme["text_strong"]),
         text,
     )
 
-    text = INLINE_STRONG_RE.sub(r'<strong style="%s">\1</strong>' % strong, text)
-    text = INLINE_EM_RE.sub(r'<em style="%s">\1</em>' % em, text)
+    text = re.sub(r"\*\*([^*]+)\*\*", r'<strong style="%s">\1</strong>' % strong, text)
+    text = re.sub(r"(?<![*\w])\*([^*\n]+)\*(?!\*)", r'<em style="%s">\1</em>' % em, text)
 
     for idx, code in enumerate(spans):
         text = text.replace(
@@ -550,38 +452,14 @@ def render_inline(raw):
 # ---------------------------------------------------------------- blocks
 
 HEADING_RE = re.compile(r"^(#{1,6})\s+(.*)$")
-# 围栏反引号数 >= 3：```` 开栏只能由 >= 4 反引号闭合（CommonMark），
-# 否则 markdown 示例代码里的内层 ``` 会把外层栏提前"闭合"，造成静默错排。
-FENCE_RE = re.compile(r"^(`{3,})(\w*)\s*$")
+FENCE_RE = re.compile(r"^```(\w*)\s*$")
 HR_RE = re.compile(r"^(-{3,}|\*{3,}|_{3,})\s*$")
-
-
-def match_img_only(line):
-    """独立成行图片：![alt](src) 独占一行（src 括号可嵌套、可带 title）。
-
-    返回 (alt, src)，不是独立成行图片返回 None。
-    与行内图片共用同一括号语义（_parse_paren + _split_url_title）。
-    """
-    if not line.startswith("!["):
-        return None
-    k = line.find("]", 2)
-    if k == -1:
-        return None
-    j = k + 1
-    if j >= len(line) or line[j] != "(":
-        return None
-    parsed = _parse_paren(line, j)
-    if not parsed:
-        return None
-    src = _split_url_title(parsed[0])
-    if not src or line[parsed[1]:].strip():
-        return None
-    return line[2:k], src
+IMG_ONLY_RE = re.compile(r"^!\[([^\]]*)\]\(([^)\s]+)\)\s*$")
 CAPTION_RE = re.compile(r"^\*(.+)\*\s*$")
 TABLE_SEP_RE = re.compile(r"^\|?[\s:|-]+\|[\s:|-]*$")
 CONTAINER_RE = re.compile(r"^:::+\s*(\w+)?\s*(.*)$")
 
-CN_NUM = "一二三四五六七八九十壹贰叁肆伍陆柒捌玖拾"
+CN_NUM = "一二三四五六七八九十"
 
 # 标题里手写的中文/阿拉伯序号。序号应由排版层生成（可换样式、可加引用），
 # 写进标题文本后就变成了不可编程的字符串。这里统一剥离后重新编号。
@@ -863,13 +741,10 @@ def render_table_cards(head, body, theme):
 
 
 def render_hr(theme):
-    # 宽度用百分比：公众号端 px 固定值在不同屏宽下表现不一致。
-    # 不用 display:inline-block：audit_inline 会把它判为 WARN，而这是生成器
-    # 自己的输出、用户无从修复——自检永远带一条洗不掉的 WARN 等于没有自检。
-    # 块级 section + margin:0 auto 居中，视觉与原来完全一致。
-    return ('<section style="margin:32px 0;">'
-            '<section style="width:12%%;height:2px;background:%s;'
-            'margin:0 auto;"></section></section>' % theme["accent"])
+    # 宽度用百分比：公众号端 px 固定值在不同屏宽下表现不一致
+    return ('<p style="text-align:center;margin:32px 0;">'
+            '<span style="display:inline-block;width:12%%;height:2px;'
+            'background:%s;"></span></p>' % theme["accent"])
 
 
 def render_figure(src, caption, theme, alt=""):
@@ -1005,16 +880,9 @@ def resolve_image(src, md_path, out_dir, assets, asset_root):
         if os.path.exists(candidate):
             abs_path = candidate
     if not os.path.exists(abs_path):
-        # 本地文件缺失：登记缺失记录再返回原 src（HTML 保留占位 <img>，
-        # embed 会跳过并提示"未内嵌"，上传清单与计数也不会漏掉这一项）
-        assets.append({"src": src, "local": None, "remote": False,
-                       "missing": True})
         return src
     img_dir = os.path.join(out_dir, "images")
-    try:
-        os.makedirs(img_dir, exist_ok=True)
-    except OSError as e:
-        sys.exit("错误：无法创建图片目录 %s（%s）" % (img_dir, e))
+    os.makedirs(img_dir, exist_ok=True)
     base = os.path.basename(abs_path)
     target = os.path.join(img_dir, base)
     n = 1
@@ -1023,10 +891,7 @@ def resolve_image(src, md_path, out_dir, assets, asset_root):
         target = os.path.join(img_dir, "%s-%d%s" % (stem, n, ext))
         n += 1
     if not os.path.exists(target):
-        try:
-            shutil.copy2(abs_path, target)
-        except OSError as e:
-            sys.exit("错误：复制图片失败 %s → %s（%s）" % (abs_path, target, e))
+        shutil.copy2(abs_path, target)
     rel = os.path.relpath(target, out_dir)
     assets.append({"src": src, "local": rel, "remote": False,
                    "basename": os.path.basename(target),
@@ -1099,20 +964,10 @@ def convert_blocks(lines, md_path, out_dir, theme, ctx):
 
         m = FENCE_RE.match(stripped)
         if m:
-            open_len = len(m.group(1))
-            lang = m.group(2)
+            lang = m.group(1)
             i += 1
             buf = []
-            while i < n:
-                s2 = lines[i].strip()
-                k = 0
-                while k < len(s2) and s2[k] == "`":
-                    k += 1
-                # 闭合栏：反引号数 >= 开栏数且后面无其它字符（闭合栏可比开栏长）。
-                # 带信息串的 ```python 不是闭合栏，是栏内代码——旧写法按
-                # startswith("```") 判闭合，会把栏提前关掉。
-                if k >= open_len and not s2[k:].strip():
-                    break
+            while i < n and not lines[i].strip().startswith("```"):
                 buf.append(lines[i])
                 i += 1
             i += 1
@@ -1187,7 +1042,7 @@ def convert_blocks(lines, md_path, out_dir, theme, ctx):
             out.append(block_html)
             continue
 
-        m = match_img_only(stripped)
+        m = IMG_ONLY_RE.match(stripped)
         if m:
             caption = None
             if i + 1 < n:
@@ -1195,9 +1050,9 @@ def convert_blocks(lines, md_path, out_dir, theme, ctx):
                 if cm:
                     caption = cm.group(1)
                     i += 1
-            src = resolve_image(m[1], md_path, out_dir,
+            src = resolve_image(m.group(2), md_path, out_dir,
                                 ctx["assets"], ctx["asset_root"])
-            out.append(render_figure(src, caption, theme, alt=m[0]))
+            out.append(render_figure(src, caption, theme, alt=m.group(1)))
             i += 1
             continue
 
@@ -1208,7 +1063,7 @@ def convert_blocks(lines, md_path, out_dir, theme, ctx):
             if (not cur or HEADING_RE.match(cur) or HR_RE.match(cur)
                     or CONTAINER_RE.match(cur) or cur.startswith(">")
                     or cur.startswith("|") or is_list_item(lines[i])
-                    or match_img_only(cur) or FENCE_RE.match(cur)):
+                    or IMG_ONLY_RE.match(cur) or FENCE_RE.match(cur)):
                 break
             buf.append(cur)
             i += 1
@@ -1244,14 +1099,8 @@ def convert(md_text, md_path, out_dir, theme, link_mode="footnote",
     CTX["theme"] = theme
     CTX["link_mode"] = link_mode
     CTX["footnotes"] = ctx["footnotes"]
-    CTX["footnote_idx"] = {}
     CTX["use_pangu"] = use_pangu
     CTX["hl_scheme"] = build_code_scheme(theme)
-    # 行内图片解析器：render_inline 里的 ![alt](src) 通过它走 resolve_image，
-    # 与独立成行的图片共享「复制到 images/ + 登记清单」管线。
-    abs_md = os.path.abspath(md_path)
-    CTX["img_resolve"] = lambda s: resolve_image(
-        s, abs_md, out_dir, ctx["assets"], ctx.get("asset_root"))
 
     body = convert_blocks(lines, md_path, out_dir, theme, ctx)
 
@@ -1340,20 +1189,15 @@ def render_toc(titles, theme):
 
 
 def render_signature(theme, author="", bio=""):
-    """尾部签名区。默认用占位署名，交付时提示用户替换，不替用户编造人名。"""
-    name = esc(author.strip() or "{{作者名}}")
-    blurb = esc(bio.strip() or "{{一句话简介}}")
+    """尾部签名区。2026-10-01 起默认不再渲染"自我介绍"行（我是{{作者名}}，{{一句话简介}}）；
+    只保留三连 CTA。author/bio 参数保留仅为兼容旧调用，不再使用。"""
     return ('<section style="margin:34px 0 0;padding:16px 18px;background:%s;'
             'border-top:2px solid %s;border-radius:%s;">'
-            '<p style="margin:0 0 8px;font-size:14px;line-height:1.75;'
-            'color:%s;word-break:break-word;">我是 <span style="font-weight:600;'
-            'color:%s;">%s</span>，%s</p>'
             '<p style="margin:0;font-size:14px;line-height:1.75;color:%s;'
             'word-break:break-word;">如果你觉得今天这篇有收获，欢迎'
             '<span style="font-weight:600;color:%s;">点赞、在看、转发</span>'
             '三连，我们下篇见。</p></section>'
             % (theme["surface"], theme["accent"], theme["radius"],
-               theme["text"], theme["text_strong"], name, blurb,
                theme["text"], theme["accent"]))
 
 
@@ -1475,26 +1319,6 @@ def build_notice(embedded, n_images):
     return head + tail
 
 
-# audit_inline 的值级检查：原来是 8 次全正文 re.search（re.I 下每次都扫完整 MB 级
-# body，大正文里 audit_inline 能占近一半耗时）。合并为一次单遍扫描：命中哪个分支
-# 报哪条，收集命中的分支序号后按原列表顺序输出——与原来逐条 search 的结果完全一致。
-_AUDIT_VALUE_PATTERNS = [
-    ("linear-gradient", "ERROR", "linear-gradient（渐变被静默丢弃，退化成无背景。改纯色）"),
-    ("box-shadow", "ERROR", "box-shadow（阴影被丢弃）"),
-    ("rgba\\(|hsla\\(", "ERROR", "rgba()/hsla() 颜色（透明度不被支持，改纯色十六进制）"),
-    ("var\\(--", "ERROR", "CSS 变量（不支持，值必须写死）"),
-    ("@media|@keyframes", "ERROR", "@media/@keyframes（媒体查询与动画不被支持）"),
-    ("\\sclass=", "ERROR", "class 属性（公众号会剥离，样式必须内联）"),
-    ("\\sid=", "WARN", "id 属性（正文里无意义，可能被剥离）"),
-    ("<img[^>]*width=\"", "WARN", "<img> 上的 width 属性（公众号不保证保留，宽度用内联 style）"),
-]
-_AUDIT_VALUE_RE = re.compile(
-    "|".join("(?P<g%d>%s)" % (i, pat)
-             for i, (pat, _lv, _msg) in enumerate(_AUDIT_VALUE_PATTERNS)),
-    re.I,
-)
-
-
 def audit_inline(body):
     """正文的平台合规自检，返回 [(级别, 说明)]，空列表即通过。
 
@@ -1554,15 +1378,18 @@ def audit_inline(body):
             elif prop == "border-radius":
                 add("WARN", "border-radius（圆角可能被丢弃，降级为直角；属可接受的优雅降级，勿依赖圆角做视觉区分）")
 
-    hit = set()
-    for m in _AUDIT_VALUE_RE.finditer(body):
-        for i in range(len(_AUDIT_VALUE_PATTERNS)):
-            if m.group("g%d" % i) is not None:
-                hit.add(i)
-                break
-    for i in sorted(hit):
-        _pat, lv, msg = _AUDIT_VALUE_PATTERNS[i]
-        add(lv, msg)
+    for pat, lv, msg in [
+        (r"linear-gradient", "ERROR", "linear-gradient（渐变被静默丢弃，退化成无背景。改纯色）"),
+        (r"box-shadow", "ERROR", "box-shadow（阴影被丢弃）"),
+        (r"rgba\(|hsla\(", "ERROR", "rgba()/hsla() 颜色（透明度不被支持，改纯色十六进制）"),
+        (r"var\(--", "ERROR", "CSS 变量（不支持，值必须写死）"),
+        (r"@media|@keyframes", "ERROR", "@media/@keyframes（媒体查询与动画不被支持）"),
+        (r"\sclass=", "ERROR", "class 属性（公众号会剥离，样式必须内联）"),
+        (r"\sid=", "WARN", "id 属性（正文里无意义，可能被剥离）"),
+        (r"<img[^>]*width=\"", "WARN", "<img> 上的 width 属性（公众号不保证保留，宽度用内联 style）"),
+    ]:
+        if re.search(pat, body, re.I):
+            add(lv, msg)
 
     # ---- 图片宽度：小图被拉伸是高频问题
     for m in re.finditer(r'<img[^>]*style="([^"]*)"', body):
@@ -1580,22 +1407,6 @@ def audit_inline(body):
     # ERROR 在前
     out.sort(key=lambda x: 0 if x[0] == "ERROR" else 1)
     return out
-
-
-def atomic_write(path, text):
-    """原子写文件：先写临时文件再 rename，写一半失败（磁盘满/断电）时
-    不会留下半截产物——要么是旧文件，要么是没有文件，绝不残缺。"""
-    tmp = path + ".tmp"
-    try:
-        with open(tmp, "w", encoding="utf-8") as fh:
-            fh.write(text)
-        os.replace(tmp, path)
-    except BaseException:
-        try:
-            os.unlink(tmp)
-        except OSError:
-            pass
-        raise
 
 
 def write_manifest(out_dir, slug, title, assets, diagrams, theme, footnotes,
@@ -1619,12 +1430,9 @@ def write_manifest(out_dir, slug, title, assets, diagrams, theme, footnotes,
                 size = "%.0f KB" % kb if kb < 1024 else "%.1f MB" % (kb / 1024)
             if a.get("remote"):
                 lines.append("| %d | %s（远程） | %s | `%s` |" % (idx, a["src"], size, a["src"]))
-            elif a.get("missing"):
-                lines.append("| %d | ⚠ 本地文件缺失：`%s` | — | `%s` |"
-                             % (idx, a["src"], a["src"]))
             else:
                 lines.append("| %d | `%s` | %s | `%s` |"
-                             % (idx, a.get("basename") or "", size, a["src"]))
+                             % (idx, a.get("basename", ""), size, a["src"]))
         lines.append("")
         lines.append("图片目录：`images/`（公众号单图建议 < 2 MB，宽度 1080 px 左右）")
         lines.append("")
@@ -1659,7 +1467,8 @@ def write_manifest(out_dir, slug, title, assets, diagrams, theme, footnotes,
                     theme.get("h2_style", "number"),
                     theme.get("code_scheme", "mono")))
     path = os.path.join(out_dir, "图片上传清单.md")
-    atomic_write(path, "\n".join(lines))
+    with open(path, "w", encoding="utf-8") as fh:
+        fh.write("\n".join(lines))
     return path
 
 
@@ -1704,24 +1513,14 @@ def main():
     if missing:
         sys.exit("缺少必填参数：%s" % "、".join(missing))
 
-    if os.path.isdir(args.input):
-        sys.exit("错误：输入是目录不是文件 %s" % args.input)
     if not os.path.isfile(args.input):
         sys.exit("错误：找不到输入文件 %s" % args.input)
 
     theme = load_theme(args.theme)
-    try:
-        with open(args.input, encoding="utf-8") as fh:
-            md_text = fh.read()
-    except UnicodeDecodeError:
-        sys.exit("错误：输入文件不是有效的 UTF-8 编码 %s" % args.input)
-    except OSError as e:
-        sys.exit("错误：无法读取输入文件 %s（%s）" % (args.input, e))
+    with open(args.input, encoding="utf-8") as fh:
+        md_text = fh.read()
 
-    try:
-        os.makedirs(args.out_dir, exist_ok=True)
-    except OSError as e:
-        sys.exit("错误：无法创建输出目录 %s（%s）" % (args.out_dir, e))
+    os.makedirs(args.out_dir, exist_ok=True)
     body, assets, diagrams, footnotes = convert(
         md_text, os.path.abspath(args.input), args.out_dir, theme,
         args.link_mode, args.render_mermaid, args.asset_root or None,
@@ -1756,7 +1555,8 @@ def main():
                             embed_stats["count"] if embed_stats else len(assets)),
     )
     html_path = os.path.join(args.out_dir, "%s-公众号版.html" % args.slug)
-    atomic_write(html_path, page)
+    with open(html_path, "w", encoding="utf-8") as fh:
+        fh.write(page)
 
     manifest = write_manifest(args.out_dir, args.slug, title, assets, diagrams,
                               theme, footnotes, embed_stats is not None)
