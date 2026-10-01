@@ -1,6 +1,6 @@
 ---
 name: topmind-wechat-post
-version: 0.2.0
+version: 0.2.1
 description: "管一篇公众号文章从选题/底稿到发布的完整生命周期：交付包搭建、审校改写、质量三关（事实/逻辑/去AI味）、状态同步、微信内联排版与发布清单。Use when 写公众号、公众号排版、公众号定稿、发公众号。Do NOT use for 只改错别字、小红书/知乎、纯网页发布。"
 action_category: write
 triggers:
@@ -203,7 +203,8 @@ python3 scripts/md2wechat.py \
 
 | 文件 | 风格 | 适用 |
 |------|------|------|
-| `assets/themes/minimal-ink.json`（默认） | 黑白灰 + 砖红 | 深度研析 / 观点 / 随笔 |
+| `assets/themes/md3-business-blue.json`（默认） | MD3 商务蓝：Material Design 3 设计语言，大圆角，tonal 配色 | 通用 / 商务 / AI 技术 |
+| `assets/themes/minimal-ink.json` | 黑白灰 + 砖红 | 深度研析 / 观点 / 随笔 |
 | `assets/themes/tech-blue.json` | 科技蓝 | AI/技术 |
 | `assets/themes/newsprint.json` | 报纸衬线 | 人文评论 |
 | `assets/themes/graphite.json` | 石墨克制 | 严肃报告 |
