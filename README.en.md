@@ -11,6 +11,10 @@
 
 **TopMindSpace writing-skills collection** — WeChat articles, X long-form posts, short-form briefs, cover art: four skills, one repo.
 
+<p align="center">
+  <img src="docs/assets/writing-cover-white.png" alt="topmind-writing-skills · writing skills collection" width="960" />
+</p>
+
 > The formal business presentation skill now lives on its own: [`topmind-presentation`](https://github.com/topmindspace/topmind-presentation) (repo `topmind-presentation`; the repo is the skill — clone and copy the root into your skills directory).
 
 ### topmind-wechat-post · WeChat article authoring
