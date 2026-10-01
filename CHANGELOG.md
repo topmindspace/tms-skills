@@ -1,5 +1,9 @@
-## [Unreleased] 拆分与改名（2026-10-01，未发版）
+## [0.7.1] - 2026-10-01
 
+> 根包 0.7.0 → **0.7.1**（patch）；技能：topmind-briefs 0.2.0 → **0.2.1**（patch，文档与去 AI 味优化）；
+> topmind-cover / topmind-wechat-post / topmind-x-article 保持原版本（仅 repository.url 元数据变更）。
+>
+> 本轮为拆分与改名专版：
 - 仓库由 `tms-skills` 改名为 **`topmind-writing-skills`**：
   npm 包 `@topmindspace/tms-skills` → `@topmindspace/topmind-writing-skills`，
   CLI `bin/tms-skills.js` → `bin/topmind-writing-skills.js`；
@@ -8,8 +12,10 @@
   workflows、`ci_privacy_scan.py`、`ci_skill_gates.sh`（去掉 `--with-pptx` 分支）同步更新。
 - **`top-ppt-html` 拆出为独立仓库 `topmind-presentation`**（技能改名 `topmind-presentation`）：
   技能文件、docs 下 ppt 专属页面（index/showcase/style-gallery、showcase/、site-assets/、
-  banner、industry-pptx-research.md）一并迁移；本仓删除 `top-ppt-html/` 目录。
+  industry-pptx-research.md）一并迁移；本仓删除 `top-ppt-html/` 目录；无引用 banner 图已删除。
 - `topmind-cover/SKILL.md` 的报告封面指引改为走 `topmind-presentation`。
+- 修 installer：`readSkillMeta` 支持 `>-` / `|` 块标量（`list` 对 briefs 曾显示 `>-…`）。
+- deprecate 脚本指引文案指向新包名。
 
 ## [0.7.0] - 2026-10-01
 

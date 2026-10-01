@@ -12,13 +12,13 @@
 - 包：<https://www.npmjs.com/package/@topmindspace/topmind-writing-skills>
 - 仓库：<https://github.com/topmindspace/topmind-writing-skills>
 
-当前线：安装器 **0.7.0** · 技能 topmind-cover **0.3.0** · topmind-wechat-post **0.2.0** · topmind-x-article **0.4.0** · topmind-briefs **0.2.0**（整仓同 tag 发版；见 CHANGELOG）。
+当前线：安装器 **0.7.1** · 技能 topmind-cover **0.3.0** · topmind-wechat-post **0.2.0** · topmind-x-article **0.4.0** · topmind-briefs **0.2.1**（整仓同 tag 发版；见 CHANGELOG）。
 演示技能已独立为 `topmind-presentation`（仓库 `topmind-presentation`），不在本仓发布线内。
 
 
 ## npm 2.x 弃用说明（仓库重置）
 
-npm 上的 `@topmindspace/topmind-writing-skills` **2.0.0–2.1.1 已弃用**（仓库重置前的过时线）；**不要安装 `^2`**。当前线是 **0.4.x**（本轮备发，tag/npm 待打待发）。
+npm 上的旧包 `@topmindspace/tms-skills` **2.0.0–2.1.1 已弃用**（仓库重置前的过时线）；**不要安装 `^2`**。本仓已改名为 `@topmindspace/topmind-writing-skills`，旧包不再更新。
 
 若需重写弃用文案，维护者可在已 `npm login` 的机器上执行 `bash scripts/deprecate-npm-2x.sh`（one-shot `@2.x` + verify）。
 
@@ -36,7 +36,7 @@ npm 上的 `@topmindspace/topmind-writing-skills` **2.0.0–2.1.1 已弃用**（
 
 ## 版本策略（务必遵守）
 
-**整仓同 tag**：`git tag vX.Y.Z` 的 `X.Y.Z` = 根 `package.json` 的 `version`（即安装器 version，如当前 v0.7.0）；tag 号不代表任何技能版本。**各技能 `version` 独立演进**（如 topmind-x-article 0.4.0、topmind-cover 0.3.0），不与 tag 号绑定。
+**整仓同 tag**：`git tag vX.Y.Z` 的 `X.Y.Z` = 根 `package.json` 的 `version`（即安装器 version，如当前 v0.7.1）；tag 号不代表任何技能版本。**各技能 `version` 独立演进**（如 topmind-x-article 0.4.0、topmind-cover 0.3.0），不与 tag 号绑定。
 
 | 包 | 事实源 | 规则 |
 |----|--------|------|
