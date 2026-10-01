@@ -35,6 +35,14 @@ Markdown 原稿 → 可直接粘贴的纯文本（`md2x.py` 按 X Article 编辑
 npx @topmindspace/tms-skills install topmind-x-article
 ```
 
+### topmind-briefs · 干货短文
+
+公众号 + X 双平台干货短文：一件事讲透（数据榜单 / 论文一句话解读 / 新品速递 / 机制讲解），X 一帖或短 thread、公众号约 300–800 字，1 张核心图。双版一键复制 HTML，只起草不代发。
+
+```bash
+npx @topmindspace/tms-skills install topmind-briefs
+```
+
 ### topmind-cover · 封面配图生成
 
 X 长文与公众号共用的封面图：震撼、醒目、主题突出。**选风格 → 看示例 → 按配方组 prompt** 三步出图，`crop-cover.py` 一键裁出双平台尺寸（X 1200×675、公众号 900×383）。11 种风格索引与配方见 [`references/cover-styles.md`](./topmind-cover/references/cover-styles.md)。
@@ -63,6 +71,7 @@ npx @topmindspace/tms-skills install topmind-cover
 | [`topmind-wechat-post`](./topmind-wechat-post/) | **0.1.0** | 公众号文章全生命周期：交付包、审校改写、质量三关、微信内联排版与发布清单 |
 | [`topmind-x-article`](./topmind-x-article/) | **0.3.0** | X 长文一键发布：Markdown 原稿 → 一键复制 HTML（含配图/提示词复制、图片点击放大）/ 纯文本兜底 + 封面图 + 发布清单 |
 | [`topmind-cover`](./topmind-cover/) | **0.3.0** | 文章封面配图（X / 公众号共用，X 主尺寸 1500×600 / 5:2）：震撼醒目主题突出；11 风格封面风格库 + 26 张示例图（含 3 张 alt 样张） + 1 张风格总览图 |
+| [`topmind-briefs`](./topmind-briefs/) | **0.1.0** | 干货短文（公众号 + X 双平台）：一件事讲透，数据榜单/论文解读/新品速递；双版一键复制 HTML |
 
 安装器 [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) 为 **0.6.0**（整仓同 tag 发版）。
 
