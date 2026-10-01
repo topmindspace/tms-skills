@@ -1,6 +1,6 @@
 ---
 name: topmind-wechat-post
-version: 0.2.1
+version: 0.2.2
 description: "管一篇公众号文章从选题/底稿到发布的完整生命周期：交付包搭建、审校改写、质量三关（事实/逻辑/去AI味）、状态同步、微信内联排版与发布清单。Use when 写公众号、公众号排版、公众号定稿、发公众号。Do NOT use for 只改错别字、小红书/知乎、纯网页发布。"
 action_category: write
 triggers:
@@ -250,3 +250,7 @@ python3 scripts/md2wechat.py \
   （如 AA 9/28 快照），分数不跨期比较。
 - **frontmatter 状态诚实**：`status: 定稿` 必须等事实/逻辑/文字三关全过才写，
   构建流水线跑通不等于定稿；`word_count` 用脚本实算，不手填。
+
+## 发文铁律
+
+精炼客观 + 素材优先 + 研究深度，见 [../../references/writing-principles.md](../../references/writing-principles.md)。触发本技能时默认执行。

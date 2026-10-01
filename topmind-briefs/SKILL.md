@@ -1,6 +1,6 @@
 ---
 name: topmind-briefs
-version: 0.2.1
+version: 0.2.2
 description: >-
   干货短文发布：公众号 + X 双平台，一件事讲透。X 一帖或短 thread，
   公众号约 300–800 字；1 张核心图（榜单/基准/截图/表格），不废话。
@@ -99,3 +99,7 @@ updated: 2026-10-01
 - 数字必须有来源；厂商数字标"厂商口径"。
 - 不洗稿：观点可以撞，表达必须原创。
 - 不碰医疗建议、投资建议、政治站队。
+
+## 发文铁律
+
+精炼客观 + 素材优先 + 研究深度，见 [../../references/writing-principles.md](../../references/writing-principles.md)。触发本技能时默认执行。

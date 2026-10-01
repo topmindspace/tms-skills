@@ -1,3 +1,13 @@
+## [0.7.8] - 2026-10-02
+
+> 根包 0.7.7 → **0.7.8**（patch）；技能：topmind-cover 0.3.5 → **0.3.6**、
+> topmind-wechat-post 0.2.1 → **0.2.2**、topmind-x-article 0.4.0 → **0.4.1**、
+> topmind-briefs 0.2.1 → **0.2.2**（patch）。
+>
+> - cover：white-clean 4 版式总览图 + README 突出主风格。
+> - 全仓：新增 `references/writing-principles.md`（精炼客观+素材优先+研究深度）；
+>   briefs/x-article/wechat-post 三技能 SKILL.md 默认链接执行。
+
 ## [0.7.7] - 2026-10-02
 
 > 根包 0.7.6 → **0.7.7**（patch）；技能：topmind-cover 0.3.4 → **0.3.5**、

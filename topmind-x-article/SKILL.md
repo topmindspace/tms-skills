@@ -1,6 +1,6 @@
 ---
 name: topmind-x-article
-version: 0.4.0
+version: 0.4.1
 description: "X 长文（Article）一键发布：Markdown 原稿 → 可直接复制的 X长文.html（富文本一键复制+配图内嵌）/ X发布稿.txt + 封面图 + 发布清单。沉淀自实战。Use when X 长文、发 X 文章、X article、长文发 X。Do NOT use for 短推文（→ topmind-x）、公众号（→ topmind-wechat-post）。"
 action_category: write
 triggers:
@@ -154,3 +154,7 @@ updated: 2026-09-29
 - **派生纪律**：`X长文.md` 永远由 `公众号稿.md` 重新派生（脚本重排 `[图N]`），
   不手工改编号；派生后 `X发布稿.txt` 同步重生成。
   `公众号稿.md` 是唯一真源：改图先改公众号稿，再重派生 X 稿，两边永不独立改图。
+
+## 发文铁律
+
+精炼客观 + 素材优先 + 研究深度，见 [../../references/writing-principles.md](../../references/writing-principles.md)。触发本技能时默认执行。
