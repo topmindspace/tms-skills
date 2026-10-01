@@ -10,7 +10,6 @@
 """
 from __future__ import annotations
 
-import py_compile
 import shutil
 import subprocess
 import sys
@@ -71,12 +70,12 @@ def main() -> None:
         check("package_skill --check 在缺 README.md 时无未捕获 Traceback",
               "Traceback" not in (r.stderr or ""), (r.stderr or "")[-200:])
 
-    # 4. scripts/*.py 可编译
+    # 4. scripts/*.py 可编译（用内置 compile 只验语法，不写 .pyc，避免污染工作区）
     for py in sorted((ROOT / "scripts").glob("*.py")):
         try:
-            py_compile.compile(str(py), doraise=True)
+            compile(py.read_text(encoding="utf-8"), str(py), "exec")
             check(f"可编译: scripts/{py.name}", True)
-        except py_compile.PyCompileError as e:
+        except SyntaxError as e:
             check(f"可编译: scripts/{py.name}", False, str(e))
 
     if fails:
