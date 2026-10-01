@@ -1,6 +1,6 @@
 ---
 name: topmind-cover
-version: 0.3.0
+version: 0.3.1
 description: "文章封面配图生成：X 长文与公众号共用。震撼、醒目、主题突出；平台尺寸规范、11 种风格模板、命名落盘、成图检查全流程覆盖。Use when 文章封面、封面图、头图、题图、cover。Do NOT use for 正文插图、PPT/报告封面。"
 action_category: write
 triggers:
