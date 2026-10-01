@@ -9,10 +9,10 @@
 ## 风格样张
 
 <p align="center">
-  <img src="https://github.com/topmindspace/topmind-writing-skills/raw/main/topmind-cover/assets/examples/overview.png" alt="topmind-cover · 11 封面风格总览" width="960" />
+  <img src="https://github.com/topmindspace/topmind-writing-skills/raw/main/topmind-cover/assets/examples/overview.png" alt="topmind-cover · 19 封面风格总览" width="960" />
 </p>
 
-11 种风格（白色清新 / 背景虚化 / 纸感拼贴 / 资讯快报 / 巨字宣言 / 教程步骤 / 极简留白 / 杂志编辑 / 爆款干货 / 品牌发布 / IP 趣味，浅色优先排序）：适用场景、配色故事、抽象设计原则、中英 prompt 配方见 [`references/cover-styles.md`](./references/cover-styles.md)；单风格大图在 [`assets/examples/`](./assets/examples/)。想自己写提示词直接给 AI 生图（不走技能流程），看 [`references/cover-prompts.md`](./references/cover-prompts.md)（可直接拷贝的提示词大全 + 全平台爆款流派调研）。
+19 种风格（白色清新 / 背景虚化 / 纸感拼贴 / 资讯快报 / 巨字宣言 / 教程步骤 / 极简留白 / 杂志编辑 / 3D萌系潮玩 / 日系动漫 / 微缩立体书 / 学院版画 / 样张矩阵 / 暗色SaaS / 电影科技流 / 硬核立体字 / 爆款干货 / 品牌发布 / IP 趣味，浅色优先排序）：适用场景、配色故事、抽象设计原则、中英 prompt 配方见 [`references/cover-styles.md`](./references/cover-styles.md)；单风格大图在 [`assets/examples/`](./assets/examples/)。想自己写提示词直接给 AI 生图（不走技能流程），看 [`references/cover-prompts.md`](./references/cover-prompts.md)（可直接拷贝的提示词大全 + 全平台爆款流派调研）。
 
 ## 安装
 

@@ -1,27 +1,28 @@
 # 封面风格示例图
 
-26 张示例（随 npm 包发布，npx 安装即得）：11 种风格 × 2 种尺寸 = 22 张 + 3 张 alt 样张
+42 张示例（随 npm 包发布，npx 安装即得）：19 种风格 × 2 种尺寸 = 38 张 + 3 张 alt 样张
 + 1 张 alt 微信尺寸版（`white-clean-alt-wechat.png`），
-另附 `overview.png`（11 宫格总览：3 行 × 4 列缩略图 + 风格名标注，选风格时先看它）。
+另附 `overview.png`（19 风格总览缩略图 + 风格名标注，选风格时先看它）。
 
-- `<style>.png`（1200×675，X 长文封面 / 公众号共用主尺寸）
-  > 注：现行主尺寸已改为 1500×600（5:2），见 `../SKILL.md` 尺寸表。
-  > 本目录样张为 16:9 旧版，仅作风格参考，不重制。
+- `<style>.png`（1500×600，X 长文封面 / 公众号共用主尺寸，5:2）
 - `<style>-wechat.png`（900×383，公众号封面大图，中央裁剪版）
-- `<style>-alt.png`（1200×675，同风格第二张演示样张；白色清新 / 背景虚化 / 纸感拼贴
-  三种新风格各有 2 张：主样张与 alt 样张用了不同的优选组合）
+- `<style>-alt.png`（同风格第二张演示样张；白色清新 / 背景虚化 / 纸感拼贴
+  三种风格各有 2 张：主样张与 alt 样张用了不同的优选组合）
 - `<style>-alt-wechat.png`（900×383，alt 样张的公众号尺寸版；目前只有 white-clean 有，即
   `white-clean-alt-wechat.png`，`crop-cover.py` 流程产出双尺寸，新增 alt 样张时一并产出）
-- `overview.png`（11 宫格总览：3 行 × 4 列缩略图 + 风格名标注，选风格时先看它）
+- `overview.png`（19 风格总览缩略图 + 风格名标注，选风格时先看它）
 
-11 种风格（白色清新 `white-clean` / 背景虚化 `bg-blur` / 纸感拼贴 `paper-collage` /
+19 种风格（白色清新 `white-clean` / 背景虚化 `bg-blur` / 纸感拼贴 `paper-collage` /
 资讯快报 `news-flash` / 巨字宣言 `big-type` / 教程步骤 `tutorial-steps` /
-极简留白 `minimal` / 杂志编辑 `magazine` / 爆款干货 `gan-huo` / 品牌发布 `brand-launch` /
+极简留白 `minimal` / 杂志编辑 `magazine` / 3D萌系潮玩 `chao-wan-3d` /
+日系动漫 `anime-desk` / 微缩立体书 `diorama-book` / 学院版画 `academic-print` /
+样张矩阵 `gallery-grid` / 暗色SaaS `dark-saas` / 电影科技流 `cinematic-flow` /
+硬核立体字 `hard-core-type` / 爆款干货 `gan-huo` / 品牌发布 `brand-launch` /
 IP 趣味 `ip-fun`，浅色优先排序）：适用场景索引与配方见 `../references/cover-styles.md`。
 
 ## 原创与虚构声明（重要）
 
-本目录 26 张示例图均为**原创设计**（只演示抽象设计原则，不临摹任何第三方封面的
+本目录 42 张示例图均为**原创设计**（只演示抽象设计原则，不临摹任何第三方封面的
 版式与配色；复用本库设计时亦不得与第三方封面构成实质相似——只学原则，不学版式）。
 图中标题文案、数字、品牌名、署名均为**虚构演示内容**（如"破晓 6.0"、
 "@老周带单"）——直接复用前请换成自己的真实标题；凡封面上的数字必须在正文中有

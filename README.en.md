@@ -50,7 +50,7 @@ npx @topmindspace/topmind-writing-skills install topmind-cover
 ```
 
 <p align="center">
-  <img src="https://github.com/topmindspace/topmind-writing-skills/raw/main/topmind-cover/assets/examples/overview.png" alt="topmind-cover · 11 cover-style overview" width="960" />
+  <img src="https://github.com/topmindspace/topmind-writing-skills/raw/main/topmind-cover/assets/examples/overview.png" alt="topmind-cover · 19 cover-style overview" width="960" />
 </p>
 
 > Let ideas fly — make good thinking visible.

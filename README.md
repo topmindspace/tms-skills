@@ -41,14 +41,14 @@ npx @topmindspace/topmind-writing-skills install topmind-briefs
 
 ### topmind-cover · 封面配图生成
 
-X 长文与公众号共用的封面图：震撼、醒目、主题突出。**选风格 → 看示例 → 按配方组 prompt** 三步出图，`crop-cover.py` 一键裁出双平台尺寸（X 1200×675、公众号 900×383）。11 种风格索引与配方见 [`references/cover-styles.md`](./topmind-cover/references/cover-styles.md)。
+X 长文与公众号共用的封面图：震撼、醒目、主题突出。**选风格 → 看示例 → 按配方组 prompt** 三步出图，`crop-cover.py` 一键裁出双平台尺寸（X 1200×675、公众号 900×383）。19 种风格索引与配方见 [`references/cover-styles.md`](./topmind-cover/references/cover-styles.md)。
 
 ```bash
 npx @topmindspace/topmind-writing-skills install topmind-cover
 ```
 
 <p align="center">
-  <img src="https://github.com/topmindspace/topmind-writing-skills/raw/main/topmind-cover/assets/examples/overview.png" alt="topmind-cover · 11 封面风格总览" width="960" />
+  <img src="https://github.com/topmindspace/topmind-writing-skills/raw/main/topmind-cover/assets/examples/overview.png" alt="topmind-cover · 19 封面风格总览" width="960" />
 </p>
 
 > 让 idea 飞，好想法被看见。
