@@ -434,22 +434,60 @@ def main():
     ap.add_argument("md", help="原稿 markdown 路径")
     ap.add_argument("--out", required=True, help="输出 HTML 路径")
     ap.add_argument("--images", nargs="*", default=[], help="[图N] 对应的图片路径（按顺序）")
+    ap.add_argument("--images-from", default=None, metavar="WECHAT_MD",
+                    help="从指定的 markdown（如公众号稿.md）中按文档顺序提取 ![]() 本地图片路径，"
+                         "作为 [图N] 的图片来源。X 稿必须从公众号稿派生时用此项，"
+                         "禁止手工拼 --images 顺序（曾因此出现配图错位）")
     ap.add_argument("--cover", default=None, help="封面图路径（1500×600，5:2）")
     args = ap.parse_args()
 
     if not os.path.isfile(args.md):
         print("输入文件不存在：%s" % args.md, file=sys.stderr)
         sys.exit(1)
-    for p in args.images:
+    with open(args.md, encoding="utf-8") as f:
+        md_text = f.read()
+
+    # 图片来源：优先 --images-from（从公众号稿等源 md 按文档顺序派生），杜绝手工排序错位
+    images = list(args.images)
+    if args.images_from:
+        if not os.path.isfile(args.images_from):
+            print("图片来源文件不存在：%s" % args.images_from, file=sys.stderr)
+            sys.exit(1)
+        with open(args.images_from, encoding="utf-8") as f:
+            src_md = f.read()
+        base = os.path.dirname(os.path.abspath(args.images_from))
+        found = []
+        for q in re.findall(r"!\[[^\]]*\]\(([^)\s]+)\)", src_md):
+            if re.match(r"https?://", q):
+                print("警告：跳过远程图片（无法内嵌）：%s" % q, file=sys.stderr)
+                continue
+            fp = q if os.path.isabs(q) else os.path.normpath(os.path.join(base, q))
+            found.append(fp)
+        if args.images:
+            print("警告：同时给了 --images 和 --images-from，采用 --images-from 派生顺序",
+                  file=sys.stderr)
+        images = found
+        print("从 %s 派生图片顺序：%d 张" % (args.images_from, len(images)), file=sys.stderr)
+
+    for p in images:
         if not os.path.isfile(p):
             print("图片不存在：%s" % p, file=sys.stderr)
+            sys.exit(1)
+
+    # 校验：[图N] 标记数量必须与图片数量一致，且编号连续 1..N
+    markers = sorted({int(n) for line in md_text.split("\n")
+                      for n in re.findall(r"^\[图(\d+)\]$", line.strip())})
+    if markers:
+        if markers != list(range(1, len(markers) + 1)):
+            print("图编号不连续：发现 %s，应为 1..%d" % (markers, len(markers)), file=sys.stderr)
+            sys.exit(1)
+        if len(images) != len(markers):
+            print("图片数量不匹配：[图N] 标记 %d 个，图片 %d 张" % (len(markers), len(images)),
+                  file=sys.stderr)
             sys.exit(1)
     if args.cover and not os.path.isfile(args.cover):
         print("封面图不存在：%s" % args.cover, file=sys.stderr)
         sys.exit(1)
-
-    with open(args.md, encoding="utf-8") as f:
-        md_text = f.read()
 
     # 标题取 frontmatter 之后的第一个 #（frontmatter 里可能有 # 开头的行）
     body_lines = md_text.split("\n")
@@ -461,7 +499,7 @@ def main():
     m = re.search(r"^#\s+(.+)$", "\n".join(body_lines), re.M)
     title = m.group(1).strip() if m else "X长文"
 
-    body = md_to_html(md_text, args.images, args.cover)
+    body = md_to_html(md_text, images, args.cover)
     page = HTML_TMPL.replace("@@TITLE@@", html.escape(title)) \
                     .replace("@@CSS@@", CSS) \
                     .replace("@@BODY@@", body) \
