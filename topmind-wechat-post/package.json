@@ -6,7 +6,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/topmindspace/tms-skills.git",
+    "url": "git+https://github.com/topmindspace/topmind-writing-skills.git",
     "directory": "topmind-wechat-post"
   },
   "type": "commonjs",

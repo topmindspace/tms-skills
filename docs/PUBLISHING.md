@@ -6,18 +6,19 @@
 
 | 通道 | 命令 | 特点 |
 |------|------|------|
-| **npm** | `npx @topmindspace/tms-skills install <skill-id>` | 钉版本、日常推荐 |
-| **GitHub** | `npx github:topmindspace/tms-skills install <skill-id>` | 跟 HEAD、可 clone |
+| **npm** | `npx @topmindspace/topmind-writing-skills install <skill-id>` | 钉版本、日常推荐 |
+| **GitHub** | `npx github:topmindspace/topmind-writing-skills install <skill-id>` | 跟 HEAD、可 clone |
 
-- 包：<https://www.npmjs.com/package/@topmindspace/tms-skills>
-- 仓库：<https://github.com/topmindspace/tms-skills>
+- 包：<https://www.npmjs.com/package/@topmindspace/topmind-writing-skills>
+- 仓库：<https://github.com/topmindspace/topmind-writing-skills>
 
-当前线：安装器 **0.7.0** · 技能 top-ppt-html **0.2.1** · topmind-cover **0.3.0** · topmind-wechat-post **0.2.0** · topmind-x-article **0.4.0** · topmind-briefs **0.2.0**（整仓同 tag 发版；见 CHANGELOG）。
+当前线：安装器 **0.7.0** · 技能 topmind-cover **0.3.0** · topmind-wechat-post **0.2.0** · topmind-x-article **0.4.0** · topmind-briefs **0.2.0**（整仓同 tag 发版；见 CHANGELOG）。
+演示技能已独立为 `topmind-presentation`（仓库 `tms-presentation-skills`），不在本仓发布线内。
 
 
 ## npm 2.x 弃用说明（仓库重置）
 
-npm 上的 `@topmindspace/tms-skills` **2.0.0–2.1.1 已弃用**（仓库重置前的过时线）；**不要安装 `^2`**。当前线是 **0.4.x**（本轮备发，tag/npm 待打待发）。
+npm 上的 `@topmindspace/topmind-writing-skills` **2.0.0–2.1.1 已弃用**（仓库重置前的过时线）；**不要安装 `^2`**。当前线是 **0.4.x**（本轮备发，tag/npm 待打待发）。
 
 若需重写弃用文案，维护者可在已 `npm login` 的机器上执行 `bash scripts/deprecate-npm-2x.sh`（one-shot `@2.x` + verify）。
 
@@ -26,16 +27,16 @@ npm 上的 `@topmindspace/tms-skills` **2.0.0–2.1.1 已弃用**（仓库重置
 
 | 优先级 | 命令 | 何时用 |
 |--------|------|--------|
-| **默认** | `npx @topmindspace/tms-skills install <skill-id>` | 日常 |
-| 跟最新源 | `npx github:topmindspace/tms-skills install <skill-id>` | 要 HEAD |
-| 备选 | `git clone` + `node tms-skills/bin/tms-skills.js install <skill-id>` | 离线 |
+| **默认** | `npx @topmindspace/topmind-writing-skills install <skill-id>` | 日常 |
+| 跟最新源 | `npx github:topmindspace/topmind-writing-skills install <skill-id>` | 要 HEAD |
+| 备选 | `git clone` + `node topmind-writing-skills/bin/topmind-writing-skills.js install <skill-id>` | 离线 |
 | 手工 | 解压 Release 的 `<skill-id>.zip` | 无 Node |
 
 不要引导 `npm install <skill-id>`（技能 id 不是独立 npm 包）。
 
 ## 版本策略（务必遵守）
 
-**整仓同 tag**：`git tag vX.Y.Z` 的 `X.Y.Z` = 根 `package.json` 的 `version`（即安装器 version，如当前 v0.7.0）；tag 号不代表任何技能版本。**各技能 `version` 独立演进**（如 top-ppt-html 0.2.1、topmind-x-article 0.4.0），不与 tag 号绑定。
+**整仓同 tag**：`git tag vX.Y.Z` 的 `X.Y.Z` = 根 `package.json` 的 `version`（即安装器 version，如当前 v0.7.0）；tag 号不代表任何技能版本。**各技能 `version` 独立演进**（如 topmind-x-article 0.4.0、topmind-cover 0.3.0），不与 tag 号绑定。
 
 | 包 | 事实源 | 规则 |
 |----|--------|------|
@@ -74,7 +75,7 @@ CI/Release 细节见 [`docs/ci.md`](./ci.md)。
    ```
 
    > **推送（2026-09-29 起）**：SSH 隧道被代理墙掐断，改走 **HTTPS + PAT Basic 认证**：
-   > `git -c "http.extraHeader=Authorization: Basic <base64(x-access-token:PAT)>" push https://github.com/topmindspace/tms-skills.git main`
+   > `git -c "http.extraHeader=Authorization: Basic <base64(x-access-token:PAT)>" push https://github.com/topmindspace/topmind-writing-skills.git main`
    > 坑：GitHub git 接口不认 `Bearer` 只认 Basic；origin 是 SSH 地址时必须显式给 HTTPS URL；PAT 一次性，用完即弃不入库。
 
    Release workflow（`.github/workflows/release.yml`）按序执行：
@@ -84,7 +85,7 @@ CI/Release 细节见 [`docs/ci.md`](./ci.md)。
    - `npm publish`：先查 registry，版本已存在则跳过；**`NPM_TOKEN` 缺失 → 显式失败**（拒绝发无 npm 包的 Release）；
      publish 命中 **E409 / 版本冲突 → 显式失败**（说明打 tag 前没 bump 版本；禁止复用 tag 号）。
    - prune Releases（留最近 2 个；git tags 保留不删）。
-6. 验证：`npm view @topmindspace/tms-skills version`
+6. 验证：`npm view @topmindspace/topmind-writing-skills version`
 
 ### 手工 publish
 
@@ -98,13 +99,9 @@ Secret **`NPM_TOKEN`**（granular，scope `@topmindspace` 写权限）配置在 
 
 | 面 | 规则 | 示例 |
 |----|------|------|
-| 技能 id / 目录 / frontmatter `name` | kebab-case，三处一致 | `top-ppt-html` |
-| 品牌展示名 | 简短 | `TopPPT HTML` |
-| 环境变量 | `TOP_PPT_*` | `TOP_PPT_NODE_EXE` |
-| 注入标记 | `__TOPPPT_*__` | `__TOPPPT_CONSTANTS__` |
-| JS API | PascalCase | `TopPptHtml` |
-| npm | `@topmindspace/*` | `@topmindspace/tms-skills` |
-| CLI | 与仓库名一致 | `tms-skills` |
+| 技能 id / 目录 / frontmatter `name` | kebab-case，三处一致 | `topmind-briefs` |
+| npm | `@topmindspace/*` | `@topmindspace/topmind-writing-skills` |
+| CLI | 与仓库名一致 | `topmind-writing-skills` |
 
 新代码禁止历史遗留标识（扫描器拦截）；文档不写更名流水账。
 

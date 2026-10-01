@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Release privacy scan for tms-skills monorepo.
+"""Release privacy scan for topmind-writing-skills monorepo.
 
 Fails when public trees contain personal/host-local markers or secrets-shaped text.
 Ignore-rules and migration notes may mention deprecated ids / local-state dir names.
@@ -44,10 +44,6 @@ ALLOWLIST = {
     Path("docs") / "PUBLISHING.md",
     Path("scripts") / "ci_privacy_scan.py",
     Path(".gitignore"),
-    Path("top-ppt-html") / ".gitignore",
-    Path("top-ppt-html") / "README.md",
-    Path("top-ppt-html") / "references" / "tech-design.md",
-    Path("top-ppt-html") / "scripts" / "package_skill.py",
 }
 
 # Paths that must never be tracked by git.

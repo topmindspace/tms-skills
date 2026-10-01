@@ -1,17 +1,17 @@
 #!/usr/bin/env node
 /**
- * tms-skills — TopMindspace agent skills installer
+ * topmind-writing-skills — TopMindspace agent skills installer
  *
- * Recommended channel (when published): npm @topmindspace/tms-skills
+ * Recommended channel (when published): npm @topmindspace/topmind-writing-skills
  * GitHub npx remains available for HEAD / offline clone.
  *
  * Usage:
- *   npx @topmindspace/tms-skills list
- *   npx @topmindspace/tms-skills install top-ppt-html
- *   npx @topmindspace/tms-skills install top-ppt-html --to ./skills-out
- *   npx @topmindspace/tms-skills install top-ppt-html --force
- *   npx @topmindspace/tms-skills uninstall top-ppt-html --to ./skills-out
- *   npx github:topmindspace/tms-skills install top-ppt-html   # follow repo HEAD
+ *   npx @topmindspace/topmind-writing-skills list
+ *   npx @topmindspace/topmind-writing-skills install topmind-briefs
+ *   npx @topmindspace/topmind-writing-skills install topmind-briefs --to ./skills-out
+ *   npx @topmindspace/topmind-writing-skills install topmind-briefs --force
+ *   npx @topmindspace/topmind-writing-skills uninstall topmind-briefs --to ./skills-out
+ *   npx github:topmindspace/topmind-writing-skills install topmind-briefs   # follow repo HEAD
  */
 'use strict';
 
@@ -202,7 +202,7 @@ function install(skillId, targetRoot, { force = false, defaultTarget = false } =
         `Already installed: ${dest}\n` +
           `  installed version: ${installedVer} (this package ships ${packageVer})\n` +
           'Refusing to overwrite. Pass --force (or -f) to replace, or remove it first:\n' +
-          `  tms-skills uninstall ${skillId} --to ${targetRoot}`
+          `  topmind-writing-skills uninstall ${skillId} --to ${targetRoot}`
       );
     }
     fs.rmSync(dest, { recursive: true, force: true });
@@ -218,9 +218,6 @@ function install(skillId, targetRoot, { force = false, defaultTarget = false } =
 }
 
 function nextStep(skillId, dest) {
-  if (skillId === 'top-ppt-html') {
-    return `optional (PPTX export only): cd "${dest}" && npm install — then restart your agent so it picks up the skill`;
-  }
   return 'restart your agent so it picks up the skill';
 }
 
@@ -266,13 +263,13 @@ function uninstall(skillId, targetRoot) {
 }
 
 function usageText() {
-  return `tms-skills — install TopMindspace agent skills
+  return `topmind-writing-skills — install TopMindspace agent skills
 
 Usage:
-  tms-skills list|ls
-  tms-skills install <skill-id> [--to|-t <dir>] [--force|-f]
-  tms-skills uninstall <skill-id> [--to|-t <dir>]
-  tms-skills help
+  topmind-writing-skills list|ls
+  topmind-writing-skills install <skill-id> [--to|-t <dir>] [--force|-f]
+  topmind-writing-skills uninstall <skill-id> [--to|-t <dir>]
+  topmind-writing-skills help
 
 Behavior:
   install    copies <skill-id>/ into <dir>/<skill-id>/. If the skill is already
@@ -288,14 +285,14 @@ Target probe order (no --to): ./.agents/skills, ./.claude/skills,
   ~/.claude/skills, ~/.agents/skills, ~/.cursor/skills, ~/.codex/skills.
 
 Examples (npm recommended when published):
-  npx @topmindspace/tms-skills list
-  npx @topmindspace/tms-skills install top-ppt-html
-  npx @topmindspace/tms-skills install top-ppt-html --to ./.agents/skills
-  npx @topmindspace/tms-skills install top-ppt-html --force
-  npx @topmindspace/tms-skills uninstall top-ppt-html --to ./.agents/skills
+  npx @topmindspace/topmind-writing-skills list
+  npx @topmindspace/topmind-writing-skills install topmind-briefs
+  npx @topmindspace/topmind-writing-skills install topmind-briefs --to ./.agents/skills
+  npx @topmindspace/topmind-writing-skills install topmind-briefs --force
+  npx @topmindspace/topmind-writing-skills uninstall topmind-briefs --to ./.agents/skills
 
   # Follow repo HEAD:
-  npx github:topmindspace/tms-skills install top-ppt-html
+  npx github:topmindspace/topmind-writing-skills install topmind-briefs
 
 Privacy: the installer is fully local — it never collects or uploads anything.
 `;

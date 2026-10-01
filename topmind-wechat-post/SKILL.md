@@ -20,7 +20,7 @@ triggers_cn:
   - 公众号发布清单
 author: TopMindspace
 license: MIT
-homepage: https://github.com/topmindspace/tms-skills#readme
+homepage: https://github.com/topmindspace/topmind-writing-skills#readme
 updated: 2026-09-29
 ---
 

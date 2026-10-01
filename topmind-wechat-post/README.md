@@ -4,12 +4,12 @@
 
 公众号文章全生命周期：交付包、审校改写、质量三关、状态同步、微信内联排版与发布清单。
 
-- 版本：**v0.2.0**（与 `@topmindspace/tms-skills@0.7.0` 同 tag）
+- 版本：**v0.2.0**（与 `@topmindspace/topmind-writing-skills@0.7.0` 同 tag）
 
 ## 安装
 
 ```bash
-npx @topmindspace/tms-skills install topmind-wechat-post
+npx @topmindspace/topmind-writing-skills install topmind-wechat-post
 ```
 
 ## 用法

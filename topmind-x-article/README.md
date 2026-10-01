@@ -4,12 +4,12 @@
 
 把 Markdown 原稿变成"复制 → 粘贴 → 发"的 X 长文（Article）发布包。
 
-- 版本：**v0.4.0**（与 `@topmindspace/tms-skills@0.7.0` 同 tag）
+- 版本：**v0.4.0**（与 `@topmindspace/topmind-writing-skills@0.7.0` 同 tag）
 
 ## 安装
 
 ```bash
-npx @topmindspace/tms-skills install topmind-x-article
+npx @topmindspace/topmind-writing-skills install topmind-x-article
 ```
 
 ## 用法

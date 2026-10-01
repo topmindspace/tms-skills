@@ -25,14 +25,14 @@ jobs:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
           cache: npm
-          cache-dependency-path: top-ppt-html/package-lock.json
+          cache-dependency-path: topmind-briefs/package-lock.json
 
       - name: Privacy scan
         run: python3 scripts/ci_privacy_scan.py
 
       # Same skill gates as CI (incl. lightweight regression fixture + smoke_pptx).
       - name: Skill gates (all discovered skills)
-        run: bash scripts/ci_skill_gates.sh --with-pptx
+        run: bash scripts/ci_skill_gates.sh
 
       # Fail fast when the tag does not match package.json version: npm publishes
       # the package.json version, so a skewed tag would permanently desync
@@ -67,7 +67,7 @@ jobs:
             cp "$skill/dist/${skill}.zip" release-assets/
             cp "$skill/dist/${skill}.manifest.json" release-assets/
           done
-          node bin/tms-skills.js list > release-assets/skills-list.txt
+          node bin/topmind-writing-skills.js list > release-assets/skills-list.txt
           ls -la release-assets/
 
       - name: Create GitHub Release
@@ -88,7 +88,7 @@ jobs:
             exit 1
           fi
           VERSION="$(node -p "require('./package.json').version")"
-          PKG="@topmindspace/tms-skills"
+          PKG="@topmindspace/topmind-writing-skills"
           echo "Checking whether ${PKG}@${VERSION} is already on the registry..."
           if npm view "${PKG}@${VERSION}" version >/dev/null 2>&1; then
             echo "${PKG}@${VERSION} already on npm — skip publish (exit 0)."

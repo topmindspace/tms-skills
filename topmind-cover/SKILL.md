@@ -22,7 +22,7 @@ triggers_cn:
   - 文章封面
 author: TopMindspace
 license: MIT
-homepage: https://github.com/topmindspace/tms-skills#readme
+homepage: https://github.com/topmindspace/topmind-writing-skills#readme
 updated: 2026-09-29
 ---
 
@@ -130,5 +130,5 @@ workbuddy 环境，仓库内无此文件；缺失时仍按固定命名落盘，�
 ## When NOT to use
 
 - 正文插图：主体是文字说明，按正文配图流程走
-- 报告/PPT 封面：走 `top-ppt-html`
+- 报告/PPT 封面：走 `topmind-presentation`（仓库 `tms-presentation-skills`，已从本仓独立出去）
 - 只想找现成图：走 `image_search` 技能

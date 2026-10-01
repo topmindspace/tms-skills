@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * tms-skills 安装器负向测试（零依赖：node 直接可跑）。
+ * topmind-writing-skills 安装器负向测试（零依赖：node 直接可跑）。
  *
  * 覆盖审计报告 严重-2 的两个实测 case，外加正常 --force 回归。
  * 注意 --to 是目标**根目录**，最终落盘 dest = <to>/<skill-id>，守卫按 dest 比对：
@@ -10,7 +10,7 @@
  *      → 必须被拒绝（原 bug：copyDir 无限递归复制直至 ENAMETOOLONG，留下垃圾目录树）
  *   3. 正常 --force 安装（目标已存在且在源树之外）仍通过
  *
- * 隔离设计：把 bin/tms-skills.js 复制到临时目录，旁边搭一个假技能树（ROOT 由 bin 位置推导），
+ * 隔离设计：把 bin/topmind-writing-skills.js 复制到临时目录，旁边搭一个假技能树（ROOT 由 bin 位置推导），
  * 即使守卫回归失效，最多删掉 /tmp 下的假目录，绝不碰仓库真技能。
  *
  * 用法：node scripts/test_install_guards.js
@@ -23,7 +23,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const REPO_BIN = path.resolve(__dirname, '..', 'bin', 'tms-skills.js');
+const REPO_BIN = path.resolve(__dirname, '..', 'bin', 'topmind-writing-skills.js');
 let failures = 0;
 
 function ok(cond, msg) {
@@ -31,18 +31,18 @@ function ok(cond, msg) {
   if (!cond) failures++;
 }
 
-/** 搭隔离环境：<tmp>/bin/tms-skills.js + <tmp>/testskill/SKILL.md */
+/** 搭隔离环境：<tmp>/bin/topmind-writing-skills.js + <tmp>/testskill/SKILL.md */
 function makeEnv() {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'tms-install-guard-'));
   fs.mkdirSync(path.join(tmp, 'bin'), { recursive: true });
-  fs.copyFileSync(REPO_BIN, path.join(tmp, 'bin', 'tms-skills.js'));
+  fs.copyFileSync(REPO_BIN, path.join(tmp, 'bin', 'topmind-writing-skills.js'));
   const skill = path.join(tmp, 'testskill');
   fs.mkdirSync(skill, { recursive: true });
   fs.writeFileSync(
     path.join(skill, 'SKILL.md'),
     '---\nname: testskill\ndescription: fake skill for installer guard tests\n---\n# testskill\n'
   );
-  return { tmp, skill, bin: path.join(tmp, 'bin', 'tms-skills.js') };
+  return { tmp, skill, bin: path.join(tmp, 'bin', 'topmind-writing-skills.js') };
 }
 
 function runInstall(env, args, cwd) {

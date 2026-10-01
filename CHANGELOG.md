@@ -1,3 +1,16 @@
+## [Unreleased] 拆分与改名（2026-10-01，未发版）
+
+- 仓库由 `tms-skills` 改名为 **`topmind-writing-skills`**：
+  npm 包 `@topmindspace/tms-skills` → `@topmindspace/topmind-writing-skills`，
+  CLI `bin/tms-skills.js` → `bin/topmind-writing-skills.js`；
+  根 `package.json` / 4 技能 `package.json` 的 `repository.url`、
+  README 中英文 badge / 安装命令 / 技能表、PUBLISHING / ci.md、
+  workflows、`ci_privacy_scan.py`、`ci_skill_gates.sh`（去掉 `--with-pptx` 分支）同步更新。
+- **`top-ppt-html` 拆出为独立仓库 `tms-presentation-skills`**（技能改名 `topmind-presentation`）：
+  技能文件、docs 下 ppt 专属页面（index/showcase/style-gallery、showcase/、site-assets/、
+  banner、industry-pptx-research.md）一并迁移；本仓删除 `top-ppt-html/` 目录。
+- `topmind-cover/SKILL.md` 的报告封面指引改为走 `topmind-presentation`。
+
 ## [0.7.0] - 2026-10-01
 
 > 根包 0.6.0 → **0.7.0**（minor，本轮是功能轮）；技能版本：topmind-x-article 0.3.0 → **0.4.0**、

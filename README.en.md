@@ -1,32 +1,27 @@
-# tms-skills
+# topmind-writing-skills
 
 **[中文](./README.md)** | English
 
 > Language note: **Chinese is the default** (`README.md`). This file is the full English parallel.
 
-[![Release](https://img.shields.io/github/v/release/topmindspace/tms-skills?style=flat-square&color=blue)](https://github.com/topmindspace/tms-skills/releases)
-[![npm](https://img.shields.io/npm/v/@topmindspace/tms-skills?style=flat-square)](https://www.npmjs.com/package/@topmindspace/tms-skills)
-[![CI](https://img.shields.io/github/actions/workflow/status/topmindspace/tms-skills/ci.yml?style=flat-square&label=CI)](https://github.com/topmindspace/tms-skills/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/topmindspace/topmind-writing-skills?style=flat-square&color=blue)](https://github.com/topmindspace/topmind-writing-skills/releases)
+[![npm](https://img.shields.io/npm/v/@topmindspace/topmind-writing-skills?style=flat-square)](https://www.npmjs.com/package/@topmindspace/topmind-writing-skills)
+[![CI](https://img.shields.io/github/actions/workflow/status/topmindspace/topmind-writing-skills/ci.yml?style=flat-square&label=CI)](https://github.com/topmindspace/topmind-writing-skills/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
 
-**TopMindspace agent-skills monorepo** — formal business presentations, WeChat articles, X long-form posts, cover art: four skills, one repo.
+**TopMindSpace writing-skills collection** — WeChat articles, X long-form posts, short-form briefs, cover art: four skills, one repo.
 
-### top-ppt-html · Formal business presentations
-
-Built for **demo reports / formal business decks**: **HTML + PPT dual delivery**. Day-to-day, present with single-file HTML like slides; export **high-fidelity editable PPTX** when needed (charts carry data you can annotate). MD3-inspired: fitting information density, restrained type / shapes / color. Formal business presenting — not decoration.
-
-```bash
-npx @topmindspace/tms-skills install top-ppt-html
-```
-
-Live: [landing](https://topmindspace.github.io/tms-skills/) · [full deck](https://topmindspace.github.io/tms-skills/showcase.html) · [style gallery](https://topmindspace.github.io/tms-skills/style-gallery.html); golden examples in [`top-ppt-html/assets/examples/`](./top-ppt-html/assets/examples/).
+> The formal business presentation skill now lives on its own: [`topmind-presentation`](https://github.com/topmindspace/tms-presentation-skills) (repo `tms-presentation-skills`).
+> ```bash
+> npx @topmindspace/tms-presentation-skills install topmind-presentation
+> ```
 
 ### topmind-wechat-post · WeChat article authoring
 
 Full lifecycle for WeChat articles: delivery package, review & rewrite, three quality gates (facts / logic / de-AI-flavor), WeChat inline typography (images must be embedded), publish checklist and status sync. Python stdlib only — zero dependencies.
 
 ```bash
-npx @topmindspace/tms-skills install topmind-wechat-post
+npx @topmindspace/topmind-writing-skills install topmind-wechat-post
 ```
 
 ### topmind-x-article · One-click X long-form publishing
@@ -34,7 +29,15 @@ npx @topmindspace/tms-skills install topmind-wechat-post
 Markdown draft → paste-ready plain text (`md2x.py` adapts to the X Article editor: images → `[图N]`, tables → "item: value" lists) + cover art + publish checklist. Publishing is done by hand-pasting; fetch the text back for verification after posting.
 
 ```bash
-npx @topmindspace/tms-skills install topmind-x-article
+npx @topmindspace/topmind-writing-skills install topmind-x-article
+```
+
+### topmind-briefs · Short-form briefs
+
+Short-form briefs for WeChat + X: one topic, one chart (data rankings / paper one-liners / product alerts / mechanism explainers). One X post or short thread, WeChat ~300–800 words, 1 key visual. One-click-copy HTML for both, draft only — never auto-post.
+
+```bash
+npx @topmindspace/topmind-writing-skills install topmind-briefs
 ```
 
 ### topmind-cover · Cover art generation
@@ -42,65 +45,63 @@ npx @topmindspace/tms-skills install topmind-x-article
 Shared cover art for X long-form and WeChat: striking, eye-catching, theme-focused. **Pick a style → check the example → compose the prompt from the recipe**, then one-click crop to both platform sizes with `crop-cover.py` (X 1200×675, WeChat 900×383). 11-style index and recipes: [`references/cover-styles.md`](./topmind-cover/references/cover-styles.md).
 
 ```bash
-npx @topmindspace/tms-skills install topmind-cover
+npx @topmindspace/topmind-writing-skills install topmind-cover
 ```
 
 <p align="center">
-  <img src="https://github.com/topmindspace/tms-skills/raw/main/topmind-cover/assets/examples/overview.png" alt="topmind-cover · 11 cover-style overview" width="960" />
+  <img src="https://github.com/topmindspace/topmind-writing-skills/raw/main/topmind-cover/assets/examples/overview.png" alt="topmind-cover · 11 cover-style overview" width="960" />
 </p>
 
 > Let ideas fly — make good thinking visible.
 
-<p align="center">
-  <img src="docs/assets/tms-skills-banner.png" alt="tms-skills · top-ppt-html — formal business presentations" width="960" />
-</p>
-
-> **Warning**: do not install `@topmindspace/tms-skills@^2` (2.0.0–2.1.1 deprecated). Current line is **0.3.x** (`latest`).
+> **Rename note**: this repo was renamed from `tms-skills` to `topmind-writing-skills`;
+> the npm package is `@topmindspace/topmind-writing-skills` and the old package is no longer updated.
+> Also do not install the old package's `^2` (2.0.0–2.1.1 deprecated).
 
 ## Skills
 
 | Skill | Version | What it does |
 |-------|---------|--------------|
-| [`top-ppt-html`](./top-ppt-html/) | **0.2.1** | Formal business decks: paginated HTML + editable 16:9 PPTX; dual delivery · MD3-inspired density; 3 modes × 9 styles; strict 0/0 |
 | [`topmind-wechat-post`](./topmind-wechat-post/) | **0.2.0** | WeChat article lifecycle: package, review, 3 quality gates, inline typography & publish checklist |
 | [`topmind-x-article`](./topmind-x-article/) | **0.4.0** | X long-form one-click publish: Markdown → one-click-copy HTML (images/prompt copy, click-to-zoom images) / plain-text fallback + cover + checklist |
 | [`topmind-cover`](./topmind-cover/) | **0.3.0** | Cover art for X / WeChat (X master 1500×600 / 5:2): striking, theme-focused; 11-style cover style library + 26 example images (incl. 3 alt samples) + 1 style overview |
-| [`topmind-briefs`](./topmind-briefs/) | **0.2.0** | Short-form briefs (WeChat + X): one topic, one chart; data rankings / paper TL;DR / product launches; one-click-copy HTML for both |
+| [`topmind-briefs`](./topmind-briefs/) | **0.2.0** | Short-form briefs (WeChat + X): one topic, one chart; data rankings / paper one-liners / product alerts / mechanism explainers; one-click-copy HTML for both |
 
-Installer [`@topmindspace/tms-skills`](https://www.npmjs.com/package/@topmindspace/tms-skills) is **0.7.0** (whole-repo same-tag releases).
+Installer [`@topmindspace/topmind-writing-skills`](https://www.npmjs.com/package/@topmindspace/topmind-writing-skills) is **0.7.0** (whole-repo same-tag releases).
 
 ## Install
 
 **npm = pinned snapshot**; **GitHub = track repo HEAD**.
 
 ```bash
-npx @topmindspace/tms-skills list
-npx @topmindspace/tms-skills install top-ppt-html
-npx @topmindspace/tms-skills install top-ppt-html --to ./.claude/skills
-npx @topmindspace/tms-skills@0.7.0 install top-ppt-html   # pin
-npx @topmindspace/tms-skills uninstall top-ppt-html --to ./.claude/skills
+npx @topmindspace/topmind-writing-skills list
+npx @topmindspace/topmind-writing-skills install topmind-briefs
+npx @topmindspace/topmind-writing-skills install topmind-briefs --to ./.claude/skills
+npx @topmindspace/topmind-writing-skills@0.7.0 install topmind-briefs   # pin
+npx @topmindspace/topmind-writing-skills uninstall topmind-briefs --to ./.claude/skills
 ```
 
 ```bash
 # track HEAD
-npx github:topmindspace/tms-skills install top-ppt-html
+npx github:topmindspace/topmind-writing-skills install topmind-briefs
 ```
 
-Default probe order: `./.agents` → `./.claude` → `./.cursor` → `./.codex` → `./.mimocode`, then user-level `~/.claude`, etc. Or pass `--to`. When `--to` is omitted, the install summary explicitly prints the auto-detected target directory. Do not `npm install top-ppt-html` (skill id is not a standalone package).
+Default probe order: `./.agents` → `./.claude` → `./.cursor` → `./.codex` → `./.mimocode`, then user-level `~/.claude`, etc. Or pass `--to`. When `--to` is omitted, the install summary explicitly prints the auto-detected target directory. Do not `npm install topmind-briefs` (skill id is not a standalone package).
 
 `install` details: if a same-named skill already exists, the installed version is reported and overwriting is refused — pass `--force` to replace (or `uninstall` first). On success, a three-line summary is printed: where it was installed / installed skill version and installer version / next steps.
-
-PPTX export needs `npm install` in the skill folder (pptxgenjs). HTML generation uses Python stdlib only.
 
 ## Repo layout
 
 ```
-tms-skills/
-├─ top-ppt-html/             # skill (SKILL.md + assets + references + scripts)
-├─ bin/tms-skills.js         # CLI: list / install / uninstall
-├─ docs/                     # publishing · showcase shots · banner · Pages source
-├─ scripts/                  # repo gates / privacy scan
-├─ package.json              # @topmindspace/tms-skills
+topmind-writing-skills/
+├─ topmind-briefs/                    # skill (SKILL.md + assets + references + scripts)
+├─ topmind-cover/                     # skill
+├─ topmind-wechat-post/               # skill
+├─ topmind-x-article/                 # skill
+├─ bin/topmind-writing-skills.js      # CLI: list / install / uninstall
+├─ docs/                              # publishing guide · CI notes (history archived in docs/archive)
+├─ scripts/                           # repo gates / privacy scan
+├─ package.json                       # @topmindspace/topmind-writing-skills
 └─ LICENSE · CHANGELOG.md · README.md · README.en.md
 ```
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * tms-skills 安装器 CLI 负向测试（零依赖：node 直接可跑）。
+ * topmind-writing-skills 安装器 CLI 负向测试（零依赖：node 直接可跑）。
  *
  * 覆盖 install/uninstall 新行为的负向分支 + 成功路径回归：
  *   1. install 到已存在的技能目录（无 --force）→ 拒绝，报错含已装版本/--force/卸载提示
@@ -16,7 +16,7 @@
  *  11. uninstall --to 经符号链接指向包根 → 拒绝，源目录完好（realpath 守卫）
  *  12. install --force --to 经符号链接指向包根 → 拒绝，源目录完好
  *
- * 隔离设计：把 bin/tms-skills.js 复制到临时目录，旁边搭假技能树，
+ * 隔离设计：把 bin/topmind-writing-skills.js 复制到临时目录，旁边搭假技能树，
  * 最多删 /tmp 下的假目录，绝不碰仓库真技能。
  *
  * 用法：node scripts/test_installer_cli.js
@@ -29,7 +29,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const REPO_BIN = path.resolve(__dirname, '..', 'bin', 'tms-skills.js');
+const REPO_BIN = path.resolve(__dirname, '..', 'bin', 'topmind-writing-skills.js');
 let failures = 0;
 
 function ok(cond, msg) {
@@ -41,18 +41,18 @@ function noTraceback(out) {
   return !/Traceback|^\s+at\s/m.test(out);
 }
 
-/** 搭隔离环境：<tmp>/bin/tms-skills.js + <tmp>/testskill/SKILL.md（version: 9.9.9） */
+/** 搭隔离环境：<tmp>/bin/topmind-writing-skills.js + <tmp>/testskill/SKILL.md（version: 9.9.9） */
 function makeEnv() {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'tms-install-cli-'));
   fs.mkdirSync(path.join(tmp, 'bin'), { recursive: true });
-  fs.copyFileSync(REPO_BIN, path.join(tmp, 'bin', 'tms-skills.js'));
+  fs.copyFileSync(REPO_BIN, path.join(tmp, 'bin', 'topmind-writing-skills.js'));
   const skill = path.join(tmp, 'testskill');
   fs.mkdirSync(skill, { recursive: true });
   fs.writeFileSync(
     path.join(skill, 'SKILL.md'),
     '---\nname: testskill\nversion: 9.9.9\ndescription: fake skill for installer cli tests\n---\n# testskill\n'
   );
-  return { tmp, skill, bin: path.join(tmp, 'bin', 'tms-skills.js') };
+  return { tmp, skill, bin: path.join(tmp, 'bin', 'topmind-writing-skills.js') };
 }
 
 function runCli(env, args, cwd) {

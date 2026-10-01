@@ -4,12 +4,12 @@
 
 Full lifecycle for WeChat articles: delivery package, review & rewrite, three quality gates, status sync, WeChat inline typography, and publish checklist.
 
-- Version: **v0.2.0** (same tag as `@topmindspace/tms-skills@0.7.0`)
+- Version: **v0.2.0** (same tag as `@topmindspace/topmind-writing-skills@0.7.0`)
 
 ## Install
 
 ```bash
-npx @topmindspace/tms-skills install topmind-wechat-post
+npx @topmindspace/topmind-writing-skills install topmind-wechat-post
 ```
 
 ## Usage

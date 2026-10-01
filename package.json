@@ -1,28 +1,29 @@
 {
-  "name": "@topmindspace/tms-skills",
+  "name": "@topmindspace/topmind-writing-skills",
   "version": "0.7.0",
-  "description": "TopMindspace 智能体技能 monorepo — 通过 npm / GitHub npx 安装技能（top-ppt-html：HTML+PPT 双交付，正式商务演示文稿）。",
+  "description": "TopMindSpace 写作技能合集 — 通过 npm / npx 安装技能（公众号长文、X 长文/短文、封面图）。",
   "license": "MIT",
   "author": "TopMindspace",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/topmindspace/tms-skills.git"
+    "url": "git+https://github.com/topmindspace/topmind-writing-skills.git"
   },
-  "homepage": "https://github.com/topmindspace/tms-skills#readme",
+  "homepage": "https://github.com/topmindspace/topmind-writing-skills#readme",
   "bugs": {
-    "url": "https://github.com/topmindspace/tms-skills/issues"
+    "url": "https://github.com/topmindspace/topmind-writing-skills/issues"
   },
   "keywords": [
     "agent-skills",
     "ai-skills",
-    "slides",
-    "pptx",
-    "report",
-    "top-ppt-html"
+    "writing",
+    "wechat",
+    "x-twitter",
+    "briefs",
+    "cover"
   ],
   "type": "commonjs",
   "bin": {
-    "tms-skills": "bin/tms-skills.js"
+    "topmind-writing-skills": "bin/topmind-writing-skills.js"
   },
   "files": [
     "bin",
@@ -30,7 +31,6 @@
     "README.en.md",
     "LICENSE",
     "CHANGELOG.md",
-    "top-ppt-html",
     "topmind-briefs",
     "topmind-cover",
     "topmind-wechat-post",
@@ -40,11 +40,11 @@
     "node": ">=18"
   },
   "scripts": {
-    "list": "node bin/tms-skills.js list",
+    "list": "node bin/topmind-writing-skills.js list",
     "discover": "node scripts/discover_skills.js",
     "sync:files": "node scripts/sync_npm_files.js",
     "prepack": "node scripts/sync_npm_files.js",
-    "install:skills": "node -e \"const {discoverSkills}=require('./scripts/discover_skills'); const {spawnSync}=require('child_process'); for (const id of discoverSkills()) { const r=spawnSync(process.execPath,['bin/tms-skills.js','install',id],{stdio:'inherit'}); if(r.status) process.exit(r.status||1); }\"",
+    "install:skills": "node -e \"const {discoverSkills}=require('./scripts/discover_skills'); const {spawnSync}=require('child_process'); for (const id of discoverSkills()) { const r=spawnSync(process.execPath,['bin/topmind-writing-skills.js','install',id],{stdio:'inherit'}); if(r.status) process.exit(r.status||1); }\"",
     "check": "node scripts/run_skill_gates.js check",
     "privacy": "python3 scripts/ci_privacy_scan.py",
     "audit": "node scripts/run_skill_gates.js audit",

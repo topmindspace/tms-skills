@@ -4,12 +4,12 @@
 
 Turn a Markdown draft into a "copy → paste → publish" X long-form (Article) package.
 
-- Version: **v0.4.0** (same tag as `@topmindspace/tms-skills@0.7.0`)
+- Version: **v0.4.0** (same tag as `@topmindspace/topmind-writing-skills@0.7.0`)
 
 ## Install
 
 ```bash
-npx @topmindspace/tms-skills install topmind-x-article
+npx @topmindspace/topmind-writing-skills install topmind-x-article
 ```
 
 ## Usage

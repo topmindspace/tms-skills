@@ -14,34 +14,25 @@
 `scripts/ci_skill_gates.sh` 被 CI 与 Release **共用**：
 
 ```bash
-bash scripts/ci_skill_gates.sh --with-pptx
+bash scripts/ci_skill_gates.sh
 ```
 
 对每个发现的技能目录依次：
 
 1. `npm ci`（或 `npm install`）
 2. `package_skill.py --check` + `audit_{styles,docs,skill,css}.py`
-3. （`--with-pptx`）轻量回归 fixture：`build_pptx.js` 用 `assets/examples/2026-09-09-research-mckinsey.model.json`
-4. `negative_tests.py`
-5. （`--with-pptx`）`bash scripts/smoke_pptx.sh`（extract → build → `validate_pptx --strict`）
-6. （若存在）`test_feedback_gates.py`
-
-`python-pptx` **仅在需要 PPTX 步骤时**安装。完整 `regression.py`（playwright）仍本地跑，不进 CI。
+3. `negative_tests.py`
+4. （若存在）`test_feedback_gates.py`
 
 ### 本地复现
 
 ```bash
-# 单技能冒烟（应 exit 0）
-cd top-ppt-html && bash scripts/smoke_pptx.sh; echo $?
-
 # 与 CI 同款全门禁
-bash scripts/ci_skill_gates.sh --with-pptx
+bash scripts/ci_skill_gates.sh
 
 # 仓库级
 npm run check && npm run audit && npm run privacy
 ```
-
-冒烟失败时 stderr 先打 **错误码 / 页码 / 短消息**，完整 JSON 在 `$TMPDIR/top-ppt-html-smoke/*.validate.json`。
 
 ## npm publish（显式失败，防假绿）
 
@@ -55,11 +46,9 @@ Release 的 publish 步骤：
 
 - PR / push：GitHub Actions → 对应 workflow → **Re-run failed jobs** / **Re-run all jobs**
 - 发版：修好后推新 commit + 新 tag（npm 版本不可覆盖；已发布号走上面的幂等路径）
-- 本地：修完再跑 `smoke_pptx.sh` 与 `ci_skill_gates.sh --with-pptx`，确认 exit 0 再推
+- 本地：修完再跑 `bash scripts/ci_skill_gates.sh`，确认 exit 0 再推
 
 ## 红线（勿为过 CI 而削弱）
 
-- 反截断 / 文本溢出门禁
-- 图表多样性地板
-- Mode A 大气正式 craft
-- runtime SHA 同版本门禁
+- 各技能 `audit_*.py` 定义的质量门禁（如去 AI 味、数字来源、配图校验）
+- `negative_tests.py` 的负向用例必须全绿
