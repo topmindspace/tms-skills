@@ -12,10 +12,11 @@ prompt 配方为中英双语模板：`{TITLE}` 为标题文字占位符（短标
 
 ## 安全区铁律（所有风格通用）
 
-900×383 公众号版是从 1500×600 主图**中央裁剪**（左右各裁约 3%）：
-**标题字与关键主体必须落在左右各 5% 安全边距之内**
-（左右各预留 5%+ 不放标题字与关键主体），否则公众号版会被裁掉。
-垂直方向不再被裁剪，上下可放心用满。
+900×383 公众号版是从 1500×600 主图**中央裁剪**（左右各裁约 3%）；
+X 与公众号在手机端信息流里，左右边缘可能被平台图标/时间/转发按钮轻微遮挡：
+**标题字与关键主体必须落在左右各 10% 安全边距之内**
+（左右各预留 10% 不放标题字与关键主体），否则会被裁掉或遮挡。
+垂直方向上下各预留 5%。
 选风格、组 prompt、检查成图时都要先过这一条。
 
 ## 原创铁律（所有风格通用）
@@ -507,7 +508,358 @@ prompt 配方为中英双语模板：`{TITLE}` 为标题文字占位符（短标
 
 ---
 
-## 风格速查（浅色优先：1~8 浅色，9~11 深色/高饱和）
+## 12. chao-wan-3d · 3D萌系潮玩
+
+- **适用场景**：爆款盘点、新手干货、合集清单；"消除冰冷感、让人想点开"的亲和型选题默认选择。
+  示例图：`assets/examples/chao-wan-3d.png`（原创）。
+- **设计语言（抽象原则）**：
+  - 泡泡玛特盲盒感：毛绒/黏土质感 3D 角色是绝对主角，占画面 40%+。
+  - 柔光散射：整个画面像被柔光箱照着，阴影极淡、边缘圆润。
+  - 黏土拟物卡片：信息卡片做成黏土质感的小物件，拿在角色手里或飘在空中。
+  - 手绘小星星/小花点缀，至多 3 处。
+- **配色故事**：奶油白/浅粉/浅蓝马卡龙底（极端浅明度）；标题深色打底 +
+  一处高饱和撞色（橙红/电光蓝二选一）；角色用暖色毛绒质感。
+- **标题写法规范**：
+  - 短标题 6~10 字，超大，字高冲击 1/3；关键词撞色 + 白色描边（贴纸感）。
+  - 数字钩子放大 1.5~2 倍 + 换对比色（如黑字中的橙红数字）。
+  - 底部胶囊标签行 3 短词，`·` 分隔。
+- **标题文案提炼公式**：数字 + 筛选动作 + 价值承诺。
+  示例（虚构演示）："26篇爆款干货"。
+- **prompt 配方**：
+  ```
+  中文：3D萌系潮玩风中文封面。字体量级：超大深色标题"{TITLE}"（逐字准确），字高冲击画面 1/3，
+  关键词"{KEYWORDS}"换撞色 {ACCENT} + 白色描边（贴纸感）；数字钩子"{NUMBER}"字号放大到其余字的
+  1.8 倍、换对比色。配色：{BG} 马卡龙浅色底（极端浅明度）；标题深色打底。构图：左侧 45%
+  留白放标题（大标题 → 数字钩子 → 胶囊标签行"{TAGLINE}"），右侧 55% 是毛绒/黏土质感 3D
+  角色（{CHARACTER}，占画面 40%+，柔光散射、阴影极淡）抱着/举着黏土质感信息卡片
+  （{CARDS}）；手绘小星星点缀至多 3 处。质感：柔光散射 + 细腻绒毛质感，拒绝塑料感。
+  除标题、胶囊行外无其他文字；所有文字避开左右各 10% 边缘；横构图，尺寸 1500×600。
+
+  EN: 3D cute-toy Chinese cover. Huge dark title "{TITLE}" (exact), glyph height 1/3 of frame;
+  keyword "{KEYWORDS}" in accent {ACCENT} with white outline (sticker feel); number hook
+  "{NUMBER}" at 1.8× size in contrasting color. {BG} macaron pastel ground. Layout: left 45%
+  negative space for title stack, right 55% fluffy/clay 3D character ({CHARACTER}, 40%+ of
+  frame, soft diffused light) holding clay info cards ({CARDS}); ≤3 hand-drawn stars.
+  No text besides title and capsule row "{TAGLINE}". All text clear of 10% edge margins.
+  Landscape 1500×600.
+  ```
+  占位符：`{KEYWORDS}` 撞色关键词、`{NUMBER}` 数字钩子（必须真实）、`{ACCENT}` 撞色
+  （橙红 #FF5A2E / 电光蓝 #2B7FFF 二选一）、`{BG}` 底色（奶油白 #FFF8F0 / 浅粉 #FFE8F0 /
+  浅蓝 #E8F2FF 三选一）、`{CHARACTER}` 毛绒角色描述、`{CARDS}` 黏土卡片内容、
+  `{TAGLINE}` 胶囊标签行。
+- **绝不清单**：
+  - 绝不角色占比不足 40%：角色是主角，小了就失去潮玩感。
+  - 绝不硬阴影：本风格阴影必须极淡，硬阴影直接变味。
+  - 绝不标题无白色描边：贴纸感是本风格的灵魂。
+  - 绝不数字与标题同色同字号：数字钩子必须 1.5~2 倍 + 换色。
+  - 绝不深底：本风格必须是浅底。
+
+---
+
+## 13. hard-core-type · 硬核立体字
+
+- **适用场景**：深度硬核教程、从入门到精通、架构指南；"这篇很硬核"的技术深度文默认选择。
+  示例图：`assets/examples/hard-core-type.png`（原创）。
+- **设计语言（抽象原则）**：
+  - 文字即建筑：标题做成混凝土/粗糙岩石/红黑砖石质感的 3D 立体字，
+    像纪念碑一样立在画面里。
+  - 巨物反差：Tiny Human vs Huge Object——小小的人物在巨字下翻书/攀爬，
+    反差本身就是震撼。
+  - 强透视：低角度仰视，巨字向远方延伸。
+- **配色故事**：深灰/暗色底（走极端深明度）或浅灰混凝土底；
+  标题用材质本色（混凝土灰/岩石棕/砖红）；一处高饱和强调（橙红/电光蓝）。
+- **标题写法规范**：
+  - 短标题 4~8 字，3D 立体字，字高占画面 1/2+（巨字就是画面）。
+  - 材质三选一：混凝土 / 粗糙岩石 / 红黑砖石。
+  - 小人物（{TINY_HUMAN}）在巨字下做动作（翻书/攀爬/仰望）。
+- **标题文案提炼公式**：领域 + "指南/精通/架构"。
+  示例（虚构演示）："Skill 指南"。
+- **prompt 配方**：
+  ```
+  中文：硬核立体字风中文封面。字体量级：标题"{TITLE}"（逐字准确）做成 {MATERIAL}
+  质感的 3D 立体巨字，字高占画面 1/2 以上，低角度仰视、强透视向远方延伸——
+  字本身就是建筑、就是画面。配色：{BG} 底；巨字用材质本色；强调色 {ACCENT}
+  只给一处（小人物的衣服/一处光源）。构图：巨物反差——小小的人物（{TINY_HUMAN}，
+  占画面 ~10%）在巨字下翻书/攀爬/仰望；一条视觉动线从人物指向巨字。
+  质感：材质必须有真实的粗糙颗粒 + 体积光 + 长阴影，拒绝光滑 CG。
+  除标题外无其他文字；标题避开左右各 10% 边缘；横构图，尺寸 1500×600。
+
+  EN: Hardcore 3D-type Chinese cover. Title "{TITLE}" (exact) as monumental 3D letters
+  in {MATERIAL} texture, glyph height 1/2+ of frame, low-angle strong perspective.
+  {BG} ground; accent {ACCENT} touches one element only. Tiny human ({TINY_HUMAN},
+  ~10% of frame) climbs/reads beneath the giant type — the scale contrast IS the impact.
+  Real rough grain + volumetric light + long shadows. No text besides title.
+  All text clear of 10% margins. Landscape 1500×600.
+  ```
+  占位符：`{MATERIAL}` 材质三选一（混凝土 / 粗糙岩石 / 红黑砖石）、`{BG}` 底色
+  （深灰 #2A2A2E / 浅灰混凝土 #D8D8DC 二选一）、`{ACCENT}` 强调色（橙红/电光蓝）、
+  `{TINY_HUMAN}` 小人物动作描述。
+- **绝不清单**：
+  - 绝不小字：本风格字高不足 1/2 直接作废。
+  - 绝无巨物反差：没有小人物，巨字就只是一块石头。
+  - 绝不光滑材质：无颗粒无阴影的"塑料巨字"一律重画。
+  - 绝不平视：必须低角度仰视，平视无压迫感。
+
+---
+
+## 14. dark-saas · 暗色SaaS玻璃拟态
+
+- **适用场景**：产品发布、工具实战测评、开发者工作流、ROI 降本增效。
+  示例图：`assets/examples/dark-saas.png`（原创）。
+- **设计语言（抽象原则）**：
+  - Dark Mode + 毛玻璃（Glassmorphism）：深色底 + 半透明毛玻璃卡片悬浮。
+  - 微光发光边框：卡片边缘有一圈极细的发光描边。
+  - 工作流节点图：节点 + 连线，讲"自动化流程"的故事。
+  - App 悬浮多维投影：界面卡片以不同角度悬浮，有真实投影。
+- **配色故事**：深空黑/深蓝黑 `#0A0E1A` 全幅底；毛玻璃卡片半透明；
+  强调色单选：电光蓝 `#2B7FFF` / 霓虹紫 `#7C5CFF` / 荧光绿 `#3DFF88`，
+  只给发光边框 + 关键词一处。
+- **标题写法规范**：
+  - 短标题 4~8 字，白色/浅色大字，字高 1/4~1/3；英文专有名词放大
+    （如 `Jev` 单独做发光描边）。
+  - 底部 4 个胶囊徽标（如"更高效 / 更安全 / 更好体验 / 更强生产力"）。
+- **标题文案提炼公式**：产品名 + 版本/核心卖点。
+  示例（虚构演示）："Jev 最佳实践"。
+- **prompt 配方**：
+  ```
+  中文：暗色SaaS风中文封面。字体量级：白色大号标题"{TITLE}"（逐字准确），字高占画面
+  1/4~1/3；英文专有名词"{EN_TERM}"单独放大 + {ACCENT} 发光描边。配色：深空黑 #0A0E1A
+  全幅底；毛玻璃卡片（{UI_CARDS}，半透明、{ACCENT} 微光发光边框）以不同角度悬浮，
+  有真实多维投影。构图：左侧 45% 标题区（标题 → 副标题"{SUBTITLE}" → 4 个胶囊徽标
+  "{BADGES}"），右侧 55% 是工作流节点图（{WORKFLOW}，节点+连线+微光）+ 悬浮 UI 卡片。
+  质感：深底加细腻噪点 + 一团 {ACCENT} 光晕，拒绝死黑。文字特效：标题关键词
+  "{KEYWORDS}"换 {ACCENT} 色。除标题、副标题、徽标外无其他文字；
+  所有文字避开左右各 10% 边缘；横构图，尺寸 1500×600。
+
+  EN: Dark SaaS Chinese cover. Large white title "{TITLE}" (exact), 1/4~1/3 of frame;
+  English term "{EN_TERM}" enlarged with {ACCENT} glow outline. Deep space black #0A0E1A
+  ground; frosted-glass cards ({UI_CARDS}, {ACCENT} glow borders) floating at angles
+  with real shadows. Left 45%: title → subtitle "{SUBTITLE}" → 4 badge chips "{BADGES}".
+  Right 55%: workflow node graph ({WORKFLOW}) + floating UI. Fine grain + {ACCENT} halo
+  on dark ground. Keyword "{KEYWORDS}" in {ACCENT}. No other text. 10% margins.
+  Landscape 1500×600.
+  ```
+  占位符：`{EN_TERM}` 英文专有名词、`{ACCENT}` 强调色三选一（电光蓝/霓虹紫/荧光绿）、
+  `{UI_CARDS}` 悬浮卡片描述、`{SUBTITLE}` 副标题、`{BADGES}` 4 个胶囊徽标、
+  `{WORKFLOW}` 工作流节点描述、`{KEYWORDS}` 标题关键词。
+- **绝不清单**：
+  - 绝不浅底：本风格必须是深底。
+  - 绝不实心不透明卡片：必须是毛玻璃半透明。
+  - 绝不无发光边框：发光边框是本风格的灵魂。
+  - 绝不第二种强调色：强调色只许一种。
+
+---
+
+## 15. anime-desk · 日系动漫工位
+
+- **适用场景**：行业科普、职业揭秘、经验避坑、个人 IP 打造。
+  示例图：`assets/examples/anime-desk.png`（原创）。
+- **设计语言（抽象原则）**：
+  - 2.5D Q版人物：二次元平涂 + 轻微立体感，表情生动（专注/惊讶/微笑）。
+  - 工位桌搭：多层堆叠的书（书脊印关键词）、AI 马克杯、代码弹窗、
+    悬浮的图表/灯泡——每个道具讲故事。
+  - 轻微透视：桌面轻微俯视，人物三分法站位。
+- **配色故事**：纯白/浅色底；标题深色 + 一处高饱和撞色（蓝/橙红）；
+  道具用马卡龙浅色系；人物发色/衣服给一处跳色。
+- **标题写法规范**：
+  - 短标题 6~10 字，超大，字高冲击 1/3；关键词撞色 + 白色描边。
+  - 感叹号/问号可做装饰（如"算法工程师！"）。
+  - 蓝色胶囊副标题（如"薪资？日常？统统告诉你"）。
+- **标题文案提炼公式**：人群/职业 + 揭秘/祛魅动词。
+  示例（虚构演示）："带你祛魅算法工程师"。
+- **prompt 配方**：
+  ```
+  中文：日系动漫风中文封面。字体量级：超大深色标题"{TITLE}"（逐字准确），字高冲击
+  1/3；关键词"{KEYWORDS}"换撞色 {ACCENT} + 白色描边（贴纸感）。配色：{BG} 浅色底；
+  道具马卡龙浅色系。构图：左侧 50% 标题区（大标题 → 蓝色胶囊副标题"{SUBTITLE}"），
+  右侧 50% 是 2.5D Q版人物（{CHARACTER}，二次元平涂+轻微立体，表情 {EXPRESSION}）
+  坐在工位前；桌搭道具：{PROPS}（书脊印关键词、AI 马克杯、代码弹窗、悬浮图表，
+  每个道具讲故事）；小装饰（感叹号/放射线）至多 2 处。质感：平涂干净 + 柔和投影，
+  拒绝死白。文字特效：数字钩子"{NUMBER}"放大 1.5 倍 + 换 {ACCENT} 色。
+  除标题、副标题外无其他文字；所有文字避开左右各 10% 边缘；横构图 1500×600。
+
+  EN: Anime-desk Chinese cover. Huge dark title "{TITLE}" (exact), 1/3 of frame;
+  keyword "{KEYWORDS}" in {ACCENT} with white outline. {BG} light ground.
+  Left 50%: title → blue capsule subtitle "{SUBTITLE}". Right 50%: 2.5D chibi character
+  ({CHARACTER}, cel-shaded, expressive {EXPRESSION}) at a desk with storytelling props
+  ({PROPS}: labeled book spines, AI mug, code popup, floating charts). ≤2 decorations.
+  Number hook "{NUMBER}" at 1.5× in {ACCENT}. No other text. 10% margins. 1500×600.
+  ```
+  占位符：`{KEYWORDS}` 撞色关键词、`{ACCENT}` 撞色（蓝/橙红）、`{BG}` 底色、
+  `{SUBTITLE}` 胶囊副标题、`{CHARACTER}` 人物描述、`{EXPRESSION}` 表情、
+  `{PROPS}` 桌搭道具、`{NUMBER}` 数字钩子（必须真实）。
+- **绝不清单**：
+  - 绝不写实人物：本风格必须是 2.5D Q版。
+  - 绝无故事道具：桌搭道具每个必须讲故事，无意义摆件一律不用。
+  - 绝不标题无白色描边。
+
+---
+
+## 16. diorama-book · 微缩立体书
+
+- **适用场景**：宏大系统学习路线、知识地图、万字长文。
+  示例图：`assets/examples/diorama-book.png`（原创）。
+- **设计语言（抽象原则）**：
+  - Diorama 微缩盆景：一本书打开，书页上立起微缩景观（山川/城市/电路）。
+  - 立体书探险：发光路径在书页间穿梭，引导视线。
+  - 移轴光影：微缩摄影感，边缘轻微虚化。
+  - 吉卜力 + 赛博朋克融合：温暖与科技的混搭。
+- **配色故事**：暖色微缩景观（吉卜力绿/暖黄）+ 赛博霓虹点缀；
+  标题深色压在留白区；发光路径用暖金/电光蓝。
+- **标题写法规范**：
+  - 短标题 4~8 字，大标题压在顶部留白区，字高 1/4~1/3。
+  - 数字钩子（如"万字"）放大 + 换色。
+- **标题文案提炼公式**：领域 + "精通/地图/路线"。
+  示例（虚构演示）："GitHub 精通地图"。
+- **prompt 配方**：
+  ```
+  中文：微缩立体书风中文封面。字体量级：顶部留白区大号深色标题"{TITLE}"（逐字准确），
+  字高 1/4~1/3；数字钩子"{NUMBER}"放大 1.5 倍 + 换 {ACCENT} 色。配色：暖色微缩景观
+  + {ACCENT} 霓虹点缀。构图：下半部是一本打开的立体书，书页上立起微缩景观
+  （{DIORAMA}，吉卜力+赛博朋克融合）；一条发光路径（{ACCENT}）在书页间穿梭；
+  移轴摄影感，边缘轻微虚化。质感：微缩模型质感 + 暖光 + 细腻颗粒。
+  除标题外无其他文字；标题避开左右各 10% 边缘；横构图 1500×600。
+
+  EN: Diorama pop-up book Chinese cover. Large dark title "{TITLE}" (exact) in top
+  negative space, 1/4~1/3 of frame; number hook "{NUMBER}" at 1.5× in {ACCENT}.
+  Open pop-up book fills lower half; miniature landscape ({DIORAMA}, Ghibli meets
+  cyberpunk) rises from pages; glowing {ACCENT} path winds through. Tilt-shift blur
+  at edges. Miniature-model texture + warm light. No other text. 10% margins. 1500×600.
+  ```
+  占位符：`{NUMBER}` 数字钩子（必须真实）、`{ACCENT}` 强调色（暖金/电光蓝）、
+  `{DIORAMA}` 微缩景观描述。
+- **绝不清单**：
+  - 绝不无立体书：书是本风格的载体，无书即无风格。
+  - 绝无发光路径：路径是视线引导，无路径即散。
+  - 绝不写实大场景：必须是微缩感，移轴虚化不能少。
+
+---
+
+## 17. cinematic-flow · 电影科技流
+
+- **适用场景**：多工具自动化工作流（A+B+C）、影视视频 AI 生产力。
+  示例图：`assets/examples/cinematic-flow.png`（原创）。
+- **设计语言（抽象原则）**：
+  - 电影级光影：冷蓝主调 + 霓虹光效，强明暗对比。
+  - 横向粒子能量光带：从左向右的光流，讲"流程"的故事。
+  - 多帧序列：同一主体多帧残影，表现"穿梭/加速"。
+  - 超写实人物/主体：细节拉满，拒绝卡通。
+- **配色故事**：深蓝黑底；冷蓝 `#2B7FFF` + 霓虹紫/青光效；标题白色/浅色；
+  强调色只给光带 + 关键词一处。
+- **标题写法规范**：
+  - 短标题 4~8 字，白色大字，字高 1/4~1/3，压在左侧留白区。
+  - 流程公式可做副标题（如"A → B → C"）。
+- **标题文案提炼公式**：工具A + 工具B + 结果。
+  示例（虚构演示）："数字人+剪辑工作流"。
+- **prompt 配方**：
+  ```
+  中文：电影科技流风中文封面。字体量级：白色大号标题"{TITLE}"（逐字准确），字高
+  1/4~1/3，压在左侧 40% 留白区；副标题"{SUBTITLE}"（如"A → B → C"流程公式）。
+  配色：深蓝黑底；冷蓝 + 霓虹光效。构图：水平线性流动——左侧标题区 →
+  中部横向粒子能量光带（{ACCENT}，从左向右）→ 右侧超写实主体（{SUBJECT}，
+  多帧序列残影、穿梭感）；强明暗对比，电影级调色。质感：体积光 + 粒子细节 +
+  胶片颗粒。除标题、副标题外无其他文字；所有文字避开左右各 10% 边缘；
+  横构图 1500×600。
+
+  EN: Cinematic tech-flow Chinese cover. Large white title "{TITLE}" (exact),
+  1/4~1/3 of frame, in left 40% negative space; subtitle "{SUBTITLE}" (e.g. "A → B → C").
+  Deep blue-black ground; cold blue + neon glow. Horizontal flow: title → particle
+  energy light-band ({ACCENT}, left to right) → hyperreal subject ({SUBJECT},
+  multi-frame ghosting). Strong chiaroscuro, cinematic grade. Volumetric light +
+  film grain. No other text. 10% margins. 1500×600.
+  ```
+  占位符：`{SUBTITLE}` 流程公式副标题、`{ACCENT}` 光带色（冷蓝/霓虹紫/青）、
+  `{SUBJECT}` 超写实主体描述。
+- **绝不清单**：
+  - 绝不卡通主体：本风格必须超写实。
+  - 绝无光带：光带是流程的视觉隐喻，无光带即无风格。
+  - 绝不浅底：本风格必须是深底。
+
+---
+
+## 18. academic-print · 学院版画
+
+- **适用场景**：论文解读、底层原理解析、严肃评测、方法论/提示词研究。
+  示例图：`assets/examples/academic-print.png`（原创）。
+- **设计语言（抽象原则）**：
+  - 19世纪铜版雕刻线稿：精密机械/解剖图式的线稿，严谨即美。
+  - 牛皮纸/撕纸纹理：纸的质感是底色。
+  - 衬线宋体标题：学术正统，字距宽松。
+  - 印章标签 + 学术对齐线：红印章点睛，对齐线框定版式。
+- **配色故事**：牛皮纸 `#E8DCC8` / 米白底；标题墨黑衬线；朱红 `#E6392B`
+  只给印章 + 一处关键词；线稿用深棕/墨色。
+- **标题写法规范**：
+  - 短标题 6~12 字，衬线宋体，字高 1/4~1/3，字距宽松。
+  - 右上角朱红印章（如"实测"）。
+  - 副标题用打字机字体（如"283万字去AI味实测"）。
+- **标题文案提炼公式**：研究对象 + 方法/结论。
+  示例（虚构演示）："283万字去AI味研究"。
+- **prompt 配方**：
+  ```
+  中文：学院版画风中文封面。字体量级：墨黑衬线宋体大标题"{TITLE}"（逐字准确），
+  字高 1/4~1/3，字距宽松；打字机字体副标题"{SUBTITLE}"；右上角朱红印章"{SEAL}"。
+  配色：牛皮纸 #E8DCC8 底 + 撕纸纹理；线稿深棕/墨色；朱红只给印章+关键词
+  "{KEYWORDS}"。构图：左侧 55% 标题区（学术对齐线框定），右侧 45% 是铜版雕刻线稿
+  （{ENGRAVING}，19世纪精密机械/解剖图风）；印章点睛。质感：纸纹 + 雕刻线条 +
+  印章肌理。除标题、副标题、印章外无其他文字；所有文字避开左右各 10% 边缘；
+  横构图 1500×600。
+
+  EN: Academic print Chinese cover. Ink-black serif title "{TITLE}" (exact),
+  1/4~1/3 of frame, generous letter-spacing; typewriter subtitle "{SUBTITLE}";
+  vermilion seal "{SEAL}" top-right. Kraft paper #E8DCC8 ground with torn-paper
+  texture; copperplate engraving ({ENGRAVING}, 19th-century precision style) right 45%;
+  academic alignment rules frame left 55% title zone. Vermilion only for seal +
+  keyword "{KEYWORDS}". Paper grain + engraved lines. No other text. 10% margins.
+  1500×600.
+  ```
+  占位符：`{SUBTITLE}` 打字机副标题、`{SEAL}` 印章文字（如"实测"，必须真实）、
+  `{KEYWORDS}` 朱红关键词、`{ENGRAVING}` 雕刻线稿描述。
+- **绝不清单**：
+  - 绝不黑体标题：本风格必须衬线宋体。
+  - 绝不无纸纹：纸的质感是底色，无纹理即无风格。
+  - 绝不花哨撞色：朱红只给两处，多一处即俗。
+
+---
+
+## 19. gallery-grid · 样张矩阵
+
+- **适用场景**：模型/工具评测、风格 LoRA 展示、生图模型发版。
+  示例图：`assets/examples/gallery-grid.png`（原创）。
+- **设计语言（抽象原则）**：
+  - Moodboard 密集排版：多张样例图平铺，本身就是内容。
+  - 多样性展示：同一提示词不同风格 / 同一模型不同场景。
+  - 实操测试对比：左右/上下对比排布。
+  - 标题压阵：大标题压在顶部，不抢样张的戏。
+- **配色故事**：浅灰/白底做画框；标题深色 + 一处撞色；样张本身色彩丰富，
+  标题必须克制。
+- **标题写法规范**：
+  - 短标题 4~8 字，顶部大标题，字高 1/4（给样张让路）。
+  - 右下角小标签（如"RTX 5080 × M2 Max"）。
+- **标题文案提炼公式**：模型/工具名 + "实测/样张"。
+  示例（虚构演示）："Qwen-Image 实测"。
+- **prompt 配方**：
+  ```
+  中文：样张矩阵风中文封面。字体量级：顶部深色大标题"{TITLE}"（逐字准确），字高
+  1/4（给样张让路）；右下角小标签"{SPECS}"。配色：浅灰/白底画框；标题深色 +
+  一处撞色 {ACCENT}。构图：下半部 2×3 或 3×3 样张矩阵（{SAMPLES}，多样性展示：
+  {VARIETY}）；样张间细线分隔；标题压阵不抢戏。质感：画框投影 + 纸纹。
+  除标题、小标签外无其他文字；所有文字避开左右各 10% 边缘；横构图 1500×600。
+
+  EN: Gallery-grid Chinese cover. Dark title "{TITLE}" (exact) at top, 1/4 of frame;
+  small spec tag "{SPECS}" bottom-right. Light gray/white mat; one accent {ACCENT}.
+  Lower half: 2×3 or 3×3 sample matrix ({SAMPLES}, variety: {VARIETY}); hairline
+  dividers; mat shadows + paper grain. No other text. 10% margins. 1500×600.
+  ```
+  占位符：`{SPECS}` 规格小标签（必须真实）、`{ACCENT}` 撞色、`{SAMPLES}` 样张描述、
+  `{VARIETY}` 多样性维度。
+- **绝不清单**：
+  - 绝不标题过大：标题字高超 1/4 就抢了样张的戏。
+  - 绝不样张无多样性：样张必须展示变化，重复即废。
+  - 绝不花哨标题：样张已够丰富，标题必须克制。
+
+---
+
+## 风格速查（19 种：1~12 浅色，13~19 深色/高饱和）
 
 | 风格 | 一句话 | 标题字号占比 | 首选题材 |
 |---|---|---|---|
@@ -519,6 +871,80 @@ prompt 配方为中英双语模板：`{TITLE}` 为标题文字占位符（短标
 | tutorial-steps | 宣纸书法 1/3 镇场 + 底部赭石时间线，三步即上手 | ~1/3 | 教程/上手指南 |
 | minimal | 85% 留白 + 一处朱红点睛 + 宽字距深灰标题，张力拉满 | ~1/6（字重补） | 随笔/书评/轻观点 |
 | magazine | 暖灰影棚颗粒 + 人像氛围 + 砖红细线，标题压阵 | 1/4~1/3 | 访谈/人物特写/商业分析 |
+| chao-wan-3d | 毛绒/黏土 3D 潮玩角色 + 贴纸感标题 + 柔光散射，亲和爆款 | 冲击 1/3 | 爆款盘点/新手干货/合集清单 |
+| anime-desk | 2.5D Q版人物 + 工位桌搭故事道具，二次元平涂 | 冲击 1/3 | 行业科普/职业揭秘/个人IP |
+| diorama-book | 微缩立体书 + 发光路径 + 移轴光影，知识探险 | 1/4~1/3 | 学习路线/知识地图/万字长文 |
+| academic-print | 铜版雕刻线稿 + 牛皮纸 + 衬线宋体 + 朱红印章，学术正统 | 1/4~1/3 | 论文解读/原理解析/方法论 |
+| gallery-grid | 样张矩阵 Moodboard + 标题压阵，多样性展示 | 1/4（让路） | 模型评测/LoRA展示/生图发版 |
+| dark-saas | 深空黑 + 毛玻璃卡片 + 发光边框 + 工作流节点，极客 | 1/4~1/3 | 产品发布/工具测评/工作流 |
+| cinematic-flow | 冷蓝霓虹 + 粒子光带 + 超写实主体，电影级流程 | 1/4~1/3 | 自动化工作流/AI生产力 |
+| hard-core-type | 混凝土/岩石 3D 巨字 + 小人物反差，纪念碑式震撼 | 1/2+ | 硬核教程/架构指南 |
 | gan-huo | 深炭灰底 + 米白 1/3 巨标题 + 朱红印章点睛，一眼即干货 | ~1/3 | 干货清单/评测/盘点 |
 | brand-launch | 深海军蓝 + 荧光绿唯一强调，品牌大标题压阵 | 1/4~1/3 | 产品发布/版本更新 |
 | ip-fun | 暖橙舞台 + 深棕叠放巨标题 + 趣味 IP 记忆点 | 1/4~1/3 | 实战案例/数据战报 |
+---
+
+## 构图骨架（4 种 Layout Template）
+
+风格决定"长什么样"，骨架决定"怎么摆"。选风格后，再选一种骨架：
+
+### L1. 左文右图 / 黄金分割
+
+- **结构**：左侧 40%~50% 纯粹留白（或浅色纯色底），放标题 + 副标题 + 数据标签；
+  右侧 50%~60% 放高精度 3D 角色 / UI 展台 / 场景插画。
+- **优势**：文字在移动端滚动时先进入视野，不与背景打架，可读性极强。
+- **适用风格**：white-clean、chao-wan-3d、anime-desk、dark-saas、diorama-book。
+- **铁律**：左右交界处留一条"呼吸带"，文字绝不压到右侧主体上。
+
+### L2. 水平线性流动 / 公式流
+
+- **结构**：左（输入）→ 中（处理流/光效）→ 右（输出/宿主）。
+- **视觉中心**：一条极度顺畅的指引线（光带/箭头/路径），契合"把复杂变简单"的心理诉求。
+- **适用风格**：cinematic-flow、dark-saas、tutorial-steps。
+- **铁律**：流动方向必须从左向右（阅读习惯），逆流即乱。
+
+### L3. 沉浸式场景中嵌字
+
+- **结构**：文字本身成为场景中的物理存在——3D 雕塑招牌、仪器铭牌、书页立字。
+- **优势**：整体性最强，视觉冲击力最大。
+- **适用风格**：hard-core-type、diorama-book、academic-print。
+- **铁律**：字必须是场景的"原住民"（材质/光影与场景一致），不能是后期贴上去的。
+
+### L4. 报刊网格 / 剪报卡片
+
+- **结构**：左右或上下网格；左侧标题用正统版面规范，右侧用便签贴纸/撕纸边缘
+  突出硬核数据。
+- **适用风格**：gallery-grid、academic-print、paper-collage、news-flash。
+- **铁律**：网格线必须对齐，错一位即廉价。
+
+---
+
+## 文案排版密码（Typography Rules）
+
+从一线头部封面提炼的文本层级规范，所有风格通用：
+
+### 超级大字（Main Title）
+
+- 汉字字重极粗（方正大黑 / 汉仪润圆 / 造字工房力黑一类），字高冲击 1/3（hard-core-type 可到 1/2+）。
+- 手法三选一：高饱和撞色 / 微渐变 / 双层立体描边（白色描边 + 阴影 = 贴纸感）。
+- 英文/专有名词单独放大（如 `Skill`、`Jev`、`GitHub`、`Muse`），可做斜体。
+
+### 数字钩子（Quantifiable Hooks）
+
+- 每张封面几乎都有突出的大数字：`3天`、`26篇`、`从0到1`、`万字`、`283万字`。
+- **技巧**：数字字号放大到其余字的 1.5~2 倍，并换对比色（黑字中的亮橙数字）。
+- 数字必须真实有出处，绝不编造。
+
+### 底部微型标签条（Chips / Badges）
+
+- 格式：`⚡实测筛选 | 📄长文精选 | 📊全流程实操` 或 4 胶囊徽标。
+- **作用**：填充下部边角空白，增强专业交付感和信任背书。
+- 字号约为标题的 1/4，至多 4 个。
+
+### 文案提炼公式（风格转译器）
+
+用户输入通常很简单（如"写了一篇 DeepSeek 部署的万字教程"），技能自动完成：
+
+1. **提炼短标题 + 核心数字**：→ "DeepSeek 部署实测 / 万字"
+2. **推荐风格**：极客硬核 → dark-saas / hard-core-type；新手向 → chao-wan-3d / anime-desk
+3. **注入安全区**：所有文字与关键主体避开左右各 10% 边缘

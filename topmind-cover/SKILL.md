@@ -1,7 +1,7 @@
 ---
 name: topmind-cover
 version: 0.3.1
-description: "文章封面配图生成：X 长文与公众号共用。震撼、醒目、主题突出；平台尺寸规范、11 种风格模板、命名落盘、成图检查全流程覆盖。Use when 文章封面、封面图、头图、题图、cover。Do NOT use for 正文插图、PPT/报告封面。"
+description: "文章封面配图生成：X 长文与公众号共用。震撼、醒目、主题突出；平台尺寸规范、19 种风格模板、4 种构图骨架、文案排版密码、命名落盘、成图检查全流程覆盖。Use when 文章封面、封面图、头图、题图、cover。Do NOT use for 正文插图、PPT/报告封面。"
 action_category: write
 triggers:
   - 封面
@@ -36,7 +36,7 @@ updated: 2026-09-29
 
 ## 风格索引（浅色优先：1~8 浅色，9~11 深色/高饱和）
 
-风格总览图见 `assets/examples/overview.png`（11 宫格：3 行 × 4 列，离线可看）。
+风格总览图见 `assets/examples/overview.png`（离线可看）。
 
 | 风格 | 首选题材 |
 |------|----------|
@@ -48,11 +48,20 @@ updated: 2026-09-29
 | 教程步骤 `tutorial-steps` | 教程、上手指南、分步实操 |
 | 极简留白 `minimal` | 随笔、书评、轻观点 |
 | 杂志编辑 `magazine` | 深度访谈、人物特写、商业分析 |
+| 3D萌系潮玩 `chao-wan-3d` | 爆款盘点、新手干货、合集清单 |
+| 日系动漫 `anime-desk` | 行业科普、职业揭秘、个人IP |
+| 微缩立体书 `diorama-book` | 学习路线、知识地图、万字长文 |
+| 学院版画 `academic-print` | 论文解读、原理解析、方法论 |
+| 样张矩阵 `gallery-grid` | 模型评测、LoRA展示、生图发版 |
+| 暗色SaaS `dark-saas` | 产品发布、工具测评、开发者工作流 |
+| 电影科技流 `cinematic-flow` | 自动化工作流、AI生产力 |
+| 硬核立体字 `hard-core-type` | 硬核教程、架构指南、从入门到精通 |
 | 爆款干货 `gan-huo` | 干货清单、评测、盘点、实测筛选 |
 | 品牌发布 `brand-launch` | 产品发布、版本更新、官方白皮书 |
 | IP 趣味 `ip-fun` | 实战案例、数据战报、复盘、连载 |
 
 适用场景细则、配色故事、prompt 配方见 `references/cover-styles.md`；单风格大图 `assets/examples/<style>.png`。
+构图骨架（4 种）与文案排版密码见 `references/cover-styles.md` 末尾章节。
 
 > 示例图为原创演示：只学设计原则，不临摹第三方版式（详见 `references/cover-styles.md` 顶部"原创铁律"）。
 
@@ -83,7 +92,11 @@ updated: 2026-09-29
 ## 工作流
 
 0. **意图判断**（必做）：先过上方"意图判断 → 直出 / 讨论"决策流；意图明确→直接生成，模糊→三问以内确认。
-   **选风格（三步，必做）**：① 按题材从 `references/cover-styles.md` 选 1 种（11 选 1，浅色优先）→ ② 看 `assets/examples/<style>.png` 确认视觉语言 → ③ 看该风格章节的标题写法规范，心里有标题雏形。
+   **风格转译器**（用户输入简单时自动触发）：提炼短标题 + 核心数字（如"DeepSeek 部署实测 / 万字"）→
+   按题材推荐风格（极客硬核 → `dark-saas` / `hard-core-type`；新手向 → `chao-wan-3d` / `anime-desk`；
+   宏大体系 → `diorama-book`；严肃研究 → `academic-print`）→ 注入 10% 安全区约束。
+   **选风格（三步，必做）**：① 按题材从 `references/cover-styles.md` 选 1 种（19 选 1，浅色优先）→ ② 看 `assets/examples/<style>.png` 确认视觉语言 → ③ 看该风格章节的标题写法规范，心里有标题雏形。
+   **选骨架**：从 `cover-styles.md` 的 4 种构图骨架选 1 种（L1 左文右图 / L2 公式流 / L3 场景嵌字 / L4 报刊网格）。
 1. **标题提炼**（先定文案，不画图）：用所选风格在 `cover-styles.md` 对应章节的标题写法规范提炼标题（一般 ≤10 字）；不满意就重写，满意再进下一步。
    - 坏："关于 Manus 2.0 的一些思考与体验"（长、没钩子）→ 好："Manus 2.0 实测"（短、有断言）
 2. **构图简报**（一句话 brief，组 prompt 前先写）：主题 + 受众 + 情绪 + 视觉隐喻 + 配色方向。
