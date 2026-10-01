@@ -6,12 +6,12 @@ One topic, one chart, then stop. Data-driven short posts: rankings, paper TL;DRs
 product launches — one X post or short thread, ~300–800 words on WeChat,
 one-click-copy HTML for both.
 
-- Version: **v0.2.0** (same tag as `@topmindspace/tms-skills@0.7.0`)
+- Version: **v0.2.0** (same tag as `@topmindspace/topmind-writing-skills@0.7.0`)
 
 ## Install
 
 ```bash
-npx @topmindspace/tms-skills install topmind-briefs
+npx @topmindspace/topmind-writing-skills install topmind-briefs
 ```
 
 ## Usage
@@ -30,11 +30,12 @@ for the full workflow.
 
 ## Content types
 
-- Data rankings / paper explainers / product launches / benchmarks
+- Data rankings / ranking alerts / paper explainers / mechanism explainers
+  (four types calibrated against real posts, see SKILL.md)
 - Operating rules: draft only, never auto-post; every number needs a source;
   vendor numbers labeled as vendor claims; no rewriting others' work
 
 ## When NOT to use
 
 X long-form → `topmind-x-article`; WeChat long-form → `topmind-wechat-post`;
-personal short posts → `topmind-x-posts`.
+personal short posts → `topmind-x-posts` (planned, not released).

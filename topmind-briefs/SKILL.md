@@ -7,7 +7,7 @@ description: >-
   Use when 写短文、发快讯、数据榜单、
   论文一句话解读、新品速递、brief、快讯。Do NOT use for X 长文
   （→ topmind-x-article）、公众号长文（→ topmind-wechat-post）、
-  个人向短帖（→ topmind-x-posts）。
+  个人向短帖（→ topmind-x-posts，规划中未发布）。
 action_category: write
 triggers:
   - 写短文
@@ -24,21 +24,21 @@ triggers_cn:
   - 发个快讯
 author: TopMindSpace
 license: MIT
-homepage: https://github.com/topmindspace/tms-skills#readme
+homepage: https://github.com/topmindspace/topmind-writing-skills#readme
 updated: 2026-10-01
 ---
 
 # topmind-briefs · 干货短文（公众号 + X）
 
-一件事，一张图，讲完就停。跟 `topmind-x-posts` 的区别：那是个人向短帖
-（第一人称、暴论、真诚）；这是**干货向短文**（数据、榜单、论文、新品，
-第三方客观口吻）。
+一件事，一张图，讲完就停。跟 `topmind-x-posts`（规划中，未发布）的区别：
+那是个人向短帖（第一人称、暴论、真诚）；这是**干货向短文**（数据、榜单、
+论文、新品，第三方客观口吻）。
 
 ## 何时不用
 
 - X 长文（数千字深度稿）→ `topmind-x-article`
 - 公众号长文 → `topmind-wechat-post`
-- 个人向短帖（第一人称、观点、段子）→ `topmind-x-posts`
+- 个人向短帖（第一人称、观点、段子）→ `topmind-x-posts`（规划中，未发布）
 - 需要多张配图、复杂排版的稿件（本技能只配 1 张核心图）
 
 ## 语言铁律
@@ -79,7 +79,7 @@ updated: 2026-10-01
 | 数据榜单型 | @ArtificialAnlys | 判断句开头 → 基准一句话 → 最扎眼数字 → 双图（解决率+成本） |
 | 榜单速报型 | @arena | "Big news:"+排名+分数 → 性价比 → 细分展开 → 纵向对比 → 榜单实拍 |
 | 论文解读型 | @RulinShao | 加粗判断 → "Introducing X"+3 bullets → 论文原图 |
-| 机制讲解型 | @akshay_pachaar | 痛点一句话 → →分步机制 → "To summarise:"三行 → 流程图/视频 |
+| 机制讲解型 | @akshay_pachaar | 痛点一句话 → 分步机制 → "To summarise:"三行 → 流程图/视频 |
 
 ## 配图铁律
 
