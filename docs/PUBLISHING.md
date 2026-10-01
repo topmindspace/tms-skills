@@ -13,7 +13,7 @@
 - 仓库：<https://github.com/topmindspace/topmind-writing-skills>
 
 当前线：安装器 **0.7.0** · 技能 topmind-cover **0.3.0** · topmind-wechat-post **0.2.0** · topmind-x-article **0.4.0** · topmind-briefs **0.2.0**（整仓同 tag 发版；见 CHANGELOG）。
-演示技能已独立为 `topmind-presentation`（仓库 `tms-presentation-skills`），不在本仓发布线内。
+演示技能已独立为 `topmind-presentation`（仓库 `topmind-presentation`），不在本仓发布线内。
 
 
 ## npm 2.x 弃用说明（仓库重置）

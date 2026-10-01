@@ -9,10 +9,7 @@
 
 **TopMindSpace 写作技能合集** —— 公众号文章、X 长文、干货短文、封面配图：四个技能，一个仓库。
 
-> 正式商务演示技能已独立出去：[`topmind-presentation`](https://github.com/topmindspace/tms-presentation-skills)（仓库 `tms-presentation-skills`）。
-> ```bash
-> npx @topmindspace/tms-presentation-skills install topmind-presentation
-> ```
+> 正式商务演示技能已独立出去：[`topmind-presentation`](https://github.com/topmindspace/topmind-presentation)（仓库 `topmind-presentation`，仓库即技能，clone 后复制根目录到技能目录即可）。
 
 ### topmind-wechat-post · 公众号创作
 

@@ -11,10 +11,7 @@
 
 **TopMindSpace writing-skills collection** — WeChat articles, X long-form posts, short-form briefs, cover art: four skills, one repo.
 
-> The formal business presentation skill now lives on its own: [`topmind-presentation`](https://github.com/topmindspace/tms-presentation-skills) (repo `tms-presentation-skills`).
-> ```bash
-> npx @topmindspace/tms-presentation-skills install topmind-presentation
-> ```
+> The formal business presentation skill now lives on its own: [`topmind-presentation`](https://github.com/topmindspace/topmind-presentation) (repo `topmind-presentation`; the repo is the skill — clone and copy the root into your skills directory).
 
 ### topmind-wechat-post · WeChat article authoring
 
