@@ -66,7 +66,23 @@ function readSkillMeta(skillId) {
   const text = fs.readFileSync(skillMd, 'utf8');
   const m = text.match(/^---\r?\n([\s\S]*?)\r?\n---/);
   if (!m) return { id: skillId, description: '' };
-  const desc = (m[1].match(/^description:\s*"(.*)"\s*$/m) || m[1].match(/^description:\s*(.+)\s*$/m) || [])[1] || '';
+  const fm = m[1];
+  let desc = '';
+  // 块标量：description: >- / > / | / |- 后跟缩进行
+  const block = fm.match(/^description:\s*[>|][-+]?\s*$/m);
+  if (block) {
+    const lines = [];
+    // slice 起点是 description 行尾，split 后首元素恒为空，直接丢掉
+    const rest = fm.slice(block.index + block[0].length).split(/\r?\n/).slice(1);
+    for (const ln of rest) {
+      if (/^[ \t]+\S/.test(ln)) lines.push(ln.trim()); // 缩进的内容行
+      else break; // 空行或顶格行 → 块结束
+    }
+    const folded = /^description:\s*>/.test(block[0]);
+    desc = folded ? lines.join(' ') : lines.join('\n');
+  } else {
+    desc = ((fm.match(/^description:\s*"(.*)"\s*$/m) || fm.match(/^description:\s*(.+)\s*$/m) || [])[1] || '');
+  }
   return { id: skillId, description: String(desc).slice(0, 120) };
 }
 
