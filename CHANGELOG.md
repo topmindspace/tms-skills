@@ -1,3 +1,13 @@
+## [0.7.4] - 2026-10-01
+
+> 根包 0.7.3 → **0.7.4**（patch）；技能：topmind-cover 0.3.1 → **0.3.2**（patch）。
+>
+> - cover 技能 11 → **19 种风格**：新增 chao-wan-3d / hard-core-type / dark-saas /
+>   anime-desk / diorama-book / cinematic-flow / academic-print / gallery-grid
+>  （完整配方 + 示例图）。
+> - 新增 4 种构图骨架 + 文案排版密码章节；SKILL.md 加入风格转译器，安全区 5%→10%。
+> - 两仓 cover 按新技能重生成（writing: chao-wan-3d / presentation: dark-saas）。
+
 ## [0.7.3] - 2026-10-01
 
 > 根包 0.7.2 → **0.7.3**（patch）。white-clean 示例图按震撼升级包重生成

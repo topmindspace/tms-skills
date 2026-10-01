@@ -4,7 +4,7 @@
 
 A reusable skill for generating cover art for X long-form posts and WeChat articles. Goal: **striking, eye-catching, theme-focused**.
 
-- Version: **v0.3.1** (same tag as `@topmindspace/topmind-writing-skills@0.7.2`)
+- Version: **v0.3.2** (same tag as `@topmindspace/topmind-writing-skills@0.7.4`)
 
 ## Style gallery
 
