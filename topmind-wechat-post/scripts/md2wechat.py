@@ -884,8 +884,7 @@ def render_figure(src, caption, theme, alt=""):
         cap = ('<p style="font-size:13px;color:%s;text-align:center;'
                'margin:9px 0 %s;line-height:1.6;">%s</p>'
                % (theme["text_light"], theme["para_gap"], render_inline(caption)))
-    border = ("border:1px solid %s;" % theme["img_border"]
-              if theme.get("img_border") else "")
+    border = ""  # MD3 优雅：图片无边框，只保留圆角
     altattr = ' alt="%s"' % esc(alt) if alt else ""
     # 图片一律 max-width:100%，绝不用 width:100%：正文容器约 677px，
     # width:100% 会把 400px 的小截图强行拉满变糊，竖图更糟。
