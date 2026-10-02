@@ -1,3 +1,10 @@
+## [0.8.7] - 2026-10-02
+
+> 根包 0.8.6 → **0.8.7**（patch）；技能：topmind-briefs 0.2.4 → **0.2.5**、
+> topmind-x-article 0.4.5 → **0.4.6**、topmind-wechat-post 0.2.8 → **0.2.9**（patch）。
+>
+> - 全仓：writing-principles.md 第五节新增"很老"→"可以追溯很早之前"（用户亲口改稿）。
+
 ## [0.8.6] - 2026-10-02
 
 > 根包 0.8.5 → **0.8.6**（patch）；技能：topmind-x-article 0.4.4 → **0.4.5**（patch）。
