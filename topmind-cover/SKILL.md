@@ -1,6 +1,6 @@
 ---
 name: topmind-cover
-version: 0.4.0
+version: 0.4.1
 description: "文章封面配图生成：X 长文与公众号共用。震撼、醒目、主题突出；平台尺寸规范、22 种风格模板、4 种构图骨架、文案排版密码、命名落盘、成图检查全流程覆盖。Use when 文章封面、封面图、头图、题图、cover。Do NOT use for 正文插图、PPT/报告封面。"
 action_category: write
 triggers:
@@ -98,8 +98,9 @@ updated: 2026-09-29
 0. **意图判断**（必做）：先过上方"意图判断 → 直出 / 讨论"决策流；意图明确→直接生成，模糊→三问以内确认。
    **风格转译器**（用户输入简单时自动触发）：提炼短标题 + 核心数字（如"DeepSeek 部署实测 / 万字"）→
    按题材推荐风格（极客硬核 → `dark-saas` / `hard-core-type`；新手向 → `chao-wan-3d` / `anime-desk`；
-   宏大体系 → `diorama-book`；严肃研究 → `academic-print`）→ 注入 10% 安全区约束。
-   **选风格（三步，必做）**：① 按题材从 `references/cover-styles.md` 选 1 种（19 选 1，浅色优先）→ ② 看 `assets/examples/<style>.png` 确认视觉语言 → ③ 看该风格章节的标题写法规范，心里有标题雏形。
+   宏大体系 → `diorama-book`；严肃研究 → `academic-print`；
+   清新震撼 → `white-clean`（纯白底 + 超大标题 + 撞色关键词 + 场景插图））→ 注入 10% 安全区约束。
+   **选风格（三步，必做）**：① 按题材从 `references/cover-styles.md` 选 1 种（22 选 1，浅色优先）→ ② 看 `assets/examples/<style>.png` 确认视觉语言 → ③ 看该风格章节的标题写法规范，心里有标题雏形。
    **选骨架**：从 `cover-styles.md` 的 4 种构图骨架选 1 种（L1 左文右图 / L2 公式流 / L3 场景嵌字 / L4 报刊网格）。
 1. **标题提炼**（先定文案，不画图）：用所选风格在 `cover-styles.md` 对应章节的标题写法规范提炼标题（一般 ≤10 字）；不满意就重写，满意再进下一步。
    - 坏："关于 Manus 2.0 的一些思考与体验"（长、没钩子）→ 好："Manus 2.0 实测"（短、有断言）

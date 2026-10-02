@@ -1,3 +1,21 @@
+## [0.8.3] - 2026-10-02
+
+> 根包 0.8.2 → **0.8.3**（patch）；技能：topmind-wechat-post 0.2.5 → **0.2.6**、
+> topmind-x-article 0.4.2 → **0.4.3**、topmind-cover 0.4.0 → **0.4.1**（均为 patch）。
+>
+> - wechat-post：`references/writing-principles.md` 新增第五节"措辞偏好"
+>   （2026-10-02 用户亲手改稿确立：不用噱头式导语/"一句话"伪简洁/绝对化断言/
+>   "我的判断"/"全文的题眼"/"同一份报告"/"坑"字/看不懂的梗；断言留余地、
+>   简洁不取巧、评论腔删掉）；SKILL.md 实战沉淀追加 v2 措辞整改、PIL 结尾
+>   总结插图做法、topmind-cover 封面流程
+> - x-article：SKILL.md 新增"文本派生铁律"（`X长文.md` 由 `公众号稿.md` 去
+>   frontmatter 派生，标题原样保留不重复加序号；曾出现"一、一、"重号 bug）
+> - cover：风格转译器新增"清新震撼 → `white-clean`"映射；修正"19 选 1"→"22 选 1"
+> - 文档卫生：根 README 技能一览表版本号全部对齐（wechat-post 0.2.0→0.2.6、
+>   x-article 0.4.0→0.4.3、cover 0.3.4→0.4.1 且"11 风格"→"22 种风格"、
+>   briefs 0.2.1→0.2.3、安装器 0.7.0→0.8.3）；各技能 README 中英文版版本号对齐；
+>   `docs/PUBLISHING.md` 当前线更新
+
 ## [0.8.2] - 2026-10-02
 
 > 根包 0.8.1 → **0.8.2**（patch）；技能：topmind-wechat-post 0.2.4 → **0.2.5**（patch）。

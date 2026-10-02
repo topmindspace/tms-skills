@@ -1,6 +1,6 @@
 ---
 name: topmind-x-article
-version: 0.4.2
+version: 0.4.3
 description: "X 长文（Article）一键发布：Markdown 原稿 → 可直接复制的 X长文.html（富文本一键复制+配图内嵌）/ X发布稿.txt + 封面图 + 发布清单。沉淀自实战。Use when X 长文、发 X 文章、X article、长文发 X。Do NOT use for 短推文（→ topmind-x）、公众号（→ topmind-wechat-post）。"
 action_category: write
 triggers:
@@ -120,6 +120,12 @@ updated: 2026-09-29
 
 - `topmind-x`：280 字短推文发布（xurl 只覆盖短推文，不发长文）。
 - `topmind-capture`：「只想存档不发布」时的收录路由。
+
+## 实战沉淀（2026-10-02 插件化/RSI 项目）
+
+- **文本派生铁律**：`X长文.md` 由 `公众号稿.md` 去 YAML frontmatter 派生，`##` 标题原样保留。
+  源稿标题已带序号（如"一、"），**不重复加序号**——曾出现"一、一、"重号 bug。
+  派生后 `md2x-html.py --images-from 公众号稿.md` + `md2x.py` 重建，保持三件套同步。
 
 ## 实战沉淀（2026-10-01 九月全景项目）
 
