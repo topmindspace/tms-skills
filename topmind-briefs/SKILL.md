@@ -1,6 +1,6 @@
 ---
 name: topmind-briefs
-version: 0.2.2
+version: 0.2.3
 description: >-
   干货短文发布：公众号 + X 双平台，一件事讲透。X 一帖或短 thread，
   公众号约 300–800 字；1 张核心图（榜单/基准/截图/表格），不废话。

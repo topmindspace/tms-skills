@@ -668,7 +668,7 @@ def render_heading(level, text, theme, index=None):
         # number / bar：都走左竖条；number 额外带 01/02 编号
         return ('<h2 style="font-size:18px;font-weight:700;color:%s;'
                 'margin:34px 0 16px;padding-left:11px;line-height:1.5;'
-                'border-left:4px solid %s;">%s%s</h2>'
+                'border-bottom:2px solid %s;padding-bottom:8px;">%s%s</h2>'
                 % (theme["text_strong"], accent, num, t))
 
     if level == 3:
@@ -721,7 +721,7 @@ def render_quote(lines, theme):
     # 用 <section> 而非 <blockquote>：公众号对 blockquote 有原生「引用」样式，
     # 可能覆盖我们设置的颜色与边框。section + border-left 样式完全自控。
     return ('<section style="margin:0 0 %s;padding:14px 16px;'
-            'background:%s;border-left:3px solid %s;border-radius:%s;'
+            'background:%s;border-top:2px solid %s;border-radius:%s;'
             'color:%s;font-size:15px;">%s</section>'
             % (theme["para_gap"], theme["surface"], theme["accent"],
                theme["radius"], theme["text"], "".join(parts)))
@@ -856,7 +856,7 @@ def render_table_cards(head, body, theme):
                    theme["text_strong"], render_inline(row[k])))
         cards.append(
             '<section style="margin:0 0 12px;padding:13px 15px;background:%s;'
-            'border-left:3px solid %s;border-radius:%s;">'
+            'border-top:2px solid %s;border-radius:%s;">'
             '<p style="margin:0 0 9px;font-size:15px;font-weight:600;color:%s;'
             'line-height:1.5;word-break:break-word;">%s</p>%s</section>'
             % (theme["surface"], theme["accent"], theme["radius"],
@@ -1062,7 +1062,7 @@ def handle_mermaid(code, out_dir, diagrams, theme, render):
     note = ("［此处为流程图 %02d，公众号不支持 mermaid。请渲染 diagrams/%s 为图片后手动插入］"
             % (idx, os.path.basename(mmd)))
     return ('<section style="margin:0 0 %s;padding:14px 16px;'
-            'background:%s;border-left:3px solid %s;color:%s;'
+            'background:%s;border-top:2px solid %s;color:%s;'
             'font-size:14px;line-height:1.7;border-radius:%s;">%s</section>'
             % (theme["para_gap"], theme["surface"], theme["accent"],
                theme["text_muted"], theme["radius"], esc(note)))
@@ -1335,7 +1335,7 @@ def render_toc(titles, theme):
         more = ('<p style="margin:9px 0 0;font-size:12.5px;color:%s;">'
                 '……共 %d 节</p>' % (theme["text_light"], len(titles)))
     return ('<section style="margin:0 0 26px;padding:15px 17px;background:%s;'
-            'border-left:3px solid %s;border-radius:%s;">'
+            'border-top:2px solid %s;border-radius:%s;">'
             '<p style="margin:0 0 10px;font-size:12.5px;font-weight:600;'
             'color:%s;letter-spacing:1px;">本文看点</p>%s%s</section>'
             % (theme["surface"], theme["accent"], theme["radius"],
