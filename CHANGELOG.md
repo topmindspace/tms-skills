@@ -1,3 +1,14 @@
+## [0.8.2] - 2026-10-02
+
+> 根包 0.8.1 → **0.8.2**（patch）；技能：topmind-wechat-post 0.2.4 → **0.2.5**（patch）。
+>
+> - wechat-post：修 0.8.1 去衬条时遗留的 `%` 格式化参数错误（signature/toc/table_cards
+>   三处多传 `theme["accent"]`，导致任何构建直接 TypeError 崩溃）；去衬条收尾：
+>   callout 去左侧色条、金句去上下横线、mermaid 占位去顶条，全套 MD3 tonal 卡片
+>   （无衬条，背景色调 + 大圆角区分层级）；标准表格表头去网格线，改 2px 蓝色底部分隔；
+>   宽表转卡片标题改蓝色强调。
+> - 全仓 writing-principles.md：卡片样式规则更新为"不用任何衬条"，表格浅色 + 蓝色强调。
+
 ## [0.8.1] - 2026-10-02
 
 > 根包 0.8.0 → **0.8.1**（patch）；技能：topmind-wechat-post 0.2.3 → **0.2.4**（patch）。
