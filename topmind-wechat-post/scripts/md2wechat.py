@@ -719,7 +719,8 @@ def render_quote(lines, theme):
                      'word-break:break-word;">%s</p>'
                      % (gap, theme["align"] or "left", x))
     # 用 <section> 而非 <blockquote>：公众号对 blockquote 有原生「引用」样式，
-    # 可能覆盖我们设置的颜色与边框。section + border-left 样式完全自控。
+    # 可能覆盖我们设置的颜色与边框。section 样式完全自控。
+    # MD3：无衬条（无 border-left/border-top），纯背景色调 + 大圆角区分层级。
     return ('<section style="margin:0 0 %s;padding:14px 16px;'
             'background:%s;border-radius:%s;'
             'color:%s;font-size:15px;">%s</section>'
@@ -815,11 +816,13 @@ def render_table(rows, theme):
         return render_table_cards(rows[0], rows[1:], theme)
 
     head = rows[0]
+    # MD3 浅色表：表头浅蓝底 + 蓝色文字，无网格线；
+    # 表头用一条蓝色底部分隔线强调，行与行之间用浅色底部分隔线。
     hcells = "".join(
-        '<th style="background:%s;border:1px solid %s;padding:10px 12px;'
+        '<th style="background:%s;border-bottom:2px solid %s;padding:10px 12px;'
         'text-align:left;font-weight:600;color:%s;font-size:14px;'
         'line-height:1.55;word-break:break-word;">%s</th>'
-        % (theme["accent_soft"], theme["border"], theme["accent"],
+        % (theme["accent_soft"], theme["accent"], theme["accent"],
            render_inline(c))
         for c in head
     )
@@ -859,8 +862,8 @@ def render_table_cards(head, body, theme):
             'border-radius:%s;">'
             '<p style="margin:0 0 9px;font-size:15px;font-weight:600;color:%s;'
             'line-height:1.5;word-break:break-word;">%s</p>%s</section>'
-            % (theme["surface"], theme["accent"], theme["radius"],
-               theme["text_strong"], title, "".join(metas)))
+            % (theme["surface"], theme["radius"],
+               theme["accent"], title, "".join(metas)))
     return ('<section style="margin:0 0 %s;">%s</section>'
             % (theme["para_gap"], "".join(cards)))
 
@@ -918,14 +921,16 @@ def render_container(kind, label, inner_lines, theme):
     text = "\n".join(inner_lines)
 
     if kind == "pull":
-        # 金句块用 <section> 不用 <div>（div 会被公众号整段吞掉）
-        return ('<section style="margin:28px 0;padding:18px 10px;'
-                'border-top:1px solid %s;border-bottom:1px solid %s;">'
+        # 金句块用 <section> 不用 <div>（div 会被公众号整段吞掉）。
+        # MD3：无上下衬线，tonal 卡片（surface_container 比正文卡片深一阶）承载。
+        return ('<section style="margin:28px 0;padding:20px 18px;'
+                'background:%s;border-radius:%s;">'
                 '<p style="margin:0;font-size:17px;line-height:1.85;color:%s;'
                 'text-align:center;font-weight:600;letter-spacing:0.5px;'
                 'word-break:break-word;">%s</p></section>'
-                % (theme["border"], theme["border"], theme["text_strong"],
-                   render_inline(text.strip())))
+                % (theme.get("surface_container", theme["surface"]),
+                   theme["radius"],
+                   theme["text_strong"], render_inline(text.strip())))
 
     if kind == "dialogue":
         rows = []
@@ -989,9 +994,11 @@ def render_container(kind, label, inner_lines, theme):
         buf.append(line.strip())
     if buf:
         body.append(render_paragraph(" ".join(buf), theme, tight=True))
+    # MD3  tonal 卡片：无衬条，靠背景色调 + 大圆角区分层级；
+    # 种类用标签文字颜色区分（note 蓝 / tip 绿 / warn 橙 / danger 红）。
     return ('<section style="margin:0 0 %s;padding:14px 16px;background:%s;'
-            'border-left:3px solid %s;border-radius:%s;">%s%s</section>'
-            % (theme["para_gap"], theme["surface"], color, theme["radius"],
+            'border-radius:%s;">%s%s</section>'
+            % (theme["para_gap"], theme["surface"], theme["radius"],
                label_html, "".join(body)))
 
 
@@ -1062,9 +1069,9 @@ def handle_mermaid(code, out_dir, diagrams, theme, render):
     note = ("［此处为流程图 %02d，公众号不支持 mermaid。请渲染 diagrams/%s 为图片后手动插入］"
             % (idx, os.path.basename(mmd)))
     return ('<section style="margin:0 0 %s;padding:14px 16px;'
-            'background:%s;border-top:2px solid %s;color:%s;'
+            'background:%s;color:%s;'
             'font-size:14px;line-height:1.7;border-radius:%s;">%s</section>'
-            % (theme["para_gap"], theme["surface"], theme["accent"],
+            % (theme["para_gap"], theme["surface"],
                theme["text_muted"], theme["radius"], esc(note)))
 
 
@@ -1338,7 +1345,7 @@ def render_toc(titles, theme):
             'border-radius:%s;">'
             '<p style="margin:0 0 10px;font-size:12.5px;font-weight:600;'
             'color:%s;letter-spacing:1px;">本文看点</p>%s%s</section>'
-            % (theme["surface"], theme["accent"], theme["radius"],
+            % (theme["surface"], theme["radius"],
                theme["accent"], rows, more))
 
 
@@ -1351,7 +1358,7 @@ def render_signature(theme, author="", bio=""):
             'word-break:break-word;">如果你觉得今天这篇有收获，欢迎'
             '<span style="font-weight:600;color:%s;">点赞、在看、转发</span>'
             '三连，我们下篇见。</p></section>'
-            % (theme["surface"], theme["accent"], theme["radius"],
+            % (theme["surface"], theme["radius"],
                theme["text"], theme["accent"]))
 
 
