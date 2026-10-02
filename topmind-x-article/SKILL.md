@@ -1,6 +1,6 @@
 ---
 name: topmind-x-article
-version: 0.4.4
+version: 0.4.5
 description: "X 长文（Article）一键发布：Markdown 原稿 → 可直接复制的 X长文.html（富文本一键复制+配图内嵌）/ X发布稿.txt + 封面图 + 发布清单。沉淀自实战。Use when X 长文、发 X 文章、X article、长文发 X。Do NOT use for 短推文（→ topmind-x）、公众号（→ topmind-wechat-post）。"
 action_category: write
 triggers:
@@ -104,7 +104,12 @@ updated: 2026-09-29
   X 原生代码块（Insert → Code → 粘贴 → 删原块，每块约 10 秒）：这是 X 平台唯一可靠的
   读者侧一键复制链路（原生代码块带 native copy button，已实测确认）
 - X 编辑器对剪贴板 data-URI 图片的处理不稳定：**文本格式一键复制可靠，
-  图片按"能带入则带入，带不入则按编号下载上传"处理**，不要承诺用户图片 100% 一键带图
+  图片按"能带入则带入，带不入则手动补"处理**，不要承诺用户图片 100% 一键带图
+- **图片手动补位（2026-10-02 新增）**：每张图下有「复制图片」按钮，
+  把 PNG 以 `image/png` 写进剪贴板，X 编辑器支持直接粘贴图片
+  （X 认图片粘贴，不认 data-URI 随文粘贴）。流程：点「复制图片」→
+  去 X 编辑器对应位置 Ctrl/Cmd+V。失败时回退到「下载图片」再上传。
+  封面同理有「复制封面图」按钮
 
 ## When NOT to use
 

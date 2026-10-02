@@ -140,6 +140,19 @@ function dlImg(btn){
   document.body.appendChild(a); a.click(); a.remove();
   toast('开始下载 '+(btn.getAttribute('data-fname')||'图片'));
 }
+/* 复制图片：把 PNG 以 image/png 写进剪贴板，X 编辑器支持直接粘贴图片（不认 data-URI 随文粘贴）。
+   流程：点某张图下的「复制图片」→ 去 X 编辑器对应位置 Ctrl/Cmd+V。 */
+async function copyImg(btn){
+  var fig=btn.closest('figure');
+  var img=fig ? fig.querySelector('img') : document.querySelector('#coverbox img');
+  if(!img){ toast('找不到图片'); return; }
+  try{
+    var res=await fetch(img.src);
+    var blob=await res.blob();
+    await navigator.clipboard.write([new ClipboardItem({'image/png': blob})]);
+    toast('图片已复制，去 X 编辑器对应位置粘贴');
+  }catch(e){ toast('复制失败，改用「下载图片」按钮'); }
+}
 /* lightbox：点击图片放大看原图。刻意不拦截右键，放大后可右键另存 / 直接截图。 */
 function openLightbox(img){
   var lb=document.getElementById('lightbox');
@@ -188,7 +201,7 @@ HTML_TMPL = """<!DOCTYPE html>
 <div class="toolbar">
   <span class="steps">1. 标题填入 X 标题栏 → 2. 一键复制全文 → 3. 粘贴到 X 正文</span>
   <button class="btn primary" onclick="copyArticle()">一键复制全文</button>
-  <span class="hint">图片随粘贴带入则直接用；没带入就按 [图N] 下载上传。封面始终单独上传。点击图片可放大查看原图。</span>
+  <span class="hint">图片随粘贴带入则直接用；没带入就点每张图下的「复制图片」到 X 对应位置粘贴（或「下载图片」后上传）。封面始终单独上传。点击图片可放大查看原图。</span>
 </div>
 <article class="article" id="article">
 @@BODY@@
@@ -345,7 +358,8 @@ def md_to_html(md_text, images, cover):
                     'onclick="openLightbox(this)">'
                     '<figcaption><span class="cap">[图%d]</span>'
                     '<button class="btn" data-fname="%s" '
-                    'onclick="dlImg(this)">下载图片</button></figcaption></figure>'
+                    'onclick="dlImg(this)">下载图片</button>'
+                    '<button class="btn" onclick="copyImg(this)">复制图片</button></figcaption></figure>'
                     % (uri, n, html.escape(fname, quote=True), n,
                        html.escape(fname, quote=True))
                 )
@@ -424,7 +438,8 @@ def md_to_html(md_text, images, cover):
             '<div>封面图预览（1500×600 · 5:2）。X 文章有独立封面上传入口，'
             '请单独上传，不要随正文粘贴。<br>'
             '<button class="btn" data-fname="%s" '
-            'onclick="dlImg(this)">下载封面图</button></div></div>'
+            'onclick="dlImg(this)">下载封面图</button>'
+            '<button class="btn" onclick="copyImg(this)">复制封面图</button></div></div>'
         ) % (cover_uri, COVER_FNAME, COVER_FNAME)
     return cover_html + "\n" + body
 
