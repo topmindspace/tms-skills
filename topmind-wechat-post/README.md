@@ -4,7 +4,7 @@
 
 公众号文章全生命周期：交付包、审校改写、质量三关、状态同步、微信内联排版与发布清单。
 
-- 版本：**v0.2.1**（与 `@topmindspace/topmind-writing-skills@0.8.1` 同 tag）
+- 版本：**v0.2.5**（与 `@topmindspace/topmind-writing-skills@0.8.2` 同 tag）
 
 ## 安装
 
