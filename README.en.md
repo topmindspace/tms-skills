@@ -78,7 +78,7 @@ Installer [`@topmindspace/topmind-writing-skills`](https://www.npmjs.com/package
 npx @topmindspace/topmind-writing-skills list
 npx @topmindspace/topmind-writing-skills install topmind-briefs
 npx @topmindspace/topmind-writing-skills install topmind-briefs --to ./.claude/skills
-npx @topmindspace/topmind-writing-skills@0.8.3 install topmind-briefs   # pin
+npx @topmindspace/topmind-writing-skills@0.8.4 install topmind-briefs   # pin
 npx @topmindspace/topmind-writing-skills uninstall topmind-briefs --to ./.claude/skills
 ```
 

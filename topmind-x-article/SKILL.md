@@ -1,6 +1,6 @@
 ---
 name: topmind-x-article
-version: 0.4.3
+version: 0.4.4
 description: "X 长文（Article）一键发布：Markdown 原稿 → 可直接复制的 X长文.html（富文本一键复制+配图内嵌）/ X发布稿.txt + 封面图 + 发布清单。沉淀自实战。Use when X 长文、发 X 文章、X article、长文发 X。Do NOT use for 短推文（→ topmind-x）、公众号（→ topmind-wechat-post）。"
 action_category: write
 triggers:
