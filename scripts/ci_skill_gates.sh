@@ -40,6 +40,10 @@ run_one() {
     npm install --omit=dev
   fi
 
+  # 清理测试运行产生的 __pycache__，避免 package 检查误报
+  find . -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
+  find . -name "*.pyc" -delete 2>/dev/null || true
+
   "$PY" scripts/package_skill.py --check
   "$PY" scripts/audit_styles.py
   "$PY" scripts/audit_docs.py
