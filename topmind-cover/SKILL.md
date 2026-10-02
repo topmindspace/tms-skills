@@ -1,7 +1,7 @@
 ---
 name: topmind-cover
-version: 0.3.7
-description: "文章封面配图生成：X 长文与公众号共用。震撼、醒目、主题突出；平台尺寸规范、19 种风格模板、4 种构图骨架、文案排版密码、命名落盘、成图检查全流程覆盖。Use when 文章封面、封面图、头图、题图、cover。Do NOT use for 正文插图、PPT/报告封面。"
+version: 0.4.0
+description: "文章封面配图生成：X 长文与公众号共用。震撼、醒目、主题突出；平台尺寸规范、22 种风格模板、4 种构图骨架、文案排版密码、命名落盘、成图检查全流程覆盖。Use when 文章封面、封面图、头图、题图、cover。Do NOT use for 正文插图、PPT/报告封面。"
 action_category: write
 triggers:
   - 封面
@@ -32,7 +32,7 @@ updated: 2026-09-29
 震撼标题 + MD3 设计基础，优雅美观，不是靠丑陋扭曲来醒目。
 
 **设计哲学**：MD3 配色角色 + 字体层级 + 形状语言为底，
-再叠加 19 种风格的设计手法。详见 [`references/md3-foundation.md`](references/md3-foundation.md)。
+再叠加 22 种风格的设计手法。详见 [`references/md3-foundation.md`](references/md3-foundation.md)。
 
 ```
 标题提炼 → MD3 配色/字体定调 → 构图简报 → 风格模板 → 生成 → 冲击力自检 → 裁剪双尺寸 → 落盘命名

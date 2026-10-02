@@ -4,7 +4,7 @@
 
 A reusable skill for generating cover art for X long-form posts and WeChat articles. Goal: **striking, eye-catching, theme-focused**.
 
-- Version: **v0.3.5** (same tag as `@topmindspace/topmind-writing-skills@0.7.9`)
+- Version: **v0.3.5** (same tag as `@topmindspace/topmind-writing-skills@0.8.0`)
 
 ## Style gallery
 
@@ -12,7 +12,7 @@ A reusable skill for generating cover art for X long-form posts and WeChat artic
   <img src="https://github.com/topmindspace/topmind-writing-skills/raw/main/topmind-cover/assets/examples/overview.png" alt="topmind-cover · 19 cover-style overview" width="960" />
 </p>
 
-19 styles (clean white / background blur / paper collage / news flash / giant-type manifesto / tutorial steps / minimalist / editorial magazine / 3D cute-toy / anime desk / diorama book / academic print / gallery grid / dark SaaS / cinematic flow / hardcore 3D type / viral dry-goods / brand launch / fun IP, light-first ordering): use cases, palette stories, abstract design principles, and Chinese+English prompt recipes in [`references/cover-styles.md`](./references/cover-styles.md); full-size per-style shots in [`assets/examples/`](./assets/examples/). Prefer writing your own prompts and sending them straight to an image model (bypassing the skill)? See [`references/cover-prompts.md`](./references/cover-prompts.md) — a copy-paste prompt compendium plus cross-platform viral-cover research.
+22 styles (clean white / background blur / paper collage / news flash / giant-type manifesto / tutorial steps / minimalist / editorial magazine / 3D cute-toy / anime desk / diorama book / academic print / gallery grid / dark SaaS / cinematic flow / hardcore 3D type / viral dry-goods / brand launch / fun IP, light-first ordering): use cases, palette stories, abstract design principles, and Chinese+English prompt recipes in [`references/cover-styles.md`](./references/cover-styles.md); full-size per-style shots in [`assets/examples/`](./assets/examples/). Prefer writing your own prompts and sending them straight to an image model (bypassing the skill)? See [`references/cover-prompts.md`](./references/cover-prompts.md) — a copy-paste prompt compendium plus cross-platform viral-cover research.
 
 ## Install
 
@@ -22,7 +22,7 @@ npx @topmindspace/topmind-writing-skills install topmind-cover
 
 ## Usage
 
-0. **Pick a style**: choose 1 of 19 styles from `references/cover-styles.md` by topic (light-first) → check the example image to confirm the visual language.
+0. **Pick a style**: choose 1 of 22 styles from `references/cover-styles.md` by topic (light-first) → check the example image to confirm the visual language.
 1. **Refine the title**: lock the title copy first (usually ≤ 10 chars) using that style's title rules; rewrite until it lands — no drawing yet.
 2. **Composition brief**: one-sentence brief (theme / audience / mood / visual metaphor / palette direction) before composing the prompt.
 3. Input: article title + 3 theme keywords + platform (x / wechat / both, default both).

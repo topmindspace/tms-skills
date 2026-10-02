@@ -78,7 +78,7 @@ npx @topmindspace/topmind-writing-skills install topmind-cover
 npx @topmindspace/topmind-writing-skills list
 npx @topmindspace/topmind-writing-skills install topmind-briefs
 npx @topmindspace/topmind-writing-skills install topmind-briefs --to ./.claude/skills
-npx @topmindspace/topmind-writing-skills@0.7.9 install topmind-briefs   # 钉版本
+npx @topmindspace/topmind-writing-skills@0.8.0 install topmind-briefs   # 钉版本
 npx @topmindspace/topmind-writing-skills uninstall topmind-briefs --to ./.claude/skills
 ```
 
