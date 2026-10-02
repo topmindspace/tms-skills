@@ -721,9 +721,9 @@ def render_quote(lines, theme):
     # 用 <section> 而非 <blockquote>：公众号对 blockquote 有原生「引用」样式，
     # 可能覆盖我们设置的颜色与边框。section + border-left 样式完全自控。
     return ('<section style="margin:0 0 %s;padding:14px 16px;'
-            'background:%s;border-top:2px solid %s;border-radius:%s;'
+            'background:%s;border-radius:%s;'
             'color:%s;font-size:15px;">%s</section>'
-            % (theme["para_gap"], theme["surface"], theme["accent"],
+            % (theme["para_gap"], theme["surface"],
                theme["radius"], theme["text"], "".join(parts)))
 
 
@@ -816,16 +816,16 @@ def render_table(rows, theme):
 
     head = rows[0]
     hcells = "".join(
-        '<th style="background:%s;border:1px solid %s;padding:9px 10px;'
+        '<th style="background:%s;border:1px solid %s;padding:10px 12px;'
         'text-align:left;font-weight:600;color:%s;font-size:14px;'
         'line-height:1.55;word-break:break-word;">%s</th>'
-        % (theme["surface"], theme["border"], theme["text_strong"],
+        % (theme["accent_soft"], theme["border"], theme["accent"],
            render_inline(c))
         for c in head
     )
     body_rows = "".join(
         "<tr>%s</tr>" % "".join(
-            '<td style="border:1px solid %s;padding:9px 10px;color:%s;'
+            '<td style="border-bottom:1px solid %s;padding:10px 12px;color:%s;'
             'font-size:14px;line-height:1.6;word-break:break-word;">%s</td>'
             % (theme["border"], theme["text"], render_inline(c))
             for c in row
@@ -856,7 +856,7 @@ def render_table_cards(head, body, theme):
                    theme["text_strong"], render_inline(row[k])))
         cards.append(
             '<section style="margin:0 0 12px;padding:13px 15px;background:%s;'
-            'border-top:2px solid %s;border-radius:%s;">'
+            'border-radius:%s;">'
             '<p style="margin:0 0 9px;font-size:15px;font-weight:600;color:%s;'
             'line-height:1.5;word-break:break-word;">%s</p>%s</section>'
             % (theme["surface"], theme["accent"], theme["radius"],
@@ -1335,7 +1335,7 @@ def render_toc(titles, theme):
         more = ('<p style="margin:9px 0 0;font-size:12.5px;color:%s;">'
                 '……共 %d 节</p>' % (theme["text_light"], len(titles)))
     return ('<section style="margin:0 0 26px;padding:15px 17px;background:%s;'
-            'border-top:2px solid %s;border-radius:%s;">'
+            'border-radius:%s;">'
             '<p style="margin:0 0 10px;font-size:12.5px;font-weight:600;'
             'color:%s;letter-spacing:1px;">本文看点</p>%s%s</section>'
             % (theme["surface"], theme["accent"], theme["radius"],
@@ -1346,7 +1346,7 @@ def render_signature(theme, author="", bio=""):
     """尾部签名区。2026-10-01 起默认不再渲染"自我介绍"行（我是{{作者名}}，{{一句话简介}}）；
     只保留三连 CTA。author/bio 参数保留仅为兼容旧调用，不再使用。"""
     return ('<section style="margin:34px 0 0;padding:16px 18px;background:%s;'
-            'border-top:2px solid %s;border-radius:%s;">'
+            'border-radius:%s;">'
             '<p style="margin:0;font-size:14px;line-height:1.75;color:%s;'
             'word-break:break-word;">如果你觉得今天这篇有收获，欢迎'
             '<span style="font-weight:600;color:%s;">点赞、在看、转发</span>'
