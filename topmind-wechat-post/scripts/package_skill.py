@@ -43,7 +43,6 @@ INCLUDE = ["SKILL.md", "README.md", "package.json", "assets/", "references/", "s
 EXCLUDE_RES = [
     re.compile(r"(^|/)scripts/_"),
     re.compile(r"(^|/)\.env($|\.)"),
-    re.compile(r"(^|/)__pycache__(/|$)"),
     re.compile(r"(^|/)node_modules(/|$)"),
     re.compile(r"(^|/)dist(/|$)"),
 ]
