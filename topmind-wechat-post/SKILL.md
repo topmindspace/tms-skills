@@ -251,6 +251,18 @@ python3 scripts/md2wechat.py \
 - **frontmatter 状态诚实**：`status: 定稿` 必须等事实/逻辑/文字三关全过才写，
   构建流水线跑通不等于定稿；`word_count` 用脚本实算，不手填。
 
+## 实战沉淀（2026-10-02 插件化/RSI 项目）
+
+- **论文图直取 arXiv 源包**：`curl https://arxiv.org/e-print/<id>` 拿源包（可能是 tar.gz
+  也可能是单 PDF），`tar tzf` 列出 `figures/*.pdf`，`pdftoppm -png -r 150` 转 PNG；
+  单 PDF 用 `pdfimages` 提取嵌入图，矢量图则按 caption 定位页码后 `pdftoppm -f N -l N`
+  整页渲染再裁剪。每张图打开验一眼再用。
+- **配图丰富度是主动挖掘出来的**：不要等"有图就用"。论文图、工具截图、评测原图、
+  关键帖子截图都要主动找；X 帖子截图走浏览器任务（DevTools 整页截图下载）。
+  有信息量的段落尽量配图，装饰图一律不要。
+- **"概要+列表"**：信息密集的节先给一句概要再列表展开；标题问号表示判断未定，
+  正文用证据把问号讲透（见 `references/writing-principles.md` 二、5 / 二点五、3 / 一、5）。
+
 ## 发文铁律
 
 精炼客观 + 素材优先 + 研究深度，见 [references/writing-principles.md](references/writing-principles.md)。触发本技能时默认执行。
