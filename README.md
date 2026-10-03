@@ -7,7 +7,7 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/topmindspace/topmind-writing-skills/ci.yml?style=flat-square&label=CI)](https://github.com/topmindspace/topmind-writing-skills/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
 
-**TopMindSpace 写作技能合集** —— 公众号文章、X 长文、干货短文、封面配图：四个技能，一个仓库。
+**TopMindSpace 写作技能合集** —— 公众号文章、X 长文、干货短文、引流段子、封面配图：五个技能，一个仓库。
 
 <p align="center">
   <img src="docs/assets/writing-cover.png" alt="topmind-writing-skills · 写作技能合集" width="960" />
@@ -39,6 +39,14 @@ npx @topmindspace/topmind-writing-skills install topmind-x-article
 npx @topmindspace/topmind-writing-skills install topmind-briefs
 ```
 
+### topmind-viral-posts · X 引流段子/爆款短篇
+
+基于 X 中文区真实爆款帖提炼的 6 大类型模板（干货忠告/互关求粉/自嘲幽默/互动提问/打卡日常/新人报到），短句分行、口语化、带互动钩子，**每帖配 1 张图**（美女/宠物/风景/奇幻/标语，走 topmind-cover 出图）。
+
+```bash
+npx @topmindspace/topmind-writing-skills install topmind-viral-posts
+```
+
 ### topmind-cover · 封面配图生成
 
 X 长文与公众号共用的封面图：震撼、醒目、主题突出。**选风格 → 看示例 → 按配方组 prompt** 三步出图，`crop-cover.py` 一键裁出双平台尺寸（X 1200×675、公众号 900×383）。19 种风格索引与配方见 [`references/cover-styles.md`](./topmind-cover/references/cover-styles.md)。
@@ -64,9 +72,10 @@ npx @topmindspace/topmind-writing-skills install topmind-cover
 | [`topmind-wechat-post`](./topmind-wechat-post/) | **0.2.6** | 公众号文章全生命周期：交付包、审校改写、质量三关、微信内联排版与发布清单 |
 | [`topmind-x-article`](./topmind-x-article/) | **0.4.3** | X 长文一键发布：Markdown 原稿 → 一键复制 HTML（含配图/提示词复制、图片点击放大）/ 纯文本兜底 + 封面图 + 发布清单 |
 | [`topmind-cover`](./topmind-cover/) | **0.4.1** | 文章封面配图（X / 公众号共用，X 主尺寸 1500×600 / 5:2）：震撼醒目主题突出；22 种风格封面风格库 + 26 张示例图（含 3 张 alt 样张） + 1 张风格总览图 |
-| [`topmind-briefs`](./topmind-briefs/) | **0.2.3** | 干货短文（公众号 + X 双平台）：一件事讲透，数据榜单/论文解读/新品速递；双版一键复制 HTML |
+| [`topmind-briefs`](./topmind-briefs/) | **0.2.6** | 干货短文（公众号 + X 双平台）：一件事讲透，数据榜单/论文解读/新品速递；双版一键复制 HTML |
+| [`topmind-viral-posts`](./topmind-viral-posts/) | **0.1.0** | X 引流段子/爆款短篇：6 大类型模板，短句分行口语化带互动钩子，每帖配 1 张图（美女/宠物/风景/奇幻/标语） |
 
-安装器 [`@topmindspace/topmind-writing-skills`](https://www.npmjs.com/package/@topmindspace/topmind-writing-skills) 为 **0.8.3**（整仓同 tag 发版）。
+安装器 [`@topmindspace/topmind-writing-skills`](https://www.npmjs.com/package/@topmindspace/topmind-writing-skills) 为 **0.8.10**（整仓同 tag 发版）。
 
 > SKILL.md frontmatter 除标准 `name`/`description` 外，本仓库扩展了 `action_category` / `triggers` / `triggers_cn` / `updated` 字段供安装器与路由使用。
 
@@ -96,6 +105,7 @@ npx github:topmindspace/topmind-writing-skills install topmind-briefs
 ```
 topmind-writing-skills/
 ├─ topmind-briefs/               # 技能（SKILL.md + assets + references + scripts）
+├─ topmind-viral-posts/          # 技能（X 引流段子/爆款短篇，每帖配图）
 ├─ topmind-cover/                # 技能
 ├─ topmind-wechat-post/          # 技能
 ├─ topmind-x-article/            # 技能
