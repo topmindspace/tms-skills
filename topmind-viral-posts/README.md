@@ -4,7 +4,7 @@
 
 短、真、钩子——3 秒看完，忍不住点赞/评论/关注。基于 X 中文区真实爆款帖提炼的 6 大类型模板，每帖配 1 张图。
 
-- 版本：**v0.1.0**（与 `@topmindspace/topmind-writing-skills@0.8.10` 同 tag）
+- 版本：**v0.2.0**（与 `@topmindspace/topmind-writing-skills@0.8.11` 同 tag）
 
 ## 安装
 
