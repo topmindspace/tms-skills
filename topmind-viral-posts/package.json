@@ -1,1 +1,13 @@
-{"author":"TopMindSpace","description":"X 引流段子/爆款短篇：6 大类型模板，短句分行口语化，每帖配 1 张图（美女/宠物/风景/奇幻/标语）。","license":"MIT","name":"topmind-viral-posts","private":true,"repository":{"directory":"topmind-viral-posts","type":"git","url":"git+https://github.com/topmindspace/topmind-writing-skills.git"},"version":"0.3.0"}
+{
+  "author": "TopMindSpace",
+  "description": "X 引流段子/爆款短篇：14 大类型模板，短句分行口语化，每帖配图（原图优先/生图兜底）。",
+  "license": "MIT",
+  "name": "topmind-viral-posts",
+  "private": true,
+  "repository": {
+    "directory": "topmind-viral-posts",
+    "type": "git",
+    "url": "git+https://github.com/topmindspace/topmind-writing-skills.git"
+  },
+  "version": "0.3.1"
+}
