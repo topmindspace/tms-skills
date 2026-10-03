@@ -4,7 +4,7 @@
 
 Short, real, hooked — read in 3 seconds, impossible not to like/comment/follow. 6 viral templates distilled from real high-engagement X posts in the Chinese community, each post paired with 1 image.
 
-- Version: **v0.2.2** (same tag as `@topmindspace/topmind-writing-skills@0.8.13`)
+- Version: **v0.2.3** (same tag as `@topmindspace/topmind-writing-skills@0.8.14`)
 
 ## Install
 
